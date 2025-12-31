@@ -57,6 +57,11 @@ class Doctor(db.Model):
     # Analytics
     profile_views = db.Column(db.Integer, default=0)
 
+    # Subscription and monetization
+    subscription_tier = db.Column(db.String(20), default='free')  # 'free', 'premium', 'featured'
+    subscription_expires_at = db.Column(db.DateTime, nullable=True)  # When paid subscription ends
+    trial_ends_at = db.Column(db.DateTime, nullable=True)  # When free trial ends (for future premium trial)
+
     # Relationships (backrefs created in City, Specialty models)
     ratings = db.relationship('Rating', backref='doctor', lazy=True)
     appointments = db.relationship('Appointment', backref='doctor', lazy=True)
@@ -184,8 +189,19 @@ class VerificationRequest(db.Model):
     __tablename__ = 'verification_requests'
 
     id = db.Column(db.Integer, primary_key=True)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=True)  # Nullable for new registrations
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    # Registration type
+    is_new_doctor = db.Column(db.Boolean, default=False)  # True if self-registration, False if claiming existing
+
+    # New doctor profile data (only for is_new_doctor=True)
+    proposed_name = db.Column(db.String(200), nullable=True)
+    proposed_specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=True)
+    proposed_city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=True)
+    proposed_education = db.Column(db.Text, nullable=True)
+    proposed_college = db.Column(db.Text, nullable=True)
+    proposed_experience = db.Column(db.Integer, nullable=True)
 
     # Contact verification
     nmc_number = db.Column(db.String(50))  # Nepal Medical Council registration
@@ -216,6 +232,8 @@ class VerificationRequest(db.Model):
 
     # Relationships
     practice_city = db.relationship('City', foreign_keys=[practice_city_id])
+    proposed_specialty = db.relationship('Specialty', foreign_keys=[proposed_specialty_id])
+    proposed_city = db.relationship('City', foreign_keys=[proposed_city_id])
     reviewer = db.relationship('User', foreign_keys=[reviewed_by])
 
     def __repr__(self):
