@@ -46,6 +46,13 @@ def upgrade_database():
                     """))
                     print("  ✓ Added trial_ends_at")
 
+                    # Add Stripe customer ID
+                    conn.execute(text("""
+                        ALTER TABLE doctors
+                        ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR(255)
+                    """))
+                    print("  ✓ Added stripe_customer_id")
+
                     # ===== VerificationRequest Model Updates =====
                     print("\nAdding self-registration fields to verification_requests table...")
 
