@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}{{ doctor.name }} - Doctor Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm doctor-profile-sidebar">
+            <div class="card-body text-center">
+                <img src="{{ doctor.photo_url if doctor.photo_url else 'https://picsum.photos/seed/doctor' + doctor.id|string + '/200/200.jpg' }}" class="rounded-circle mb-3" alt="{{ doctor.name }}" onerror="this.src='https://picsum.photos/seed/doctor{{ doctor.id }}/200/200.jpg'">
+                <h3 class="card-title">{{ doctor.name }}</h3>
+                {% if doctor.is_verified %}
+                <div class="mb-2">
+                    <span class="badge bg-success">Verified</span>
+                </div>
+                {% endif %}
+                <p class="card-text text-muted">{{ doctor.specialty.name }}</p>
+                <p class="card-text"><i class="fas fa-map-marker-alt me-2"></i>{{ doctor.city.name }}</p>
+                
+                <div class="mb-3">
+                    <div class="rating mb-2">
+                        {% set full_stars = avg_rating | int %}
+                        {% set has_half_star = (avg_rating - full_stars) >= 0.5 %}
+                        
+                        {% for i in range(full_stars) %}
+                        <i class="fas fa-star text-warning"></i>
+                        {% endfor %}
+                        
+                        {% if has_half_star %}
+                        <i class="fas fa-star-half-alt text-warning"></i>
+                        {% endif %}
+                        
+                        {% for i in range(5 - full_stars - (1 if has_half_star else 0)) %}
+                        <i class="far fa-star text-warning"></i>
+                        {% endfor %}
+                    </div>
+                    <span class="text-muted">{{ "%.1f"|format(avg_rating) }} out of 5 ({{ ratings | length }} reviews)</span>
+                </div>
+                
+                {% if 'user_id' in session %}
+                <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#ratingModal">
+                    <i class="fas fa-star me-2"></i>Rate This Doctor
+                </button>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You must be <a href="{{ url_for('login', next=request.url) }}" class="alert-link">logged in</a> to rate this doctor.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        {# Banner Ad - Hidden for MVP Launch #}
+        {# {% from 'partials/ad_display.html' import render_ad %}
+        {{ render_ad(banner_ad, 'mb-4') }} #}
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title mb-3">About</h4>
+                <p class="card-text">{{ doctor.description }}</p>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <h5>Experience</h5>
+                        <p class="card-text">{{ doctor.experience }} years</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h5>Education</h5>
+                        <p class="card-text">{{ doctor.education }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h5>College</h5>
+                        <p class="card-text">{{ doctor.college }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h5>Specialty</h5>
+                        <p class="card-text">{{ doctor.specialty.name }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Inline ad between About and Reviews - Hidden for MVP Launch #}
+        {# {{ render_ad(inline_ad, 'my-4') }} #}
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Patient Reviews</h4>
+                
+                {% if ratings %}
+                {% for rating in ratings %}
+                <div class="review mb-4 pb-3 border-bottom">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h6 class="mb-0">{{ rating.user_name }}</h6>
+                        <div>
+                            {% for i in range(rating.rating) %}
+                            <i class="fas fa-star text-warning"></i>
+                            {% endfor %}
+                            {% for i in range(5 - rating.rating) %}
+                            <i class="far fa-star text-warning"></i>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <p class="card-text">{{ rating.comment }}</p>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="card-text text-muted">No reviews yet. Be the first to review this doctor.</p>
+                {% endif %}
+                
+                {% if 'user_id' in session %}
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">
+                    <i class="fas fa-star me-2"></i>Rate This Doctor
+                </button>
+                {% else %}
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You must be <a href="{{ url_for('login', next=request.url) }}" class="alert-link">logged in</a> to rate a doctor.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rating Modal -->
+<div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ratingModalLabel">Rate This Doctor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('rate_doctor') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <input type="hidden" name="doctor_id" value="{{ doctor.id }}">
+                <input type="hidden" name="doctor_slug" value="{{ doctor.slug }}">
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Your Rating</label>
+                        <div class="star-rating" data-rating="0">
+                            <span class="star" data-value="1"><i class="far fa-star"></i></span>
+                            <span class="star" data-value="2"><i class="far fa-star"></i></span>
+                            <span class="star" data-value="3"><i class="far fa-star"></i></span>
+                            <span class="star" data-value="4"><i class="far fa-star"></i></span>
+                            <span class="star" data-value="5"><i class="far fa-star"></i></span>
+                        </div>
+                        <input type="hidden" id="rating-input" name="rating" value="0" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Your Review</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="Share your experience with this doctor..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star-rating .star');
+    const ratingInput = document.getElementById('rating-input');
+    const ratingForm = document.querySelector('#ratingModal form');
+    const initialRating = parseInt(document.querySelector('.star-rating').dataset.rating);
+
+    function setStars(rating) {
+        stars.forEach((star, index) => {
+            const starIcon = star.querySelector('i');
+            if (index < rating) {
+                starIcon.classList.remove('far');
+                starIcon.classList.add('fas', 'text-warning');
+            } else {
+                starIcon.classList.remove('fas', 'text-warning');
+                starIcon.classList.add('far');
+            }
+        });
+    }
+
+    if (initialRating > 0) {
+        setStars(initialRating);
+    }
+
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.dataset.value);
+            ratingInput.value = rating;
+            setStars(rating);
+        });
+
+        star.addEventListener('mouseenter', function() {
+            const rating = parseInt(this.dataset.value);
+            setStars(rating);
+        });
+    });
+
+    document.querySelector('.star-rating').addEventListener('mouseleave', function() {
+        setStars(parseInt(ratingInput.value));
+    });
+
+    if (ratingForm) {
+        ratingForm.addEventListener('submit', function(event) {
+            // Let the browser submit the form normally.
+            // The 'action' attribute on the form tag will handle the request.
+        });
+    }
+});
+</script>
+{% endblock %}

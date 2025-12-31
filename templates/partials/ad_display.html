@@ -1,0 +1,97 @@
+{#
+Reusable ad display macro
+Renders advertisements with different types: banner, native, text, adsense
+Includes click tracking and impression tracking
+#}
+
+{% macro render_ad(ad, position_class='') %}
+{% if ad %}
+<div class="ad-container {{ position_class }}" data-ad-id="{{ ad.id }}">
+    <p class="text-muted small mb-2 text-center">Advertisement</p>
+
+    {% if ad.ad_type == 'banner' %}
+        {# Banner/Image Ad #}
+        <a href="{{ url_for('ad_click', ad_id=ad.id) }}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="ad-link">
+            <img src="{{ ad.image_url }}"
+                 class="img-fluid"
+                 alt="{{ ad.alt_text or 'Advertisement' }}">
+        </a>
+
+    {% elif ad.ad_type == 'native' %}
+        {# Native Ad (custom HTML) #}
+        <div class="native-ad">
+            {{ ad.html_content | safe }}
+        </div>
+
+    {% elif ad.ad_type == 'text' %}
+        {# Text Ad #}
+        <div class="text-ad">
+            <a href="{{ url_for('ad_click', ad_id=ad.id) }}"
+               target="_blank"
+               rel="noopener noreferrer">
+                {{ ad.html_content | safe }}
+            </a>
+        </div>
+
+    {% elif ad.ad_type == 'adsense' %}
+        {# Google AdSense Ad #}
+        <div class="adsense-ad">
+            {#
+            AdSense code will be inserted here
+            Replace with actual AdSense ad unit code when configured
+            #}
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="{{ ad.html_content }}"
+                 data-ad-slot="{{ ad.link_url }}"
+                 data-ad-format="{{ ad.format }}"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+    {% endif %}
+
+    {# Impression Tracking #}
+    <script>
+    (function() {
+        // Track impression when ad is visible
+        var adContainer = document.querySelector('[data-ad-id="{{ ad.id }}"]');
+        if (adContainer) {
+            // Use Intersection Observer for better performance
+            if ('IntersectionObserver' in window) {
+                var observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            trackImpression();
+                            observer.disconnect();
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                observer.observe(adContainer);
+            } else {
+                // Fallback for older browsers
+                trackImpression();
+            }
+
+            function trackImpression() {
+                fetch('{{ url_for("ad_impression", ad_id=ad.id) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).catch(function(error) {
+                    console.error('Error tracking ad impression:', error);
+                });
+            }
+        }
+    })();
+    </script>
+</div>
+{% endif %}
+{% endmacro %}

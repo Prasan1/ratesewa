@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Find Doctors in Nepal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="search-container">
+            <h3 class="text-center">
+                <i class="fas fa-search me-2"></i>Find the Best Doctors in Nepal
+            </h3>
+            <p class="text-center text-muted mb-4">Search by city and specialty to find the right doctor for you</p>
+            <form id="filterForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="citySelect" class="form-label">
+                            <i class="fas fa-map-marker-alt me-2"></i>Select City
+                        </label>
+                        <select id="citySelect" class="form-select">
+                            <option value="">All Cities</option>
+                            {% for city in cities %}
+                            <option value="{{ city.id }}">{{ city.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="specialtySelect" class="form-label">
+                            <i class="fas fa-stethoscope me-2"></i>Select Specialty
+                        </label>
+                        <select id="specialtySelect" class="form-select">
+                            <option value="">All Specialties</option>
+                            {% for specialty in specialties %}
+                            <option value="{{ specialty.id }}">{{ specialty.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12 text-center">
+                        <button type="button" id="filterBtn" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-2"></i>Search Doctors
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-3">Doctor List</h2>
+                <div id="doctorList" class="row">
+                    <div class="col-12 text-center py-5">
+                        <p class="mt-2">Please use the search filters to find doctors</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Sidebar Ad - Hidden for MVP Launch #}
+    {# <div class="col-lg-3">
+        {% from 'partials/ad_display.html' import render_ad %}
+        {{ render_ad(sidebar_ad, 'sticky-top mb-4') }}
+    </div> #}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    loadDoctors();
+
+    $('#filterBtn').click(function() {
+        loadDoctors();
+    });
+        
+    $('#citySelect, #specialtySelect').change(function() {
+        loadDoctors();
+    });
+});
+    
+    function loadDoctors() {
+        const cityId = $('#citySelect').val();
+        const specialtyId = $('#specialtySelect').val();
+        
+        $('#doctorList').html('<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>');
+        
+        $.ajax({
+            url: '/doctors',
+            type: 'GET',
+            data: { city_id: cityId, specialty_id: specialtyId },
+            success: function(doctors) {
+                displayDoctors(doctors);
+            },
+            error: function() {
+                $('#doctorList').html('<div class="col-12"><div class="alert alert-danger">Error loading doctors.</div></div>');
+            }
+        });
+    }
+    
+    function displayDoctors(doctors) {
+        if (doctors.length === 0) {
+            $('#doctorList').html('<div class="col-12"><div class="alert alert-info">No doctors found.</div></div>');
+            return;
+        }
+        
+        let html = '';
+        doctors.forEach(doctor => {
+            const ratingCount = doctor.rating_count || 0;
+            const hasRatings = ratingCount > 0;
+            const avgRating = hasRatings ? parseFloat(doctor.avg_rating).toFixed(1) : 'Not rated';
+            const starHtml = generateStarRatingHtml(doctor.avg_rating, ratingCount);
+            const verifiedBadge = doctor.is_verified ? '<span class="badge bg-success ms-2">Verified</span>' : '';
+
+            html += `
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card doctor-card h-100 ${doctor.is_featured ? 'featured' : ''}">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="doctor-avatar me-3">
+                                    <img src="${doctor.photo_url || 'https://picsum.photos/seed/doctor' + doctor.id + '/80/80.jpg'}" class="rounded-circle" alt="${doctor.name}" onerror="this.src='https://picsum.photos/seed/doctor${doctor.id}/80/80.jpg'">
+                                </div>
+                                <div class="doctor-info flex-grow-1">
+                                    <h5 class="card-title mb-1">${doctor.name}${verifiedBadge}</h5>
+                                    <p class="card-text text-muted mb-1">${doctor.specialty_name}</p>
+                                    <p class="card-text text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>${doctor.city_name}</p>
+                                </div>
+                            </div>
+                            <div class="doctor-details">
+                                <p class="card-text small mb-1"><strong>Experience:</strong> ${doctor.experience} years</p>
+                                <p class="card-text small mb-1"><strong>Education:</strong> ${doctor.education}</p>
+                                <p class="card-text small mb-2"><strong>College:</strong> ${doctor.college}</p>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="rating me-2">
+                                        ${starHtml}
+                                    </div>
+                                    <span class="text-muted small">${hasRatings ? `${avgRating} (${ratingCount} reviews)` : 'Not rated yet'}</span>
+                                </div>
+                                <p class="card-text small text-muted">${doctor.description}</p>
+                            </div>
+                            <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                        </div>
+                    </div>
+            </div>
+        `;
+    });
+    
+    $('#doctorList').html(html);
+    }
+    
+    function generateStarRatingHtml(rating, ratingCount) {
+        if (!ratingCount) {
+            return '<span class="text-muted">Not rated yet</span>';
+        }
+        
+        let html = '';
+        const numericRating = parseFloat(rating);
+        const fullStars = Math.floor(numericRating);
+        const hasHalfStar = (numericRating - fullStars) >= 0.5;
+        
+        for (let i = 0; i < fullStars; i++) {
+            html += '<i class="fas fa-star text-warning"></i>';
+        }
+        
+        if (hasHalfStar) {
+            html += '<i class="fas fa-star-half-alt text-warning"></i>';
+        }
+        
+        const emptyStars = 5 - Math.ceil(numericRating);
+        for (let i = 0; i < emptyStars; i++) {
+            html += '<i class="far fa-star text-warning"></i>';
+        }
+        
+        return html;
+    }
+</script>
+{% endblock %}

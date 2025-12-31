@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Cities{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="mb-1">Manage Cities</h2>
+        <p class="text-muted mb-0">Maintain city options used across the directory.</p>
+    </div>
+    <a href="{{ url_for('admin_city_new') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add City
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for city in cities %}
+            <tr>
+                <td class="fw-semibold">{{ city.name }}</td>
+                <td class="text-muted">{{ city.description or '—' }}</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_city_edit', city_id=city.id) }}">Edit</a>
+                    <form method="post" action="{{ url_for('admin_city_delete', city_id=city.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this city?');">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" class="text-center text-muted py-4">No cities found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="mb-1">Manage Users</h2>
+        <p class="text-muted mb-0">Remove users who violate policies or spam.</p>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td class="fw-semibold">{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if user.is_admin %}
+                        <span class="badge bg-success">Admin</span>
+                    {% else %}
+                        <span class="badge bg-warning">User</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.is_active %}
+                        <span class="badge bg-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-danger">Inactive</span>
+                    {% endif %}
+                </td>
+                <td class="text-end">
+                    {% if session.get('user_id') != user.id %}
+                    <form method="post" action="{{ url_for('admin_user_status', user_id=user.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        {% if user.is_active %}
+                        <input type="hidden" name="action" value="deactivate"/>
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Deactivate this user?');">Deactivate</button>
+                        {% else %}
+                        <input type="hidden" name="action" value="activate"/>
+                        <button type="submit" class="btn btn-sm btn-outline-success">Reactivate</button>
+                        {% endif %}
+                    </form>
+                    {% else %}
+                    <span class="text-muted">Current session</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center text-muted py-4">No users found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

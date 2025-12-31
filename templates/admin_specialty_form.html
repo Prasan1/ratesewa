@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}{% if specialty %}Edit Specialty{% else %}Add Specialty{% endif %}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="mb-1">{% if specialty %}Edit Specialty{% else %}Add Specialty{% endif %}</h2>
+        <p class="text-muted mb-0">Specialties are used for filtering and profiles.</p>
+    </div>
+    <a href="{{ url_for('admin_specialties') }}" class="btn btn-outline-primary">Back to list</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Specialty name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ specialty.name if specialty else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3">{{ specialty.description if specialty else '' }}</textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">{% if specialty %}Save changes{% else %}Add specialty{% endif %}</button>
+                <a href="{{ url_for('admin_specialties') }}" class="btn btn-outline-primary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

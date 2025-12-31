@@ -1,0 +1,22 @@
+
+This is a doctor rating platform for developing nation like Nepal. 
+Registered user can comment and rate doctor they visit based on what they feel.
+The page is simple flask, jquery based page which has list of doctors and the 
+users can search doctors in their locality by usig a drop down selection and 
+selectiing city and specialist. They can see the pharmacy the doctor is 
+available for duty and contact information. In Nepal, small pharmacy can 
+schedule once or twice a week or once or twice a month or daily specialist 
+visit for few hours and take patient. That way both make money. 
+
+We need to think about how we monitize this: 
+I thought of putting add on the right side of the panel but 
+that will not be enough, I also thought about listing 
+featured profile for a doctors, there card appears as featured 
+when users serach for a doctor in that locality and the first appearance 
+would be their profile. 
+
+We need to style a little bit on the user profile who is logged in as this looks cheap as of now. 
+we also need a machanism so one user do not keep rating the doctors randomly based on how they feel
+instead of based on the service they provided to them.
+
+Let's start with this.  

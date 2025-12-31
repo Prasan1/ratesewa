@@ -1,0 +1,53 @@
+HOW TO REPLACE THE TEMPORARY LOGO WITH YOUR ACTUAL LOGO
+========================================================
+
+CURRENT STATUS:
+---------------
+✅ Temporary logo is showing (stethoscope + stars design)
+⏳ Waiting for your actual logo file
+
+QUICK STEPS TO ADD YOUR REAL LOGO:
+-----------------------------------
+
+1. Save your logo as PNG file (with transparent background)
+   - Recommended size: 300-400px wide
+   - Name it exactly: logo.png
+
+2. Copy to this folder:
+   static/img/logo.png
+
+   Full path:
+   /home/ppaudyal/Documents/drprofile/doctor_directory/static/img/logo.png
+
+3. Restart server:
+   ./run_dev.sh
+
+4. Refresh browser (Ctrl + Shift + R)
+
+5. Done! Your logo appears!
+
+WAYS TO COPY THE FILE:
+-----------------------
+
+Option A - Command line:
+$ cp ~/Downloads/logo.png static/img/logo.png
+
+Option B - File manager:
+1. Open file manager
+2. Navigate to: /home/ppaudyal/Documents/drprofile/doctor_directory/static/img/
+3. Paste your logo.png file there
+
+LOGO FILE MUST BE:
+------------------
+- Named exactly: logo.png (lowercase)
+- Format: PNG (transparent background recommended)
+- Location: static/img/logo.png
+
+CURRENT LOGO:
+-------------
+Right now you're seeing a temporary logo I created.
+It looks similar to your actual logo but simpler.
+
+Replace it with your professional logo for the best look!
+
+========================================================

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Appointments - Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title mb-4">
+                    <i class="fas fa-calendar-check me-2"></i>Manage Appointments
+                </h2>
+
+                {% if appointments %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Date & Time</th>
+                                <th>Status</th>
+                                <th>Rated</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appt in appointments %}
+                            <tr>
+                                <td>#{{ appt.id }}</td>
+                                <td>{{ appt.user.name }}</td>
+                                <td>{{ appt.doctor.name }}</td>
+                                <td>{{ appt.appointment_date.strftime('%b %d, %Y') }} {{ appt.appointment_time.strftime('%I:%M %p') }}</td>
+                                <td>
+                                    {% if appt.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% elif appt.status == 'confirmed' %}
+                                    <span class="badge bg-success">Confirmed</span>
+                                    {% elif appt.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if appt.is_rated %}
+                                    <i class="fas fa-check-circle text-success" title="Rated"></i>
+                                    {% else %}
+                                    <i class="fas fa-times-circle text-muted" title="Not rated"></i>
+                                    {% endif %}
+                                </td>
+                                <td>{{ appt.created_at.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    {% if appt.status == 'pending' %}
+                                    <a href="{{ url_for('confirm_appointment', appointment_id=appt.id) }}" class="btn btn-sm btn-success me-1">
+                                        <i class="fas fa-check"></i> Confirm
+                                    </a>
+                                    <a href="{{ url_for('cancel_appointment', appointment_id=appt.id) }}" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                    {% elif appt.status == 'confirmed' %}
+                                    <a href="{{ url_for('cancel_appointment', appointment_id=appt.id) }}" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No appointments found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
