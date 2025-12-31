@@ -150,27 +150,27 @@ $(document).ready(function() {
     
     function generateStarRatingHtml(rating, ratingCount) {
         if (!ratingCount) {
-            return '<span class="text-muted">Not rated yet</span>';
+            return '';  // Return empty, let the text show "Not rated yet"
         }
-        
+
         let html = '';
         const numericRating = parseFloat(rating);
         const fullStars = Math.floor(numericRating);
         const hasHalfStar = (numericRating - fullStars) >= 0.5;
-        
+
         for (let i = 0; i < fullStars; i++) {
             html += '<i class="fas fa-star text-warning"></i>';
         }
-        
+
         if (hasHalfStar) {
             html += '<i class="fas fa-star-half-alt text-warning"></i>';
         }
-        
+
         const emptyStars = 5 - Math.ceil(numericRating);
         for (let i = 0; i < emptyStars; i++) {
             html += '<i class="far fa-star text-warning"></i>';
         }
-        
+
         return html;
     }
 </script>

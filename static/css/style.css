@@ -123,16 +123,17 @@ a:hover {
 .doctor-card.featured::before {
     content: "FEATURED";
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 8px;
+    right: 8px;
     background: #f3ebd1;
     color: #6c5a1f;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.65rem;
     font-weight: 600;
-    letter-spacing: 0.4px;
-    box-shadow: 0 6px 12px rgba(108, 90, 31, 0.15);
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 4px rgba(108, 90, 31, 0.15);
+    z-index: 10;
 }
 
 /* Rating Stars */
