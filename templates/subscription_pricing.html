@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}Subscription Pricing - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Back Button -->
+            <div class="mb-3">
+                <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Promotional Banner -->
+            {% set promo = get_promotion_banner() %}
+            {% if promo %}
+            <div class="alert alert-success shadow-lg mb-4" style="background: linear-gradient(135deg, {{ promo.color }} 0%, #059669 100%); border: none;">
+                <div class="text-center text-white py-3">
+                    <h3 class="mb-2"><i class="fas fa-gift me-2"></i>{{ promo.message }}</h3>
+                    <p class="mb-0 h5">⏰ {{ promo.days_left }} days left - No credit card required!</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Page Header -->
+            <div class="text-center mb-5">
+                <h2 class="mb-3">Choose Your Plan</h2>
+                <p class="text-muted">
+                    {% if promo %}
+                    Get instant access to all premium features - completely FREE during our New Year promotion!
+                    {% else %}
+                    Upgrade your profile to reach more patients and grow your practice
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Current Tier Badge -->
+            {% if current_tier != 'free' %}
+            <div class="alert alert-info text-center mb-4">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>Your Current Plan:</strong> {{ current_tier_info.name }}
+                {% if doctor.subscription_expires_at %}
+                <span class="text-muted"> ({{ 'Expires' if not promo else 'Free until' }}: {{ doctor.subscription_expires_at.strftime('%b %d, %Y') }})</span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Pricing Cards -->
+            <div class="row g-4 mb-5">
+                {% for tier_key, tier in all_tiers.items() %}
+                <div class="col-md-4">
+                    <div class="card h-100 {% if tier_key == current_tier %}border-success border-3{% elif tier.get('highlight') %}border-primary border-2{% endif %} shadow">
+                        <!-- Card Header -->
+                        <div class="card-header text-center {% if tier_key == current_tier %}bg-success text-white{% elif tier_key == 'featured' %}bg-primary text-white{% elif tier_key == 'premium' %}bg-info text-white{% else %}bg-light{% endif %} py-3">
+                            <h4 class="mb-0">{{ tier.name }}</h4>
+                            {% if tier.get('highlight') %}
+                            <small class="badge bg-warning text-dark mt-2">{{ tier.highlight }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="card-body d-flex flex-column">
+                            <!-- Price -->
+                            <div class="text-center mb-4">
+                                {% if tier_key != 'free' %}
+                                    {% if promo %}
+                                    <div class="mb-2">
+                                        <h2 class="mb-0" style="color: #10b981;">FREE</h2>
+                                        <small class="text-muted">(for {{ promo.days_left }} days)</small>
+                                    </div>
+                                    <div class="text-decoration-line-through text-muted">
+                                        <small>Regular: ${{ tier.price_usd }}/month</small>
+                                    </div>
+                                    {% else %}
+                                    <h2 class="mb-1">${{ tier.price_usd }}<small class="text-muted">/month</small></h2>
+                                    <small class="text-muted">~NPR {{ tier.price_npr }}</small>
+                                    {% endif %}
+                                {% else %}
+                                <h2 class="mb-1">Free</h2>
+                                <small class="text-muted">Forever</small>
+                                {% endif %}
+                            </div>
+
+                            <!-- Features List -->
+                            <ul class="list-unstyled mb-4 flex-grow-1">
+                                {% for feature in tier.features %}
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>{{ feature }}
+                                </li>
+                                {% endfor %}
+
+                                {% if tier.get('locked_features') %}
+                                {% for locked in tier.locked_features %}
+                                <li class="mb-2 text-muted">
+                                    <i class="fas fa-lock me-2"></i><s>{{ locked }}</s>
+                                </li>
+                                {% endfor %}
+                                {% endif %}
+                            </ul>
+
+                            <!-- Action Button -->
+                            <div class="mt-auto">
+                                {% if tier_key == current_tier %}
+                                <button class="btn btn-success w-100" disabled>
+                                    <i class="fas fa-check-circle me-2"></i>Current Plan
+                                </button>
+                                {% elif tier_key == 'free' %}
+                                <button class="btn btn-outline-secondary w-100" disabled>
+                                    Default Plan
+                                </button>
+                                {% else %}
+                                <a href="{{ url_for('create_checkout_session', tier=tier_key) }}" class="btn btn-{% if tier_key == 'featured' %}primary{% else %}info{% endif %} w-100 btn-lg">
+                                    {% if promo %}
+                                    <i class="fas fa-gift me-2"></i>Get Free Access
+                                    {% else %}
+                                    <i class="fas fa-arrow-up me-2"></i>Upgrade Now
+                                    {% endif %}
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Features Comparison Table -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-list-check me-2"></i>Detailed Feature Comparison</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="40%">Feature</th>
+                                    <th class="text-center">Free</th>
+                                    <th class="text-center">Premium</th>
+                                    <th class="text-center">Featured</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Profile Listing</strong></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Verification Badge</strong></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Respond to Reviews</strong></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td><strong>Analytics Dashboard</strong></td>
+                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Contact Info Visible</strong></td>
+                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td><strong>Photo Gallery</strong></td>
+                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                    <td class="text-center">Up to 5</td>
+                                    <td class="text-center">Unlimited</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Display Hours</strong></td>
+                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td><strong>Featured Badge</strong></td>
+                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Top Search Results</strong></td>
+                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td><strong>Priority Placement</strong></td>
+                                    <td class="text-center">1x</td>
+                                    <td class="text-center">1.5x</td>
+                                    <td class="text-center">3x</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Frequently Asked Questions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="faqAccordion">
+                        {% if promo %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    What happens after the {{ promo.days_left }}-day promotion ends?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    After the promotion ends on {{ doctor.subscription_expires_at.strftime('%B %d, %Y') if doctor.subscription_expires_at else 'Feb 26, 2025' }}, you can choose to:
+                                    <ul>
+                                        <li>Continue with a paid subscription ($22-37/month) to keep premium features</li>
+                                        <li>Downgrade to the free tier (you'll keep all your data and reviews)</li>
+                                    </ul>
+                                    We'll send reminders before the promotion ends!
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Can I cancel anytime?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes! You can cancel your subscription anytime. {% if promo %}During the free promotion, there's nothing to cancel - just enjoy the features!{% else %}When you cancel, you'll keep access until the end of your billing period.{% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    What payment methods do you accept?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    {% if promo %}
+                                    During the promotional period, no payment is required! When payments start, we'll accept:
+                                    {% else %}
+                                    We accept:
+                                    {% endif %}
+                                    <ul>
+                                        <li>International credit/debit cards (Visa, Mastercard, Amex)</li>
+                                        <li>Digital wallets (coming soon: Khalti, eSewa)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-expand first FAQ during promo
+    {% if promo %}
+    const firstFaq = document.querySelector('#faq1');
+    if (firstFaq) {
+        new bootstrap.Collapse(firstFaq, { show: true });
+    }
+    {% endif %}
+});
+</script>
+{% endblock %}

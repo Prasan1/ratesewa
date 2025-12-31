@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Subscription Successful! - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center">
+            <div class="card shadow-lg border-0 mt-5">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h2 class="mb-3">Welcome to Premium!</h2>
+                    <p class="text-muted mb-4">
+                        Your subscription has been activated successfully. All premium features are now available on your profile!
+                    </p>
+
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                        </a>
+                        <a href="{{ url_for('doctor_analytics') }}" class="btn btn-outline-info">
+                            <i class="fas fa-chart-bar me-2"></i>View Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
