@@ -365,6 +365,11 @@ def privacy():
 def terms():
     return render_template('terms.html')
 
+@app.route('/pricing')
+def pricing():
+    """Pricing page for doctors - shows promotional offer"""
+    return render_template('pricing.html')
+
 # --- Doctor Verification Routes ---
 @app.route('/claim-profile', methods=['GET'])
 def claim_profile():
@@ -1216,6 +1221,32 @@ def admin_user_status(user_id):
         flash('User reactivated successfully.', 'success')
     else:
         flash('User deactivated successfully.', 'warning')
+    return redirect(url_for('admin_users'))
+
+@app.route('/admin/users/<int:user_id>/toggle-admin', methods=['POST'])
+@admin_required
+def admin_user_toggle_admin(user_id):
+    """Toggle admin status for a user"""
+    if session.get('user_id') == user_id:
+        flash('You cannot change your own admin status.', 'warning')
+        return redirect(url_for('admin_users'))
+
+    user = User.query.get_or_404(user_id)
+
+    # Toggle admin status
+    user.is_admin = not user.is_admin
+    if user.is_admin:
+        user.role = 'admin'
+    elif user.role == 'admin':
+        user.role = 'patient'  # Revert to patient if they're not a doctor
+
+    db.session.commit()
+
+    if user.is_admin:
+        flash(f'{user.name} ({user.email}) is now an admin!', 'success')
+    else:
+        flash(f'{user.name} ({user.email}) is no longer an admin.', 'info')
+
     return redirect(url_for('admin_users'))
 
 # --- Admin Route: Toggle Featured Status ---

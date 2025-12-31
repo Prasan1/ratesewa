@@ -1,0 +1,31 @@
+{# Promotional Banner for New Year 2026 Launch Offer #}
+<div class="alert alert-dismissible fade show mb-4 border-0 shadow-sm"
+     style="background: linear-gradient(135deg, #7B2CBF 0%, #9D4EDD 100%); border-radius: 12px;"
+     role="alert">
+    <div class="container-fluid">
+        <div class="row align-items-center py-2">
+            <div class="col-lg-8 text-white">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-none d-md-flex" style="font-size: 2.5rem;">
+                        🎉
+                    </div>
+                    <div>
+                        <h5 class="mb-1 fw-bold text-white">
+                            <span class="d-inline d-md-none">🎉</span> New Year 2026 Special Launch Offer!
+                        </h5>
+                        <p class="mb-0 small text-white-50">
+                            <strong class="text-white">100% FREE</strong> profile registration for all doctors until <strong class="text-white">April 25, 2026</strong>.
+                            No hidden charges. Claim your profile today!
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <a href="{{ url_for('claim_profile') }}" class="btn btn-light btn-lg fw-semibold">
+                    <i class="fas fa-rocket me-2"></i>Get Started Free
+                </a>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>

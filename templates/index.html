@@ -3,6 +3,9 @@
 {% block title %}Find Doctors in Nepal{% endblock %}
 
 {% block content %}
+<!-- Promotional Banner -->
+{% include 'partials/promo_banner.html' %}
+
 <div class="row">
     <div class="col-12">
         <!-- Doctor Claim Profile CTA -->
@@ -13,11 +16,11 @@
                         <div class="row align-items-center">
                             <div class="col-lg-8">
                                 <div class="d-inline-flex align-items-center gap-2 bg-white border rounded-pill px-3 py-1 mb-3">
-                                    <i class="fas fa-user-md text-primary"></i>
-                                    <small class="fw-semibold text-primary">For Verified Providers</small>
+                                    <span class="badge bg-success">100% FREE</span>
+                                    <small class="fw-semibold text-primary">Launch Offer - Until April 25, 2026</small>
                                 </div>
                                 <h4 class="mb-2 text-dark">Are You a Doctor? Claim Your Profile</h4>
-                                <p class="mb-3 text-muted">Manage your presence, respond to reviews, and earn a verified badge that builds patient trust.</p>
+                                <p class="mb-3 text-muted">Manage your presence, respond to reviews, and earn a verified badge that builds patient trust. All features included at no cost during our launch period.</p>
                                 <div class="d-flex flex-wrap gap-3">
                                     <div class="d-flex align-items-center gap-2">
                                         <i class="fas fa-shield-check text-success"></i>
@@ -27,19 +30,23 @@
                                         <i class="fas fa-message text-primary"></i>
                                         <span class="text-muted">Reply to reviews</span>
                                     </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fas fa-chart-line text-success"></i>
+                                        <span class="text-muted">Profile analytics</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
                                 <div class="d-grid gap-2">
-                                    <a href="{{ url_for('claim_profile') }}" class="btn btn-primary">
+                                    <a href="{{ url_for('claim_profile') }}" class="btn btn-primary btn-lg">
                                         <i class="fas fa-check-circle me-2"></i>Claim Your Profile
                                     </a>
-                                    <a href="{{ url_for('doctor_self_register') }}" class="btn btn-outline-primary">
+                                    <a href="{{ url_for('doctor_self_register') }}" class="btn btn-outline-primary btn-lg">
                                         <i class="fas fa-user-plus me-2"></i>Register as New Doctor
                                     </a>
                                 </div>
-                                <div class="mt-3 small text-muted">
-                                    Review in 2-3 business days • Free to join
+                                <div class="mt-3 small text-success fw-semibold">
+                                    <i class="fas fa-gift me-1"></i>100% Free • Review in 2-3 business days
                                 </div>
                             </div>
                         </div>

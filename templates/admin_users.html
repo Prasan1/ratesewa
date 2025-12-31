@@ -42,18 +42,35 @@
                 </td>
                 <td class="text-end">
                     {% if session.get('user_id') != user.id %}
-                    <form method="post" action="{{ url_for('admin_user_status', user_id=user.id) }}" class="d-inline">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        {% if user.is_active %}
-                        <input type="hidden" name="action" value="deactivate"/>
-                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Deactivate this user?');">Deactivate</button>
-                        {% else %}
-                        <input type="hidden" name="action" value="activate"/>
-                        <button type="submit" class="btn btn-sm btn-outline-success">Reactivate</button>
-                        {% endif %}
-                    </form>
+                    <div class="btn-group" role="group">
+                        <!-- Toggle Admin Status -->
+                        <form method="post" action="{{ url_for('admin_user_toggle_admin', user_id=user.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            {% if user.is_admin %}
+                            <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('Remove admin privileges from {{ user.name }}?');">
+                                <i class="fas fa-shield-alt"></i> Remove Admin
+                            </button>
+                            {% else %}
+                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-shield-alt"></i> Make Admin
+                            </button>
+                            {% endif %}
+                        </form>
+
+                        <!-- Activate/Deactivate -->
+                        <form method="post" action="{{ url_for('admin_user_status', user_id=user.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            {% if user.is_active %}
+                            <input type="hidden" name="action" value="deactivate"/>
+                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Deactivate this user?');">Deactivate</button>
+                            {% else %}
+                            <input type="hidden" name="action" value="activate"/>
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Reactivate</button>
+                            {% endif %}
+                        </form>
+                    </div>
                     {% else %}
-                    <span class="text-muted">Current session</span>
+                    <span class="text-muted small"><i class="fas fa-user-shield me-1"></i>You (Current Admin)</span>
                     {% endif %}
                 </td>
             </tr>

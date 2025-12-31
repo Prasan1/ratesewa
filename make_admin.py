@@ -44,7 +44,8 @@ if __name__ == "__main__":
     # Make these users admin
     admin_emails = [
         'opaltechlab@gmail.com',
-        'paul.paudyal@gmail.com'
+        'paul.paudyal@gmail.com',
+        'iti.gtm02@gmail.com'
     ]
 
     print("\nMaking users admin...\n")
