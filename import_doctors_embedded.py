@@ -83,6 +83,37 @@ def doctor_exists(name):
     existing = Doctor.query.filter(Doctor.name.ilike(name)).first()
     return existing is not None
 
+def create_missing_specialties():
+    """Create any missing specialties needed for import"""
+    specialties_needed = [
+        "Dermatology",
+        "Pediatric Dermatology",
+        "Neurosurgery",
+        "Pulmonology",
+        "Critical Care",
+        "Cardiology",
+        "Psychiatry",
+        "Anesthesiology",
+        "Obstetrics & Gynecology",
+    ]
+
+    created_count = 0
+    for specialty_name in specialties_needed:
+        existing = Specialty.query.filter(Specialty.name.ilike(specialty_name)).first()
+        if not existing:
+            specialty = Specialty(name=specialty_name)
+            db.session.add(specialty)
+            print(f"  ✅ Created specialty: {specialty_name}")
+            created_count += 1
+        else:
+            print(f"  ⏭️  Specialty exists: {specialty_name}")
+
+    if created_count > 0:
+        db.session.commit()
+        print(f"\n✅ Created {created_count} new specialties\n")
+    else:
+        print("\n✅ All required specialties already exist\n")
+
 def import_doctors():
     """Import all embedded doctor data"""
 
@@ -90,6 +121,15 @@ def import_doctors():
         print("=" * 70)
         print("Importing Doctors from Embedded Data")
         print("=" * 70)
+
+        # Step 1: Create missing specialties
+        print("\nStep 1: Ensuring required specialties exist...")
+        print("-" * 70)
+        create_missing_specialties()
+
+        # Step 2: Import doctors
+        print("Step 2: Importing doctors...")
+        print("-" * 70)
 
         imported_count = 0
         skipped_count = 0

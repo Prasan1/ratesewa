@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Import Doctors - Admin - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="mb-4">
+                <i class="fas fa-file-import me-2"></i>Import Doctors
+            </h1>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Bulk Import from Embedded Data</h5>
+                    <p class="text-muted">
+                        This will import 18 doctors from the embedded dataset (no file upload needed).
+                    </p>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Current Database Status:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Total doctors in database: <strong>{{ current_doctor_count }}</strong></li>
+                            <li>Doctors to import: <strong>18</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Important:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Duplicate doctors will be automatically skipped</li>
+                            <li>New cities and specialties will be created if needed</li>
+                            <li>This operation is safe to run multiple times</li>
+                        </ul>
+                    </div>
+
+                    <h6 class="mt-4 mb-3">Doctors to be imported:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="small">
+                                <li>Prof. Dr. Anil Kumar Jha (Dermatology, Kathmandu)</li>
+                                <li>Dr. Mahesh Shah (Dermatology, Kathmandu)</li>
+                                <li>Prof. Dr. Sagarmani Jha (Dermatology, Kathmandu)</li>
+                                <li>Dr. Padma Tuladhar (Dermatology, Kathmandu)</li>
+                                <li>Dr. Megha Dev (Dermatology, Kathmandu)</li>
+                                <li>Dr. Suchana Marahatta (Dermatology, Kathmandu)</li>
+                                <li>Dr. Smita Joshi (Pediatric Dermatology, Kathmandu)</li>
+                                <li>Dr. Siree Thapa (Dermatology, Kathmandu)</li>
+                                <li>Dr. Prarthana Adhikari (Dermatology, Kathmandu)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="small">
+                                <li>Prof. Dr. Shristi Shrestha (Dermatology, Kathmandu)</li>
+                                <li>Prof. Dr. Prakash Kafle (Neurosurgery, Biratnagar)</li>
+                                <li>Dr. Ram Hari Ghimire (Pulmonology, Biratnagar)</li>
+                                <li>Dr. Rajesh Nepal (Cardiology, Biratnagar)</li>
+                                <li>Dr. Vijay Kaul (Psychiatry, Biratnagar)</li>
+                                <li>Dr. Manish Pradhan (Dermatology, Biratnagar)</li>
+                                <li>Dr. Rupak Bhattarai (Anesthesiology, Biratnagar)</li>
+                                <li>Dr. Shanti Subedi (Obstetrics & Gynecology, Biratnagar)</li>
+                                <li>Dr. Bandana Paudel (Anesthesiology, Biratnagar)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('run_import_doctors') }}" class="mt-4" onsubmit="return confirm('Are you sure you want to run the import?');">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-play me-2"></i>Run Import Now
+                        </button>
+                        <a href="{{ url_for('admin_doctors') }}" class="btn btn-secondary btn-lg ms-2">
+                            <i class="fas fa-arrow-left me-2"></i>Cancel
+                        </a>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6><i class="fas fa-question-circle me-2"></i>Troubleshooting</h6>
+                    <p class="small text-muted mb-0">
+                        If the import fails, ensure that:
+                    </p>
+                    <ul class="small text-muted">
+                        <li>Required specialties exist in the database (they will be created if missing)</li>
+                        <li>Cities exist or will be created automatically</li>
+                        <li>Database connection is working</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

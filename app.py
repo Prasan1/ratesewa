@@ -1231,6 +1231,43 @@ def toggle_featured(doctor_id):
         flash('Doctor not found.', 'danger')
     return redirect(url_for('index'))
 
+# --- Admin Route: Import Doctors from Embedded Data ---
+@app.route('/admin/import-doctors')
+@admin_required
+def import_doctors_page():
+    """Show import doctors page with button to trigger import"""
+    from models import Doctor
+    current_doctor_count = Doctor.query.count()
+    return render_template('admin_import_doctors.html', current_doctor_count=current_doctor_count)
+
+@app.route('/admin/import-doctors/run', methods=['POST'])
+@admin_required
+def run_import_doctors():
+    """Execute the doctor import from embedded data"""
+    try:
+        # Import the function from the embedded script
+        from import_doctors_embedded import import_doctors, DOCTORS_DATA
+
+        # Capture output
+        import io
+        import sys
+        old_stdout = sys.stdout
+        sys.stdout = buffer = io.StringIO()
+
+        # Run the import
+        import_doctors()
+
+        # Get the output
+        output = buffer.getvalue()
+        sys.stdout = old_stdout
+
+        flash('Doctor import completed! Check the results below.', 'success')
+        return render_template('admin_import_result.html', output=output)
+
+    except Exception as e:
+        flash(f'Error during import: {str(e)}', 'danger')
+        return redirect(url_for('import_doctors_page'))
+
 # --- DOCTOR PROFILE ROUTE (USES SLUG) ---
 @app.route('/doctor/<slug>')
 def doctor_profile(slug):

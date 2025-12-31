@@ -53,6 +53,8 @@
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin_verification_requests') }}"><i class="fas fa-clipboard-check me-2"></i>Verification Requests</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin_appointments') }}"><i class="fas fa-calendar-check me-2"></i>Manage Appointments</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-primary" href="{{ url_for('import_doctors_page') }}"><i class="fas fa-file-import me-2"></i>Import Doctors</a></li>
                         </ul>
                     </li>
                     {% endif %}
