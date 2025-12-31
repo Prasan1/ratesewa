@@ -47,8 +47,7 @@ def get_or_create_city(city_name):
     if not city:
         # Create new city
         city = City(
-            name=city_name,
-            slug=slugify(city_name)
+            name=city_name
         )
         db.session.add(city)
         db.session.flush()  # Get the ID
@@ -71,10 +70,24 @@ def get_specialty(specialty_name):
     specialty_mappings = {
         'obstetrics & gynecology': ['gynecology', 'obstetrics', 'ob/gyn', 'obgyn'],
         'pediatric dermatology': ['dermatology', 'pediatrics'],
-        'pulmonology / critical care': ['pulmonology', 'critical care', 'respiratory'],
+    }
+
+    # Handle combined specialties by mapping to primary specialty
+    combined_specialty_mappings = {
+        'pulmonology / critical care': 'pulmonology',
+        'critical care / pulmonology': 'pulmonology',
     }
 
     specialty_lower = specialty_name.lower()
+
+    # Check if it's a combined specialty
+    if specialty_lower in combined_specialty_mappings:
+        mapped_specialty_name = combined_specialty_mappings[specialty_lower]
+        specialty = Specialty.query.filter(Specialty.name.ilike(mapped_specialty_name)).first()
+        if specialty:
+            print(f"  ℹ️  Mapped '{specialty_name}' to '{specialty.name}'")
+            return specialty
+
     for main_specialty, variations in specialty_mappings.items():
         for variation in variations:
             if variation in specialty_lower:
@@ -176,7 +189,7 @@ def import_doctors_from_csv(csv_file_path):
                         description=description,
                         education=education if education else None,
                         college=None,  # Not in CSV
-                        years_experience=years_exp,
+                        experience=years_exp,
                         photo_url=None,  # No photos in CSV
                         slug=slug
                     )

@@ -9,22 +9,20 @@ from models import Specialty
 from slugify import slugify
 
 def add_specialty_if_not_exists(name):
-    """Add specialty if it doesn't exist"""
-    with app.app_context():
-        # Check if specialty exists (case-insensitive)
-        existing = Specialty.query.filter(Specialty.name.ilike(name)).first()
+    """Add specialty if it doesn't exist (must be called within app_context)"""
+    # Check if specialty exists (case-insensitive)
+    existing = Specialty.query.filter(Specialty.name.ilike(name)).first()
 
-        if existing:
-            print(f"  ⏭️  {name} - already exists")
-            return False
-        else:
-            specialty = Specialty(
-                name=name,
-                slug=slugify(name)
-            )
-            db.session.add(specialty)
-            print(f"  ✅ {name} - created")
-            return True
+    if existing:
+        print(f"  ⏭️  {name} - already exists")
+        return False
+    else:
+        specialty = Specialty(
+            name=name
+        )
+        db.session.add(specialty)
+        print(f"  ✅ {name} - created")
+        return True
 
 def add_all_specialties():
     """Add all specialties found in the CSV"""

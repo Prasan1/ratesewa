@@ -12,9 +12,6 @@ import os
 # Add current directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from add_missing_specialties import add_all_specialties
-from import_doctors_csv import import_doctors_from_csv
-
 def main():
     """Run all import operations"""
     print("\n")
@@ -26,6 +23,9 @@ def main():
     # Step 1: Add missing specialties
     print("STEP 1: Adding missing specialties...")
     print("-" * 70)
+
+    # Import inside main to ensure proper context
+    from add_missing_specialties import add_all_specialties
     add_all_specialties()
 
     print("\n")
@@ -41,6 +41,8 @@ def main():
         print(f"   {os.getcwd()}")
         return
 
+    # Import inside main to ensure proper context
+    from import_doctors_csv import import_doctors_from_csv
     import_doctors_from_csv(csv_file)
 
     print("\n")
