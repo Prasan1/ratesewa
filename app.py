@@ -5,9 +5,10 @@ import os
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from authlib.integrations.flask_client import OAuth
-from models import db, City, Specialty, Doctor, User, Rating, Appointment, ContactMessage, Advertisement
+from models import db, City, Specialty, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse
 from config import Config
 import ad_manager
+import upload_utils
 
 # Load environment variables
 load_dotenv()
@@ -27,6 +28,11 @@ app.config['SESSION_COOKIE_SECURE'] = False  # Set to True when using HTTPS
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
+
+# File upload configurations
+app.config['UPLOAD_FOLDER'] = os.path.join(app.instance_path, 'uploads')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'jpg', 'jpeg', 'png'}
 
 # Initialize SQLAlchemy
 db.init_app(app)
@@ -323,6 +329,137 @@ def privacy():
 @app.route('/terms')
 def terms():
     return render_template('terms.html')
+
+# --- Doctor Verification Routes ---
+@app.route('/claim-profile', methods=['GET'])
+def claim_profile():
+    """Search for unclaimed doctor profiles"""
+    search_query = request.args.get('search', '').strip()
+    unclaimed_doctors = []
+
+    if search_query:
+        # Find doctors without a linked user account
+        unclaimed_doctors = Doctor.query.outerjoin(User, User.doctor_id == Doctor.id)\
+            .filter(Doctor.name.ilike(f'%{search_query}%'))\
+            .filter(User.id.is_(None))\
+            .filter(Doctor.is_active == True)\
+            .all()
+
+    return render_template('claim_profile_search.html',
+                          search_query=search_query,
+                          unclaimed_doctors=unclaimed_doctors)
+
+
+@app.route('/claim-profile/<int:doctor_id>', methods=['GET'])
+@login_required
+def claim_profile_form(doctor_id):
+    """Show verification form for claiming a doctor profile"""
+    doctor = Doctor.query.get_or_404(doctor_id)
+
+    # Check if doctor is already claimed
+    if doctor.user_account:
+        flash('This profile has already been claimed.', 'warning')
+        return redirect(url_for('claim_profile'))
+
+    # Check if user already has a pending verification request for this doctor
+    existing_request = VerificationRequest.query.filter_by(
+        doctor_id=doctor_id,
+        user_id=session['user_id'],
+        status='pending'
+    ).first()
+
+    if existing_request:
+        flash('You already have a pending verification request for this profile.', 'info')
+        return redirect(url_for('claim_profile'))
+
+    # Get all cities for the dropdown
+    cities = City.query.order_by(City.name).all()
+
+    return render_template('claim_profile_form.html',
+                          doctor=doctor,
+                          cities=cities,
+                          current_user=User.query.get(session['user_id']))
+
+
+@app.route('/claim-profile/<int:doctor_id>/submit', methods=['POST'])
+@login_required
+def claim_profile_submit(doctor_id):
+    """Process verification request submission"""
+    doctor = Doctor.query.get_or_404(doctor_id)
+
+    # Check if doctor is already claimed
+    if doctor.user_account:
+        flash('This profile has already been claimed.', 'warning')
+        return redirect(url_for('claim_profile'))
+
+    try:
+        # Get form data
+        nmc_number = request.form.get('nmc_number', '').strip()
+        phone_number = request.form.get('phone_number', '').strip()
+        email = request.form.get('email', '').strip()
+        practice_address = request.form.get('practice_address', '').strip()
+        practice_city_id = request.form.get('practice_city_id')
+
+        # Validate required fields
+        if not all([nmc_number, phone_number, email, practice_address, practice_city_id]):
+            flash('All fields are required.', 'danger')
+            return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
+
+        # Handle file uploads
+        medical_degree = request.files.get('medical_degree')
+        govt_id = request.files.get('govt_id')
+        practice_license = request.files.get('practice_license')
+
+        # Validate required file uploads
+        if not medical_degree or not govt_id:
+            flash('Medical degree and government ID are required.', 'danger')
+            return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
+
+        # Save files
+        upload_folder = app.config['UPLOAD_FOLDER']
+        medical_degree_path = upload_utils.save_verification_document(
+            medical_degree, upload_folder, doctor_id, 'medical_degree'
+        )
+        govt_id_path = upload_utils.save_verification_document(
+            govt_id, upload_folder, doctor_id, 'govt_id'
+        )
+
+        # Optional practice license
+        practice_license_path = None
+        if practice_license and practice_license.filename:
+            practice_license_path = upload_utils.save_verification_document(
+                practice_license, upload_folder, doctor_id, 'practice_license'
+            )
+
+        # Create verification request
+        verification_request = VerificationRequest(
+            doctor_id=doctor_id,
+            user_id=session['user_id'],
+            nmc_number=nmc_number,
+            phone_number=phone_number,
+            email=email,
+            practice_address=practice_address,
+            practice_city_id=practice_city_id,
+            medical_degree_path=medical_degree_path,
+            govt_id_path=govt_id_path,
+            practice_license_path=practice_license_path,
+            email_verified=True,  # Email is already verified through user account
+            status='pending'
+        )
+
+        db.session.add(verification_request)
+        db.session.commit()
+
+        flash('Verification request submitted successfully! Our admin team will review it within 2-3 business days.', 'success')
+        return redirect(url_for('user_profile'))
+
+    except ValueError as e:
+        flash(str(e), 'danger')
+        return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred while processing your request: {str(e)}', 'danger')
+        return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
 
 # --- SQLAlchemy Teardown ---
 @app.teardown_appcontext

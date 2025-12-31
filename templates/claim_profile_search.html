@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Claim Your Doctor Profile - RankSewa{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
+                    <h2 class="card-title">Claim Your Doctor Profile</h2>
+                    <p class="text-muted">Are you a healthcare provider listed on RankSewa? Claim your profile to manage your information and respond to patient reviews.</p>
+                </div>
+
+                <!-- Search Form -->
+                <form method="GET" action="{{ url_for('claim_profile') }}" class="mb-4">
+                    <div class="input-group input-group-lg">
+                        <input type="text"
+                               class="form-control"
+                               name="search"
+                               placeholder="Search your name..."
+                               value="{{ search_query or '' }}"
+                               required>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                    </div>
+                    <small class="form-text text-muted mt-2 d-block">
+                        <i class="fas fa-info-circle"></i> Enter your name as it appears on your practice
+                    </small>
+                </form>
+
+                {% if search_query %}
+                    <hr class="my-4">
+
+                    {% if unclaimed_doctors %}
+                        <h5 class="mb-3">Found {{ unclaimed_doctors|length }} profile(s) matching "{{ search_query }}"</h5>
+
+                        <div class="list-group">
+                            {% for doctor in unclaimed_doctors %}
+                            <div class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div class="flex-grow-1">
+                                        <h5 class="mb-1">
+                                            {{ doctor.name }}
+                                            {% if doctor.is_verified %}
+                                            <span class="badge bg-success"><i class="fas fa-check-circle"></i> Verified</span>
+                                            {% endif %}
+                                        </h5>
+                                        <p class="mb-1 text-muted">
+                                            <i class="fas fa-stethoscope me-1"></i>{{ doctor.specialty.name }}
+                                            <span class="ms-3"><i class="fas fa-map-marker-alt me-1"></i>{{ doctor.city.name }}</span>
+                                        </p>
+                                        {% if doctor.education %}
+                                        <small class="text-muted">
+                                            <i class="fas fa-graduation-cap me-1"></i>{{ doctor.education }}
+                                        </small>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}"
+                                           class="btn btn-primary">
+                                            <i class="fas fa-hand-paper me-2"></i>Claim This Profile
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>No unclaimed profiles found</strong> matching "{{ search_query }}".
+                            <hr>
+                            <p class="mb-0">
+                                <strong>Possible reasons:</strong>
+                            </p>
+                            <ul class="mb-2">
+                                <li>Your profile may already be claimed</li>
+                                <li>You may not be listed on RankSewa yet</li>
+                                <li>Try searching with a different name variation</li>
+                            </ul>
+                            <p class="mb-0">
+                                <strong>Need help?</strong> Contact us at <a href="mailto:support@ranksewa.com">support@ranksewa.com</a>
+                            </p>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                <!-- Benefits Section -->
+                <div class="mt-5">
+                    <h5 class="mb-3"><i class="fas fa-star text-warning me-2"></i>Benefits of Claiming Your Profile</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Respond to patient reviews</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Update your practice information</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Get verified badge</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>View profile analytics</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Connect with more patients</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Build your online reputation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Section -->
+                <div class="alert alert-light mt-4">
+                    <h6><i class="fas fa-question-circle me-2"></i>Don't see your profile?</h6>
+                    <p class="mb-0">
+                        If you're a licensed healthcare provider in Nepal and don't see your profile,
+                        please contact us at <a href="mailto:support@ranksewa.com">support@ranksewa.com</a>
+                        and we'll help you get listed.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

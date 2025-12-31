@@ -49,10 +49,20 @@ class Doctor(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     is_verified = db.Column(db.Boolean, default=False)
 
+    # Verification and contact info
+    nmc_number = db.Column(db.String(50), unique=True, nullable=True)  # Nepal Medical Council registration
+    phone_number = db.Column(db.String(20), nullable=True)
+    practice_address = db.Column(db.Text, nullable=True)
+
+    # Analytics
+    profile_views = db.Column(db.Integer, default=0)
+
     # Relationships (backrefs created in City, Specialty models)
     ratings = db.relationship('Rating', backref='doctor', lazy=True)
     appointments = db.relationship('Appointment', backref='doctor', lazy=True)
     contact_messages = db.relationship('ContactMessage', backref='doctor', lazy=True)
+    verification_requests = db.relationship('VerificationRequest', backref='doctor', lazy=True)
+    review_responses = db.relationship('DoctorResponse', backref='doctor', lazy=True)
 
     @property
     def avg_rating(self):
@@ -80,10 +90,16 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
 
+    # User role and doctor linkage
+    role = db.Column(db.String(20), default='patient')  # 'patient', 'doctor', 'admin'
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=True)
+
     # Relationships
     ratings = db.relationship('Rating', backref='user', lazy=True)
     appointments = db.relationship('Appointment', backref='user', lazy=True)
     contact_messages = db.relationship('ContactMessage', backref='user', lazy=True)
+    doctor_profile = db.relationship('Doctor', foreign_keys=[doctor_id], backref='user_account', uselist=False)
+    verification_requests = db.relationship('VerificationRequest', backref='user', lazy=True)
 
     def set_password(self, password):
         """Hash and set the user's password"""
@@ -107,6 +123,9 @@ class Rating(db.Model):
     rating = db.Column(db.Integer, nullable=False)
     comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship to doctor response
+    doctor_response = db.relationship('DoctorResponse', backref='rating', uselist=False, lazy=True)
 
     @property
     def user_name(self):
@@ -159,6 +178,66 @@ class ContactMessage(db.Model):
 
     def __repr__(self):
         return f'<ContactMessage {self.id} from {self.email}>'
+
+
+class VerificationRequest(db.Model):
+    __tablename__ = 'verification_requests'
+
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    # Contact verification
+    nmc_number = db.Column(db.String(50))  # Nepal Medical Council registration
+    phone_number = db.Column(db.String(20))
+    phone_verified = db.Column(db.Boolean, default=False)
+    email = db.Column(db.String(200))
+    email_verified = db.Column(db.Boolean, default=False)
+    email_verification_token = db.Column(db.String(255), nullable=True)
+
+    # Document paths (stored in /instance/uploads/verification/{doctor_id}/)
+    medical_degree_path = db.Column(db.String(500), nullable=True)
+    govt_id_path = db.Column(db.String(500), nullable=True)
+    practice_license_path = db.Column(db.String(500), nullable=True)
+
+    # Practice information
+    practice_address = db.Column(db.Text)
+    practice_city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=True)
+
+    # Admin review
+    status = db.Column(db.String(20), default='pending')  # 'pending', 'approved', 'rejected'
+    admin_notes = db.Column(db.Text, nullable=True)
+    reviewed_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    reviewed_at = db.Column(db.DateTime, nullable=True)
+
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    practice_city = db.relationship('City', foreign_keys=[practice_city_id])
+    reviewer = db.relationship('User', foreign_keys=[reviewed_by])
+
+    def __repr__(self):
+        return f'<VerificationRequest {self.id} - {self.status}>'
+
+
+class DoctorResponse(db.Model):
+    __tablename__ = 'doctor_responses'
+
+    id = db.Column(db.Integer, primary_key=True)
+    rating_id = db.Column(db.Integer, db.ForeignKey('ratings.id'), nullable=False, unique=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Doctor's user account
+    response_text = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships (backrefs created in Rating, Doctor, User models)
+    response_user = db.relationship('User', foreign_keys=[user_id])
+
+    def __repr__(self):
+        return f'<DoctorResponse {self.id} for Rating {self.rating_id}>'
 
 
 class Advertisement(db.Model):
