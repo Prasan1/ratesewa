@@ -110,7 +110,7 @@ $(document).ready(function() {
             const hasRatings = ratingCount > 0;
             const avgRating = hasRatings ? parseFloat(doctor.avg_rating).toFixed(1) : 'Not rated';
             const starHtml = generateStarRatingHtml(doctor.avg_rating, ratingCount);
-            const verifiedBadge = doctor.is_verified ? '<span class="badge bg-success ms-2">Verified</span>' : '';
+            const verifiedBadge = doctor.is_verified ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>' : '';
 
             html += `
                 <div class="col-md-6 col-lg-4 mb-4">
@@ -121,7 +121,10 @@ $(document).ready(function() {
                                     <img src="${doctor.photo_url || 'https://picsum.photos/seed/doctor' + doctor.id + '/80/80.jpg'}" class="rounded-circle" alt="${doctor.name}" onerror="this.src='https://picsum.photos/seed/doctor${doctor.id}/80/80.jpg'">
                                 </div>
                                 <div class="doctor-info flex-grow-1">
-                                    <h5 class="card-title mb-1">${doctor.name}${verifiedBadge}</h5>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <h5 class="card-title mb-1">${doctor.name}</h5>
+                                        ${verifiedBadge}
+                                    </div>
                                     <p class="card-text text-muted mb-1">${doctor.specialty_name}</p>
                                     <p class="card-text text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>${doctor.city_name}</p>
                                 </div>
