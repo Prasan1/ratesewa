@@ -36,6 +36,8 @@ csrf = CSRFProtect(app)
 
 # Initialize OAuth
 oauth = OAuth(app)
+
+# Facebook OAuth
 facebook = oauth.register(
     name='facebook',
     client_id=os.environ.get('FACEBOOK_CLIENT_ID'),
@@ -44,6 +46,15 @@ facebook = oauth.register(
     authorize_url='https://www.facebook.com/v19.0/dialog/oauth',
     api_base_url='https://graph.facebook.com/v19.0/',
     client_kwargs={'scope': 'email,public_profile'}
+)
+
+# Google OAuth
+google = oauth.register(
+    name='google',
+    client_id=os.environ.get('GOOGLE_CLIENT_ID'),
+    client_secret=os.environ.get('GOOGLE_CLIENT_SECRET'),
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={'scope': 'openid email profile'}
 )
 
 # --- Authentication Decorators ---
@@ -223,6 +234,74 @@ def facebook_callback():
         flash('Your account has been deactivated. Please contact support.', 'danger')
         return redirect(url_for('login'))
 
+    session['user_id'] = user.id
+    session['user_name'] = user.name
+    session['is_admin'] = user.is_admin
+    flash(f'Welcome, {user.name}!', 'success')
+
+    next_page = session.pop('oauth_next', None)
+    return redirect(next_page or url_for('index'))
+
+@app.route('/login/google')
+def google_login():
+    if not google.client_id or not google.client_secret:
+        flash('Google login is not configured. Please contact the site admin.', 'warning')
+        return redirect(url_for('login'))
+    next_page = request.args.get('next')
+    if next_page:
+        session['oauth_next'] = next_page
+    redirect_uri = url_for('google_authorized', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route('/login/google/authorized')
+def google_authorized():
+    if not google.client_id or not google.client_secret:
+        flash('Google login is not configured. Please contact the site admin.', 'warning')
+        return redirect(url_for('login'))
+
+    try:
+        token = google.authorize_access_token()
+    except Exception as e:
+        flash('Google login failed. Please try again.', 'danger')
+        return redirect(url_for('login'))
+
+    if not token:
+        flash('Google login failed. Please try again.', 'danger')
+        return redirect(url_for('login'))
+
+    # Get user info from Google
+    user_info = token.get('userinfo')
+    if not user_info:
+        flash('Failed to get user information from Google.', 'danger')
+        return redirect(url_for('login'))
+
+    email = user_info.get('email')
+    name = user_info.get('name') or 'Google User'
+
+    if not email:
+        flash('Email not provided by Google. Please try again.', 'danger')
+        return redirect(url_for('login'))
+
+    # Check if user exists
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        # Create new user
+        user = User(name=name, email=email)
+        user.set_password(os.urandom(16).hex())  # Random password for OAuth users
+        db.session.add(user)
+        db.session.commit()
+
+    # Check if user is admin
+    if is_admin_email(user.email) and not user.is_admin:
+        user.is_admin = True
+        db.session.commit()
+
+    # Check if user is active
+    if not user.is_active:
+        flash('Your account has been deactivated. Please contact support.', 'danger')
+        return redirect(url_for('login'))
+
+    # Log user in
     session['user_id'] = user.id
     session['user_name'] = user.name
     session['is_admin'] = user.is_admin
