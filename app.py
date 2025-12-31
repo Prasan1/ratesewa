@@ -987,6 +987,141 @@ def cancel_appointment(appointment_id):
     return redirect(url_for('admin_appointments'))
 
 
+# --- Admin Verification Routes ---
+@app.route('/admin/verification-requests')
+@admin_required
+def admin_verification_requests():
+    """List all doctor verification requests"""
+    status_filter = request.args.get('status', 'all')
+
+    # Get counts for each status
+    counts = {
+        'all': VerificationRequest.query.count(),
+        'pending': VerificationRequest.query.filter_by(status='pending').count(),
+        'approved': VerificationRequest.query.filter_by(status='approved').count(),
+        'rejected': VerificationRequest.query.filter_by(status='rejected').count()
+    }
+
+    # Filter by status
+    if status_filter == 'pending':
+        verification_requests = VerificationRequest.query.filter_by(status='pending')\
+            .order_by(VerificationRequest.created_at.desc()).all()
+    elif status_filter == 'approved':
+        verification_requests = VerificationRequest.query.filter_by(status='approved')\
+            .order_by(VerificationRequest.reviewed_at.desc()).all()
+    elif status_filter == 'rejected':
+        verification_requests = VerificationRequest.query.filter_by(status='rejected')\
+            .order_by(VerificationRequest.reviewed_at.desc()).all()
+    else:
+        verification_requests = VerificationRequest.query\
+            .order_by(VerificationRequest.created_at.desc()).all()
+
+    return render_template('admin_verification_requests.html',
+                         requests=verification_requests,
+                         status_filter=status_filter,
+                         counts=counts)
+
+
+@app.route('/admin/verification-requests/<int:request_id>', methods=['GET', 'POST'])
+@admin_required
+def admin_verification_detail(request_id):
+    """View and process a verification request"""
+    verification_request = VerificationRequest.query.get_or_404(request_id)
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'approve':
+            try:
+                # Link user to doctor profile
+                user = verification_request.user
+                user.doctor_id = verification_request.doctor_id
+                user.role = 'doctor'
+
+                # Mark doctor as verified
+                doctor = verification_request.doctor
+                doctor.is_verified = True
+                doctor.nmc_number = verification_request.nmc_number
+                doctor.phone_number = verification_request.phone_number
+                doctor.practice_address = verification_request.practice_address
+
+                # Update verification request
+                verification_request.status = 'approved'
+                verification_request.reviewed_by = session['user_id']
+                verification_request.reviewed_at = datetime.utcnow()
+
+                db.session.commit()
+
+                flash(f'Verification approved! {doctor.name} is now verified and linked to {user.name}.', 'success')
+                return redirect(url_for('admin_verification_requests'))
+
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Error approving verification: {str(e)}', 'danger')
+
+        elif action == 'reject':
+            admin_notes = request.form.get('admin_notes', '').strip()
+
+            if not admin_notes:
+                flash('Please provide a reason for rejection.', 'danger')
+            else:
+                try:
+                    verification_request.status = 'rejected'
+                    verification_request.admin_notes = admin_notes
+                    verification_request.reviewed_by = session['user_id']
+                    verification_request.reviewed_at = datetime.utcnow()
+
+                    db.session.commit()
+
+                    flash(f'Verification request rejected.', 'info')
+                    return redirect(url_for('admin_verification_requests'))
+
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f'Error rejecting verification: {str(e)}', 'danger')
+
+    return render_template('admin_verification_detail.html', request=verification_request)
+
+
+@app.route('/verification/document/<int:request_id>/<doc_type>')
+@admin_required
+def serve_verification_document(request_id, doc_type):
+    """Serve verification documents (admin only)"""
+    from flask import send_from_directory
+    import os
+
+    verification_request = VerificationRequest.query.get_or_404(request_id)
+
+    # Get the document path based on type
+    if doc_type == 'medical_degree':
+        doc_path = verification_request.medical_degree_path
+    elif doc_type == 'govt_id':
+        doc_path = verification_request.govt_id_path
+    elif doc_type == 'practice_license':
+        doc_path = verification_request.practice_license_path
+    else:
+        flash('Invalid document type.', 'danger')
+        return redirect(url_for('admin_verification_detail', request_id=request_id))
+
+    if not doc_path:
+        flash('Document not found.', 'danger')
+        return redirect(url_for('admin_verification_detail', request_id=request_id))
+
+    # Construct full path
+    upload_folder = app.config['UPLOAD_FOLDER']
+    full_path = os.path.join(upload_folder, doc_path)
+
+    if not os.path.exists(full_path):
+        flash('Document file not found on server.', 'danger')
+        return redirect(url_for('admin_verification_detail', request_id=request_id))
+
+    # Serve the file
+    directory = os.path.dirname(full_path)
+    filename = os.path.basename(full_path)
+
+    return send_from_directory(directory, filename)
+
+
 # --- User Profile Route ---
 @app.route('/profile')
 @login_required

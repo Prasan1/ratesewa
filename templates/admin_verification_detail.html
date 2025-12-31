@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Verification Request: {{ request.doctor.name }} - Admin - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <!-- Back Button -->
+            <div class="mb-3">
+                <a href="{{ url_for('admin_verification_requests') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Requests
+                </a>
+            </div>
+
+            <!-- Status Banner -->
+            <div class="alert {% if request.status == 'pending' %}alert-warning{% elif request.status == 'approved' %}alert-success{% else %}alert-danger{% endif %} mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">
+                            Status:
+                            {% if request.status == 'pending' %}
+                            <i class="fas fa-clock"></i> Pending Review
+                            {% elif request.status == 'approved' %}
+                            <i class="fas fa-check-circle"></i> Approved
+                            {% else %}
+                            <i class="fas fa-times-circle"></i> Rejected
+                            {% endif %}
+                        </h5>
+                        {% if request.reviewed_by %}
+                        <small>
+                            Reviewed by {{ request.reviewer.name }} on {{ request.reviewed_at.strftime('%b %d, %Y at %I:%M %p') }}
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doctor Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>Doctor Profile</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Name:</strong> {{ request.doctor.name }}</p>
+                            <p><strong>Specialty:</strong> {{ request.doctor.specialty.name }}</p>
+                            <p><strong>City:</strong> {{ request.doctor.city.name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Current Status:</strong>
+                                {% if request.doctor.is_verified %}
+                                <span class="badge bg-success">Verified</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Not Verified</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Profile:</strong>
+                                <a href="{{ url_for('doctor_profile', slug=request.doctor.slug) }}" target="_blank">
+                                    View Public Profile <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submitted Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Submitted Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Submitted By:</strong><br>
+                                {{ request.user.name }}<br>
+                                <small class="text-muted">{{ request.user.email }}</small>
+                            </p>
+                            <p><strong>NMC Number:</strong> {{ request.nmc_number }}</p>
+                            <p><strong>Phone Number:</strong> {{ request.phone_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Email:</strong> {{ request.email }}</p>
+                            <p><strong>Practice Address:</strong><br>{{ request.practice_address }}</p>
+                            <p><strong>Practice City:</strong> {{ request.practice_city.name if request.practice_city else '-' }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <p class="mb-0"><strong>Submitted:</strong> {{ request.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uploaded Documents -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-upload me-2"></i>Uploaded Documents</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Medical Degree -->
+                        <div class="col-md-6 mb-3">
+                            <h6><i class="fas fa-graduation-cap me-2"></i>Medical Degree</h6>
+                            {% if request.medical_degree_path %}
+                            <div class="border p-2 rounded">
+                                <a href="{{ url_for('serve_verification_document', request_id=request.id, doc_type='medical_degree') }}"
+                                   target="_blank" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-download me-1"></i>View Document
+                                </a>
+                                <small class="d-block mt-2 text-muted">{{ request.medical_degree_path.split('/')[-1] }}</small>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">Not uploaded</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Government ID -->
+                        <div class="col-md-6 mb-3">
+                            <h6><i class="fas fa-id-card me-2"></i>Government ID</h6>
+                            {% if request.govt_id_path %}
+                            <div class="border p-2 rounded">
+                                <a href="{{ url_for('serve_verification_document', request_id=request.id, doc_type='govt_id') }}"
+                                   target="_blank" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-download me-1"></i>View Document
+                                </a>
+                                <small class="d-block mt-2 text-muted">{{ request.govt_id_path.split('/')[-1] }}</small>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">Not uploaded</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Practice License (Optional) -->
+                        {% if request.practice_license_path %}
+                        <div class="col-md-6 mb-3">
+                            <h6><i class="fas fa-certificate me-2"></i>Practice License</h6>
+                            <div class="border p-2 rounded">
+                                <a href="{{ url_for('serve_verification_document', request_id=request.id, doc_type='practice_license') }}"
+                                   target="_blank" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-download me-1"></i>View Document
+                                </a>
+                                <small class="d-block mt-2 text-muted">{{ request.practice_license_path.split('/')[-1] }}</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Notes (if rejected or approved) -->
+            {% if request.admin_notes %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Admin Notes</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ request.admin_notes }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action Buttons (only for pending) -->
+            {% if request.status == 'pending' %}
+            <div class="card shadow-sm border-warning">
+                <div class="card-body">
+                    <h5 class="mb-3"><i class="fas fa-gavel me-2"></i>Review Actions</h5>
+
+                    <form method="POST" class="mb-3" onsubmit="return confirm('Are you sure you want to APPROVE this verification request? This will link the user account to the doctor profile and mark the doctor as verified.');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="action" value="approve"/>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>Approve Verification
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <form method="POST" id="rejectForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="action" value="reject"/>
+
+                        <div class="mb-3">
+                            <label for="admin_notes" class="form-label">
+                                <strong>Rejection Reason</strong> (required)
+                            </label>
+                            <textarea class="form-control"
+                                      id="admin_notes"
+                                      name="admin_notes"
+                                      rows="3"
+                                      placeholder="Please provide a reason for rejection..."
+                                      required></textarea>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-times-circle me-2"></i>Reject Verification
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('rejectForm')?.addEventListener('submit', function(e) {
+    const notes = document.getElementById('admin_notes').value.trim();
+    if (!notes) {
+        e.preventDefault();
+        alert('Please provide a reason for rejection.');
+        return false;
+    }
+
+    if (!confirm('Are you sure you want to REJECT this verification request?')) {
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
+{% endblock %}
