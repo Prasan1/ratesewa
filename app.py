@@ -9,6 +9,9 @@ from models import db, City, Specialty, Doctor, User, Rating, Appointment, Conta
 from config import Config
 import ad_manager
 import upload_utils
+import stripe
+import subscription_config
+import promo_config
 
 # Load environment variables
 load_dotenv()
@@ -62,6 +65,11 @@ google = oauth.register(
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={'scope': 'openid email profile'}
 )
+
+# Stripe Payment Configuration
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
 # --- Authentication Decorators ---
 def login_required(f):
@@ -609,6 +617,241 @@ def doctor_self_register_submit():
         return redirect(url_for('doctor_self_register'))
 
 
+# ============================================================================
+# SUBSCRIPTION & PAYMENT ROUTES
+# ============================================================================
+
+@app.route('/subscription/pricing')
+@doctor_required
+def subscription_pricing():
+    """Show subscription pricing page for doctors"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    # Get current tier info
+    current_tier_info = subscription_config.get_tier_info(doctor.subscription_tier or 'free')
+
+    # Get upgrade options
+    upgrade_options = subscription_config.get_upgrade_options(doctor.subscription_tier or 'free')
+
+    return render_template('subscription_pricing.html',
+                          doctor=doctor,
+                          current_tier=doctor.subscription_tier or 'free',
+                          current_tier_info=current_tier_info,
+                          upgrade_options=upgrade_options,
+                          all_tiers=subscription_config.SUBSCRIPTION_TIERS)
+
+
+@app.route('/subscription/create-checkout/<tier>')
+@doctor_required
+def create_checkout_session(tier):
+    """Create Stripe checkout session for subscription (or grant free during promo)"""
+    try:
+        user = User.query.get(session['user_id'])
+        doctor = user.doctor_profile
+
+        # Validate tier
+        if tier not in ['premium', 'featured']:
+            flash('Invalid subscription tier.', 'danger')
+            return redirect(url_for('subscription_pricing'))
+
+        # Check if already subscribed to this tier
+        if doctor.subscription_tier == tier:
+            flash(f'You are already on {tier.title()}!', 'info')
+            return redirect(url_for('doctor_dashboard'))
+
+        # PROMOTIONAL PERIOD: Grant features for free!
+        if promo_config.is_promotion_active():
+            # Auto-grant tier during promotion
+            doctor.subscription_tier = tier
+
+            # Set featured status if featured tier
+            if tier == 'featured':
+                doctor.is_featured = True
+
+            # Set promo end date as subscription expiry
+            doctor.subscription_expires_at = promo_config.CURRENT_PROMOTION['end_date']
+
+            db.session.commit()
+
+            promo = promo_config.get_promotion_banner()
+            flash(f'🎉 {promo["message"]} You now have {tier.title()} access - enjoy all features FREE for {promo["days_left"]} days!', 'success')
+            return redirect(url_for('doctor_dashboard'))
+
+        # PAYMENT ENABLED: Create Stripe checkout
+        if not promo_config.should_charge_payment():
+            flash('Payment system is currently disabled. Please check back later!', 'info')
+            return redirect(url_for('subscription_pricing'))
+
+        # Get tier info
+        tier_info = subscription_config.SUBSCRIPTION_TIERS[tier]
+
+        # Create Stripe checkout session
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=subscription_config.STRIPE_CONFIG['payment_method_types'],
+            line_items=[{
+                'price_data': {
+                    'currency': subscription_config.STRIPE_CONFIG['currency'],
+                    'product_data': {
+                        'name': f'RankSewa {tier_info["name"]} Subscription',
+                        'description': f'Monthly subscription - {tier_info["name"]} tier',
+                    },
+                    'unit_amount': tier_info['price_usd'] * 100,  # Amount in cents
+                    'recurring': {
+                        'interval': 'month',
+                    },
+                },
+                'quantity': 1,
+            }],
+            mode='subscription',
+            success_url=request.host_url + f'subscription/success?session_id={{CHECKOUT_SESSION_ID}}',
+            cancel_url=request.host_url + 'subscription/cancel',
+            client_reference_id=str(doctor.id),
+            customer_email=user.email,
+            metadata={
+                'doctor_id': doctor.id,
+                'user_id': user.id,
+                'tier': tier
+            }
+        )
+
+        return redirect(checkout_session.url, code=303)
+
+    except Exception as e:
+        flash(f'Error creating checkout session: {str(e)}', 'danger')
+        return redirect(url_for('subscription_pricing'))
+
+
+@app.route('/subscription/success')
+@doctor_required
+def subscription_success():
+    """Handle successful subscription payment"""
+    session_id = request.args.get('session_id')
+
+    if session_id:
+        try:
+            # Retrieve the session from Stripe
+            checkout_session = stripe.checkout.Session.retrieve(session_id)
+
+            # Get doctor and tier from metadata
+            doctor_id = int(checkout_session.metadata['doctor_id'])
+            tier = checkout_session.metadata['tier']
+
+            # Update doctor subscription (will be confirmed by webhook)
+            doctor = Doctor.query.get(doctor_id)
+            if doctor and checkout_session.payment_status == 'paid':
+                flash(f'🎉 Success! You are now subscribed to {tier.title()}. Welcome to premium features!', 'success')
+            else:
+                flash('Payment is being processed. Your subscription will be activated shortly.', 'info')
+
+        except Exception as e:
+            flash(f'Error retrieving session: {str(e)}', 'warning')
+
+    return render_template('subscription_success.html')
+
+
+@app.route('/subscription/cancel')
+@doctor_required
+def subscription_cancel():
+    """Handle cancelled subscription checkout"""
+    flash('Subscription checkout was cancelled. You can upgrade anytime!', 'info')
+    return render_template('subscription_cancel.html')
+
+
+@app.route('/subscription/portal')
+@doctor_required
+def subscription_portal():
+    """Redirect to Stripe customer portal for subscription management"""
+    try:
+        user = User.query.get(session['user_id'])
+        doctor = user.doctor_profile
+
+        # Check if doctor has a Stripe customer ID (stored after first payment)
+        if not hasattr(doctor, 'stripe_customer_id') or not doctor.stripe_customer_id:
+            flash('No active subscription found. Please subscribe first.', 'info')
+            return redirect(url_for('subscription_pricing'))
+
+        # Create portal session
+        portal_session = stripe.billing_portal.Session.create(
+            customer=doctor.stripe_customer_id,
+            return_url=request.host_url + 'doctor/dashboard',
+        )
+
+        return redirect(portal_session.url, code=303)
+
+    except Exception as e:
+        flash(f'Error accessing subscription portal: {str(e)}', 'danger')
+        return redirect(url_for('doctor_dashboard'))
+
+
+@app.route('/stripe/webhook', methods=['POST'])
+@csrf.exempt  # Stripe webhooks don't include CSRF token
+def stripe_webhook():
+    """Handle Stripe webhook events"""
+    payload = request.get_data()
+    sig_header = request.headers.get('Stripe-Signature')
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, STRIPE_WEBHOOK_SECRET
+        )
+    except ValueError:
+        # Invalid payload
+        return jsonify({'error': 'Invalid payload'}), 400
+    except stripe.error.SignatureVerificationError:
+        # Invalid signature
+        return jsonify({'error': 'Invalid signature'}), 400
+
+    # Handle the event
+    if event['type'] == 'checkout.session.completed':
+        session_obj = event['data']['object']
+
+        # Get doctor and tier from metadata
+        doctor_id = int(session_obj['metadata']['doctor_id'])
+        tier = session_obj['metadata']['tier']
+        customer_id = session_obj['customer']
+
+        # Update doctor subscription
+        doctor = Doctor.query.get(doctor_id)
+        if doctor:
+            doctor.subscription_tier = tier
+            doctor.stripe_customer_id = customer_id
+
+            # Set is_featured based on tier
+            if tier == 'featured':
+                doctor.is_featured = True
+
+            db.session.commit()
+            print(f"✅ Subscription activated: Doctor {doctor.id} -> {tier}")
+
+    elif event['type'] == 'customer.subscription.updated':
+        subscription = event['data']['object']
+        customer_id = subscription['customer']
+
+        # Find doctor by stripe customer ID
+        doctor = Doctor.query.filter_by(stripe_customer_id=customer_id).first()
+        if doctor:
+            # Update subscription status
+            if subscription['status'] == 'active':
+                print(f"✅ Subscription updated for doctor {doctor.id}")
+            else:
+                print(f"⚠️  Subscription status changed to {subscription['status']} for doctor {doctor.id}")
+
+    elif event['type'] == 'customer.subscription.deleted':
+        subscription = event['data']['object']
+        customer_id = subscription['customer']
+
+        # Find doctor and downgrade to free
+        doctor = Doctor.query.filter_by(stripe_customer_id=customer_id).first()
+        if doctor:
+            doctor.subscription_tier = 'free'
+            doctor.is_featured = False
+            db.session.commit()
+            print(f"⬇️  Subscription cancelled: Doctor {doctor.id} -> free")
+
+    return jsonify({'success': True}), 200
+
+
 # --- SQLAlchemy Teardown ---
 @app.teardown_appcontext
 def shutdown_session(exception=None):
@@ -618,9 +861,13 @@ def shutdown_session(exception=None):
 
 # --- Context Processor for Ads ---
 @app.context_processor
-def inject_ad_function():
-    """Make ad manager function available to all templates"""
-    return dict(get_ad=ad_manager.get_ad_for_position)
+def inject_global_functions():
+    """Make global functions available to all templates"""
+    return dict(
+        get_ad=ad_manager.get_ad_for_position,
+        get_promotion_banner=promo_config.get_promotion_banner,
+        is_promotion_active=promo_config.is_promotion_active
+    )
 
 # --- Main App Routes ---
 @app.route('/')

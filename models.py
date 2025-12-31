@@ -61,6 +61,7 @@ class Doctor(db.Model):
     subscription_tier = db.Column(db.String(20), default='free')  # 'free', 'premium', 'featured'
     subscription_expires_at = db.Column(db.DateTime, nullable=True)  # When paid subscription ends
     trial_ends_at = db.Column(db.DateTime, nullable=True)  # When free trial ends (for future premium trial)
+    stripe_customer_id = db.Column(db.String(255), nullable=True)  # Stripe customer ID for subscription management
 
     # Relationships (backrefs created in City, Specialty models)
     ratings = db.relationship('Rating', backref='doctor', lazy=True)
