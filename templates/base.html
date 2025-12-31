@@ -103,7 +103,11 @@
             <div class="row">
                 <!-- About Section -->
                 <div class="col-lg-4 mb-4 mb-lg-0">
-                    <h5 class="text-uppercase mb-3">RankSewa</h5>
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="RankSewa" height="32" class="me-2"
+                             onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/logo-temp.svg') }}';">
+                        <h5 class="text-uppercase mb-0">RankSewa</h5>
+                    </div>
                     <p class="text-muted small">Discover healthcare providers in Nepal based on real patient experiences. Reviews reflect individual opinions and experiences, not medical evaluations.</p>
                 </div>
 
