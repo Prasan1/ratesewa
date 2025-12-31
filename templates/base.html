@@ -59,6 +59,10 @@
                             <i class="fas fa-user me-1"></i>{{ session['user_name'] }}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            {% if session.get('role') == 'doctor' %}
+                            <li><a class="dropdown-item" href="{{ url_for('doctor_dashboard') }}"><i class="fas fa-user-md me-2"></i>Doctor Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% endif %}
                             <li><a class="dropdown-item" href="{{ url_for('user_profile') }}"><i class="fas fa-user-circle me-2"></i>My Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>

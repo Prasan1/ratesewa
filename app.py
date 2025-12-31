@@ -98,6 +98,25 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+def doctor_required(f):
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Please log in first.', 'warning')
+            return redirect(url_for('login'))
+        user = User.query.get(session['user_id'])
+        if not user or not user.is_active:
+            session.clear()
+            flash('Your account has been deactivated. Please contact support.', 'danger')
+            return redirect(url_for('login'))
+        if user.role != 'doctor' or not user.doctor_id:
+            flash('Doctor access required. Please claim your profile first.', 'warning')
+            return redirect(url_for('claim_profile'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 # --- Helper Function for Slugs ---
 def generate_slug(name):
     """Generates a URL-friendly slug from a name."""
@@ -182,6 +201,7 @@ def login():
             session['user_id'] = user.id
             session['user_name'] = user.name
             session['is_admin'] = user.is_admin
+            session['role'] = user.role
             flash(f'Welcome back, {user.name}!', 'success')
 
             next_page = request.args.get('next')
@@ -243,6 +263,7 @@ def facebook_callback():
     session['user_id'] = user.id
     session['user_name'] = user.name
     session['is_admin'] = user.is_admin
+    session['role'] = user.role
     flash(f'Welcome, {user.name}!', 'success')
 
     next_page = session.pop('oauth_next', None)
@@ -311,6 +332,7 @@ def google_authorized():
     session['user_id'] = user.id
     session['user_name'] = user.name
     session['is_admin'] = user.is_admin
+    session['role'] = user.role
     flash(f'Welcome, {user.name}!', 'success')
 
     next_page = session.pop('oauth_next', None)
@@ -811,6 +833,17 @@ def doctor_profile(slug):
         flash('Doctor not found.', 'danger')
         return redirect(url_for('index'))
 
+    # Track profile views (skip if doctor is viewing own profile)
+    user_is_doctor = False
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])
+        if user and user.doctor_id == doctor.id:
+            user_is_doctor = True
+
+    if not user_is_doctor:
+        doctor.profile_views = (doctor.profile_views or 0) + 1
+        db.session.commit()
+
     # Get ratings sorted by ID descending
     ratings = sorted(doctor.ratings, key=lambda r: r.id, reverse=True)
 
@@ -1120,6 +1153,163 @@ def serve_verification_document(request_id, doc_type):
     filename = os.path.basename(full_path)
 
     return send_from_directory(directory, filename)
+
+
+# --- Doctor Dashboard Routes ---
+@app.route('/doctor/dashboard')
+@doctor_required
+def doctor_dashboard():
+    """Doctor dashboard - overview of profile and analytics"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    # Get review statistics
+    review_count = len(doctor.ratings)
+    avg_rating = doctor.avg_rating
+
+    # Count responses
+    response_count = DoctorResponse.query.filter_by(doctor_id=doctor.id).count()
+    response_rate = (response_count / review_count * 100) if review_count > 0 else 0
+
+    # Get verification status
+    verification_request = VerificationRequest.query.filter_by(
+        doctor_id=doctor.id,
+        user_id=user.id
+    ).order_by(VerificationRequest.created_at.desc()).first()
+
+    return render_template('doctor_dashboard.html',
+                         doctor=doctor,
+                         user=user,
+                         review_count=review_count,
+                         avg_rating=avg_rating,
+                         response_count=response_count,
+                         response_rate=response_rate,
+                         verification_request=verification_request)
+
+
+@app.route('/doctor/profile/edit', methods=['GET', 'POST'])
+@doctor_required
+def doctor_profile_edit():
+    """Edit doctor profile information"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    if request.method == 'POST':
+        try:
+            # Allow editing only certain fields
+            doctor.description = request.form.get('description', '').strip()
+            doctor.education = request.form.get('education', '').strip()
+            doctor.college = request.form.get('college', '').strip()
+            doctor.practice_address = request.form.get('practice_address', '').strip()
+
+            db.session.commit()
+            flash('Profile updated successfully!', 'success')
+            return redirect(url_for('doctor_dashboard'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating profile: {str(e)}', 'danger')
+
+    return render_template('doctor_profile_edit.html', doctor=doctor, user=user)
+
+
+@app.route('/doctor/reviews')
+@doctor_required
+def doctor_reviews():
+    """View all reviews for doctor's profile"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    # Get all ratings with responses
+    ratings = Rating.query.filter_by(doctor_id=doctor.id)\
+        .order_by(Rating.created_at.desc()).all()
+
+    return render_template('doctor_reviews.html',
+                         doctor=doctor,
+                         ratings=ratings)
+
+
+@app.route('/doctor/reviews/<int:rating_id>/respond', methods=['POST'])
+@doctor_required
+def doctor_respond_to_review(rating_id):
+    """Add or update response to a review"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    rating = Rating.query.get_or_404(rating_id)
+
+    # Verify this review is for the doctor's profile
+    if rating.doctor_id != doctor.id:
+        flash('You can only respond to reviews of your profile.', 'danger')
+        return redirect(url_for('doctor_reviews'))
+
+    response_text = request.form.get('response_text', '').strip()
+
+    if not response_text:
+        flash('Response cannot be empty.', 'danger')
+        return redirect(url_for('doctor_reviews'))
+
+    try:
+        # Check if response already exists
+        existing_response = DoctorResponse.query.filter_by(rating_id=rating_id).first()
+
+        if existing_response:
+            # Update existing response
+            existing_response.response_text = response_text
+            existing_response.updated_at = datetime.utcnow()
+            flash('Response updated successfully!', 'success')
+        else:
+            # Create new response
+            new_response = DoctorResponse(
+                rating_id=rating_id,
+                doctor_id=doctor.id,
+                user_id=user.id,
+                response_text=response_text
+            )
+            db.session.add(new_response)
+            flash('Response added successfully!', 'success')
+
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error saving response: {str(e)}', 'danger')
+
+    return redirect(url_for('doctor_reviews'))
+
+
+@app.route('/doctor/analytics')
+@doctor_required
+def doctor_analytics():
+    """View profile analytics"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    # Get review statistics
+    ratings = doctor.ratings
+    review_count = len(ratings)
+    avg_rating = doctor.avg_rating
+
+    # Response statistics
+    response_count = DoctorResponse.query.filter_by(doctor_id=doctor.id).count()
+    response_rate = (response_count / review_count * 100) if review_count > 0 else 0
+
+    # Rating breakdown
+    rating_breakdown = {
+        5: len([r for r in ratings if r.rating == 5]),
+        4: len([r for r in ratings if r.rating == 4]),
+        3: len([r for r in ratings if r.rating == 3]),
+        2: len([r for r in ratings if r.rating == 2]),
+        1: len([r for r in ratings if r.rating == 1])
+    }
+
+    return render_template('doctor_analytics.html',
+                         doctor=doctor,
+                         review_count=review_count,
+                         avg_rating=avg_rating,
+                         response_count=response_count,
+                         response_rate=response_rate,
+                         rating_breakdown=rating_breakdown)
 
 
 # --- User Profile Route ---

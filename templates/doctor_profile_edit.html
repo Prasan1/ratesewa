@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Doctor Dashboard - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Back Button -->
+            <div class="mb-3">
+                <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Your Profile</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('doctor_profile_edit') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                        <!-- Read-only fields -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Note:</strong> Name, Specialty, and City cannot be changed. Contact admin support if you need to update these fields.
+                        </div>
+
+                        <!-- Name (Read-only) -->
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Name</strong></label>
+                            <input type="text" class="form-control" value="{{ doctor.name }}" readonly>
+                        </div>
+
+                        <!-- Specialty (Read-only) -->
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Specialty</strong></label>
+                            <input type="text" class="form-control" value="{{ doctor.specialty.name }}" readonly>
+                        </div>
+
+                        <!-- City (Read-only) -->
+                        <div class="mb-3">
+                            <label class="form-label"><strong>City</strong></label>
+                            <input type="text" class="form-control" value="{{ doctor.city.name }}" readonly>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Editable Fields -->
+                        <h5 class="mb-3">Editable Information</h5>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">
+                                <i class="fas fa-align-left me-1"></i><strong>Profile Description</strong>
+                            </label>
+                            <textarea class="form-control"
+                                      id="description"
+                                      name="description"
+                                      rows="4"
+                                      placeholder="Tell patients about yourself, your practice philosophy, areas of interest...">{{ doctor.description or '' }}</textarea>
+                            <small class="form-text text-muted">
+                                This will be displayed on your public profile
+                            </small>
+                        </div>
+
+                        <!-- Education -->
+                        <div class="mb-3">
+                            <label for="education" class="form-label">
+                                <i class="fas fa-graduation-cap me-1"></i><strong>Education & Qualifications</strong>
+                            </label>
+                            <textarea class="form-control"
+                                      id="education"
+                                      name="education"
+                                      rows="2"
+                                      placeholder="e.g., MBBS, MD (Internal Medicine)">{{ doctor.education or '' }}</textarea>
+                            <small class="form-text text-muted">
+                                List your degrees and certifications
+                            </small>
+                        </div>
+
+                        <!-- College -->
+                        <div class="mb-3">
+                            <label for="college" class="form-label">
+                                <i class="fas fa-university me-1"></i><strong>Medical School/College</strong>
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="college"
+                                   name="college"
+                                   value="{{ doctor.college or '' }}"
+                                   placeholder="e.g., Kathmandu Medical College">
+                            <small class="form-text text-muted">
+                                Where did you complete your medical education?
+                            </small>
+                        </div>
+
+                        <!-- Practice Address -->
+                        <div class="mb-3">
+                            <label for="practice_address" class="form-label">
+                                <i class="fas fa-map-marker-alt me-1"></i><strong>Practice Address</strong>
+                            </label>
+                            <textarea class="form-control"
+                                      id="practice_address"
+                                      name="practice_address"
+                                      rows="2"
+                                      placeholder="Your clinic/hospital address">{{ doctor.practice_address or '' }}</textarea>
+                            <small class="form-text text-muted">
+                                Patients will use this to find your practice
+                            </small>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Important Notice -->
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>Important</h6>
+                            <ul class="mb-0">
+                                <li>You cannot edit or delete patient reviews</li>
+                                <li>Changes to your profile are visible immediately</li>
+                                <li>Ensure all information is accurate and up-to-date</li>
+                            </ul>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

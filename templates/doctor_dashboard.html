@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Dashboard - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-tachometer-alt me-2"></i>Doctor Dashboard
+                <small class="text-muted">Welcome, Dr. {{ doctor.name }}</small>
+            </h2>
+
+            <!-- Verification Status Banner -->
+            {% if verification_request %}
+                {% if verification_request.status == 'pending' %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-clock me-2"></i>
+                    <strong>Verification Pending:</strong> Your verification request is under review. We'll notify you once it's processed.
+                </div>
+                {% elif verification_request.status == 'rejected' %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-times-circle me-2"></i>
+                    <strong>Verification Rejected:</strong> {{ verification_request.admin_notes or 'Please contact support for details.' }}
+                </div>
+                {% endif %}
+            {% endif %}
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <!-- Profile Views -->
+                <div class="col-md-3 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-eye fa-2x text-primary mb-2"></i>
+                            <h3 class="mb-0">{{ doctor.profile_views or 0 }}</h3>
+                            <p class="text-muted mb-0">Profile Views</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Reviews -->
+                <div class="col-md-3 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-star fa-2x text-warning mb-2"></i>
+                            <h3 class="mb-0">{{ review_count }}</h3>
+                            <p class="text-muted mb-0">Total Reviews</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Average Rating -->
+                <div class="col-md-3 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+                            <h3 class="mb-0">{{ "%.1f"|format(avg_rating) }}</h3>
+                            <p class="text-muted mb-0">Average Rating</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Response Rate -->
+                <div class="col-md-3 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-reply fa-2x text-info mb-2"></i>
+                            <h3 class="mb-0">{{ "%.0f"|format(response_rate) }}%</h3>
+                            <p class="text-muted mb-0">Response Rate</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 mb-2">
+                                    <a href="{{ url_for('doctor_profile_edit') }}" class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-edit me-2"></i>Edit Profile
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a href="{{ url_for('doctor_reviews') }}" class="btn btn-outline-success w-100">
+                                        <i class="fas fa-comments me-2"></i>Manage Reviews
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a href="{{ url_for('doctor_analytics') }}" class="btn btn-outline-info w-100">
+                                        <i class="fas fa-chart-bar me-2"></i>View Analytics
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a href="{{ url_for('doctor_profile', slug=doctor.slug) }}" target="_blank" class="btn btn-outline-secondary w-100">
+                                        <i class="fas fa-external-link-alt me-2"></i>View Public Profile
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Info & Status -->
+            <div class="row">
+                <!-- Profile Information -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>Profile Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th width="40%">Name:</th>
+                                        <td>{{ doctor.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Specialty:</th>
+                                        <td>{{ doctor.specialty.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>City:</th>
+                                        <td>{{ doctor.city.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Experience:</th>
+                                        <td>{{ doctor.experience or '-' }} years</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Status:</th>
+                                        <td>
+                                            {% if doctor.is_verified %}
+                                            <span class="badge bg-success"><i class="fas fa-check-circle"></i> Verified</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">Not Verified</span>
+                                            {% endif %}
+                                            {% if doctor.is_featured %}
+                                            <span class="badge bg-warning text-dark"><i class="fas fa-star"></i> Featured</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% if doctor.nmc_number %}
+                                    <tr>
+                                        <th>NMC Number:</th>
+                                        <td>{{ doctor.nmc_number }}</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Information -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i>Account Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th width="40%">Email:</th>
+                                        <td>{{ user.email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Role:</th>
+                                        <td><span class="badge bg-primary">{{ user.role.capitalize() }}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Phone:</th>
+                                        <td>{{ doctor.phone_number or '-' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Practice Address:</th>
+                                        <td>{{ doctor.practice_address or '-' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="alert alert-light mt-3 mb-0">
+                                <small>
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    <strong>Note:</strong> To update your name, specialty, or city, please contact admin support.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

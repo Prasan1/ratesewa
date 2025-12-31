@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Doctor Dashboard - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-chart-bar me-2"></i>Profile Analytics</h2>
+                <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Overview Cards -->
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm h-100 border-primary">
+                        <div class="card-body text-center">
+                            <i class="fas fa-eye fa-3x text-primary mb-3"></i>
+                            <h2 class="mb-0">{{ doctor.profile_views or 0 }}</h2>
+                            <p class="text-muted mb-0">Total Profile Views</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm h-100 border-warning">
+                        <div class="card-body text-center">
+                            <i class="fas fa-comments fa-3x text-warning mb-3"></i>
+                            <h2 class="mb-0">{{ review_count }}</h2>
+                            <p class="text-muted mb-0">Total Reviews</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm h-100 border-success">
+                        <div class="card-body text-center">
+                            <i class="fas fa-star fa-3x text-success mb-3"></i>
+                            <h2 class="mb-0">{{ "%.1f"|format(avg_rating) }}</h2>
+                            <p class="text-muted mb-0">Average Rating</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rating Breakdown -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-star me-2"></i>Rating Distribution</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if review_count > 0 %}
+                            {% for stars in [5, 4, 3, 2, 1] %}
+                            <div class="row mb-2 align-items-center">
+                                <div class="col-md-2">
+                                    <strong>{{ stars }} Stars</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="progress" style="height: 25px;">
+                                        {% set percentage = (rating_breakdown[stars] / review_count * 100)|round(1) %}
+                                        <div class="progress-bar {% if stars >= 4 %}bg-success{% elif stars == 3 %}bg-warning{% else %}bg-danger{% endif %}"
+                                             role="progressbar"
+                                             style="width: {{ percentage }}%"
+                                             aria-valuenow="{{ rating_breakdown[stars] }}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="{{ review_count }}">
+                                            {{ percentage }}%
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <span class="badge bg-secondary">{{ rating_breakdown[stars] }} reviews</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <p class="text-muted mb-0">No reviews yet. Rating breakdown will appear when you receive reviews.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Response Rate -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-reply me-2"></i>Response Statistics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Reviews Responded To</h6>
+                                    <div class="progress mb-3" style="height: 30px;">
+                                        <div class="progress-bar bg-info"
+                                             role="progressbar"
+                                             style="width: {{ response_rate }}%">
+                                            {{ "%.0f"|format(response_rate) }}%
+                                        </div>
+                                    </div>
+                                    <p class="text-muted">{{ response_count }} out of {{ review_count }} reviews have responses</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Response Rate Goal</h6>
+                                    <p>
+                                        {% if response_rate >= 80 %}
+                                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle"></i> Excellent</span>
+                                        <p class="text-muted mt-2">You're doing great! High response rates build patient trust.</p>
+                                        {% elif response_rate >= 50 %}
+                                        <span class="badge bg-warning text-dark fs-6"><i class="fas fa-info-circle"></i> Good</span>
+                                        <p class="text-muted mt-2">Try to respond to more reviews to improve patient engagement.</p>
+                                        {% else %}
+                                        <span class="badge bg-danger fs-6"><i class="fas fa-exclamation-circle"></i> Needs Improvement</span>
+                                        <p class="text-muted mt-2">Responding to reviews shows patients you care about their feedback.</p>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insights & Tips -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Insights & Tips</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-chart-line me-2 text-success"></i>What's Working</h6>
+                                    <ul>
+                                        {% if avg_rating >= 4.0 %}
+                                        <li>Your average rating of {{ "%.1f"|format(avg_rating) }} is excellent!</li>
+                                        {% endif %}
+                                        {% if response_rate >= 50 %}
+                                        <li>You're actively engaging with patient feedback</li>
+                                        {% endif %}
+                                        {% if review_count >= 10 %}
+                                        <li>You have a good number of reviews building trust</li>
+                                        {% endif %}
+                                        {% if avg_rating >= 4.0 and response_rate >= 50 and review_count >= 10 %}
+                                        <li>Keep up the great work!</li>
+                                        {% elif review_count == 0 %}
+                                        <li>Once you get reviews, insights will appear here</li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-bullseye me-2 text-primary"></i>Areas to Improve</h6>
+                                    <ul>
+                                        {% if response_rate < 80 %}
+                                        <li>Aim to respond to at least 80% of your reviews</li>
+                                        {% endif %}
+                                        {% if review_count < 10 %}
+                                        <li>Encourage satisfied patients to leave reviews</li>
+                                        {% endif %}
+                                        {% if avg_rating < 4.0 and review_count > 0 %}
+                                        <li>Address concerns in negative reviews professionally</li>
+                                        {% endif %}
+                                        {% if response_rate >= 80 and review_count >= 10 and avg_rating >= 4.0 %}
+                                        <li>You're doing excellent! Keep maintaining quality care</li>
+                                        {% elif review_count == 0 %}
+                                        <li>Get your first reviews to unlock detailed insights</li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
