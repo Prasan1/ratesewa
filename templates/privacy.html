@@ -20,13 +20,34 @@
                 <div class="card-body">
                     <h3>Information We Collect</h3>
 
-                    <h5 class="mt-3">Personal Information</h5>
+                    <h5 class="mt-3">Personal Information (All Users)</h5>
                     <p>When you register or use our services, we may collect:</p>
                     <ul>
                         <li>Name and email address</li>
-                        <li>Profile information (if provided via Google login)</li>
+                        <li>Password (securely hashed, never stored in plain text)</li>
+                        <li>Profile information (if provided via Google or Facebook login)</li>
                         <li>Reviews and ratings you submit</li>
                         <li>Communication preferences</li>
+                        <li>Age verification (confirmation that you are 16+ years old)</li>
+                    </ul>
+
+                    <h5 class="mt-3">Additional Information for Healthcare Providers</h5>
+                    <p>When doctors claim or register profiles, we collect:</p>
+                    <ul>
+                        <li>Professional details (specialty, experience, education, medical school)</li>
+                        <li>Nepal Medical Council (NMC) registration number</li>
+                        <li>Phone number and practice address</li>
+                        <li>Verification documents (medical degree, government ID, practice license)</li>
+                        <li>Profile photos (optional)</li>
+                        <li>Responses to patient reviews</li>
+                    </ul>
+
+                    <h5 class="mt-3">Uploaded Content</h5>
+                    <p>We collect and store:</p>
+                    <ul>
+                        <li>Profile photos uploaded by doctors</li>
+                        <li>Verification documents (stored securely, accessible only to admin team)</li>
+                        <li>Images are optimized (resized, compressed) for performance</li>
                     </ul>
 
                     <h5 class="mt-3">Usage Information</h5>
@@ -36,6 +57,15 @@
                         <li>Pages you visit and time spent</li>
                         <li>IP address and location data</li>
                         <li>Device information</li>
+                        <li>Profile views and search activity</li>
+                    </ul>
+
+                    <h5 class="mt-3">Content Moderation Data</h5>
+                    <p>When you flag a review or content, we collect:</p>
+                    <ul>
+                        <li>Your user ID (if logged in; anonymous flags are allowed)</li>
+                        <li>Reason for flagging and additional details provided</li>
+                        <li>Timestamp of the report</li>
                     </ul>
                 </div>
             </div>
@@ -46,11 +76,16 @@
                     <p>We use your data to:</p>
                     <ul>
                         <li>Provide and maintain our service</li>
-                        <li>Allow you to submit reviews and ratings</li>
-                        <li>Communicate with you about updates and features</li>
+                        <li>Allow you to submit and view reviews and ratings</li>
+                        <li>Verify healthcare provider credentials and identities</li>
+                        <li>Process photo uploads and optimize images</li>
+                        <li>Enable doctor-patient communication (through reviews and responses)</li>
+                        <li>Moderate content and review flagged reports</li>
+                        <li>Communicate with you about updates, security, and features</li>
                         <li>Improve our platform based on usage patterns</li>
-                        <li>Prevent fraud and ensure platform security</li>
-                        <li>Comply with legal obligations</li>
+                        <li>Prevent fraud, abuse, and ensure platform security</li>
+                        <li>Comply with legal obligations and respond to legal requests</li>
+                        <li>Track profile views for analytics (doctors only)</li>
                     </ul>
                 </div>
             </div>
@@ -70,11 +105,12 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h3>Third-Party Authentication</h3>
-                    <p>When you use Google login:</p>
+                    <p>When you use Google or Facebook login:</p>
                     <ul>
-                        <li>We receive your name, email, and profile picture from Google</li>
-                        <li>Google's privacy policy applies to their authentication service</li>
-                        <li>We do not receive or store your Google password</li>
+                        <li>We receive your name, email, and profile picture from the provider</li>
+                        <li>The provider's privacy policy applies to their authentication service</li>
+                        <li>We do not receive or store your Google/Facebook password</li>
+                        <li>You can revoke our access at any time through your Google/Facebook account settings</li>
                     </ul>
                 </div>
             </div>
@@ -103,8 +139,46 @@
                         <li><strong>Deletion:</strong> Request deletion of your account and data</li>
                         <li><strong>Opt-out:</strong> Unsubscribe from marketing communications</li>
                         <li><strong>Data Portability:</strong> Request your data in a portable format</li>
+                        <li><strong>Object:</strong> Object to certain types of data processing</li>
                     </ul>
-                    <p class="mt-3">To exercise these rights, please contact us at: <a href="mailto:privacy@ranksewa.com">privacy@ranksewa.com</a></p>
+                    <p class="mt-3">To exercise these rights, please contact us at: <a href="mailto:support@ranksewa.com">support@ranksewa.com</a></p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3>Account Deletion & Data Removal</h3>
+
+                    <h5 class="mt-3">How to Request Deletion</h5>
+                    <p>To delete your account, email <a href="mailto:support@ranksewa.com">support@ranksewa.com</a> with your request. We process deletion requests within 2-3 business days.</p>
+
+                    <h5 class="mt-3">What Gets Deleted</h5>
+                    <ul>
+                        <li>Your account credentials (email, password)</li>
+                        <li>Personal contact information (phone number, address)</li>
+                        <li>Uploaded photos and documents</li>
+                        <li>Your name is anonymized in any remaining content</li>
+                    </ul>
+
+                    <h5 class="mt-3">What May Remain</h5>
+                    <p>For transparency and legal compliance, some data may be retained:</p>
+                    <ul>
+                        <li><strong>Reviews you wrote:</strong> Remain visible but anonymized (helps maintain platform integrity)</li>
+                        <li><strong>Doctor profiles:</strong> May remain visible in anonymized form if you're a healthcare provider</li>
+                        <li><strong>Legal records:</strong> Data required for legal compliance, fraud prevention, or dispute resolution</li>
+                        <li><strong>Analytics:</strong> Anonymized usage statistics</li>
+                        <li><strong>Backups:</strong> Data may persist in backups for up to 90 days before permanent deletion</li>
+                    </ul>
+
+                    <h5 class="mt-3">Healthcare Provider Deletion</h5>
+                    <p>When a doctor deletes their account:</p>
+                    <ul>
+                        <li>Profile is removed from search results and listings</li>
+                        <li>Verification documents are permanently deleted</li>
+                        <li>Professional information (NMC number, phone) is deleted</li>
+                        <li>Patient reviews may remain visible (anonymized) for public health transparency</li>
+                        <li>Doctor responses to reviews are deleted</li>
+                    </ul>
                 </div>
             </div>
 
@@ -143,9 +217,10 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h3>Contact Us</h3>
-                    <p>If you have questions about this Privacy Policy, please contact us:</p>
+                    <p>If you have questions about this Privacy Policy or data practices, please contact us:</p>
                     <ul>
-                        <li><strong>Email:</strong> <a href="mailto:privacy@ranksewa.com">privacy@ranksewa.com</a></li>
+                        <li><strong>General Support:</strong> <a href="mailto:support@ranksewa.com">support@ranksewa.com</a></li>
+                        <li><strong>Legal/Privacy:</strong> <a href="mailto:legal@ranksewa.com">legal@ranksewa.com</a></li>
                         <li><strong>Website:</strong> <a href="https://ranksewa.com">https://ranksewa.com</a></li>
                     </ul>
                 </div>
