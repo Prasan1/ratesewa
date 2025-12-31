@@ -11,7 +11,7 @@ services:
 
     build_command: pip install -r requirements.txt && python3 init_db.py
 
-    run_command: gunicorn --worker-tmp-dir /dev/shm --workers 2 --bind 0.0.0.0:8080 app:app
+    run_command: gunicorn --worker-tmp-dir /dev/shm --workers 2 --bind 0.0.0.0:8080 wsgi:application
 
     http_port: 8080
 
