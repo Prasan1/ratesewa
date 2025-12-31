@@ -483,6 +483,132 @@ def claim_profile_submit(doctor_id):
         flash(f'An error occurred while processing your request: {str(e)}', 'danger')
         return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
 
+
+@app.route('/doctor/self-register', methods=['GET'])
+@login_required
+def doctor_self_register():
+    """Show self-registration form for doctors not in the database"""
+    cities = City.query.order_by(City.name).all()
+    specialties = Specialty.query.order_by(Specialty.name).all()
+    return render_template('doctor_self_register.html', cities=cities, specialties=specialties)
+
+
+@app.route('/doctor/self-register/submit', methods=['POST'])
+@login_required
+def doctor_self_register_submit():
+    """Process doctor self-registration submission"""
+    try:
+        # Get form data - all fields are mandatory
+        name = request.form.get('name', '').strip()
+        specialty_id = request.form.get('specialty_id')
+        city_id = request.form.get('city_id')
+        education = request.form.get('education', '').strip()
+        college = request.form.get('college', '').strip()
+        experience = request.form.get('experience')
+        nmc_number = request.form.get('nmc_number', '').strip()
+        phone_number = request.form.get('phone_number', '').strip()
+        email = request.form.get('email', '').strip()
+        practice_address = request.form.get('practice_address', '').strip()
+
+        # Validate all required fields
+        if not all([name, specialty_id, city_id, education, college, experience,
+                   nmc_number, phone_number, email, practice_address]):
+            flash('All fields are required. Please complete the form.', 'danger')
+            return redirect(url_for('doctor_self_register'))
+
+        # Convert experience to integer
+        try:
+            experience = int(experience)
+            if experience < 0 or experience > 60:
+                raise ValueError("Experience must be between 0 and 60 years")
+        except ValueError:
+            flash('Please enter a valid experience (0-60 years).', 'danger')
+            return redirect(url_for('doctor_self_register'))
+
+        # Validate specialty and city exist
+        specialty = Specialty.query.get(specialty_id)
+        city = City.query.get(city_id)
+        if not specialty or not city:
+            flash('Invalid specialty or city selected.', 'danger')
+            return redirect(url_for('doctor_self_register'))
+
+        # Check if NMC number already exists
+        existing_doctor = Doctor.query.filter_by(nmc_number=nmc_number).first()
+        if existing_doctor:
+            flash('This NMC number is already registered. Please claim your existing profile instead.', 'warning')
+            return redirect(url_for('claim_profile'))
+
+        # Check for pending verification request with this NMC
+        existing_request = VerificationRequest.query.filter_by(
+            nmc_number=nmc_number,
+            status='pending'
+        ).first()
+        if existing_request:
+            flash('A verification request with this NMC number is already pending review.', 'warning')
+            return redirect(url_for('user_profile'))
+
+        # Handle file uploads - all are mandatory
+        medical_degree = request.files.get('medical_degree')
+        govt_id = request.files.get('govt_id')
+        practice_license = request.files.get('practice_license')
+
+        if not medical_degree or not govt_id or not practice_license:
+            flash('All document uploads are required.', 'danger')
+            return redirect(url_for('doctor_self_register'))
+
+        # Create a temporary doctor ID for file storage (use user_id as placeholder)
+        temp_doctor_id = f"new_{session['user_id']}"
+
+        # Save files
+        upload_folder = app.config['UPLOAD_FOLDER']
+        medical_degree_path = upload_utils.save_verification_document(
+            medical_degree, upload_folder, temp_doctor_id, 'medical_degree'
+        )
+        govt_id_path = upload_utils.save_verification_document(
+            govt_id, upload_folder, temp_doctor_id, 'govt_id'
+        )
+        practice_license_path = upload_utils.save_verification_document(
+            practice_license, upload_folder, temp_doctor_id, 'practice_license'
+        )
+
+        # Create verification request with is_new_doctor=True
+        verification_request = VerificationRequest(
+            doctor_id=None,  # No doctor profile yet
+            user_id=session['user_id'],
+            is_new_doctor=True,
+            proposed_name=name,
+            proposed_specialty_id=specialty_id,
+            proposed_city_id=city_id,
+            proposed_education=education,
+            proposed_college=college,
+            proposed_experience=experience,
+            nmc_number=nmc_number,
+            phone_number=phone_number,
+            email=email,
+            practice_address=practice_address,
+            practice_city_id=city_id,  # Using same city for practice
+            medical_degree_path=medical_degree_path,
+            govt_id_path=govt_id_path,
+            practice_license_path=practice_license_path,
+            email_verified=True,  # Email is already verified through user account
+            status='pending'
+        )
+
+        db.session.add(verification_request)
+        db.session.commit()
+
+        flash('Registration submitted successfully! Our admin team will review your application within 2-3 business days. You will receive an email notification once reviewed.', 'success')
+        return redirect(url_for('user_profile'))
+
+    except ValueError as e:
+        flash(str(e), 'danger')
+        return redirect(url_for('doctor_self_register'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred while processing your registration: {str(e)}', 'danger')
+        return redirect(url_for('doctor_self_register'))
+
+
 # --- SQLAlchemy Teardown ---
 @app.teardown_appcontext
 def shutdown_session(exception=None):
@@ -1066,27 +1192,79 @@ def admin_verification_detail(request_id):
 
         if action == 'approve':
             try:
-                # Link user to doctor profile
                 user = verification_request.user
-                user.doctor_id = verification_request.doctor_id
-                user.role = 'doctor'
 
-                # Mark doctor as verified
-                doctor = verification_request.doctor
-                doctor.is_verified = True
-                doctor.nmc_number = verification_request.nmc_number
-                doctor.phone_number = verification_request.phone_number
-                doctor.practice_address = verification_request.practice_address
+                # Check if this is a new doctor registration
+                if verification_request.is_new_doctor:
+                    # Create new doctor profile from verification data
+                    from slugify import slugify
 
-                # Update verification request
-                verification_request.status = 'approved'
-                verification_request.reviewed_by = session['user_id']
-                verification_request.reviewed_at = datetime.utcnow()
+                    # Generate unique slug
+                    base_slug = slugify(verification_request.proposed_name)
+                    slug = base_slug
+                    counter = 1
+                    while Doctor.query.filter_by(slug=slug).first():
+                        slug = f"{base_slug}-{counter}"
+                        counter += 1
 
-                db.session.commit()
+                    # Create new doctor
+                    new_doctor = Doctor(
+                        name=verification_request.proposed_name,
+                        slug=slug,
+                        city_id=verification_request.proposed_city_id,
+                        specialty_id=verification_request.proposed_specialty_id,
+                        education=verification_request.proposed_education,
+                        college=verification_request.proposed_college,
+                        experience=verification_request.proposed_experience,
+                        nmc_number=verification_request.nmc_number,
+                        phone_number=verification_request.phone_number,
+                        practice_address=verification_request.practice_address,
+                        is_verified=True,  # Immediately verified upon approval
+                        is_active=True,
+                        is_featured=False,
+                        subscription_tier='free',  # Start with free tier
+                        description=f"Verified doctor with {verification_request.proposed_experience} years of experience."
+                    )
 
-                flash(f'Verification approved! {doctor.name} is now verified and linked to {user.name}.', 'success')
-                return redirect(url_for('admin_verification_requests'))
+                    db.session.add(new_doctor)
+                    db.session.flush()  # Get the doctor ID
+
+                    # Link user to the new doctor profile
+                    user.doctor_id = new_doctor.id
+                    user.role = 'doctor'
+
+                    # Update verification request with the new doctor_id
+                    verification_request.doctor_id = new_doctor.id
+                    verification_request.status = 'approved'
+                    verification_request.reviewed_by = session['user_id']
+                    verification_request.reviewed_at = datetime.utcnow()
+
+                    db.session.commit()
+
+                    flash(f'New doctor profile created and verified! {new_doctor.name} is now live and linked to {user.name}.', 'success')
+                    return redirect(url_for('admin_verification_requests'))
+
+                else:
+                    # Existing flow: claiming an existing profile
+                    user.doctor_id = verification_request.doctor_id
+                    user.role = 'doctor'
+
+                    # Mark doctor as verified
+                    doctor = verification_request.doctor
+                    doctor.is_verified = True
+                    doctor.nmc_number = verification_request.nmc_number
+                    doctor.phone_number = verification_request.phone_number
+                    doctor.practice_address = verification_request.practice_address
+
+                    # Update verification request
+                    verification_request.status = 'approved'
+                    verification_request.reviewed_by = session['user_id']
+                    verification_request.reviewed_at = datetime.utcnow()
+
+                    db.session.commit()
+
+                    flash(f'Verification approved! {doctor.name} is now verified and linked to {user.name}.', 'success')
+                    return redirect(url_for('admin_verification_requests'))
 
             except Exception as e:
                 db.session.rollback()
