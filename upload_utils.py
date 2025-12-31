@@ -240,3 +240,99 @@ def get_upload_path(upload_folder, doctor_id, filename):
         Full file path
     """
     return os.path.join(upload_folder, 'verification', str(doctor_id), filename)
+
+
+def save_profile_photo(file, upload_folder, doctor_id, max_size_mb=5):
+    """
+    Save and optimize a doctor's profile photo
+
+    Args:
+        file: FileStorage object from request.files
+        upload_folder: Base upload folder path
+        doctor_id: ID of the doctor
+        max_size_mb: Maximum file size in MB (default 5MB)
+
+    Returns:
+        Relative path to saved photo, or None if save failed
+    """
+    if not file or file.filename == '':
+        return None
+
+    # Validate file type - only images allowed
+    if not allowed_file(file.filename, 'image'):
+        raise ValueError(f"Invalid file type. Allowed: {', '.join(ALLOWED_EXTENSIONS['image'])}")
+
+    # Validate file size
+    if not validate_file_size(file, max_mb=max_size_mb):
+        raise ValueError(f"File too large. Maximum size: {max_size_mb}MB")
+
+    # Validate image dimensions
+    is_valid, message = validate_image_dimensions(file, min_width=100, min_height=100)
+    if not is_valid:
+        raise ValueError(message)
+
+    # Create photos directory
+    photos_folder = os.path.join(upload_folder, 'photos')
+    os.makedirs(photos_folder, exist_ok=True)
+
+    # Generate unique filename
+    unique_filename = generate_unique_filename(file.filename)
+
+    # Save and optimize image
+    filepath = os.path.join(photos_folder, unique_filename)
+
+    try:
+        # Open and process image
+        img = Image.open(file)
+
+        # Convert RGBA to RGB if necessary (for PNG with transparency)
+        if img.mode in ('RGBA', 'LA', 'P'):
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+            background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+            img = background
+
+        # Resize if image is too large (max 800x800 for profile photos)
+        max_dimension = 800
+        if img.width > max_dimension or img.height > max_dimension:
+            img.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
+
+        # Save optimized image
+        img.save(filepath, 'JPEG', quality=85, optimize=True)
+
+        # Return relative path
+        relative_path = os.path.join('photos', unique_filename)
+        return relative_path
+
+    except Exception as e:
+        # If save fails, clean up and raise error
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        raise ValueError(f"Error processing image: {str(e)}")
+
+
+def delete_profile_photo(upload_folder, relative_path):
+    """
+    Delete a profile photo from filesystem
+
+    Args:
+        upload_folder: Base upload folder path
+        relative_path: Relative path to the photo
+
+    Returns:
+        Boolean indicating if deletion was successful
+    """
+    if not relative_path:
+        return False
+
+    full_path = os.path.join(upload_folder, relative_path)
+
+    try:
+        if os.path.exists(full_path):
+            os.remove(full_path)
+            return True
+        return False
+    except Exception as e:
+        print(f"Error deleting photo {full_path}: {e}")
+        return False

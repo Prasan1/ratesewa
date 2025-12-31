@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Account - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Back Button -->
+            <div class="mb-3">
+                <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Delete Your Account</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-warning me-2"></i>Warning: This Action Cannot Be Undone</h5>
+                        <p class="mb-0">
+                            Deleting your account is permanent. Please read the following carefully before proceeding.
+                        </p>
+                    </div>
+
+                    <h5 class="mb-3">What Will Happen:</h5>
+                    <ul class="mb-4">
+                        <li><strong>Your profile will be removed</strong> from search results and public listings</li>
+                        <li><strong>Your account will be deactivated</strong> - you won't be able to log in</li>
+                        <li><strong>Patient reviews will remain visible</strong> for transparency, but your name will be anonymized</li>
+                        <li><strong>All your personal data</strong> (email, phone, documents) will be permanently deleted</li>
+                        <li><strong>Your responses to reviews</strong> will be removed</li>
+                        <li><strong>Any active subscriptions</strong> will be cancelled immediately</li>
+                    </ul>
+
+                    <h5 class="mb-3">Before You Delete:</h5>
+                    <ul class="mb-4">
+                        <li>Download any data you need from your profile</li>
+                        <li>Cancel any active subscriptions if applicable</li>
+                        <li>If you have concerns about your profile, please contact <a href="mailto:support@ranksewa.com">support@ranksewa.com</a> instead</li>
+                        <li>If you're receiving unwanted contact from patients, we can help address that without deleting your account</li>
+                    </ul>
+
+                    <hr class="my-4">
+
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-envelope me-2"></i>How to Delete Your Account</h5>
+                        <p>
+                            For security and verification purposes, account deletion requests must be processed manually by our team.
+                        </p>
+                        <p class="mb-0">
+                            <strong>To delete your account, please email us at:</strong>
+                            <br>
+                            <a href="mailto:support@ranksewa.com?subject=Account Deletion Request - {{ doctor.name }}&body=I would like to request the deletion of my doctor account.%0D%0A%0D%0ADoctor Name: {{ doctor.name }}%0D%0AEmail: {{ user.email }}%0D%0A%0D%0AReason for leaving (optional):%0D%0A" class="btn btn-primary mt-2">
+                                <i class="fas fa-envelope me-2"></i>Email Support to Delete Account
+                            </a>
+                        </p>
+                    </div>
+
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h6 class="mb-2"><i class="fas fa-question-circle me-2"></i>What to Include in Your Email:</h6>
+                            <ul class="mb-0 small">
+                                <li>Your registered email address</li>
+                                <li>Your full name as it appears on your profile</li>
+                                <li>Reason for account deletion (optional but helpful)</li>
+                                <li>Any feedback on how we can improve</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <p class="text-muted small">
+                        <strong>Response Time:</strong> We typically process account deletion requests within 2-3 business days.
+                        You'll receive a confirmation email once your account has been deleted.
+                    </p>
+
+                    <div class="d-grid">
+                        <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Need Help Card -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-life-ring me-2"></i>Need Help?</h5>
+                    <p class="card-text">
+                        If you're experiencing issues or have concerns, our support team is here to help.
+                        We can assist with:
+                    </p>
+                    <ul class="mb-3">
+                        <li>Profile updates or corrections</li>
+                        <li>Managing patient reviews</li>
+                        <li>Privacy concerns</li>
+                        <li>Subscription or billing questions</li>
+                    </ul>
+                    <a href="mailto:support@ranksewa.com" class="btn btn-primary">
+                        <i class="fas fa-envelope me-2"></i>Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

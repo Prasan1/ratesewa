@@ -188,9 +188,25 @@
                         <small>
                             Your documents will be securely stored and only reviewed by our admin team for verification purposes.
                             We will never share your personal documents with third parties.
-                            By submitting this form, you agree to our <a href="{{ url_for('terms') }}" target="_blank">Terms of Service</a>
-                            and <a href="{{ url_for('privacy') }}" target="_blank">Privacy Policy</a>.
                         </small>
+                    </div>
+
+                    <!-- Age Verification -->
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="age_confirm" required>
+                        <label class="form-check-label" for="age_confirm">
+                            I confirm that I am at least 16 years old
+                        </label>
+                    </div>
+
+                    <!-- Terms and Conditions Agreement -->
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="terms_agree" required>
+                        <label class="form-check-label" for="terms_agree">
+                            I certify that all information provided is accurate and I agree to RankSewa's
+                            <a href="{{ url_for('terms') }}" target="_blank">Terms of Service</a> and
+                            <a href="{{ url_for('privacy') }}" target="_blank">Privacy Policy</a>
+                        </label>
                     </div>
 
                     <!-- Submit Buttons -->

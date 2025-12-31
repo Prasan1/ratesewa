@@ -13,7 +13,7 @@
 
 <div class="card">
     <div class="card-body">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="row g-3">
                 <div class="col-md-6">
@@ -51,13 +51,41 @@
                     <input type="text" class="form-control" id="college" name="college" value="{{ doctor.college if doctor else '' }}">
                 </div>
                 <div class="col-12">
-                    <label for="photo_url" class="form-label">
-                        Photo URL
+                    <label for="profile_photo" class="form-label">
+                        Profile Photo
                         <small class="text-muted">(Optional - Leave empty for default avatar)</small>
                     </label>
-                    <input type="url" class="form-control" id="photo_url" name="photo_url" value="{{ doctor.photo_url if doctor else '' }}" placeholder="https://example.com/doctor-photo.jpg">
-                    <div class="form-text">
-                        Upload photo to image hosting service (imgur.com, imgbb.com) and paste URL here
+                    <div class="d-flex align-items-start gap-3">
+                        <!-- Current Photo Preview -->
+                        {% if doctor and doctor.photo_url %}
+                        <div>
+                            <img src="{{ url_for('serve_photo', filename=doctor.photo_url.split('/')[-1]) }}"
+                                 alt="{{ doctor.name }}"
+                                 class="rounded-circle"
+                                 style="width: 80px; height: 80px; object-fit: cover;"
+                                 id="photoPreview">
+                        </div>
+                        {% endif %}
+
+                        <!-- Upload Input -->
+                        <div class="flex-grow-1">
+                            <input type="file"
+                                   class="form-control"
+                                   id="profile_photo"
+                                   name="profile_photo"
+                                   accept=".jpg,.jpeg,.png">
+                            <div class="form-text">
+                                Upload JPG or PNG (max 5MB, min 100x100px)
+                            </div>
+                            {% if doctor and doctor.photo_url %}
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="remove_photo" name="remove_photo">
+                                <label class="form-check-label text-danger" for="remove_photo">
+                                    Remove current photo
+                                </label>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-12 d-flex align-items-end gap-3">

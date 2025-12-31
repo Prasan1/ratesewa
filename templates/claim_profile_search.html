@@ -4,32 +4,78 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-sm">
+    <div class="col-lg-10">
+        <div class="card shadow-sm border-0">
             <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
-                    <h2 class="card-title">Claim Your Doctor Profile</h2>
-                    <p class="text-muted">Are you a healthcare provider listed on RankSewa? Claim your profile to manage your information and respond to patient reviews.</p>
+                <div class="text-center mb-5">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white mb-3" style="width: 64px; height: 64px;">
+                        <i class="fas fa-user-md fa-2x"></i>
+                    </div>
+                    <h2 class="card-title mb-2">Claim Your Doctor Profile</h2>
+                    <p class="text-muted mb-0">Join verified providers on RankSewa and take control of your presence, reviews, and patient trust.</p>
                 </div>
 
-                <!-- Search Form -->
-                <form method="GET" action="{{ url_for('claim_profile') }}" class="mb-4">
-                    <div class="input-group input-group-lg">
-                        <input type="text"
-                               class="form-control"
-                               name="search"
-                               placeholder="Search your name..."
-                               value="{{ search_query or '' }}"
-                               required>
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-search me-2"></i>Search
-                        </button>
+                <div class="row g-4 align-items-stretch mb-4">
+                    <div class="col-lg-7">
+                        <div class="card h-100 border-0 bg-light">
+                            <div class="card-body p-4">
+                                <h5 class="mb-3"><i class="fas fa-magnifying-glass me-2 text-primary"></i>Find your profile</h5>
+                                <form method="GET" action="{{ url_for('claim_profile') }}">
+                                    <div class="input-group input-group-lg">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="search"
+                                               placeholder="Search your name..."
+                                               value="{{ search_query or '' }}"
+                                               required>
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-search me-2"></i>Search
+                                        </button>
+                                    </div>
+                                    <small class="form-text text-muted mt-2 d-block">
+                                        <i class="fas fa-info-circle"></i> Enter your name as it appears on your practice
+                                    </small>
+                                </form>
+                                <div class="d-flex flex-wrap gap-2 mt-3">
+                                    <span class="badge rounded-pill text-bg-light border">Verification review in 2-3 days</span>
+                                    <span class="badge rounded-pill text-bg-light border">Secure document checks</span>
+                                    <span class="badge rounded-pill text-bg-light border">Free to claim</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <small class="form-text text-muted mt-2 d-block">
-                        <i class="fas fa-info-circle"></i> Enter your name as it appears on your practice
-                    </small>
-                </form>
+                    <div class="col-lg-5">
+                        <div class="card h-100 border-0">
+                            <div class="card-body p-4">
+                                <h5 class="mb-3"><i class="fas fa-star text-warning me-2"></i>Why doctors claim</h5>
+                                <ul class="list-unstyled mb-3">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Control profile details and practice info</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Respond to patient reviews professionally</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Earn a verified badge that builds trust</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Access insights on profile views</li>
+                                </ul>
+                                <div class="border-top pt-3">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="text-center flex-grow-1">
+                                            <div class="fw-semibold">Trusted</div>
+                                            <small class="text-muted">By patients nationwide</small>
+                                        </div>
+                                        <div class="vr mx-3"></div>
+                                        <div class="text-center flex-grow-1">
+                                            <div class="fw-semibold">Verified</div>
+                                            <small class="text-muted">Credential checks</small>
+                                        </div>
+                                        <div class="vr mx-3"></div>
+                                        <div class="text-center flex-grow-1">
+                                            <div class="fw-semibold">Secure</div>
+                                            <small class="text-muted">Protected uploads</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 {% if search_query %}
                     <hr class="my-4">
@@ -84,10 +130,10 @@
                         </div>
 
                         <!-- Not Listed CTA -->
-                        <div class="card bg-primary text-white mb-3">
+                        <div class="card bg-primary text-white mb-3 border-0">
                             <div class="card-body text-center p-4">
-                                <h5 class="mb-3"><i class="fas fa-user-plus me-2"></i>Not Listed on RankSewa Yet?</h5>
-                                <p class="mb-3">Join hundreds of doctors building their online presence. Add your profile and get verified!</p>
+                                <h5 class="mb-2"><i class="fas fa-user-plus me-2"></i>Not Listed on RankSewa Yet?</h5>
+                                <p class="mb-3">Create a new profile and submit documents for verification.</p>
                                 <a href="{{ url_for('doctor_self_register') }}" class="btn btn-light btn-lg">
                                     <i class="fas fa-plus-circle me-2"></i>Register as a New Doctor
                                 </a>
@@ -96,43 +142,55 @@
                     {% endif %}
                 {% endif %}
 
-                <!-- Benefits Section -->
-                <div class="mt-5">
-                    <h5 class="mb-3"><i class="fas fa-star text-warning me-2"></i>Benefits of Claiming Your Profile</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <ul class="list-unstyled">
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Respond to patient reviews</li>
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Update your practice information</li>
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Get verified badge</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <ul class="list-unstyled">
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>View profile analytics</li>
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Connect with more patients</li>
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Build your online reputation</li>
-                            </ul>
+                <div class="row g-4 mt-4">
+                    <div class="col-lg-7">
+                        <div class="card border-0 bg-light h-100">
+                            <div class="card-body p-4">
+                                <h5 class="mb-3"><i class="fas fa-list-check text-primary me-2"></i>How it works</h5>
+                                <div class="d-flex flex-column gap-3">
+                                    <div class="d-flex gap-3">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">1</div>
+                                        <div>
+                                            <div class="fw-semibold">Search and select your profile</div>
+                                            <div class="text-muted small">We match your listing by name and location.</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-3">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">2</div>
+                                        <div>
+                                            <div class="fw-semibold">Upload verification documents</div>
+                                            <div class="text-muted small">NMC license, degree, and ID for review.</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-3">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">3</div>
+                                        <div>
+                                            <div class="fw-semibold">Get verified and manage your profile</div>
+                                            <div class="text-muted small">Respond to reviews and track engagement.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Self-Registration CTA -->
-                <div class="card border-primary mt-4">
-                    <div class="card-body text-center p-4">
-                        <h5><i class="fas fa-user-plus text-primary me-2"></i>Don't See Your Profile?</h5>
-                        <p class="text-muted mb-3">
-                            If you're a licensed healthcare provider in Nepal and not listed on RankSewa yet,
-                            register yourself and get verified!
-                        </p>
-                        <a href="{{ url_for('doctor_self_register') }}" class="btn btn-primary btn-lg">
-                            <i class="fas fa-plus-circle me-2"></i>Register as a New Doctor
-                        </a>
-                        <div class="mt-3">
-                            <small class="text-muted">
-                                <i class="fas fa-shield-alt me-1"></i>
-                                Free to join • Get verified • Build your reputation
-                            </small>
+                    <div class="col-lg-5">
+                        <div class="card border-primary h-100">
+                            <div class="card-body text-center p-4">
+                                <h5><i class="fas fa-user-plus text-primary me-2"></i>Don't See Your Profile?</h5>
+                                <p class="text-muted mb-3">
+                                    If you're a licensed healthcare provider in Nepal and not listed on RankSewa yet,
+                                    register yourself and get verified.
+                                </p>
+                                <a href="{{ url_for('doctor_self_register') }}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-plus-circle me-2"></i>Register as a New Doctor
+                                </a>
+                                <div class="mt-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-shield-alt me-1"></i>
+                                        Free to join • Get verified • Build your reputation
+                                    </small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

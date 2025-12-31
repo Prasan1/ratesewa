@@ -18,7 +18,7 @@
                     <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Your Profile</h4>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" action="{{ url_for('doctor_profile_edit') }}">
+                    <form method="POST" action="{{ url_for('doctor_profile_edit') }}" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
                         <!-- Read-only fields -->
@@ -49,6 +49,51 @@
 
                         <!-- Editable Fields -->
                         <h5 class="mb-3">Editable Information</h5>
+
+                        <!-- Profile Photo -->
+                        <div class="mb-4">
+                            <label for="profile_photo" class="form-label">
+                                <i class="fas fa-camera me-1"></i><strong>Profile Photo</strong>
+                            </label>
+                            <div class="d-flex align-items-start gap-3">
+                                <!-- Current Photo Preview -->
+                                <div>
+                                    {% if doctor.photo_url %}
+                                    <img src="{{ url_for('serve_photo', filename=doctor.photo_url.split('/')[-1]) }}"
+                                         alt="{{ doctor.name }}"
+                                         class="rounded-circle"
+                                         style="width: 100px; height: 100px; object-fit: cover;"
+                                         id="photoPreview">
+                                    {% else %}
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                                         style="width: 100px; height: 100px;"
+                                         id="photoPreview">
+                                        <i class="fas fa-user-md fa-2x"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Upload Input -->
+                                <div class="flex-grow-1">
+                                    <input type="file"
+                                           class="form-control"
+                                           id="profile_photo"
+                                           name="profile_photo"
+                                           accept=".jpg,.jpeg,.png">
+                                    <small class="form-text text-muted">
+                                        Upload a professional photo (JPG or PNG, max 5MB, min 100x100px)
+                                    </small>
+                                    {% if doctor.photo_url %}
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" id="remove_photo" name="remove_photo">
+                                        <label class="form-check-label text-danger" for="remove_photo">
+                                            Remove current photo
+                                        </label>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Description -->
                         <div class="mb-3">
@@ -138,4 +183,41 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Photo preview
+    const photoInput = document.getElementById('profile_photo');
+    const photoPreview = document.getElementById('photoPreview');
+
+    if (photoInput) {
+        photoInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                // Validate file size (5MB)
+                const maxSize = 5 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    alert('File size must not exceed 5MB');
+                    this.value = '';
+                    return;
+                }
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoPreview.innerHTML = `
+                        <img src="${e.target.result}"
+                             alt="Preview"
+                             class="rounded-circle"
+                             style="width: 100px; height: 100px; object-fit: cover;">
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

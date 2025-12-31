@@ -1,0 +1,37 @@
+1. I was able to register and submit the profile as a doctor locally and haven't tested in prod. I think oauth is not working in localhost we need to check. 
+2. When I edit doctors as admin, it asks for photo URL? How do i provide this? 
+3. If we allow pic upload feature for doc, how do we manage image files? 
+4. Admin password need to be changed.
+5. We need a feature to delete data if doctor wants their information to remove
+6. We also need a feature as an admin to flag user comment for inappropiate language or need a way to filter those comments as users type in. 
+   We need to let users know that they have to civil and comment in that manner instead of showing anger or defamaming rehetoric. 
+7. If there's any data policy that we have to follow then we will list that along side our policy section. 
+8. When registration gets submitted, what happens? Who receives it? And how the review process work?
+9. WE need to enforce this strongly: 
+    Registration
+        You must provide accurate and complete information when creating an account
+        You are responsible for maintaining the security of your account
+        You must be at least 16 years old to use this Platform
+        One person may not maintain multiple accounts
+    Account Security
+        Keep your password confidential
+        Notify us immediately of any unauthorized access
+        You are responsible for all activities under your account
+10. Review Guidelines
+    When posting reviews, you agree to:
+
+    Share only your genuine personal experience
+    Be honest, fair, and respectful
+    Not post false, misleading, or defamatory content
+    Not include personal medical information
+    Not use offensive, abusive, or discriminatory language
+    Not promote or advertise products or services
+    Not violate any laws or third-party rights
+    Content Ownership
+    You retain ownership of content you post
+    By posting, you grant RankSewa a non-exclusive, worldwide license to use, display, and distribute your content
+    We may edit or remove Content
+
+11. While registering we will put this terms and condition link and have user click accept before submitting or submit button will not be enabled. 
+12. We will list this email on the footer:  legal@ranksewa.com , support@ranksewa.com
+

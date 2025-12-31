@@ -212,7 +212,7 @@ def login():
             session['role'] = user.role
             flash(f'Welcome back, {user.name}!', 'success')
 
-            next_page = request.args.get('next')
+            next_page = request.values.get('next')
             return redirect(next_page or url_for('index'))
         else:
             flash('Invalid email or password.', 'danger')
@@ -267,6 +267,11 @@ def facebook_callback():
     if not user.is_active:
         flash('Your account has been deactivated. Please contact support.', 'danger')
         return redirect(url_for('login'))
+
+    # Ensure user has a role (fix for users created before migration)
+    if not user.role:
+        user.role = 'patient'
+        db.session.commit()
 
     session['user_id'] = user.id
     session['user_name'] = user.name
@@ -947,7 +952,6 @@ def admin_doctor_new():
         education = request.form.get('education', '').strip()
         college = request.form.get('college', '').strip()
         description = request.form.get('description', '').strip()
-        photo_url = request.form.get('photo_url', '').strip()
         is_featured = bool(request.form.get('is_featured'))
         is_active = bool(request.form.get('is_active'))
         is_verified = bool(request.form.get('is_verified'))
@@ -968,12 +972,28 @@ def admin_doctor_new():
             education=education or None,
             college=college or None,
             description=description or None,
-            photo_url=photo_url or None,
+            photo_url=None,  # Will be set after photo upload
             is_featured=is_featured,
             is_active=is_active,
             is_verified=is_verified
         )
         db.session.add(doctor)
+        db.session.flush()  # Get doctor ID before photo upload
+
+        # Handle photo upload
+        if 'profile_photo' in request.files:
+            photo_file = request.files['profile_photo']
+            if photo_file and photo_file.filename:
+                try:
+                    photo_path = upload_utils.save_profile_photo(
+                        photo_file,
+                        app.config['UPLOAD_FOLDER'],
+                        doctor.id
+                    )
+                    doctor.photo_url = photo_path
+                except ValueError as e:
+                    flash(f'Error uploading photo: {str(e)}', 'warning')
+
         db.session.commit()
         flash('Doctor added successfully.', 'success')
         return redirect(url_for('admin_doctors'))
@@ -995,7 +1015,6 @@ def admin_doctor_edit(doctor_id):
         education = request.form.get('education', '').strip()
         college = request.form.get('college', '').strip()
         description = request.form.get('description', '').strip()
-        photo_url = request.form.get('photo_url', '').strip()
         is_featured = bool(request.form.get('is_featured'))
         is_active = bool(request.form.get('is_active'))
         is_verified = bool(request.form.get('is_verified'))
@@ -1014,10 +1033,32 @@ def admin_doctor_edit(doctor_id):
         doctor.education = education or None
         doctor.college = college or None
         doctor.description = description or None
-        doctor.photo_url = photo_url or None
         doctor.is_featured = is_featured
         doctor.is_active = is_active
         doctor.is_verified = is_verified
+
+        # Handle profile photo removal
+        if 'remove_photo' in request.form and doctor.photo_url:
+            upload_utils.delete_profile_photo(app.config['UPLOAD_FOLDER'], doctor.photo_url)
+            doctor.photo_url = None
+
+        # Handle photo upload
+        if 'profile_photo' in request.files:
+            photo_file = request.files['profile_photo']
+            if photo_file and photo_file.filename:
+                try:
+                    # Delete old photo if exists
+                    if doctor.photo_url:
+                        upload_utils.delete_profile_photo(app.config['UPLOAD_FOLDER'], doctor.photo_url)
+
+                    photo_path = upload_utils.save_profile_photo(
+                        photo_file,
+                        app.config['UPLOAD_FOLDER'],
+                        doctor.id
+                    )
+                    doctor.photo_url = photo_path
+                except ValueError as e:
+                    flash(f'Error uploading photo: {str(e)}', 'warning')
 
         db.session.commit()
         flash('Doctor updated successfully.', 'success')
@@ -1580,6 +1621,21 @@ def serve_verification_document(request_id, doc_type):
     return send_from_directory(directory, filename)
 
 
+@app.route('/uploads/photos/<filename>')
+def serve_photo(filename):
+    """Serve profile photos (publicly accessible)"""
+    from flask import send_from_directory
+    import os
+
+    photos_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'photos')
+
+    # Security: Prevent directory traversal
+    if '..' in filename or filename.startswith('/'):
+        abort(404)
+
+    return send_from_directory(photos_folder, filename)
+
+
 # --- Doctor Dashboard Routes ---
 @app.route('/doctor/dashboard')
 @doctor_required
@@ -1627,8 +1683,37 @@ def doctor_profile_edit():
             doctor.college = request.form.get('college', '').strip()
             doctor.practice_address = request.form.get('practice_address', '').strip()
 
+            # Handle profile photo removal
+            if 'remove_photo' in request.form and doctor.photo_url:
+                # Delete old photo
+                upload_utils.delete_profile_photo(app.config['UPLOAD_FOLDER'], doctor.photo_url)
+                doctor.photo_url = None
+                flash('Profile photo removed.', 'info')
+
+            # Handle photo upload
+            if 'profile_photo' in request.files:
+                photo_file = request.files['profile_photo']
+                if photo_file and photo_file.filename:
+                    try:
+                        # Delete old photo if exists
+                        if doctor.photo_url:
+                            upload_utils.delete_profile_photo(app.config['UPLOAD_FOLDER'], doctor.photo_url)
+
+                        # Save new photo
+                        photo_path = upload_utils.save_profile_photo(
+                            photo_file,
+                            app.config['UPLOAD_FOLDER'],
+                            doctor.id
+                        )
+                        doctor.photo_url = photo_path
+                        flash('Profile photo updated successfully!', 'success')
+
+                    except ValueError as e:
+                        flash(f'Error uploading photo: {str(e)}', 'warning')
+
             db.session.commit()
-            flash('Profile updated successfully!', 'success')
+            if 'remove_photo' not in request.form and 'profile_photo' not in request.files:
+                flash('Profile updated successfully!', 'success')
             return redirect(url_for('doctor_dashboard'))
 
         except Exception as e:
@@ -1735,6 +1820,16 @@ def doctor_analytics():
                          response_count=response_count,
                          response_rate=response_rate,
                          rating_breakdown=rating_breakdown)
+
+
+@app.route('/doctor/delete-account', methods=['GET'])
+@doctor_required
+def doctor_delete_account():
+    """Show account deletion information page (directs to email support)"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    return render_template('doctor_delete_account.html', doctor=doctor, user=user)
 
 
 # --- User Profile Route ---

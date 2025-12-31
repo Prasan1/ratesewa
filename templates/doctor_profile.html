@@ -156,6 +156,21 @@
                 <input type="hidden" name="doctor_slug" value="{{ doctor.slug }}">
 
                 <div class="modal-body">
+                    <!-- Review Guidelines Notice -->
+                    <div class="alert alert-info mb-3">
+                        <h6 class="mb-2"><i class="fas fa-info-circle me-2"></i>Review Guidelines</h6>
+                        <small>
+                            Please be honest, fair, and respectful in your review. Share only your genuine personal experience.
+                            <strong>Do not</strong> include:
+                            <ul class="mb-0 mt-1 small">
+                                <li>False, misleading, or defamatory content</li>
+                                <li>Personal medical information</li>
+                                <li>Offensive, abusive, or discriminatory language</li>
+                                <li>Promotional content or advertisements</li>
+                            </ul>
+                        </small>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label">Your Rating</label>
                         <div class="star-rating" data-rating="0">
@@ -170,7 +185,10 @@
 
                     <div class="mb-3">
                         <label for="comment" class="form-label">Your Review</label>
-                        <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="Share your experience with this doctor..." required></textarea>
+                        <textarea class="form-control" id="comment" name="comment" rows="4" placeholder="Share your genuine experience with this doctor. Be honest, fair, and respectful..." required></textarea>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-handshake me-1"></i>Help others by being civil and constructive in your feedback
+                        </small>
                     </div>
                 </div>
                 <div class="modal-footer">
