@@ -1322,6 +1322,26 @@ def run_import_doctors():
         flash(f'Error during import: {str(e)}', 'danger')
         return redirect(url_for('import_doctors_page'))
 
+@app.route('/admin/activate-all-doctors', methods=['POST'])
+@admin_required
+def activate_all_doctors():
+    """Activate all inactive doctors (one-time fix)"""
+    try:
+        inactive_doctors = Doctor.query.filter_by(is_active=False).all()
+        count = len(inactive_doctors)
+
+        for doctor in inactive_doctors:
+            doctor.is_active = True
+
+        db.session.commit()
+
+        flash(f'Successfully activated {count} doctors! They should now appear on the homepage.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error activating doctors: {str(e)}', 'danger')
+
+    return redirect(url_for('import_doctors_page'))
+
 # --- DOCTOR PROFILE ROUTE (USES SLUG) ---
 @app.route('/doctor/<slug>')
 def doctor_profile(slug):

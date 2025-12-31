@@ -186,7 +186,8 @@ def import_doctors(use_app_context=True):
                     college=None,
                     experience=years_exp,
                     photo_url=None,
-                    slug=slug
+                    slug=slug,
+                    is_active=True  # Make sure imported doctors are active
                 )
 
                 db.session.add(doctor)

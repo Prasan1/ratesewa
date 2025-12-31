@@ -77,15 +77,25 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ url_for('run_import_doctors') }}" class="mt-4" onsubmit="return confirm('Are you sure you want to run the import?');">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-play me-2"></i>Run Import Now
-                        </button>
-                        <a href="{{ url_for('admin_doctors') }}" class="btn btn-secondary btn-lg ms-2">
+                    <div class="d-flex gap-2 mt-4 flex-wrap">
+                        <form method="POST" action="{{ url_for('run_import_doctors') }}" class="d-inline" onsubmit="return confirm('Are you sure you want to run the import?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-play me-2"></i>Run Import Now
+                            </button>
+                        </form>
+
+                        <form method="POST" action="{{ url_for('activate_all_doctors') }}" class="d-inline" onsubmit="return confirm('This will activate ALL inactive doctors. Continue?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-toggle-on me-2"></i>Activate All Doctors
+                            </button>
+                        </form>
+
+                        <a href="{{ url_for('admin_doctors') }}" class="btn btn-secondary btn-lg">
                             <i class="fas fa-arrow-left me-2"></i>Cancel
                         </a>
-                    </form>
+                    </div>
                 </div>
             </div>
 
