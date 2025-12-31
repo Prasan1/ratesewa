@@ -310,3 +310,36 @@ class Advertisement(db.Model):
 
     def __repr__(self):
         return f'<Advertisement {self.name} - {self.position}>'
+
+
+class ReviewFlag(db.Model):
+    """
+    Model for flagging inappropriate reviews
+    NOT for removing negative reviews - only for content moderation
+    """
+    __tablename__ = 'review_flags'
+
+    id = db.Column(db.Integer, primary_key=True)
+    rating_id = db.Column(db.Integer, db.ForeignKey('ratings.id'), nullable=False)
+    reporter_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # Null if anonymous
+
+    # Flag details
+    reason = db.Column(db.String(50), nullable=False)  # 'offensive', 'discriminatory', 'false', 'privacy', 'spam'
+    additional_details = db.Column(db.Text, nullable=True)
+
+    # Review status
+    status = db.Column(db.String(20), default='pending')  # 'pending', 'reviewed', 'approved', 'dismissed'
+    admin_notes = db.Column(db.Text, nullable=True)
+    reviewed_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    reviewed_at = db.Column(db.DateTime, nullable=True)
+
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    rating = db.relationship('Rating', foreign_keys=[rating_id], backref='flags')
+    reporter = db.relationship('User', foreign_keys=[reporter_user_id])
+    reviewer = db.relationship('User', foreign_keys=[reviewed_by])
+
+    def __repr__(self):
+        return f'<ReviewFlag {self.id} - Rating {self.rating_id} - {self.reason}>'

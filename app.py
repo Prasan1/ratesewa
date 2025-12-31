@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from authlib.integrations.flask_client import OAuth
-from models import db, City, Specialty, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse
+from models import db, City, Specialty, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag
 from config import Config
 import ad_manager
 import upload_utils
@@ -1321,6 +1321,61 @@ def rate_doctor():
     # Get the doctor's slug to redirect correctly
     doctor = Doctor.query.get(doctor_id)
     return redirect(url_for('doctor_profile', slug=doctor.slug))
+
+
+@app.route('/flag_review', methods=['POST'])
+def flag_review():
+    """Flag a review as inappropriate (content moderation, NOT for negative reviews)"""
+    rating_id = request.form.get('rating_id')
+    reason = request.form.get('reason')
+    additional_details = request.form.get('additional_details', '').strip()
+    doctor_slug = request.form.get('doctor_slug')
+
+    if not rating_id or not reason:
+        flash('Please provide a reason for flagging.', 'danger')
+        return redirect(url_for('doctor_profile', slug=doctor_slug))
+
+    # Validate reason
+    valid_reasons = ['offensive', 'discriminatory', 'false', 'privacy', 'spam']
+    if reason not in valid_reasons:
+        flash('Invalid flag reason.', 'danger')
+        return redirect(url_for('doctor_profile', slug=doctor_slug))
+
+    # Get reporter user ID (null if not logged in - allow anonymous flags)
+    reporter_user_id = session.get('user_id', None)
+
+    # Check if this user already flagged this review
+    if reporter_user_id:
+        existing_flag = ReviewFlag.query.filter_by(
+            rating_id=rating_id,
+            reporter_user_id=reporter_user_id
+        ).first()
+
+        if existing_flag:
+            flash('You have already flagged this review. Our team will review it soon.', 'info')
+            return redirect(url_for('doctor_profile', slug=doctor_slug))
+
+    try:
+        # Create flag
+        flag = ReviewFlag(
+            rating_id=int(rating_id),
+            reporter_user_id=reporter_user_id,
+            reason=reason,
+            additional_details=additional_details or None
+        )
+
+        db.session.add(flag)
+        db.session.commit()
+
+        flash('Thank you for reporting. Our team will review this content within 24-48 hours.', 'success')
+
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error flagging review: {str(e)}")
+        flash('Error submitting flag. Please try again.', 'danger')
+
+    return redirect(url_for('doctor_profile', slug=doctor_slug))
+
 
 @app.route('/book_appointment', methods=['POST'])
 @login_required
