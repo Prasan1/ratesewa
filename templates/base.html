@@ -33,6 +33,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('index') }}">Home</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-primary fw-bold" href="{{ url_for('claim_profile') }}">
+                            <i class="fas fa-user-md me-1"></i>Are You a Doctor?
+                        </a>
+                    </li>
                     {# Hidden for MVP launch #}
                     {# <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('clinics') }}">For Clinics</a>
@@ -61,6 +66,9 @@
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             {% if session.get('role') == 'doctor' %}
                             <li><a class="dropdown-item" href="{{ url_for('doctor_dashboard') }}"><i class="fas fa-user-md me-2"></i>Doctor Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% elif session.get('role') == 'patient' %}
+                            <li><a class="dropdown-item text-primary" href="{{ url_for('claim_profile') }}"><i class="fas fa-user-md me-2"></i>Are You a Doctor? Claim Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             {% endif %}
                             <li><a class="dropdown-item" href="{{ url_for('user_profile') }}"><i class="fas fa-user-circle me-2"></i>My Profile</a></li>
