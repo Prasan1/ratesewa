@@ -1254,8 +1254,8 @@ def run_import_doctors():
         old_stdout = sys.stdout
         sys.stdout = buffer = io.StringIO()
 
-        # Run the import
-        import_doctors()
+        # Run the import (use_app_context=False since we're already in a Flask route)
+        import_doctors(use_app_context=False)
 
         # Get the output
         output = buffer.getvalue()

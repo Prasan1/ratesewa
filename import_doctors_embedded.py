@@ -114,10 +114,15 @@ def create_missing_specialties():
     else:
         print("\n✅ All required specialties already exist\n")
 
-def import_doctors():
-    """Import all embedded doctor data"""
+def import_doctors(use_app_context=True):
+    """Import all embedded doctor data
 
-    with app.app_context():
+    Args:
+        use_app_context: If True, wrap in app.app_context().
+                        Set to False when calling from a Flask route.
+    """
+
+    def _do_import():
         print("=" * 70)
         print("Importing Doctors from Embedded Data")
         print("=" * 70)
@@ -216,6 +221,13 @@ def import_doctors():
             db.session.rollback()
             print(f"\n❌ Error committing changes: {str(e)}")
             print("   All changes have been rolled back.")
+
+    # Run with or without app context
+    if use_app_context:
+        with app.app_context():
+            _do_import()
+    else:
+        _do_import()
 
 if __name__ == '__main__':
     import_doctors()
