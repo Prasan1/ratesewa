@@ -99,7 +99,7 @@ class User(db.Model):
     appointments = db.relationship('Appointment', backref='user', lazy=True)
     contact_messages = db.relationship('ContactMessage', backref='user', lazy=True)
     doctor_profile = db.relationship('Doctor', foreign_keys=[doctor_id], backref='user_account', uselist=False)
-    verification_requests = db.relationship('VerificationRequest', backref='user', lazy=True)
+    verification_requests = db.relationship('VerificationRequest', foreign_keys='VerificationRequest.user_id', backref='user', lazy=True)
 
     def set_password(self, password):
         """Hash and set the user's password"""
