@@ -316,6 +316,14 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('index'))
 
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+@app.route('/terms')
+def terms():
+    return render_template('terms.html')
+
 # --- SQLAlchemy Teardown ---
 @app.teardown_appcontext
 def shutdown_session(exception=None):

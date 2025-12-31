@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}RankSewa - Find & Rank Best Doctors in Nepal{% endblock %}</title>
+    <title>{% block title %}RankSewa - Discover Healthcare Providers Based on Patient Experiences{% endblock %}</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
@@ -98,9 +98,57 @@
         {{ render_ad(get_ad('footer_banner'), 'text-center') }}
     </div> #}
 
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container text-center">
-            <p>&copy; 2025 RankSewa. Find & Rank the Best Doctors in Nepal.</p>
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <!-- About Section -->
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5 class="text-uppercase mb-3">RankSewa</h5>
+                    <p class="text-muted small">Discover healthcare providers in Nepal based on real patient experiences. Reviews reflect individual opinions and experiences, not medical evaluations.</p>
+                </div>
+
+                <!-- Legal Section -->
+                <div class="col-lg-3 col-md-4 mb-4 mb-lg-0">
+                    <h6 class="text-uppercase mb-3">Legal</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{{ url_for('terms') }}" class="text-muted text-decoration-none small">Terms of Service</a></li>
+                        <li class="mb-2"><a href="{{ url_for('privacy') }}" class="text-muted text-decoration-none small">Privacy Policy</a></li>
+                    </ul>
+                </div>
+
+                <!-- Quick Links Section -->
+                <div class="col-lg-2 col-md-4 mb-4 mb-lg-0">
+                    <h6 class="text-uppercase mb-3">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{{ url_for('index') }}" class="text-muted text-decoration-none small">Home</a></li>
+                        <li class="mb-2"><a href="{{ url_for('login') }}" class="text-muted text-decoration-none small">Login</a></li>
+                        <li class="mb-2"><a href="{{ url_for('register') }}" class="text-muted text-decoration-none small">Register</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Section -->
+                <div class="col-lg-3 col-md-4">
+                    <h6 class="text-uppercase mb-3">Contact</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="mailto:support@ranksewa.com" class="text-muted text-decoration-none small"><i class="fas fa-envelope me-2"></i>support@ranksewa.com</a></li>
+                        <li class="mb-2"><a href="https://ranksewa.com" class="text-muted text-decoration-none small"><i class="fas fa-globe me-2"></i>Visit Website</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr class="my-4 bg-secondary">
+
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 small text-muted">&copy; 2025 RankSewa. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <small class="text-muted">
+                        <i class="fas fa-lock me-1"></i> SSL Secured  |
+                        <i class="fas fa-shield-alt ms-2 me-1"></i> Privacy Compliant
+                    </small>
+                </div>
+            </div>
         </div>
     </footer>
 
