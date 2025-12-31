@@ -9,7 +9,7 @@ services:
       deploy_on_push: true
       repo: Prasan1/ratesewa
 
-    build_command: pip install -r requirements.txt && mkdir -p instance && python3 -c "from app import app, db; app.app_context().push(); db.create_all(); print('✅ Database initialized')"
+    build_command: pip install -r requirements.txt && python3 init_db.py
 
     run_command: gunicorn --worker-tmp-dir /dev/shm --workers 2 --bind 0.0.0.0:8080 app:app
 
