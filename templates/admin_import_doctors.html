@@ -22,7 +22,18 @@
                         <strong>Current Database Status:</strong>
                         <ul class="mb-0 mt-2">
                             <li>Total doctors in database: <strong>{{ current_doctor_count }}</strong></li>
+                            <li>Cities in database: <strong>{{ cities|length }}</strong> ({% for city in cities %}{{ city.name }}{% if not loop.last %}, {% endif %}{% endfor %})</li>
+                            <li>Specialties in database: <strong>{{ specialties|length }}</strong></li>
                             <li>Doctors to import: <strong>18</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-secondary">
+                        <strong>Test - Check if these doctors exist:</strong>
+                        <ul class="mb-0 mt-2 small">
+                            {% for doctor in found_doctors %}
+                            <li>{{ doctor }}</li>
+                            {% endfor %}
                         </ul>
                     </div>
 

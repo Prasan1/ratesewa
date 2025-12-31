@@ -1267,9 +1267,32 @@ def toggle_featured(doctor_id):
 @admin_required
 def import_doctors_page():
     """Show import doctors page with button to trigger import"""
-    from models import Doctor
+    from models import Doctor, City, Specialty
     current_doctor_count = Doctor.query.count()
-    return render_template('admin_import_doctors.html', current_doctor_count=current_doctor_count)
+
+    # Debug info
+    cities = City.query.all()
+    specialties = Specialty.query.all()
+
+    # Check if specific doctors exist
+    test_doctors = [
+        "Prof. Dr. Anil Kumar Jha",
+        "Dr. Mahesh Shah",
+        "Prof. Dr. Prakash Kafle"
+    ]
+    found_doctors = []
+    for name in test_doctors:
+        doctor = Doctor.query.filter(Doctor.name.ilike(name)).first()
+        if doctor:
+            found_doctors.append(f"{name} (found)")
+        else:
+            found_doctors.append(f"{name} (NOT FOUND)")
+
+    return render_template('admin_import_doctors.html',
+                         current_doctor_count=current_doctor_count,
+                         cities=cities,
+                         specialties=specialties,
+                         found_doctors=found_doctors)
 
 @app.route('/admin/import-doctors/run', methods=['POST'])
 @admin_required
