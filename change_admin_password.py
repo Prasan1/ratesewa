@@ -16,7 +16,7 @@ def change_admin_password():
         print()
 
         # Find admin user
-        admin = User.query.filter_by(email='admin@ratesewa.com').first()
+        admin = User.query.filter_by(email='admin@ranksewa.com').first()
 
         if not admin:
             print("❌ Admin user not found!")

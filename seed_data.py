@@ -398,32 +398,32 @@ def seed_database():
         db.session.commit()
 
         # Create admin user if doesn't exist
-        admin_user = User.query.filter_by(email="admin@ratesewa.com").first()
+        admin_user = User.query.filter_by(email="admin@ranksewa.com").first()
         if not admin_user:
             admin_user = User(
                 name="Admin",
-                email="admin@ratesewa.com",
+                email="admin@ranksewa.com",
                 password=generate_password_hash("admin123"),
                 is_admin=True,
                 is_active=True
             )
             db.session.add(admin_user)
             db.session.commit()
-            print(f"  ✓ Created admin user (email: admin@ratesewa.com, password: admin123)")
+            print(f"  ✓ Created admin user (email: admin@ranksewa.com, password: admin123)")
 
         # Create test user if doesn't exist
-        test_user = User.query.filter_by(email="test@ratesewa.com").first()
+        test_user = User.query.filter_by(email="test@ranksewa.com").first()
         if not test_user:
             test_user = User(
                 name="Test User",
-                email="test@ratesewa.com",
+                email="test@ranksewa.com",
                 password=generate_password_hash("test123"),
                 is_admin=False,
                 is_active=True
             )
             db.session.add(test_user)
             db.session.commit()
-            print(f"  ✓ Created test user (email: test@ratesewa.com, password: test123)")
+            print(f"  ✓ Created test user (email: test@ranksewa.com, password: test123)")
 
         print(f"\n✅ Database seeding complete!")
         print(f"   Cities: {City.query.count()}")

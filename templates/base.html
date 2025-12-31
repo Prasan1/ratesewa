@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}RateSewa - Find & Rate Doctors in Nepal{% endblock %}</title>
+    <title>{% block title %}RankSewa - Find & Rank Best Doctors in Nepal{% endblock %}</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
@@ -21,9 +21,9 @@
     <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="RateSewa" height="40" class="me-2"
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="RankSewa" height="40" class="me-2"
                      onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/logo-temp.svg') }}';">
-                <span class="logo-text">RateSewa</span>
+                <span class="logo-text">RankSewa</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -100,7 +100,7 @@
 
     <footer class="bg-dark text-white py-4 mt-5">
         <div class="container text-center">
-            <p>&copy; 2025 RateSewa. Find & Rate the Best Doctors in Nepal.</p>
+            <p>&copy; 2025 RankSewa. Find & Rank the Best Doctors in Nepal.</p>
         </div>
     </footer>
 
