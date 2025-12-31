@@ -67,6 +67,7 @@
                     </div>
 
                     <form method="POST" action="{{ url_for('run_import_doctors') }}" class="mt-4" onsubmit="return confirm('Are you sure you want to run the import?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn btn-primary btn-lg">
                             <i class="fas fa-play me-2"></i>Run Import Now
                         </button>
