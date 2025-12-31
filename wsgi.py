@@ -2,27 +2,22 @@
 import os
 import sys
 
-# Add the current directory to Python path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, current_dir)
+# Ensure we can import from current directory
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-print(f"🔍 Loading RateSewa from: {current_dir}")
-print(f"🔍 Python path: {sys.path[:3]}")
+# Import the Flask app
+from app import app, db
 
-try:
-    # Import the Flask app
-    from app import app
-    print("✅ Flask app imported successfully")
+# Create database tables if they don't exist
+with app.app_context():
+    try:
+        db.create_all()
+        print("✅ Database tables ready")
+    except Exception as e:
+        print(f"⚠️  Database setup: {e}")
 
-    # Expose the app for gunicorn
-    application = app
-
-    print(f"✅ Application ready: {app.name}")
-except Exception as e:
-    print(f"❌ Error loading application: {e}")
-    import traceback
-    traceback.print_exc()
-    raise
+# Expose the app for gunicorn
+application = app
 
 if __name__ == '__main__':
     app.run()
