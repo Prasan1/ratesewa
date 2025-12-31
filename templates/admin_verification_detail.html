@@ -38,10 +38,37 @@
 
             <!-- Doctor Information -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>Doctor Profile</h5>
+                <div class="card-header {% if request.is_new_doctor %}bg-success{% else %}bg-primary{% endif %} text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-md me-2"></i>
+                        {% if request.is_new_doctor %}
+                        New Doctor Registration
+                        {% else %}
+                        Existing Doctor Profile
+                        {% endif %}
+                    </h5>
                 </div>
                 <div class="card-body">
+                    {% if request.is_new_doctor %}
+                    <!-- New doctor - show proposed information -->
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>New Registration:</strong> This is a self-registration. Approving will create a new doctor profile.
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Proposed Name:</strong> {{ request.proposed_name }}</p>
+                            <p><strong>Specialty:</strong> {{ request.proposed_specialty.name if request.proposed_specialty else '-' }}</p>
+                            <p><strong>City:</strong> {{ request.proposed_city.name if request.proposed_city else '-' }}</p>
+                            <p><strong>Experience:</strong> {{ request.proposed_experience }} years</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Education:</strong> {{ request.proposed_education }}</p>
+                            <p><strong>College:</strong> {{ request.proposed_college }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Existing doctor - show current profile info -->
                     <div class="row">
                         <div class="col-md-6">
                             <p><strong>Name:</strong> {{ request.doctor.name }}</p>
@@ -63,6 +90,7 @@
                             </p>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
 

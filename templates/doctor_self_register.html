@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Register as a Doctor - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Back Button -->
+            <div class="mb-3">
+                <a href="{{ url_for('claim_profile') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Search
+                </a>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Register as a New Doctor</h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Info Alert -->
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Welcome to RankSewa!</strong> Complete this form to add your profile. All fields are mandatory for verification. Your profile will be reviewed by our admin team before going live.
+                    </div>
+
+                    <form method="POST" action="{{ url_for('doctor_self_register_submit') }}" enctype="multipart/form-data" id="selfRegisterForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                        <!-- Section 1: Basic Information -->
+                        <h5 class="border-bottom pb-2 mb-3"><i class="fas fa-user me-2"></i>Basic Information</h5>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="name" class="form-label"><strong>Full Name</strong> <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                       placeholder="Dr. Your Full Name" required maxlength="200">
+                                <small class="form-text text-muted">Enter your full name with prefix (Dr.)</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="specialty_id" class="form-label"><strong>Medical Specialty</strong> <span class="text-danger">*</span></label>
+                                <select class="form-select" id="specialty_id" name="specialty_id" required>
+                                    <option value="">-- Select Specialty --</option>
+                                    {% for specialty in specialties %}
+                                    <option value="{{ specialty.id }}">{{ specialty.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="city_id" class="form-label"><strong>Primary City</strong> <span class="text-danger">*</span></label>
+                                <select class="form-select" id="city_id" name="city_id" required>
+                                    <option value="">-- Select City --</option>
+                                    {% for city in cities %}
+                                    <option value="{{ city.id }}">{{ city.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Section 2: Professional Information -->
+                        <h5 class="border-bottom pb-2 mb-3"><i class="fas fa-graduation-cap me-2"></i>Professional Qualifications</h5>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="education" class="form-label"><strong>Education & Degrees</strong> <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="education" name="education" rows="2"
+                                          placeholder="e.g., MBBS, MD (Internal Medicine), Fellowship in Cardiology" required></textarea>
+                                <small class="form-text text-muted">List all your medical degrees and certifications</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="college" class="form-label"><strong>Medical School/College</strong> <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="college" name="college"
+                                       placeholder="e.g., Kathmandu Medical College" required>
+                                <small class="form-text text-muted">Where did you complete your medical education?</small>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="experience" class="form-label"><strong>Years of Experience</strong> <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="experience" name="experience"
+                                       min="0" max="60" placeholder="e.g., 10" required>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Section 3: Verification Information -->
+                        <h5 class="border-bottom pb-2 mb-3"><i class="fas fa-clipboard-check me-2"></i>Verification Details</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nmc_number" class="form-label"><strong>NMC Registration Number</strong> <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nmc_number" name="nmc_number"
+                                       placeholder="e.g., 8325" required maxlength="50">
+                                <small class="form-text text-muted">Nepal Medical Council registration number</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="phone_number" class="form-label"><strong>Phone Number</strong> <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="phone_number" name="phone_number"
+                                       placeholder="e.g., 9841234567" required maxlength="20">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label"><strong>Email Address</strong> <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" name="email"
+                                       placeholder="doctor@example.com" required maxlength="200" value="{{ session.get('user_email', '') }}">
+                                <small class="form-text text-muted">We'll use this for verification and updates</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="practice_address" class="form-label"><strong>Practice Address</strong> <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="practice_address" name="practice_address" rows="2"
+                                          placeholder="Your clinic/hospital address" required></textarea>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Section 4: Document Uploads -->
+                        <h5 class="border-bottom pb-2 mb-3"><i class="fas fa-file-upload me-2"></i>Required Documents</h5>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Important:</strong> All documents are mandatory. Accepted formats: PDF, JPG, PNG (Max 10MB each)
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="medical_degree" class="form-label"><strong>Medical Degree Certificate</strong> <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" id="medical_degree" name="medical_degree"
+                                       accept=".pdf,.jpg,.jpeg,.png" required>
+                                <small class="form-text text-muted">Upload your MBBS/MD certificate</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="govt_id" class="form-label"><strong>Government ID (Citizenship/Passport)</strong> <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" id="govt_id" name="govt_id"
+                                       accept=".pdf,.jpg,.jpeg,.png" required>
+                                <small class="form-text text-muted">For identity verification</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="practice_license" class="form-label"><strong>NMC Practice License</strong> <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" id="practice_license" name="practice_license"
+                                       accept=".pdf,.jpg,.jpeg,.png" required>
+                                <small class="form-text text-muted">Nepal Medical Council practice license</small>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Terms and Conditions -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="terms_agree" required>
+                            <label class="form-check-label" for="terms_agree">
+                                I certify that all information provided is accurate and I agree to RankSewa's
+                                <a href="{{ url_for('terms_of_service') }}" target="_blank">Terms of Service</a> and
+                                <a href="{{ url_for('privacy_policy') }}" target="_blank">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <!-- What Happens Next -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="mb-2"><i class="fas fa-info-circle me-2"></i>What Happens Next?</h6>
+                                <ol class="mb-0 small">
+                                    <li>Your application will be reviewed by our admin team (usually within 2-3 business days)</li>
+                                    <li>We'll verify your documents and credentials</li>
+                                    <li>Once approved, your profile will go live with a <strong>Verified</strong> badge</li>
+                                    <li>You'll get access to your doctor dashboard to manage reviews and analytics</li>
+                                    <li>Patients can find you in search results and leave reviews</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Registration
+                            </button>
+                            <a href="{{ url_for('claim_profile') }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('selfRegisterForm');
+    const fileInputs = ['medical_degree', 'govt_id', 'practice_license'];
+
+    // File size validation (10MB max)
+    fileInputs.forEach(inputId => {
+        const input = document.getElementById(inputId);
+        input.addEventListener('change', function() {
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (this.files[0] && this.files[0].size > maxSize) {
+                alert('File size must not exceed 10MB. Please choose a smaller file.');
+                this.value = '';
+            }
+        });
+    });
+
+    // Form submission confirmation
+    form.addEventListener('submit', function(e) {
+        const allFilesSelected = fileInputs.every(inputId => {
+            const input = document.getElementById(inputId);
+            return input.files.length > 0;
+        });
+
+        if (!allFilesSelected) {
+            e.preventDefault();
+            alert('Please upload all required documents before submitting.');
+            return false;
+        }
+
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+    });
+});
+</script>
+{% endblock %}

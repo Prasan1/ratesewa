@@ -111,58 +111,47 @@
         {{ render_ad(get_ad('footer_banner'), 'text-center') }}
     </div> #}
 
-    <footer class="bg-dark text-white py-5 mt-5">
+    <footer style="background: linear-gradient(135deg, #f8f5ff 0%, #e8f5e9 100%); border-top: 3px solid #7B2CBF;" class="py-4 mt-5">
         <div class="container">
-            <div class="row">
-                <!-- About Section -->
-                <div class="col-lg-4 mb-4 mb-lg-0">
-                    <div class="d-flex align-items-center mb-3">
-                        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="RankSewa" height="32" class="me-2"
+            <div class="row align-items-center">
+                <!-- Logo and Tagline -->
+                <div class="col-md-4 mb-3 mb-md-0 text-center text-md-start">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-2">
+                        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="RankSewa" height="28" class="me-2"
                              onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/logo-temp.svg') }}';">
-                        <h5 class="text-uppercase mb-0">RankSewa</h5>
+                        <h5 class="mb-0 fw-bold" style="color: #7B2CBF;">RankSewa</h5>
                     </div>
-                    <p class="text-muted small">Discover healthcare providers in Nepal based on real patient experiences. Reviews reflect individual opinions and experiences, not medical evaluations.</p>
+                    <p class="mb-0 small" style="color: #666;">Find trusted healthcare providers in Nepal</p>
                 </div>
 
-                <!-- Legal Section -->
-                <div class="col-lg-3 col-md-4 mb-4 mb-lg-0">
-                    <h6 class="text-uppercase mb-3">Legal</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{{ url_for('terms') }}" class="text-muted text-decoration-none small">Terms of Service</a></li>
-                        <li class="mb-2"><a href="{{ url_for('privacy') }}" class="text-muted text-decoration-none small">Privacy Policy</a></li>
-                    </ul>
+                <!-- Quick Links -->
+                <div class="col-md-4 mb-3 mb-md-0 text-center">
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="{{ url_for('index') }}" class="text-decoration-none small fw-semibold" style="color: #059669;">Home</a>
+                        <a href="{{ url_for('claim_profile') }}" class="text-decoration-none small fw-semibold" style="color: #7B2CBF;">For Doctors</a>
+                        <a href="{{ url_for('terms') }}" class="text-decoration-none small fw-semibold" style="color: #059669;">Terms</a>
+                        <a href="{{ url_for('privacy') }}" class="text-decoration-none small fw-semibold" style="color: #7B2CBF;">Privacy</a>
+                    </div>
                 </div>
 
-                <!-- Quick Links Section -->
-                <div class="col-lg-2 col-md-4 mb-4 mb-lg-0">
-                    <h6 class="text-uppercase mb-3">Quick Links</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{{ url_for('index') }}" class="text-muted text-decoration-none small">Home</a></li>
-                        <li class="mb-2"><a href="{{ url_for('login') }}" class="text-muted text-decoration-none small">Login</a></li>
-                        <li class="mb-2"><a href="{{ url_for('register') }}" class="text-muted text-decoration-none small">Register</a></li>
-                    </ul>
-                </div>
-
-                <!-- Contact Section -->
-                <div class="col-lg-3 col-md-4">
-                    <h6 class="text-uppercase mb-3">Contact</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="mailto:support@ranksewa.com" class="text-muted text-decoration-none small"><i class="fas fa-envelope me-2"></i>support@ranksewa.com</a></li>
-                        <li class="mb-2"><a href="https://ranksewa.com" class="text-muted text-decoration-none small"><i class="fas fa-globe me-2"></i>Visit Website</a></li>
-                    </ul>
+                <!-- Contact & Copyright -->
+                <div class="col-md-4 text-center text-md-end">
+                    <div class="mb-2">
+                        <a href="mailto:support@ranksewa.com" class="text-decoration-none small" style="color: #666;">
+                            <i class="fas fa-envelope" style="color: #059669;"></i> support@ranksewa.com
+                        </a>
+                    </div>
+                    <p class="mb-0 small" style="color: #999;">&copy; 2025 RankSewa. All rights reserved.</p>
                 </div>
             </div>
 
-            <hr class="my-4 bg-secondary">
-
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start">
-                    <p class="mb-0 small text-muted">&copy; 2025 RankSewa. All rights reserved.</p>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <small class="text-muted">
-                        <i class="fas fa-lock me-1"></i> SSL Secured  |
-                        <i class="fas fa-shield-alt ms-2 me-1"></i> Privacy Compliant
+            <!-- Trust Badges -->
+            <div class="row mt-3">
+                <div class="col-12 text-center">
+                    <small style="color: #999;">
+                        <i class="fas fa-shield-alt" style="color: #7B2CBF;"></i> <span class="me-3">Verified Reviews</span>
+                        <i class="fas fa-lock" style="color: #059669;"></i> <span class="me-3">Secure Platform</span>
+                        <i class="fas fa-user-md" style="color: #7B2CBF;"></i> <span>Doctor Verified</span>
                     </small>
                 </div>
             </div>
