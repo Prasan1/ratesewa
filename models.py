@@ -43,7 +43,7 @@ class Doctor(db.Model):
     experience = db.Column(db.Integer)
     education = db.Column(db.Text)  # Educational qualifications (e.g., "MBBS, MD")
     college = db.Column(db.Text)  # Where they studied (e.g., "Tribhuvan University")
-    # workplace = db.Column(db.Text)  # TEMPORARILY DISABLED - Run migration first!
+    workplace = db.Column(db.Text)  # Where they work (e.g., "B&C Medical College")
     description = db.Column(db.Text)
     photo_url = db.Column(db.Text)  # URL to doctor's photo
     is_featured = db.Column(db.Boolean, default=False)

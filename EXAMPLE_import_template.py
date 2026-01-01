@@ -88,7 +88,7 @@ def import_your_hospital_doctors():
                     description=description,
                     education=None,  # Will be filled when doctor claims profile (e.g., "MBBS, MD")
                     college=None,  # Will be filled when doctor claims profile (e.g., "Tribhuvan University")
-                    workplace="[YOUR HOSPITAL/CLINIC NAME]",  # Update this (e.g., "Grande Hospital")
+                    workplace="[YOUR HOSPITAL/CLINIC NAME], [CITY]",  # Update this (e.g., "Grande Hospital, Kathmandu")
                     experience=5,  # Default years of experience
                     photo_url=None,
                     slug=slug,
