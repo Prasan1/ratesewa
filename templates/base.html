@@ -61,11 +61,13 @@
                             </span>
                         </a>
                     </li>
+                    {% if session.get('role') != 'doctor' %}
                     <li class="nav-item ms-lg-2">
                         <a class="btn btn-outline-primary btn-sm" href="{{ url_for('claim_profile') }}">
                             <i class="fas fa-user-md me-1"></i>For Doctors
                         </a>
                     </li>
+                    {% endif %}
                     {% if 'user_id' in session and session.get('is_admin') %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
