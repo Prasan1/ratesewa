@@ -1342,6 +1342,34 @@ def activate_all_doctors():
 
     return redirect(url_for('import_doctors_page'))
 
+@app.route('/admin/import-bnc-doctors/run', methods=['POST'])
+@admin_required
+def run_import_bnc_doctors():
+    """Import doctors from B&C Medical College"""
+    try:
+        # Import the function from the B&C import script
+        from import_bnc_doctors import import_bnc_doctors
+
+        # Capture output
+        import io
+        import sys
+        old_stdout = sys.stdout
+        sys.stdout = buffer = io.StringIO()
+
+        # Run the import
+        import_bnc_doctors()
+
+        # Get the output
+        output = buffer.getvalue()
+        sys.stdout = old_stdout
+
+        flash('B&C Medical College doctors import completed!', 'success')
+        return render_template('admin_import_result.html', output=output)
+
+    except Exception as e:
+        flash(f'Error during B&C import: {str(e)}', 'danger')
+        return redirect(url_for('import_doctors_page'))
+
 @app.route('/admin/debug-doctor/<int:doctor_id>')
 @admin_required
 def debug_doctor(doctor_id):
