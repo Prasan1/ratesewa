@@ -884,8 +884,40 @@ def inject_global_functions():
 def index():
     cities = City.query.all()
     specialties = Specialty.query.all()
-    sidebar_ad = ad_manager.get_ad_for_position('homepage_sidebar')
-    return render_template('index.html', cities=cities, specialties=specialties, sidebar_ad=sidebar_ad)
+
+    # Get stats for social proof section
+    total_doctors = Doctor.query.filter_by(is_active=True).count()
+    total_cities = City.query.count()
+    total_reviews = Rating.query.count()
+    verified_doctors = Doctor.query.filter_by(is_verified=True, is_active=True).count()
+
+    return render_template('index.html',
+                         cities=cities,
+                         specialties=specialties,
+                         total_doctors=total_doctors,
+                         total_cities=total_cities,
+                         total_reviews=total_reviews,
+                         verified_doctors=verified_doctors)
+
+@app.route('/test-homepage')
+def test_homepage():
+    """Test route for improved homepage design"""
+    cities = City.query.all()
+    specialties = Specialty.query.all()
+
+    # Get stats for social proof section
+    total_doctors = Doctor.query.filter_by(is_active=True).count()
+    total_cities = City.query.count()
+    total_reviews = Rating.query.count()
+    verified_doctors = Doctor.query.filter_by(is_verified=True, is_active=True).count()
+
+    return render_template('index_improved.html',
+                         cities=cities,
+                         specialties=specialties,
+                         total_doctors=total_doctors,
+                         total_cities=total_cities,
+                         total_reviews=total_reviews,
+                         verified_doctors=verified_doctors)
 
 @app.route('/clinics')
 def clinics():
@@ -895,6 +927,7 @@ def clinics():
 def get_doctors():
     city_id = request.args.get('city_id', '')
     specialty_id = request.args.get('specialty_id', '')
+    name_search = request.args.get('name', '')
 
     # Build query with filters
     query = Doctor.query.filter_by(is_active=True)
@@ -904,6 +937,10 @@ def get_doctors():
 
     if specialty_id:
         query = query.filter(Doctor.specialty_id == int(specialty_id))
+
+    if name_search:
+        # Search by name (case-insensitive partial match)
+        query = query.filter(Doctor.name.ilike(f'%{name_search}%'))
 
     # Order by is_featured first, then avg_rating, then name
     # Note: We'll sort by avg_rating in Python since it's a property

@@ -1,14 +1,70 @@
 {% extends "base.html" %}
 
-{% block title %}Find Doctors in Nepal{% endblock %}
+{% block title %}Find Trusted Doctors in Nepal Based on Real Patient Experience{% endblock %}
 
 {% block content %}
 <!-- Promotional Banner -->
 {% include 'partials/promo_banner.html' %}
 
+<!-- Hero Section - NEW -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="text-center py-5" style="background: linear-gradient(135deg, #f8f5ff 0%, #e8f5e9 100%); border-radius: 16px;">
+            <h1 class="display-5 fw-bold mb-3" style="color: #7B2CBF;">
+                Find Trusted Doctors in Nepal Based on Real Patient Experience
+            </h1>
+            <p class="lead text-muted mb-4">
+                Helping patients make safer healthcare choices.
+            </p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a href="#searchSection" class="btn btn-primary btn-lg">
+                    <i class="fas fa-search me-2"></i>Search Doctors
+                </a>
+                <a href="#whyReviewsMatter" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-star me-2"></i>Write a Review
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Social Proof Section - NEW -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body py-4">
+                <div class="row text-center g-4">
+                    <div class="col-md-3">
+                        <h3 class="fw-bold mb-1" style="color: #7B2CBF;">{{ total_doctors }}+</h3>
+                        <p class="text-muted mb-0">Doctors Listed</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="fw-bold mb-1" style="color: #059669;">{{ total_cities }}+</h3>
+                        <p class="text-muted mb-0">Cities Covered</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="fw-bold mb-1" style="color: #7B2CBF;">{{ total_reviews }}+</h3>
+                        <p class="text-muted mb-0">Patient Reviews</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="fw-bold mb-1" style="color: #059669;">{{ verified_doctors }}+</h3>
+                        <p class="text-muted mb-0">Verified Doctors</p>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        Kathmandu | Lalitpur | Pokhara | Biratnagar | Birtamod
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
-        <!-- Doctor Claim Profile CTA -->
+        <!-- Doctor Claim Profile CTA - IMPROVED COPY -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card border-0 shadow-sm overflow-hidden" style="background: linear-gradient(120deg, #eff6ff 0%, #ecfeff 60%, #f0fdf4 100%);">
@@ -20,19 +76,26 @@
                                     <small class="fw-semibold text-primary">Launch Offer - Until April 25, 2026</small>
                                 </div>
                                 <h4 class="mb-2 text-dark">Are You a Doctor? Claim Your Profile</h4>
-                                <p class="mb-3 text-muted">Manage your presence, respond to reviews, and earn a verified badge that builds patient trust. All features included at no cost during our launch period.</p>
-                                <div class="d-flex flex-wrap gap-3">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="fas fa-shield-check text-success"></i>
-                                        <span class="text-muted">Secure verification</span>
+                                <p class="mb-3 text-muted">Build patient trust with verified badge, respond to feedback, and stand out in search.</p>
+                                <!-- IMPROVED: Better bullet points -->
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-4">
+                                        <div class="d-flex align-items-start gap-2">
+                                            <i class="fas fa-check-circle text-success mt-1"></i>
+                                            <span class="small">Builds your professional reputation</span>
+                                        </div>
                                     </div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="fas fa-message text-primary"></i>
-                                        <span class="text-muted">Reply to reviews</span>
+                                    <div class="col-md-4">
+                                        <div class="d-flex align-items-start gap-2">
+                                            <i class="fas fa-check-circle text-success mt-1"></i>
+                                            <span class="small">Helps patients choose you</span>
+                                        </div>
                                     </div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="fas fa-chart-line text-success"></i>
-                                        <span class="text-muted">Profile analytics</span>
+                                    <div class="col-md-4">
+                                        <div class="d-flex align-items-start gap-2">
+                                            <i class="fas fa-check-circle text-success mt-1"></i>
+                                            <span class="small">Increases trust & visibility</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -55,14 +118,87 @@
             </div>
         </div>
 
-        <div class="search-container">
+        <!-- How RankSewa Helps - NEW -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h3 class="text-center mb-4">How RankSewa Helps</h3>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="text-center p-3">
+                                    <div class="mb-3">
+                                        <i class="fas fa-user-friends fa-3x" style="color: #7B2CBF;"></i>
+                                    </div>
+                                    <h5 class="mb-3">For Patients</h5>
+                                    <ul class="list-unstyled text-start" style="max-width: 300px; margin: 0 auto;">
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>Read honest reviews
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>Find right doctor faster
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>Make informed decisions
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-center p-3">
+                                    <div class="mb-3">
+                                        <i class="fas fa-user-md fa-3x" style="color: #059669;"></i>
+                                    </div>
+                                    <h5 class="mb-3">For Doctors</h5>
+                                    <ul class="list-unstyled text-start" style="max-width: 300px; margin: 0 auto;">
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>Earn patient trust
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>Show experience clearly
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>Manage professional reputation
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Why Reviews Matter - NEW -->
+        <div class="row mb-4" id="whyReviewsMatter">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f5ff 0%, #e8f5e9 100%);">
+                    <div class="card-body p-4 text-center">
+                        <h3 class="mb-3">Why Reviews Matter</h3>
+                        <p class="lead text-muted" style="max-width: 800px; margin: 0 auto;">
+                            Choosing a doctor is a big decision. RankSewa helps patients learn from real experiences
+                            so good doctors get recognition and patients feel safer.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-container" id="searchSection">
             <h3 class="text-center">
                 <i class="fas fa-search me-2"></i>Find the Best Doctors in Nepal
             </h3>
             <p class="text-center text-muted mb-4">Search by city and specialty to find the right doctor for you</p>
             <form id="filterForm">
                 <div class="row g-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <label for="nameSearch" class="form-label">
+                            <i class="fas fa-user-md me-2"></i>Search by Name
+                        </label>
+                        <input type="text" id="nameSearch" class="form-control" placeholder="Enter doctor's name...">
+                    </div>
+                    <div class="col-md-4">
                         <label for="citySelect" class="form-label">
                             <i class="fas fa-map-marker-alt me-2"></i>Select City
                         </label>
@@ -73,7 +209,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="specialtySelect" class="form-label">
                             <i class="fas fa-stethoscope me-2"></i>Select Specialty
                         </label>
@@ -106,12 +242,6 @@
             </div>
         </div>
     </div>
-
-    {# Sidebar Ad - Hidden for MVP Launch #}
-    {# <div class="col-lg-3">
-        {% from 'partials/ad_display.html' import render_ad %}
-        {{ render_ad(sidebar_ad, 'sticky-top mb-4') }}
-    </div> #}
 </div>
 {% endblock %}
 
@@ -123,22 +253,36 @@ $(document).ready(function() {
     $('#filterBtn').click(function() {
         loadDoctors();
     });
-        
+
     $('#citySelect, #specialtySelect').change(function() {
         loadDoctors();
     });
+
+    // Search as user types (with debounce)
+    let searchTimeout;
+    $('#nameSearch').on('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function() {
+            loadDoctors();
+        }, 500); // Wait 500ms after user stops typing
+    });
 });
-    
+
     function loadDoctors() {
         const cityId = $('#citySelect').val();
         const specialtyId = $('#specialtySelect').val();
-        
+        const nameSearch = $('#nameSearch').val();
+
         $('#doctorList').html('<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>');
-        
+
         $.ajax({
             url: '/doctors',
             type: 'GET',
-            data: { city_id: cityId, specialty_id: specialtyId },
+            data: {
+                city_id: cityId,
+                specialty_id: specialtyId,
+                name: nameSearch
+            },
             success: function(doctors) {
                 displayDoctors(doctors);
             },
@@ -147,20 +291,25 @@ $(document).ready(function() {
             }
         });
     }
-    
+
     function displayDoctors(doctors) {
         if (doctors.length === 0) {
             $('#doctorList').html('<div class="col-12"><div class="alert alert-info">No doctors found.</div></div>');
             return;
         }
-        
+
         let html = '';
         doctors.forEach(doctor => {
             const ratingCount = doctor.rating_count || 0;
             const hasRatings = ratingCount > 0;
-            const avgRating = hasRatings ? parseFloat(doctor.avg_rating).toFixed(1) : 'Not rated';
+            const avgRating = hasRatings ? parseFloat(doctor.avg_rating).toFixed(1) : '';
             const starHtml = generateStarRatingHtml(doctor.avg_rating, ratingCount);
             const verifiedBadge = doctor.is_verified ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>' : '';
+
+            // IMPROVED: Better "no reviews" messaging
+            const ratingText = hasRatings
+                ? `${avgRating} (${ratingCount} reviews)`
+                : '⭐ No reviews yet — <a href="/doctor/' + doctor.slug + '" class="text-primary">Be the first to review</a>';
 
             html += `
                 <div class="col-md-6 col-lg-4 mb-4">
@@ -181,13 +330,13 @@ $(document).ready(function() {
                             </div>
                             <div class="doctor-details">
                                 <p class="card-text small mb-1"><strong>Experience:</strong> ${doctor.experience} years</p>
-                                <p class="card-text small mb-1"><strong>Education:</strong> ${doctor.education}</p>
-                                <p class="card-text small mb-2"><strong>College:</strong> ${doctor.college}</p>
+                                ${doctor.education ? `<p class="card-text small mb-1"><strong>Education:</strong> ${doctor.education}</p>` : ''}
+                                ${doctor.workplace ? `<p class="card-text small mb-2"><strong>Works At:</strong> ${doctor.workplace}</p>` : ''}
                                 <div class="d-flex align-items-center mb-2">
                                     <div class="rating me-2">
                                         ${starHtml}
                                     </div>
-                                    <span class="text-muted small">${hasRatings ? `${avgRating} (${ratingCount} reviews)` : 'Not rated yet'}</span>
+                                    <span class="text-muted small">${ratingText}</span>
                                 </div>
                                 <p class="card-text small text-muted">${doctor.description}</p>
                             </div>
@@ -197,13 +346,13 @@ $(document).ready(function() {
             </div>
         `;
     });
-    
+
     $('#doctorList').html(html);
     }
-    
+
     function generateStarRatingHtml(rating, ratingCount) {
         if (!ratingCount) {
-            return '';  // Return empty, let the text show "Not rated yet"
+            return '';  // Return empty, let the text show improved message
         }
 
         let html = '';
