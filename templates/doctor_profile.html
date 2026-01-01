@@ -129,7 +129,7 @@
                         <h5>Experience</h5>
                         <p class="card-text">{{ doctor.experience }} years</p>
                     </div>
-                    {% if doctor.workplace %}
+                    {% if doctor.workplace is defined and doctor.workplace %}
                     <div class="col-md-6 mb-3">
                         <h5>Works At</h5>
                         <p class="card-text">{{ doctor.workplace }}</p>
