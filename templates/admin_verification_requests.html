@@ -63,12 +63,26 @@
                                 {% for request in requests %}
                                 <tr>
                                     <td>
+                                        {% if request.is_new_doctor %}
+                                        <strong>{{ request.proposed_name }}</strong>
+                                        <span class="badge bg-info ms-1">New</span><br>
+                                        <small class="text-muted">
+                                            <i class="fas fa-map-marker-alt me-1"></i>{{ request.practice_city.name if request.practice_city else '-' }}
+                                        </small>
+                                        {% else %}
                                         <strong>{{ request.doctor.name }}</strong><br>
                                         <small class="text-muted">
                                             <i class="fas fa-map-marker-alt me-1"></i>{{ request.doctor.city.name }}
                                         </small>
+                                        {% endif %}
                                     </td>
-                                    <td>{{ request.doctor.specialty.name }}</td>
+                                    <td>
+                                        {% if request.is_new_doctor %}
+                                        {{ request.proposed_specialty.name if request.proposed_specialty else '-' }}
+                                        {% else %}
+                                        {{ request.doctor.specialty.name }}
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         {{ request.user.name }}<br>
                                         <small class="text-muted">{{ request.user.email }}</small>
