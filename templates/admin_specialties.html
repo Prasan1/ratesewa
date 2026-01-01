@@ -8,9 +8,22 @@
         <h2 class="mb-1">Manage Specialties</h2>
         <p class="text-muted mb-0">Keep specialties aligned with your directory focus.</p>
     </div>
-    <a href="{{ url_for('admin_specialty_new') }}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Add Specialty
-    </a>
+    <div class="d-flex gap-2">
+        <form method="POST" action="{{ url_for('merge_duplicate_specialties') }}" class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <button type="submit" class="btn btn-warning" onclick="return confirm('This will merge duplicate specialties (e.g., Dermatology → Dermatologist). Continue?');">
+                <i class="fas fa-compress-alt me-2"></i>Merge Duplicates
+            </button>
+        </form>
+        <a href="{{ url_for('admin_specialty_new') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Specialty
+        </a>
+    </div>
+</div>
+
+<div class="alert alert-info mb-4">
+    <i class="fas fa-info-circle me-2"></i>
+    <strong>Fix Duplicate Specialties:</strong> If doctors aren't showing up in search, you may have duplicate specialties (e.g., "Dermatology" and "Dermatologist"). Click "Merge Duplicates" to consolidate them.
 </div>
 
 <div class="table-responsive">

@@ -1342,6 +1342,101 @@ def activate_all_doctors():
 
     return redirect(url_for('import_doctors_page'))
 
+@app.route('/admin/debug-doctor/<int:doctor_id>')
+@admin_required
+def debug_doctor(doctor_id):
+    """Debug a specific doctor's data"""
+    doctor = Doctor.query.get_or_404(doctor_id)
+
+    debug_info = {
+        'id': doctor.id,
+        'name': doctor.name,
+        'slug': doctor.slug,
+        'is_active': doctor.is_active,
+        'is_verified': doctor.is_verified,
+        'is_featured': doctor.is_featured,
+        'specialty_id': doctor.specialty_id,
+        'specialty_name': doctor.specialty.name if doctor.specialty else 'None',
+        'city_id': doctor.city_id,
+        'city_name': doctor.city.name if doctor.city else 'None',
+        'experience': doctor.experience,
+        'avg_rating': doctor.avg_rating,
+        'review_count': len(doctor.ratings)
+    }
+
+    # Check if this doctor would show up in a search
+    test_query = Doctor.query.filter_by(
+        is_active=True,
+        specialty_id=doctor.specialty_id,
+        city_id=doctor.city_id
+    ).all()
+
+    flash(f"Debug Info for {doctor.name}: {debug_info}", 'info')
+    flash(f"Doctors matching this specialty+city: {len(test_query)} total", 'info')
+
+    return redirect(url_for('admin_doctors'))
+
+@app.route('/admin/merge-duplicate-specialties', methods=['POST'])
+@admin_required
+def merge_duplicate_specialties():
+    """Merge duplicate specialties (e.g., Dermatology -> Dermatologist)"""
+    try:
+        from fix_duplicate_specialties import SPECIALTY_MAPPINGS
+
+        total_merged = 0
+        messages = []
+
+        for target_name, source_names in SPECIALTY_MAPPINGS.items():
+            # Find or create target specialty
+            target = Specialty.query.filter(Specialty.name.ilike(target_name)).first()
+
+            if not target:
+                # Check if any of the source names exist
+                for source_name in source_names:
+                    source = Specialty.query.filter(Specialty.name.ilike(source_name)).first()
+                    if source:
+                        # Rename the first found source to target
+                        source.name = target_name
+                        target = source
+                        messages.append(f"Renamed '{source_name}' to '{target_name}'")
+                        break
+
+                if not target:
+                    continue
+
+            # Now merge all source specialties into target
+            for source_name in source_names:
+                sources = Specialty.query.filter(Specialty.name.ilike(source_name)).all()
+
+                for source in sources:
+                    if source.id == target.id:
+                        continue  # Skip self
+
+                    # Move all doctors from source to target
+                    doctors = Doctor.query.filter_by(specialty_id=source.id).all()
+
+                    if doctors:
+                        for doctor in doctors:
+                            doctor.specialty_id = target.id
+
+                        total_merged += len(doctors)
+                        messages.append(f"Merged {len(doctors)} doctors from '{source.name}' to '{target.name}'")
+
+                        # Delete the old specialty
+                        db.session.delete(source)
+
+        db.session.commit()
+
+        flash(f'Successfully merged duplicate specialties! Moved {total_merged} doctors.', 'success')
+        for msg in messages:
+            flash(msg, 'info')
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error merging specialties: {str(e)}', 'danger')
+
+    return redirect(url_for('admin_specialties'))
+
 # --- DOCTOR PROFILE ROUTE (USES SLUG) ---
 @app.route('/doctor/<slug>')
 def doctor_profile(slug):
