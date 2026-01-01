@@ -132,36 +132,44 @@
 
                         <hr class="my-4">
 
-                        <!-- Section 4: Document Uploads -->
-                        <h5 class="border-bottom pb-2 mb-3"><i class="fas fa-file-upload me-2"></i>Required Documents</h5>
+                        <!-- Section 4: Document Upload -->
+                        <h5 class="border-bottom pb-2 mb-3"><i class="fas fa-file-upload me-2"></i>Identity Verification</h5>
 
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <strong>Important:</strong> All documents are mandatory. Accepted formats: PDF, JPG, PNG (Max 10MB each)
+                        <div class="alert alert-info">
+                            <i class="fas fa-id-card me-2"></i>
+                            <strong>Required:</strong> Upload a government-issued ID to verify your identity. Accepted formats: PDF, JPG, PNG (Max 10MB)
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="medical_degree" class="form-label"><strong>Medical Degree Certificate</strong> <span class="text-danger">*</span></label>
-                                <input type="file" class="form-control" id="medical_degree" name="medical_degree"
-                                       accept=".pdf,.jpg,.jpeg,.png" required>
-                                <small class="form-text text-muted">Upload your MBBS/MD certificate</small>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="govt_id" class="form-label"><strong>Government ID (Citizenship/Passport)</strong> <span class="text-danger">*</span></label>
+                            <div class="col-md-12 mb-3">
+                                <label for="govt_id" class="form-label"><strong>Government ID (Citizenship/Passport/License)</strong> <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" id="govt_id" name="govt_id"
                                        accept=".pdf,.jpg,.jpeg,.png" required>
-                                <small class="form-text text-muted">For identity verification</small>
+                                <small class="form-text text-muted">Upload a clear photo of your citizenship, passport, or driver's license</small>
                             </div>
+                        </div>
+
+                        <!-- Optional Documents -->
+                        <div class="alert alert-light border">
+                            <h6 class="mb-2"><i class="fas fa-lightbulb me-2"></i>Speed Up Verification (Optional)</h6>
+                            <p class="small text-muted mb-2">
+                                Adding your medical degree or practice license helps us verify you faster, but they're not required to get started.
+                            </p>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="practice_license" class="form-label"><strong>NMC Practice License</strong> <span class="text-danger">*</span></label>
+                                <label for="medical_degree" class="form-label"><strong>Medical Degree Certificate</strong> <span class="text-muted">(Optional)</span></label>
+                                <input type="file" class="form-control" id="medical_degree" name="medical_degree"
+                                       accept=".pdf,.jpg,.jpeg,.png">
+                                <small class="form-text text-muted">Helps us verify you faster</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="practice_license" class="form-label"><strong>NMC Practice License</strong> <span class="text-muted">(Optional)</span></label>
                                 <input type="file" class="form-control" id="practice_license" name="practice_license"
-                                       accept=".pdf,.jpg,.jpeg,.png" required>
-                                <small class="form-text text-muted">Nepal Medical Council practice license</small>
+                                       accept=".pdf,.jpg,.jpeg,.png">
+                                <small class="form-text text-muted">Helps us verify you faster</small>
                             </div>
                         </div>
 
@@ -225,25 +233,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // File size validation (10MB max)
     fileInputs.forEach(inputId => {
         const input = document.getElementById(inputId);
-        input.addEventListener('change', function() {
-            const maxSize = 10 * 1024 * 1024; // 10MB
-            if (this.files[0] && this.files[0].size > maxSize) {
-                alert('File size must not exceed 10MB. Please choose a smaller file.');
-                this.value = '';
-            }
-        });
+        if (input) {
+            input.addEventListener('change', function() {
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                if (this.files[0] && this.files[0].size > maxSize) {
+                    alert('File size must not exceed 10MB. Please choose a smaller file.');
+                    this.value = '';
+                }
+            });
+        }
     });
 
-    // Form submission confirmation
+    // Form submission confirmation - only govt_id is required
     form.addEventListener('submit', function(e) {
-        const allFilesSelected = fileInputs.every(inputId => {
-            const input = document.getElementById(inputId);
-            return input.files.length > 0;
-        });
+        const govtIdInput = document.getElementById('govt_id');
 
-        if (!allFilesSelected) {
+        if (!govtIdInput.files || govtIdInput.files.length === 0) {
             e.preventDefault();
-            alert('Please upload all required documents before submitting.');
+            alert('Please upload your Government ID to continue.');
             return false;
         }
 

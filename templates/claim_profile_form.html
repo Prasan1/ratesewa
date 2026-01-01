@@ -127,32 +127,16 @@
 
                     <hr class="my-4">
 
-                    <h5 class="mb-3"><i class="fas fa-upload me-2"></i>Document Uploads</h5>
+                    <h5 class="mb-3"><i class="fas fa-upload me-2"></i>Document Upload</h5>
                     <p class="text-muted small mb-4">
-                        Please upload clear, legible photos or scans of the following documents.
-                        Accepted formats: JPG, PNG, PDF (max 10MB each)
+                        Upload a government-issued ID to verify your identity.
+                        Accepted formats: JPG, PNG, PDF (max 10MB)
                     </p>
-
-                    <!-- Medical Degree Upload -->
-                    <div class="mb-4">
-                        <label for="medical_degree" class="form-label">
-                            <i class="fas fa-graduation-cap me-2"></i>Medical Degree Certificate *
-                        </label>
-                        <input type="file"
-                               class="form-control"
-                               id="medical_degree"
-                               name="medical_degree"
-                               accept=".jpg,.jpeg,.png,.pdf"
-                               required>
-                        <small class="form-text text-muted">
-                            Upload a photo or scan of your medical degree
-                        </small>
-                    </div>
 
                     <!-- Government ID Upload -->
                     <div class="mb-4">
                         <label for="govt_id" class="form-label">
-                            <i class="fas fa-id-card me-2"></i>Government ID (Citizenship/Passport) *
+                            <i class="fas fa-id-card me-2"></i>Government ID (Citizenship/Passport/License) *
                         </label>
                         <input type="file"
                                class="form-control"
@@ -161,7 +145,30 @@
                                accept=".jpg,.jpeg,.png,.pdf"
                                required>
                         <small class="form-text text-muted">
-                            Upload a photo of your citizenship or passport
+                            Upload a clear photo of your citizenship, passport, or driver's license
+                        </small>
+                    </div>
+
+                    <!-- Optional Documents -->
+                    <div class="alert alert-light border">
+                        <h6 class="mb-2"><i class="fas fa-lightbulb me-2"></i>Speed Up Verification (Optional)</h6>
+                        <small class="text-muted">
+                            Adding medical degree or practice license documents helps us verify you faster, but they're not required.
+                        </small>
+                    </div>
+
+                    <!-- Medical Degree Upload (Optional) -->
+                    <div class="mb-4">
+                        <label for="medical_degree" class="form-label">
+                            <i class="fas fa-graduation-cap me-2"></i>Medical Degree Certificate (Optional)
+                        </label>
+                        <input type="file"
+                               class="form-control"
+                               id="medical_degree"
+                               name="medical_degree"
+                               accept=".jpg,.jpeg,.png,.pdf">
+                        <small class="form-text text-muted">
+                            Helps us verify you faster
                         </small>
                     </div>
 
@@ -176,7 +183,7 @@
                                name="practice_license"
                                accept=".jpg,.jpeg,.png,.pdf">
                         <small class="form-text text-muted">
-                            If you have a separate practice license, upload it here
+                            Helps us verify you faster
                         </small>
                     </div>
 
@@ -258,19 +265,11 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
 
 // Form validation
 document.querySelector('form').addEventListener('submit', function(e) {
-    const requiredFiles = ['medical_degree', 'govt_id'];
-    let allFilesProvided = true;
+    const govtIdInput = document.getElementById('govt_id');
 
-    requiredFiles.forEach(fieldName => {
-        const input = document.getElementById(fieldName);
-        if (!input.files || input.files.length === 0) {
-            allFilesProvided = false;
-        }
-    });
-
-    if (!allFilesProvided) {
+    if (!govtIdInput.files || govtIdInput.files.length === 0) {
         e.preventDefault();
-        alert('Please upload all required documents');
+        alert('Please upload your Government ID to continue');
         return false;
     }
 });

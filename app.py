@@ -450,19 +450,25 @@ def claim_profile_submit(doctor_id):
         govt_id = request.files.get('govt_id')
         practice_license = request.files.get('practice_license')
 
-        # Validate required file uploads
-        if not medical_degree or not govt_id:
-            flash('Medical degree and government ID are required.', 'danger')
+        # Validate required file upload (only govt_id is required)
+        if not govt_id or not govt_id.filename:
+            flash('Government ID is required for verification.', 'danger')
             return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
 
         # Save files
         upload_folder = app.config['UPLOAD_FOLDER']
-        medical_degree_path = upload_utils.save_verification_document(
-            medical_degree, upload_folder, doctor_id, 'medical_degree'
-        )
+
+        # Save required govt_id
         govt_id_path = upload_utils.save_verification_document(
             govt_id, upload_folder, doctor_id, 'govt_id'
         )
+
+        # Optional medical degree
+        medical_degree_path = None
+        if medical_degree and medical_degree.filename:
+            medical_degree_path = upload_utils.save_verification_document(
+                medical_degree, upload_folder, doctor_id, 'medical_degree'
+            )
 
         # Optional practice license
         practice_license_path = None
@@ -565,13 +571,13 @@ def doctor_self_register_submit():
             flash('A verification request with this NMC number is already pending review.', 'warning')
             return redirect(url_for('user_profile'))
 
-        # Handle file uploads - all are mandatory
+        # Handle file uploads - only govt_id is mandatory
         medical_degree = request.files.get('medical_degree')
         govt_id = request.files.get('govt_id')
         practice_license = request.files.get('practice_license')
 
-        if not medical_degree or not govt_id or not practice_license:
-            flash('All document uploads are required.', 'danger')
+        if not govt_id or not govt_id.filename:
+            flash('Government ID is required for verification.', 'danger')
             return redirect(url_for('doctor_self_register'))
 
         # Create a temporary doctor ID for file storage (use user_id as placeholder)
@@ -579,15 +585,25 @@ def doctor_self_register_submit():
 
         # Save files
         upload_folder = app.config['UPLOAD_FOLDER']
-        medical_degree_path = upload_utils.save_verification_document(
-            medical_degree, upload_folder, temp_doctor_id, 'medical_degree'
-        )
+
+        # Save required govt_id
         govt_id_path = upload_utils.save_verification_document(
             govt_id, upload_folder, temp_doctor_id, 'govt_id'
         )
-        practice_license_path = upload_utils.save_verification_document(
-            practice_license, upload_folder, temp_doctor_id, 'practice_license'
-        )
+
+        # Optional medical degree
+        medical_degree_path = None
+        if medical_degree and medical_degree.filename:
+            medical_degree_path = upload_utils.save_verification_document(
+                medical_degree, upload_folder, temp_doctor_id, 'medical_degree'
+            )
+
+        # Optional practice license
+        practice_license_path = None
+        if practice_license and practice_license.filename:
+            practice_license_path = upload_utils.save_verification_document(
+                practice_license, upload_folder, temp_doctor_id, 'practice_license'
+            )
 
         # Create verification request with is_new_doctor=True
         verification_request = VerificationRequest(
@@ -2197,7 +2213,17 @@ def user_profile():
     # Get user's ratings
     ratings = Rating.query.filter_by(user_id=user_id).order_by(Rating.created_at.desc()).all()
 
-    return render_template('user_profile.html', user=user, appointments=appointments, ratings=ratings)
+    # Check for pending verification request
+    pending_verification = VerificationRequest.query.filter_by(
+        user_id=user_id,
+        status='pending'
+    ).order_by(VerificationRequest.created_at.desc()).first()
+
+    return render_template('user_profile.html',
+                         user=user,
+                         appointments=appointments,
+                         ratings=ratings,
+                         pending_verification=pending_verification)
 
 @app.route('/change-password', methods=['POST'])
 @login_required

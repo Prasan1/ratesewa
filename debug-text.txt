@@ -1,37 +1,94 @@
-1. I was able to register and submit the profile as a doctor locally and haven't tested in prod. I think oauth is not working in localhost we need to check. 
-2. When I edit doctors as admin, it asks for photo URL? How do i provide this? 
-3. If we allow pic upload feature for doc, how do we manage image files? 
-4. Admin password need to be changed.
-5. We need a feature to delete data if doctor wants their information to remove
-6. We also need a feature as an admin to flag user comment for inappropiate language or need a way to filter those comments as users type in. 
-   We need to let users know that they have to civil and comment in that manner instead of showing anger or defamaming rehetoric. 
-7. If there's any data policy that we have to follow then we will list that along side our policy section. 
-8. When registration gets submitted, what happens? Who receives it? And how the review process work?
-9. WE need to enforce this strongly: 
-    Registration
-        You must provide accurate and complete information when creating an account
-        You are responsible for maintaining the security of your account
-        You must be at least 16 years old to use this Platform
-        One person may not maintain multiple accounts
-    Account Security
-        Keep your password confidential
-        Notify us immediately of any unauthorized access
-        You are responsible for all activities under your account
-10. Review Guidelines
-    When posting reviews, you agree to:
+1️⃣ Powerful Hero Section (Top)
 
-    Share only your genuine personal experience
-    Be honest, fair, and respectful
-    Not post false, misleading, or defamatory content
-    Not include personal medical information
-    Not use offensive, abusive, or discriminatory language
-    Not promote or advertise products or services
-    Not violate any laws or third-party rights
-    Content Ownership
-    You retain ownership of content you post
-    By posting, you grant RankSewa a non-exclusive, worldwide license to use, display, and distribute your content
-    We may edit or remove Content
+Replace the current text with something like:
 
-11. While registering we will put this terms and condition link and have user click accept before submitting or submit button will not be enabled. 
-12. We will list this email on the footer:  legal@ranksewa.com , support@ranksewa.com
+Find Trusted Doctors in Nepal Based on Real Patient Experience
+Helping patients make safer healthcare choices.
 
+CTA:
+
+✅ Search Doctors
+
+⭐ Write a Review
+
+Add a second CTA for patients, not just doctors
+
+🧑‍⚕️ 2️⃣ Doctor Claim Banner (What You Already Have — but rewrite)
+
+Your current claim banner is good but too polite 😊
+Make it psychological + ego-driven
+
+Are You a Doctor? Claim Your Profile
+Build patient trust with verified badge, respond to feedback, and stand out in search.
+
+Add bullet points like:
+✔️ Builds your professional reputation
+✔️ Helps patients choose you
+✔️ Increases trust & visibility
+
+CTA stays:
+
+Claim Profile
+
+Register New Doctor
+
+🧍‍♂️ 3️⃣ Social Proof / Trust Section
+
+You must show this even if numbers are small.
+
+Add something like:
+
+100+ Doctors Listed
+Multiple Cities Covered
+Patients already using RankSewa
+
+Even:
+🏥 Lalitpur | Kathmandu | Pokhara | Bharatpur
+
+Numbers build trust.
+
+⭐ 4️⃣ How RankSewa Helps Patients
+
+Simple short three-column explanation:
+
+For Patients
+
+Read honest reviews
+
+Find right doctor faster
+
+Make informed decisions
+
+For Doctors
+
+Earn patient trust
+
+Show experience clearly
+
+Manage professional reputation
+
+This educates instantly.
+
+💬 5️⃣ Add a Section: "Why Reviews Matter"
+
+This is your moral justification (very important for Nepal)
+
+Example text:
+
+Choosing a doctor is a big decision.
+RankSewa helps patients learn from real experiences so good doctors get recognition and patients feel safer.
+
+This shields you from criticism & negativity.
+It positions you as pro-patient + pro-good doctors.
+
+🎯 Quick UI Tweaks That Will Increase Conversions
+✔️ Add Ratings Placeholder
+
+Even if unrated:
+Instead of
+❌ “Not rated yet”
+
+Show:
+⭐ No reviews yet — Be the first to review
+
+This encourages action psychologi
