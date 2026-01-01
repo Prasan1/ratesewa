@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, s
 from sqlalchemy.orm import joinedload
 import re
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from authlib.integrations.flask_client import OAuth
@@ -9,6 +10,7 @@ from models import db, City, Specialty, Doctor, User, Rating, Appointment, Conta
 from config import Config
 import ad_manager
 import upload_utils
+import r2_storage
 import stripe
 import subscription_config
 import promo_config
@@ -455,26 +457,28 @@ def claim_profile_submit(doctor_id):
             flash('Government ID is required for verification.', 'danger')
             return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
 
-        # Save files
-        upload_folder = app.config['UPLOAD_FOLDER']
-
+        # Save files to R2
         # Save required govt_id
-        govt_id_path = upload_utils.save_verification_document(
-            govt_id, upload_folder, doctor_id, 'govt_id'
+        govt_id_path = r2_storage.save_verification_document(
+            govt_id, doctor_id, 'govt_id'
         )
+
+        if not govt_id_path:
+            flash('Error uploading government ID. Please try again.', 'danger')
+            return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
 
         # Optional medical degree
         medical_degree_path = None
         if medical_degree and medical_degree.filename:
-            medical_degree_path = upload_utils.save_verification_document(
-                medical_degree, upload_folder, doctor_id, 'medical_degree'
+            medical_degree_path = r2_storage.save_verification_document(
+                medical_degree, doctor_id, 'medical_degree'
             )
 
         # Optional practice license
         practice_license_path = None
         if practice_license and practice_license.filename:
-            practice_license_path = upload_utils.save_verification_document(
-                practice_license, upload_folder, doctor_id, 'practice_license'
+            practice_license_path = r2_storage.save_verification_document(
+                practice_license, doctor_id, 'practice_license'
             )
 
         # Create verification request
@@ -583,26 +587,28 @@ def doctor_self_register_submit():
         # Create a temporary doctor ID for file storage (use user_id as placeholder)
         temp_doctor_id = f"new_{session['user_id']}"
 
-        # Save files
-        upload_folder = app.config['UPLOAD_FOLDER']
-
+        # Save files to R2
         # Save required govt_id
-        govt_id_path = upload_utils.save_verification_document(
-            govt_id, upload_folder, temp_doctor_id, 'govt_id'
+        govt_id_path = r2_storage.save_verification_document(
+            govt_id, temp_doctor_id, 'govt_id'
         )
+
+        if not govt_id_path:
+            flash('Error uploading government ID. Please try again.', 'danger')
+            return redirect(url_for('doctor_self_register'))
 
         # Optional medical degree
         medical_degree_path = None
         if medical_degree and medical_degree.filename:
-            medical_degree_path = upload_utils.save_verification_document(
-                medical_degree, upload_folder, temp_doctor_id, 'medical_degree'
+            medical_degree_path = r2_storage.save_verification_document(
+                medical_degree, temp_doctor_id, 'medical_degree'
             )
 
         # Optional practice license
         practice_license_path = None
         if practice_license and practice_license.filename:
-            practice_license_path = upload_utils.save_verification_document(
-                practice_license, upload_folder, temp_doctor_id, 'practice_license'
+            practice_license_path = r2_storage.save_verification_document(
+                practice_license, temp_doctor_id, 'practice_license'
             )
 
         # Create verification request with is_new_doctor=True
@@ -1952,9 +1958,9 @@ def admin_verification_detail(request_id):
 @app.route('/verification/document/<int:request_id>/<doc_type>')
 @admin_required
 def serve_verification_document(request_id, doc_type):
-    """Serve verification documents (admin only)"""
-    from flask import send_from_directory
-    import os
+    """Serve verification documents from R2 (admin only)"""
+    from flask import send_file
+    import io
 
     verification_request = VerificationRequest.query.get_or_404(request_id)
 
@@ -1973,19 +1979,30 @@ def serve_verification_document(request_id, doc_type):
         flash('Document not found.', 'danger')
         return redirect(url_for('admin_verification_detail', request_id=request_id))
 
-    # Construct full path
-    upload_folder = app.config['UPLOAD_FOLDER']
-    full_path = os.path.join(upload_folder, doc_path)
+    # Get file from R2
+    file_content = r2_storage.get_verification_document(doc_path)
 
-    if not os.path.exists(full_path):
-        flash('Document file not found on server.', 'danger')
+    if not file_content:
+        flash('Document file not found in storage.', 'warning')
         return redirect(url_for('admin_verification_detail', request_id=request_id))
 
-    # Serve the file
-    directory = os.path.dirname(full_path)
-    filename = os.path.basename(full_path)
+    # Determine content type based on file extension
+    file_ext = doc_path.split('.')[-1].lower()
+    content_type_map = {
+        'pdf': 'application/pdf',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'png': 'image/png'
+    }
+    content_type = content_type_map.get(file_ext, 'application/octet-stream')
 
-    return send_from_directory(directory, filename)
+    # Create a BytesIO object and send file
+    return send_file(
+        io.BytesIO(file_content),
+        mimetype=content_type,
+        as_attachment=False,
+        download_name=doc_path.split('/')[-1]
+    )
 
 
 @app.route('/uploads/photos/<filename>')

@@ -83,8 +83,10 @@ Includes click tracking and impression tracking
                 fetch('{{ url_for("ad_impression", ad_id=ad.id) }}', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
-                    }
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token() }}'
+                    },
+                    credentials: 'same-origin'
                 }).catch(function(error) {
                     console.error('Error tracking ad impression:', error);
                 });
