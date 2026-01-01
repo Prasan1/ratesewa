@@ -77,7 +77,9 @@ def import_kmc_doctors():
     # ... rest of the code ...
     description = f"{name} is a {specialty_name} practicing at Kathmandu Medical College, {city_name}, Nepal."
     # ...
-    college="Kathmandu Medical College",
+    education=None,  # Doctor will fill when claiming profile
+    college=None,  # Doctor will fill when claiming profile
+    workplace="Kathmandu Medical College",  # Where they currently work
 ```
 
 ### Step 3: Add Route in app.py

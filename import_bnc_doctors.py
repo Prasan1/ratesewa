@@ -109,8 +109,9 @@ def import_bnc_doctors():
                     specialty_id=specialty.id,
                     city_id=city.id,
                     description=description,
-                    education=f"{specialty_name}",
-                    college="B&C Medical College",
+                    education=None,  # Will be updated when doctor claims profile
+                    college=None,  # Will be updated when doctor claims profile
+                    workplace="B&C Medical College, Birtamod",
                     experience=5,  # Default experience
                     photo_url=None,
                     slug=slug,

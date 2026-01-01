@@ -119,24 +119,34 @@
                 <p class="card-text">{{ doctor.description }}</p>
                 
                 <hr>
-                
+
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <h5>Experience</h5>
-                        <p class="card-text">{{ doctor.experience }} years</p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <h5>Education</h5>
-                        <p class="card-text">{{ doctor.education }}</p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <h5>College</h5>
-                        <p class="card-text">{{ doctor.college }}</p>
-                    </div>
                     <div class="col-md-6 mb-3">
                         <h5>Specialty</h5>
                         <p class="card-text">{{ doctor.specialty.name }}</p>
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <h5>Experience</h5>
+                        <p class="card-text">{{ doctor.experience }} years</p>
+                    </div>
+                    {% if doctor.workplace %}
+                    <div class="col-md-6 mb-3">
+                        <h5>Works At</h5>
+                        <p class="card-text">{{ doctor.workplace }}</p>
+                    </div>
+                    {% endif %}
+                    {% if doctor.education %}
+                    <div class="col-md-6 mb-3">
+                        <h5>Education</h5>
+                        <p class="card-text">{{ doctor.education }}</p>
+                    </div>
+                    {% endif %}
+                    {% if doctor.college %}
+                    <div class="col-md-6 mb-3">
+                        <h5>College</h5>
+                        <p class="card-text">{{ doctor.college }}</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

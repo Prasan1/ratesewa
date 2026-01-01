@@ -1370,6 +1370,31 @@ def run_import_bnc_doctors():
         flash(f'Error during B&C import: {str(e)}', 'danger')
         return redirect(url_for('import_doctors_page'))
 
+@app.route('/admin/add-workplace-field', methods=['POST'])
+@admin_required
+def add_workplace_field():
+    """Migration: Add workplace field to doctors table"""
+    try:
+        from add_workplace_field import add_workplace_column
+
+        # Capture output
+        import io
+        import sys
+        old_stdout = sys.stdout
+        sys.stdout = buffer = io.StringIO()
+
+        add_workplace_column()
+
+        output = buffer.getvalue()
+        sys.stdout = old_stdout
+
+        flash('Workplace field migration completed!', 'success')
+        return render_template('admin_import_result.html', output=output)
+
+    except Exception as e:
+        flash(f'Error during migration: {str(e)}', 'danger')
+        return redirect(url_for('import_doctors_page'))
+
 @app.route('/admin/debug-doctor/<int:doctor_id>')
 @admin_required
 def debug_doctor(doctor_id):

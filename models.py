@@ -41,8 +41,9 @@ class Doctor(db.Model):
     city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
     specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=False)
     experience = db.Column(db.Integer)
-    education = db.Column(db.Text)
-    college = db.Column(db.Text)
+    education = db.Column(db.Text)  # Educational qualifications (e.g., "MBBS, MD")
+    college = db.Column(db.Text)  # Where they studied (e.g., "Tribhuvan University")
+    workplace = db.Column(db.Text)  # Where they work (e.g., "B&C Medical College")
     description = db.Column(db.Text)
     photo_url = db.Column(db.Text)  # URL to doctor's photo
     is_featured = db.Column(db.Boolean, default=False)

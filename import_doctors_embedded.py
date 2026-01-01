@@ -184,6 +184,7 @@ def import_doctors(use_app_context=True):
                     description=description,
                     education=doctor_data['education'] if doctor_data['education'] else None,
                     college=None,
+                    workplace=None,  # Will be updated when doctor claims profile
                     experience=years_exp,
                     photo_url=None,
                     slug=slug,

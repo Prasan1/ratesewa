@@ -10,6 +10,22 @@
                 <i class="fas fa-file-import me-2"></i>Import Doctors
             </h1>
 
+            <!-- Database Migration: Add Workplace Field -->
+            <div class="alert alert-warning mb-4">
+                <h5><i class="fas fa-database me-2"></i>Database Migration Required</h5>
+                <p class="mb-2">Before importing B&C doctors, you need to add the "workplace" field to the database.</p>
+                <p class="small mb-3">This migration adds a new column to store where doctors work (hospital/clinic name).</p>
+                <form method="POST" action="{{ url_for('add_workplace_field') }}" class="d-inline" onsubmit="return confirm('Run database migration to add workplace field?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-database me-2"></i>Run Migration: Add Workplace Field
+                    </button>
+                </form>
+                <p class="small text-muted mt-2 mb-0">
+                    <i class="fas fa-info-circle me-1"></i>Safe to run multiple times. Will skip if field already exists.
+                </p>
+            </div>
+
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Bulk Import from Embedded Data</h5>
