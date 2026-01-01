@@ -2,6 +2,15 @@
 
 {% block title %}{{ doctor.name }} - Doctor Profile{% endblock %}
 
+{% block og_type %}profile{% endblock %}
+{% block og_title %}{{ doctor.name }} - {{ doctor.specialty.name }} in {{ doctor.city.name }}{% endblock %}
+{% block og_description %}{{ doctor.description[:160] }}{% endblock %}
+{% block og_image %}{{ doctor.photo_url if doctor.photo_url else request.url_root + 'static/img/logo.png' }}{% endblock %}
+
+{% block twitter_title %}{{ doctor.name }} - {{ doctor.specialty.name }} in {{ doctor.city.name }}{% endblock %}
+{% block twitter_description %}{{ doctor.description[:200] }}{% endblock %}
+{% block twitter_image %}{{ doctor.photo_url if doctor.photo_url else request.url_root + 'static/img/logo.png' }}{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="col-md-4 mb-4">
