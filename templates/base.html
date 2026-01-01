@@ -13,11 +13,11 @@
     <meta property="og:image" content="{% block og_image %}{{ request.url_root }}static/img/logo.png{% endblock %}">
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ request.url }}">
-    <meta property="twitter:title" content="{% block twitter_title %}RankSewa - Find Trusted Healthcare Providers in Nepal{% endblock %}">
-    <meta property="twitter:description" content="{% block twitter_description %}Discover and review the best doctors and healthcare providers in Nepal. Read patient experiences and find trusted medical professionals near you.{% endblock %}">
-    <meta property="twitter:image" content="{% block twitter_image %}{{ request.url_root }}static/img/logo.png{% endblock %}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ request.url }}">
+    <meta name="twitter:title" content="{% block twitter_title %}RankSewa - Find Trusted Healthcare Providers in Nepal{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Discover and review the best doctors and healthcare providers in Nepal. Read patient experiences and find trusted medical professionals near you.{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ request.url_root }}static/img/logo.png{% endblock %}">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
