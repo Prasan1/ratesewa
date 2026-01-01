@@ -14,9 +14,9 @@ def update_bnc_doctors():
         print("Fixing B&C Medical College Doctor Fields")
         print("=" * 70)
 
-        # Find doctors from B&C Medical College based on description
+        # Find ONLY doctors with college = "B&C Medical College" (the incorrect import)
         bnc_doctors = Doctor.query.filter(
-            Doctor.description.ilike('%B&C Medical College%')
+            Doctor.college == 'B&C Medical College'
         ).all()
 
         updated = 0
