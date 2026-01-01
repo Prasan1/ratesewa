@@ -49,6 +49,63 @@
                 {% endif %}
             </div>
         </div>
+
+        <!-- Social Media Share - Compact -->
+        <div class="card shadow-sm mt-3">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <small class="text-muted me-3">Share:</small>
+                    <div class="d-flex gap-3">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}"
+                           target="_blank"
+                           class="text-primary"
+                           title="Share on Facebook">
+                            <i class="fab fa-facebook fa-lg"></i>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!&url={{ request.url }}"
+                           target="_blank"
+                           class="text-info"
+                           title="Share on Twitter">
+                            <i class="fab fa-twitter fa-lg"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url }}"
+                           target="_blank"
+                           class="text-primary"
+                           title="Share on LinkedIn">
+                            <i class="fab fa-linkedin fa-lg"></i>
+                        </a>
+                        <a href="https://wa.me/?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!%20{{ request.url }}"
+                           target="_blank"
+                           class="text-success"
+                           title="Share on WhatsApp">
+                            <i class="fab fa-whatsapp fa-lg"></i>
+                        </a>
+                        <button onclick="copyProfileLink()"
+                                class="btn btn-link p-0 text-secondary"
+                                id="copyLinkBtn"
+                                title="Copy Link">
+                            <i class="fas fa-link fa-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctor Promotion Badge (If verified doctor is viewing their own profile) -->
+        {% if session.get('doctor_id') == doctor.id and doctor.is_verified %}
+        <div class="card shadow-sm mt-3 border-success">
+            <div class="card-body">
+                <h6 class="card-title text-success mb-3">
+                    <i class="fas fa-bullhorn me-2"></i>Promote Your Profile!
+                </h6>
+                <p class="small text-muted mb-3">Share your verified profile on social media to attract more patients!</p>
+                <div class="alert alert-success small mb-0">
+                    <i class="fas fa-gift me-2"></i>
+                    <strong>Tell your colleagues:</strong> RankSewa is 100% FREE for all doctors until April 25, 2026!
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
     
     <div class="col-md-8">
@@ -347,5 +404,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Copy profile link to clipboard
+function copyProfileLink() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(function() {
+        const btn = document.getElementById('copyLinkBtn');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check fa-lg"></i>';
+        btn.classList.remove('text-secondary');
+        btn.classList.add('text-success');
+
+        setTimeout(function() {
+            btn.innerHTML = originalHTML;
+            btn.classList.remove('text-success');
+            btn.classList.add('text-secondary');
+        }, 2000);
+    }).catch(function(err) {
+        alert('Failed to copy link: ' + err);
+    });
+}
 </script>
 {% endblock %}

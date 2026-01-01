@@ -122,14 +122,29 @@
     <footer style="background: linear-gradient(135deg, #f8f5ff 0%, #e8f5e9 100%); border-top: 3px solid #7B2CBF;" class="py-4 mt-5">
         <div class="container">
             <div class="row align-items-center">
-                <!-- Logo and Tagline -->
+                <!-- Logo, Brand, and Social Media -->
                 <div class="col-md-4 mb-3 mb-md-0 text-center text-md-start">
                     <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-2">
-                        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="RankSewa" height="28" class="me-2"
+                        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="RankSewa" height="32" class="me-2"
                              onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/logo-temp.svg') }}';">
                         <h5 class="mb-0 fw-bold" style="color: #7B2CBF;">RankSewa</h5>
                     </div>
-                    <p class="mb-0 small" style="color: #666;">Find trusted healthcare providers in Nepal</p>
+                    <p class="mb-2 small" style="color: #666;">Find trusted healthcare providers in Nepal</p>
+                    <!-- Social Media Icons -->
+                    <div class="d-flex gap-3 justify-content-center justify-content-md-start">
+                        <a href="https://www.facebook.com/ranksewa" target="_blank" class="text-primary" title="Facebook">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="https://twitter.com/ranksewa" target="_blank" class="text-info" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/ranksewa" target="_blank" class="text-primary" title="LinkedIn">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="https://www.instagram.com/ranksewa" target="_blank" class="text-danger" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Quick Links -->
