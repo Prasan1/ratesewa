@@ -14,12 +14,13 @@ SUBSCRIPTION_TIERS = {
             'Profile listing',
             'Verification badge',
             'Respond to reviews',
-            'Basic profile editing'
+            'Basic profile editing',
+            'Profile photo upload'  # Updated: Now included in Basic tier
         ],
         'locked_features': [
             'Analytics dashboard',
             'Contact info visible',
-            'Photo gallery',
+            'Photo gallery (multiple photos)',  # Updated: Multiple photos still Premium+
             'Appointment hours',
             'Priority placement',
             'Featured badge'
@@ -59,6 +60,46 @@ SUBSCRIPTION_TIERS = {
     }
 }
 
+# Clinic tiers (multi-doctor billing)
+CLINIC_TIERS = {
+    'clinic_starter': {
+        'name': 'Clinic Starter',
+        'price_npr': 4999,
+        'price_usd': 37,
+        'max_doctors': 3,
+        'features': [
+            'Manage up to 3 doctors',
+            'Priority support (48h response)',
+            'Featured placement boosts',
+            'Enhanced analytics for managed profiles'
+        ]
+    },
+    'clinic_growth': {
+        'name': 'Clinic Growth',
+        'price_npr': 9999,
+        'price_usd': 74,
+        'max_doctors': 8,
+        'features': [
+            'Manage up to 8 doctors',
+            'Priority support (24h response)',
+            'Featured placement boosts',
+            'Enhanced analytics for managed profiles'
+        ]
+    },
+    'clinic_pro': {
+        'name': 'Clinic Pro',
+        'price_npr': 14999,
+        'price_usd': 111,
+        'max_doctors': 15,
+        'features': [
+            'Manage up to 15 doctors',
+            'Dedicated priority support',
+            'Featured placement boosts',
+            'Enhanced analytics for managed profiles'
+        ]
+    }
+}
+
 # Stripe configuration
 STRIPE_CONFIG = {
     'currency': 'usd',
@@ -79,11 +120,11 @@ TIER_FEATURES = {
     'free': {
         'can_view_analytics': False,
         'can_show_contact': False,
-        'can_upload_photos': False,
+        'can_upload_photos': True,  # Updated: Now allowed in Basic tier
         'can_show_hours': False,
         'is_featured': False,
         'search_boost_multiplier': 1.0,
-        'max_photos': 0
+        'max_photos': 1  # Updated: Allow 1 profile photo in Basic tier
     },
     'premium': {
         'can_view_analytics': True,
@@ -134,3 +175,8 @@ def get_upgrade_options(current_tier):
 def calculate_price_npr(price_usd, exchange_rate=135):
     """Convert USD price to NPR (default rate: 135 NPR/USD)"""
     return int(price_usd * exchange_rate)
+
+
+def get_clinic_tier_info(tier_name):
+    """Get clinic tier information"""
+    return CLINIC_TIERS.get(tier_name, CLINIC_TIERS['clinic_starter'])

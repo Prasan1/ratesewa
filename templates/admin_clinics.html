@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Clinics{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="mb-1">Manage Clinics</h2>
+        <p class="text-muted mb-0">Maintain clinic profiles and visibility.</p>
+    </div>
+    <a href="{{ url_for('admin_clinic_new') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add Clinic
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Clinic</th>
+                <th>City</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for clinic in clinics %}
+            <tr>
+                <td>
+                    <div class="fw-semibold">{{ clinic.name }}</div>
+                    <div class="text-muted small">{{ clinic.phone_number or '—' }}</div>
+                </td>
+                <td>{{ clinic.city.name }}</td>
+                <td>
+                    {% if clinic.is_active %}
+                    <span class="badge bg-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                    {% if clinic.is_featured %}
+                    <span class="badge bg-warning text-dark ms-2">Featured</span>
+                    {% endif %}
+                </td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_clinic_edit', clinic_id=clinic.id) }}">Edit</a>
+                    <form method="post" action="{{ url_for('admin_clinic_delete', clinic_id=clinic.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this clinic?');">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center text-muted py-4">No clinics found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Clinic Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="mb-3"><i class="fas fa-briefcase-medical me-2"></i>Manage Clinic Profiles</h2>
+                <p class="text-muted mb-4">
+                    This area is for receptionists and clinic managers who manage doctor profiles and appointments.
+                    Clinic manager access requires admin approval.
+                </p>
+                <form method="POST" action="{{ url_for('clinic_manager_activate') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-cog me-2"></i>Request Clinic Manager Access
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

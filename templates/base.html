@@ -58,6 +58,13 @@
                             <i class="fas fa-heartbeat me-1 d-lg-none"></i>Health Digest
                         </a>
                     </li>
+                    {# Clinics menu - Hidden for MVP, can re-enable later
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('clinics') }}">
+                            <i class="fas fa-hospital me-1 d-lg-none"></i>Clinics
+                        </a>
+                    </li>
+                    #}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('pricing') }}">
                             <i class="fas fa-tag me-1 d-lg-none"></i>Pricing
@@ -69,6 +76,13 @@
                             <i class="fas fa-user-md me-1"></i>For Doctors
                         </a>
                     </li>
+                    {# For Clinics button - Hidden for MVP, can re-enable later
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('clinic_manager_dashboard') }}">
+                            <i class="fas fa-briefcase-medical me-1"></i>For Clinics
+                        </a>
+                    </li>
+                    #}
                     {% endif %}
                     {% if 'user_id' in session and session.get('is_admin') %}
                     <li class="nav-item dropdown">
@@ -79,6 +93,7 @@
                             <li><a class="dropdown-item" href="{{ url_for('admin_doctors') }}"><i class="fas fa-user-md me-2"></i>Manage Doctors</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin_articles') }}"><i class="fas fa-newspaper me-2"></i>Manage Articles</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin_cities') }}"><i class="fas fa-city me-2"></i>Manage Cities</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_clinics') }}"><i class="fas fa-hospital me-2"></i>Manage Clinics</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin_specialties') }}"><i class="fas fa-stethoscope me-2"></i>Manage Specialties</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin_users') }}"><i class="fas fa-users me-2"></i>Manage Users</a></li>
                             <li><hr class="dropdown-divider"></li>
@@ -99,6 +114,12 @@
                             <li><a class="dropdown-item" href="{{ url_for('doctor_dashboard') }}"><i class="fas fa-user-md me-2"></i>Doctor Dashboard</a></li>
                             <li><hr class="dropdown-divider"></li>
                             {% else %}
+                            {# Clinic Manager menu - Hidden for MVP, can re-enable later
+                            {% if session.get('role') == 'clinic_manager' %}
+                            <li><a class="dropdown-item" href="{{ url_for('clinic_manager_dashboard') }}"><i class="fas fa-briefcase-medical me-2"></i>Clinic Manager</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            #}
                             {% if session.get('role') == 'patient' %}
                             <li><a class="dropdown-item text-primary" href="{{ url_for('claim_profile') }}"><i class="fas fa-user-md me-2"></i>Are You a Doctor? Claim Profile</a></li>
                             <li><hr class="dropdown-divider"></li>

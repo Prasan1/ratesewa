@@ -1,89 +1,43 @@
 {% extends "base.html" %}
 
-{% block title %}For Clinics{% endblock %}
+{% block title %}Clinics - RankSewa{% endblock %}
 
 {% block content %}
-<section class="mb-5">
-    <div class="card">
-        <div class="card-body p-4 p-md-5">
-            <h1 class="mb-3">Grow your clinic with Doctor Directory Nepal</h1>
-            <p class="text-muted mb-4">Simple, affordable plans for Nepal. Get discovered by patients searching by city and specialty.</p>
-            <a href="mailto:hello@doctordirectorynepal.com" class="btn btn-primary">
-                <i class="fas fa-envelope me-2"></i>Contact for onboarding
-            </a>
-        </div>
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="mb-1">Clinics</h2>
+        <p class="text-muted mb-0">Browse clinics and discover their doctors.</p>
     </div>
-</section>
+    <a href="{{ url_for('clinic_manager_dashboard') }}" class="btn btn-outline-primary">
+        <i class="fas fa-briefcase-medical me-2"></i>For Clinic Managers
+    </a>
+</div>
 
-<section class="mb-5">
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h4 class="mb-2">Verified Badge</h4>
-                    <p class="text-muted small">Build trust with a verified profile and rich clinic details.</p>
-                    <div class="display-6 fw-semibold mb-3">NPR 1,500<span class="fs-6 text-muted">/month</span></div>
-                    <ul class="text-muted small">
-                        <li>Verified badge on profile</li>
-                        <li>Extended clinic details</li>
-                        <li>Priority support</li>
-                    </ul>
+<div class="row g-4">
+    {% for clinic in clinics %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between mb-2">
+                    <h5 class="mb-0">{{ clinic.name }}</h5>
+                    {% if clinic.is_featured %}
+                    <span class="badge bg-warning text-dark">Featured</span>
+                    {% endif %}
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 border">
-                <div class="card-body">
-                    <div class="badge bg-success mb-2">Most Popular</div>
-                    <h4 class="mb-2">Featured Listing</h4>
-                    <p class="text-muted small">Stand out in search and featured sections.</p>
-                    <div class="display-6 fw-semibold mb-3">NPR 2,500<span class="fs-6 text-muted">/month</span></div>
-                    <ul class="text-muted small">
-                        <li>Featured badge in listings</li>
-                        <li>Top placement in search</li>
-                        <li>Profile banner highlight</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h4 class="mb-2">Clinic Bundle</h4>
-                    <p class="text-muted small">Best for multi-doctor clinics and hospitals.</p>
-                    <div class="display-6 fw-semibold mb-3">NPR 8,000<span class="fs-6 text-muted">/month</span></div>
-                    <ul class="text-muted small">
-                        <li>Up to 10 doctor profiles</li>
-                        <li>Featured listing included</li>
-                        <li>Monthly performance report</li>
-                    </ul>
-                </div>
+                <p class="text-muted small mb-2">
+                    <i class="fas fa-map-marker-alt me-1"></i>{{ clinic.city.name }}
+                </p>
+                {% if clinic.description %}
+                <p class="text-muted small mb-3">{{ clinic.description }}</p>
+                {% endif %}
+                <a href="{{ url_for('clinic_profile', slug=clinic.slug) }}" class="btn btn-outline-primary btn-sm">View clinic</a>
             </div>
         </div>
     </div>
-</section>
-
-<section class="mb-5">
-    <div class="card">
-        <div class="card-body p-4 p-md-5">
-            <h3 class="mb-3">Add-ons for Nepal market</h3>
-            <div class="row g-3 text-muted small">
-                <div class="col-md-6">SMS appointment reminders (per clinic)</div>
-                <div class="col-md-6">Priority placement for seasonal campaigns</div>
-                <div class="col-md-6">Sponsored health awareness content</div>
-                <div class="col-md-6">Local ads for diagnostics and pharmacies</div>
-            </div>
-        </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">No clinics available yet.</div>
     </div>
-</section>
-
-<section>
-    <div class="card">
-        <div class="card-body p-4 p-md-5">
-            <h3 class="mb-2">Ready to onboard?</h3>
-            <p class="text-muted mb-4">Share your clinic details and we will set up your profile in 24-48 hours.</p>
-            <a href="mailto:hello@doctordirectorynepal.com" class="btn btn-outline-primary">Email sales</a>
-        </div>
-    </div>
-</section>
+    {% endfor %}
+</div>
 {% endblock %}
