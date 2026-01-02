@@ -591,10 +591,8 @@ def doctor_self_register_submit():
 
         # Note: We intentionally allow multiple users to submit with the same NMC number
         # Admin will review all requests and approve the legitimate one
-        # This handles cases like:
-        # - Forgot password and created new account
-        # - Fraudulent impersonation attempts
-        # - Data entry errors
+        # This prevents real doctors from being locked out by fraudulent submissions
+        # Admin sees red "Duplicate" warnings and can compare documents side-by-side
 
         # Handle file uploads - only govt_id is mandatory
         medical_degree = request.files.get('medical_degree')
@@ -2263,17 +2261,16 @@ def user_profile():
     # Get user's ratings
     ratings = Rating.query.filter_by(user_id=user_id).order_by(Rating.created_at.desc()).all()
 
-    # Check for pending verification request
-    pending_verification = VerificationRequest.query.filter_by(
-        user_id=user_id,
-        status='pending'
+    # Latest verification request for status display
+    verification_request = VerificationRequest.query.filter_by(
+        user_id=user_id
     ).order_by(VerificationRequest.created_at.desc()).first()
 
     return render_template('user_profile.html',
                          user=user,
                          appointments=appointments,
                          ratings=ratings,
-                         pending_verification=pending_verification)
+                         verification_request=verification_request)
 
 @app.route('/change-password', methods=['POST'])
 @login_required
