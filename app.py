@@ -2500,5 +2500,85 @@ def debug_r2_config():
     return '<pre>' + '\n'.join(debug_info) + '</pre>'
 
 
+@app.route('/admin/debug/test-r2-upload')
+@login_required
+@admin_required
+def test_r2_upload():
+    """Test R2 upload with a small test file (admin only)"""
+    import io
+    from r2_storage import R2Storage
+
+    results = []
+    results.append("=== R2 Upload Test ===\n")
+
+    # Get credentials
+    access_key_id = os.getenv('R2_ACCESS_KEY_ID', '').strip()
+    secret_access_key = os.getenv('R2_SECRET_ACCESS_KEY', '').strip()
+    endpoint_url = os.getenv('R2_ENDPOINT_URL', '').strip()
+    bucket_name = os.getenv('R2_BUCKET_NAME', 'ranksewa-documents').strip()
+
+    # Check credentials
+    if not all([access_key_id, secret_access_key, endpoint_url]):
+        results.append("❌ Missing R2 credentials")
+        return '<pre>' + '\n'.join(results) + '</pre>'
+
+    results.append(f"Bucket: {bucket_name}")
+    results.append(f"Endpoint: {endpoint_url}")
+    results.append(f"Access Key ID: {access_key_id[:8]}...{access_key_id[-4:]}\n")
+
+    try:
+        # Initialize R2
+        results.append("Step 1: Initializing R2Storage...")
+        r2 = R2Storage(access_key_id, secret_access_key, endpoint_url, bucket_name)
+        results.append("✓ R2Storage initialized\n")
+
+        # Create test file
+        results.append("Step 2: Creating test file...")
+        test_content = f"R2 Test Upload - {datetime.now().isoformat()}"
+        test_file = io.BytesIO(test_content.encode('utf-8'))
+        test_object_name = f"test/upload-test-{datetime.now().timestamp()}.txt"
+        results.append("✓ Test file created\n")
+
+        # Try upload
+        results.append(f"Step 3: Uploading to '{test_object_name}'...")
+        result = r2.upload_file(test_file, test_object_name, 'text/plain')
+
+        if result:
+            results.append(f"✓✓✓ UPLOAD SUCCESSFUL! ✓✓✓")
+            results.append(f"Object name: {result}")
+            results.append("\n🎉 R2 is working correctly!")
+
+            # Try to verify file exists
+            results.append("\nStep 4: Verifying file exists...")
+            if r2.file_exists(result):
+                results.append("✓ File verified in R2\n")
+
+                # Try to read it back
+                results.append("Step 5: Reading file back...")
+                content = r2.get_file_object(result)
+                if content:
+                    results.append(f"✓ File content: {content.decode('utf-8')}\n")
+
+                # Clean up test file
+                results.append("Step 6: Cleaning up test file...")
+                if r2.delete_file(result):
+                    results.append("✓ Test file deleted")
+            else:
+                results.append("⚠️ Could not verify file (might still be uploading)")
+        else:
+            results.append("❌ UPLOAD FAILED")
+            results.append("Check application logs for detailed error")
+
+    except Exception as e:
+        results.append(f"\n❌ ERROR: {type(e).__name__}")
+        results.append(f"Message: {str(e)}")
+
+        # Try to get more details
+        if hasattr(e, 'response'):
+            results.append(f"Response: {e.response}")
+
+    return '<pre>' + '\n'.join(results) + '</pre>'
+
+
 if __name__ == '__main__':
     app.run(debug=True)

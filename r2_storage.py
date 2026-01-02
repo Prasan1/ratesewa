@@ -23,12 +23,23 @@ class R2Storage:
         self.bucket_name = bucket_name
 
         # Initialize S3-compatible client for R2
+        # R2 requires specific config to work with boto3
+        from botocore.config import Config as BotoConfig
+
+        boto_config = BotoConfig(
+            signature_version='s3v4',
+            s3={
+                'addressing_style': 'path'
+            }
+        )
+
         self.s3_client = boto3.client(
             's3',
             endpoint_url=endpoint_url,
             aws_access_key_id=access_key_id,
             aws_secret_access_key=secret_access_key,
-            region_name='auto'  # R2 uses 'auto' for region
+            region_name='auto',  # R2 uses 'auto' for region
+            config=boto_config
         )
 
     def upload_file(self, file_obj, object_name, content_type=None):
@@ -48,6 +59,8 @@ class R2Storage:
             if content_type:
                 extra_args['ContentType'] = content_type
 
+            print(f"[R2] Attempting upload to bucket '{self.bucket_name}', object '{object_name}'")
+
             # Upload file
             self.s3_client.upload_fileobj(
                 file_obj,
@@ -56,11 +69,17 @@ class R2Storage:
                 ExtraArgs=extra_args
             )
 
-            print(f"File uploaded successfully to R2: {object_name}")
+            print(f"[R2] ✓ Upload successful: {object_name}")
             return object_name
 
         except ClientError as e:
-            print(f"Error uploading file to R2: {e}")
+            error_code = e.response.get('Error', {}).get('Code', 'Unknown')
+            error_msg = e.response.get('Error', {}).get('Message', str(e))
+            print(f"[R2] ✗ ClientError uploading file: {error_code} - {error_msg}")
+            print(f"[R2] Full error: {e}")
+            return None
+        except Exception as e:
+            print(f"[R2] ✗ Unexpected error uploading file: {type(e).__name__}: {e}")
             return None
 
     def upload_file_from_path(self, file_path, object_name, content_type=None):
@@ -202,11 +221,17 @@ def save_verification_document(file, doctor_id, doc_type):
 
     # Check if R2 is configured (all values must be non-empty after stripping)
     if not all([access_key_id, secret_access_key, endpoint_url]):
-        print("R2 credentials not configured, falling back to local storage")
+        print("[R2] Credentials not configured, falling back to local storage")
         return None
 
+    print(f"[R2] Initializing with bucket: {bucket_name}, endpoint: {endpoint_url}")
+
     # Initialize R2 client
-    r2 = R2Storage(access_key_id, secret_access_key, endpoint_url, bucket_name)
+    try:
+        r2 = R2Storage(access_key_id, secret_access_key, endpoint_url, bucket_name)
+    except Exception as e:
+        print(f"[R2] Failed to initialize R2Storage: {type(e).__name__}: {e}")
+        return None
 
     # Generate secure filename
     filename = secure_filename(file.filename)
