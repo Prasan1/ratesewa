@@ -97,6 +97,15 @@
                      style="max-height: 500px; object-fit: cover;">
                 {% endif %}
 
+                <!-- Medical Disclaimer -->
+                <div class="alert alert-warning border-warning mb-4">
+                    <small>
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Medical Disclaimer:</strong> This article is for informational purposes only and does not constitute medical advice.
+                        Always consult with a qualified healthcare professional before making any health decisions or changes to your treatment.
+                    </small>
+                </div>
+
                 <!-- Article Content -->
                 <div class="article-body">
                     {{ article.content | safe }}
