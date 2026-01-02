@@ -3,241 +3,407 @@
 {% block title %}Doctor Dashboard - RankSewa{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4">
-                <i class="fas fa-tachometer-alt me-2"></i>Doctor Dashboard
-                <small class="text-muted">Welcome, Dr. {{ doctor.name }}</small>
-            </h2>
+<style>
+    .stat-card {
+        border: none;
+        border-radius: 16px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+    .stat-card .card-body {
+        position: relative;
+        z-index: 2;
+    }
+    .stat-icon {
+        font-size: 3rem;
+        opacity: 0.2;
+        position: absolute;
+        right: 15px;
+        bottom: 15px;
+        z-index: 1;
+    }
+    .gradient-purple {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .gradient-blue {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    .gradient-orange {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+    .gradient-green {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    .action-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    .action-card:hover {
+        border-color: #7B2CBF;
+        transform: translateX(5px);
+    }
+    .profile-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .profile-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    .verified-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        backdrop-filter: blur(10px);
+    }
+    .quick-stat {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255,255,255,0.1);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+    }
+</style>
 
-            <!-- Verification Status Banner -->
-            {% if verification_request %}
-                {% if verification_request.status == 'pending' %}
-                <div class="alert alert-warning">
-                    <i class="fas fa-clock me-2"></i>
-                    <strong>Verification Pending:</strong> Your verification request is under review. We'll notify you once it's processed.
-                </div>
-                {% elif verification_request.status == 'rejected' %}
-                <div class="alert alert-danger">
-                    <i class="fas fa-times-circle me-2"></i>
-                    <strong>Verification Rejected:</strong> {{ verification_request.admin_notes or 'Please contact support for details.' }}
-                </div>
-                {% endif %}
-            {% endif %}
-
-            <!-- Promotional Banner & Subscription CTA -->
-            {% set promo = get_promotion_banner() %}
-            {% if promo and doctor.subscription_tier == 'free' %}
-            <div class="card shadow-lg mb-4" style="background: linear-gradient(135deg, {{ promo.color }} 0%, #7B2CBF 100%); border: none;">
-                <div class="card-body p-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-8 text-white">
-                            <h4 class="mb-2"><i class="fas fa-gift me-2"></i>{{ promo.message }}</h4>
-                            <p class="mb-0 h6">Get instant access to Premium or Featured tier - absolutely FREE for {{ promo.days_left }} days! No credit card required.</p>
-                        </div>
-                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                            <a href="{{ url_for('subscription_pricing') }}" class="btn btn-light btn-lg shadow">
-                                <i class="fas fa-rocket me-2"></i>Get Free Premium
-                            </a>
+<div class="container-fluid px-4">
+    <!-- Profile Hero Section -->
+    <div class="profile-hero shadow-lg">
+        <div class="row align-items-center position-relative" style="z-index: 2;">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="me-4">
+                        <div style="width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
+                            <i class="fas fa-user-md" style="font-size: 3rem; color: #667eea;"></i>
                         </div>
                     </div>
-                </div>
-            </div>
-            {% elif doctor.subscription_tier != 'free' %}
-            <!-- Current Subscription Status -->
-            <div class="alert alert-success mb-4">
-                <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <i class="fas fa-check-circle me-2"></i>
-                        <strong>Active Subscription:</strong> {{ doctor.subscription_tier.title() }}
-                        {% if doctor.subscription_expires_at %}
-                        <span class="text-muted ms-2">({{ 'Free until' if promo else 'Expires' }}: {{ doctor.subscription_expires_at.strftime('%b %d, %Y') }})</span>
-                        {% endif %}
+                        <h1 class="mb-2" style="font-weight: 600;">Dr. {{ doctor.name }}</h1>
+                        <p class="mb-2" style="font-size: 1.2rem; opacity: 0.9;">
+                            <i class="fas fa-stethoscope me-2"></i>{{ doctor.specialty.name }}
+                        </p>
+                        <div class="verified-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Verified Doctor</span>
+                        </div>
                     </div>
-                    <a href="{{ url_for('subscription_pricing') }}" class="btn btn-sm btn-outline-success">
-                        <i class="fas fa-star me-1"></i>Manage Subscription
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{{ url_for('doctor_profile', slug=doctor.slug) }}" target="_blank" class="btn btn-light btn-lg shadow">
+                    <i class="fas fa-external-link-alt me-2"></i>View Public Profile
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mt-4 position-relative" style="z-index: 2;">
+            <div class="col-md-3 col-6 mb-3 mb-md-0">
+                <div class="quick-stat">
+                    <i class="fas fa-map-marker-alt fa-2x"></i>
+                    <div>
+                        <small style="opacity: 0.8;">Location</small>
+                        <div><strong>{{ doctor.city.name }}</strong></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3 mb-md-0">
+                <div class="quick-stat">
+                    <i class="fas fa-graduation-cap fa-2x"></i>
+                    <div>
+                        <small style="opacity: 0.8;">Experience</small>
+                        <div><strong>{{ doctor.experience or 0 }} Years</strong></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="quick-stat">
+                    <i class="fas fa-certificate fa-2x"></i>
+                    <div>
+                        <small style="opacity: 0.8;">NMC Number</small>
+                        <div><strong>{{ doctor.nmc_number or '-' }}</strong></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="quick-stat">
+                    <i class="fas fa-crown fa-2x"></i>
+                    <div>
+                        <small style="opacity: 0.8;">Tier</small>
+                        <div><strong>{{ doctor.subscription_tier.title() }}</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promotional Banner -->
+    {% set promo = get_promotion_banner() %}
+    {% if promo and doctor.subscription_tier == 'free' %}
+    <div class="alert shadow-lg mb-4" style="background: linear-gradient(135deg, {{ promo.color }} 0%, #7B2CBF 100%); border: none; border-radius: 16px;">
+        <div class="row align-items-center text-white">
+            <div class="col-md-8">
+                <h4 class="mb-2"><i class="fas fa-gift me-2"></i>{{ promo.message }}</h4>
+                <p class="mb-0">Get instant access to Premium or Featured tier - absolutely FREE for {{ promo.days_left }} days! No credit card required.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="{{ url_for('subscription_pricing') }}" class="btn btn-light btn-lg shadow">
+                    <i class="fas fa-rocket me-2"></i>Claim Free Premium
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Performance Stats -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stat-card shadow-sm gradient-purple text-white">
+                <div class="card-body p-4">
+                    <div style="position: relative;">
+                        <i class="fas fa-eye stat-icon"></i>
+                        <h6 class="mb-2" style="opacity: 0.9; font-weight: 500;">Profile Views</h6>
+                        <h2 class="mb-0" style="font-weight: 700;">{{ "{:,}".format(doctor.profile_views or 0) }}</h2>
+                        <small style="opacity: 0.8;">Total impressions</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stat-card shadow-sm gradient-blue text-white">
+                <div class="card-body p-4">
+                    <div style="position: relative;">
+                        <i class="fas fa-star stat-icon"></i>
+                        <h6 class="mb-2" style="opacity: 0.9; font-weight: 500;">Total Reviews</h6>
+                        <h2 class="mb-0" style="font-weight: 700;">{{ review_count }}</h2>
+                        <small style="opacity: 0.8;">Patient feedback</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stat-card shadow-sm gradient-orange text-white">
+                <div class="card-body p-4">
+                    <div style="position: relative;">
+                        <i class="fas fa-chart-line stat-icon"></i>
+                        <h6 class="mb-2" style="opacity: 0.9; font-weight: 500;">Average Rating</h6>
+                        <h2 class="mb-0" style="font-weight: 700;">{{ "%.1f"|format(avg_rating) }}<small style="font-size: 1.5rem;">/5</small></h2>
+                        <small style="opacity: 0.8;">
+                            {% for i in range(avg_rating|int) %}★{% endfor %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stat-card shadow-sm gradient-green text-white">
+                <div class="card-body p-4">
+                    <div style="position: relative;">
+                        <i class="fas fa-reply stat-icon"></i>
+                        <h6 class="mb-2" style="opacity: 0.9; font-weight: 500;">Response Rate</h6>
+                        <h2 class="mb-0" style="font-weight: 700;">{{ "%.0f"|format(response_rate) }}%</h2>
+                        <small style="opacity: 0.8;">Reviews responded</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Grid -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3"><i class="fas fa-bolt me-2 text-primary"></i>Quick Actions</h4>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="{{ url_for('doctor_profile_edit') }}" class="text-decoration-none">
+                <div class="action-card card shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fas fa-edit fa-2x text-white"></i>
+                        </div>
+                        <h6 class="mb-2">Edit Profile</h6>
+                        <small class="text-muted">Update your information</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="{{ url_for('doctor_reviews') }}" class="text-decoration-none">
+                <div class="action-card card shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fas fa-comments fa-2x text-white"></i>
+                        </div>
+                        <h6 class="mb-2">Manage Reviews</h6>
+                        <small class="text-muted">Respond to patient feedback</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="{{ url_for('doctor_analytics') }}" class="text-decoration-none">
+                <div class="action-card card shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fas fa-chart-bar fa-2x text-white"></i>
+                        </div>
+                        <h6 class="mb-2">View Analytics</h6>
+                        <small class="text-muted">Track your performance</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="{{ url_for('subscription_pricing') }}" class="text-decoration-none">
+                <div class="action-card card shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fas fa-rocket fa-2x text-white"></i>
+                        </div>
+                        <h6 class="mb-2">Upgrade Plan</h6>
+                        <small class="text-muted">Get more visibility</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Detailed Information -->
+    <div class="row">
+        <!-- Profile Details -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm" style="border-radius: 16px; border: none;">
+                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px 16px 0 0; border: none;">
+                    <h5 class="mb-0 text-white"><i class="fas fa-user-md me-2"></i>Professional Information</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Full Name</label>
+                        <div class="h6">{{ doctor.name }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Specialty</label>
+                        <div class="h6">{{ doctor.specialty.name }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Education</label>
+                        <div>{{ doctor.education or '-' }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Medical College</label>
+                        <div>{{ doctor.college or '-' }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Practice Address</label>
+                        <div>{{ doctor.practice_address or '-' }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Status</label>
+                        <div>
+                            {% if doctor.is_verified %}
+                            <span class="badge" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); padding: 0.5rem 1rem; border-radius: 50px;">
+                                <i class="fas fa-check-circle"></i> Verified Doctor
+                            </span>
+                            {% endif %}
+                            {% if doctor.is_featured %}
+                            <span class="badge" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 0.5rem 1rem; border-radius: 50px;">
+                                <i class="fas fa-star"></i> Featured
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Information -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm" style="border-radius: 16px; border: none;">
+                <div class="card-header" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 16px 16px 0 0; border: none;">
+                    <h5 class="mb-0 text-white"><i class="fas fa-user-circle me-2"></i>Account Settings</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Email Address</label>
+                        <div class="h6">{{ user.email }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Phone Number</label>
+                        <div>{{ doctor.phone_number or '-' }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Account Type</label>
+                        <div>
+                            <span class="badge bg-primary" style="padding: 0.5rem 1rem; border-radius: 50px;">
+                                <i class="fas fa-user-md"></i> Verified Doctor
+                            </span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="alert" style="background: rgba(123, 44, 191, 0.1); border: 1px solid rgba(123, 44, 191, 0.2); border-radius: 12px;">
+                        <small>
+                            <i class="fas fa-info-circle me-1 text-primary"></i>
+                            <strong>Need to update?</strong> Contact support to change your name, specialty, or city.
+                        </small>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{{ url_for('user_profile') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </a>
+                        <a href="{{ url_for('doctor_delete_account') }}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash-alt me-2"></i>Delete Account
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help & Support -->
+    <div class="card shadow-sm mb-4" style="border-radius: 16px; border: none; background: linear-gradient(135deg, #f8f5ff 0%, #e8f5e9 100%);">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="mb-2"><i class="fas fa-question-circle me-2 text-primary"></i>Need Help?</h5>
+                    <p class="mb-0 text-muted">Our support team is here to help you succeed on RankSewa.</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <a href="mailto:support@ranksewa.com" class="btn btn-primary">
+                        <i class="fas fa-envelope me-2"></i>Contact Support
                     </a>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Stats Cards -->
-            <div class="row mb-4">
-                <!-- Profile Views -->
-                <div class="col-md-3 mb-3">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-eye fa-2x text-primary mb-2"></i>
-                            <h3 class="mb-0">{{ doctor.profile_views or 0 }}</h3>
-                            <p class="text-muted mb-0">Profile Views</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Total Reviews -->
-                <div class="col-md-3 mb-3">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-star fa-2x text-warning mb-2"></i>
-                            <h3 class="mb-0">{{ review_count }}</h3>
-                            <p class="text-muted mb-0">Total Reviews</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Average Rating -->
-                <div class="col-md-3 mb-3">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
-                            <h3 class="mb-0">{{ "%.1f"|format(avg_rating) }}</h3>
-                            <p class="text-muted mb-0">Average Rating</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Response Rate -->
-                <div class="col-md-3 mb-3">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-reply fa-2x text-info mb-2"></i>
-                            <h3 class="mb-0">{{ "%.0f"|format(response_rate) }}%</h3>
-                            <p class="text-muted mb-0">Response Rate</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-3 mb-2">
-                                    <a href="{{ url_for('doctor_profile_edit') }}" class="btn btn-outline-primary w-100">
-                                        <i class="fas fa-edit me-2"></i>Edit Profile
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-2">
-                                    <a href="{{ url_for('doctor_reviews') }}" class="btn btn-outline-success w-100">
-                                        <i class="fas fa-comments me-2"></i>Manage Reviews
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-2">
-                                    <a href="{{ url_for('doctor_analytics') }}" class="btn btn-outline-info w-100">
-                                        <i class="fas fa-chart-bar me-2"></i>View Analytics
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-2">
-                                    <a href="{{ url_for('doctor_profile', slug=doctor.slug) }}" target="_blank" class="btn btn-outline-secondary w-100">
-                                        <i class="fas fa-external-link-alt me-2"></i>View Public Profile
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Profile Info & Status -->
-            <div class="row">
-                <!-- Profile Information -->
-                <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-header bg-secondary text-white">
-                            <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>Profile Information</h5>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-sm mb-0">
-                                <tbody>
-                                    <tr>
-                                        <th width="40%">Name:</th>
-                                        <td>{{ doctor.name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Specialty:</th>
-                                        <td>{{ doctor.specialty.name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>City:</th>
-                                        <td>{{ doctor.city.name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Experience:</th>
-                                        <td>{{ doctor.experience or '-' }} years</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Status:</th>
-                                        <td>
-                                            {% if doctor.is_verified %}
-                                            <span class="badge bg-success"><i class="fas fa-check-circle"></i> Verified</span>
-                                            {% else %}
-                                            <span class="badge bg-secondary">Not Verified</span>
-                                            {% endif %}
-                                            {% if doctor.is_featured %}
-                                            <span class="badge bg-warning text-dark"><i class="fas fa-star"></i> Featured</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    {% if doctor.nmc_number %}
-                                    <tr>
-                                        <th>NMC Number:</th>
-                                        <td>{{ doctor.nmc_number }}</td>
-                                    </tr>
-                                    {% endif %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Account Information -->
-                <div class="col-lg-6 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-header bg-info text-white">
-                            <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i>Account Information</h5>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-sm mb-0">
-                                <tbody>
-                                    <tr>
-                                        <th width="40%">Email:</th>
-                                        <td>{{ user.email }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Role:</th>
-                                        <td><span class="badge bg-primary">{{ user.role.capitalize() }}</span></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Phone:</th>
-                                        <td>{{ doctor.phone_number or '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Practice Address:</th>
-                                        <td>{{ doctor.practice_address or '-' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <div class="alert alert-light mt-3 mb-0">
-                                <small>
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    <strong>Note:</strong> To update your name, specialty, or city, please contact admin support.
-                                </small>
-                            </div>
-
-                            <div class="mt-3">
-                                <a href="{{ url_for('doctor_delete_account') }}" class="btn btn-sm btn-outline-danger">
-                                    <i class="fas fa-trash-alt me-1"></i>Delete Account
-                                </a>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
