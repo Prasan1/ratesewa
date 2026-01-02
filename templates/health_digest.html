@@ -90,6 +90,7 @@
                             <a href="{{ url_for('article_detail', slug=article.slug) }}" class="digest-thumb">
                                 <img src="{{ article.featured_image or 'https://picsum.photos/seed/article' + article.id|string + '/400/300' }}"
                                      alt="{{ article.title }}"
+                                     loading="lazy"
                                      onerror="this.src='https://picsum.photos/seed/article{{ article.id }}/400/300'">
                             </a>
                         </div>

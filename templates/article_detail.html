@@ -94,6 +94,7 @@
                 <img src="{{ article.featured_image }}"
                      class="img-fluid rounded mb-4 w-100"
                      alt="{{ article.title }}"
+                     loading="lazy"
                      style="max-height: 500px; object-fit: cover;">
                 {% endif %}
 
@@ -129,6 +130,7 @@
                                              class="rounded-circle me-3"
                                              width="60"
                                              height="60"
+                                             loading="lazy"
                                              alt="{{ doctor.name }}">
                                         <div>
                                             <h6 class="mb-0">{{ doctor.name }}</h6>
