@@ -194,13 +194,13 @@ def save_verification_document(file, doctor_id, doc_type):
     Returns:
         str: R2 object path if successful, None otherwise
     """
-    # Get R2 credentials from environment
-    access_key_id = os.getenv('R2_ACCESS_KEY_ID')
-    secret_access_key = os.getenv('R2_SECRET_ACCESS_KEY')
-    endpoint_url = os.getenv('R2_ENDPOINT_URL')
-    bucket_name = os.getenv('R2_BUCKET_NAME', 'ranksewa-documents')
+    # Get R2 credentials from environment (strip whitespace/newlines)
+    access_key_id = os.getenv('R2_ACCESS_KEY_ID', '').strip()
+    secret_access_key = os.getenv('R2_SECRET_ACCESS_KEY', '').strip()
+    endpoint_url = os.getenv('R2_ENDPOINT_URL', '').strip()
+    bucket_name = os.getenv('R2_BUCKET_NAME', 'ranksewa-documents').strip()
 
-    # Check if R2 is configured
+    # Check if R2 is configured (all values must be non-empty after stripping)
     if not all([access_key_id, secret_access_key, endpoint_url]):
         print("R2 credentials not configured, falling back to local storage")
         return None
@@ -239,11 +239,11 @@ def get_verification_document(object_name):
     Returns:
         bytes: File content if successful, None otherwise
     """
-    # Get R2 credentials from environment
-    access_key_id = os.getenv('R2_ACCESS_KEY_ID')
-    secret_access_key = os.getenv('R2_SECRET_ACCESS_KEY')
-    endpoint_url = os.getenv('R2_ENDPOINT_URL')
-    bucket_name = os.getenv('R2_BUCKET_NAME', 'ranksewa-documents')
+    # Get R2 credentials from environment (strip whitespace/newlines)
+    access_key_id = os.getenv('R2_ACCESS_KEY_ID', '').strip()
+    secret_access_key = os.getenv('R2_SECRET_ACCESS_KEY', '').strip()
+    endpoint_url = os.getenv('R2_ENDPOINT_URL', '').strip()
+    bucket_name = os.getenv('R2_BUCKET_NAME', 'ranksewa-documents').strip()
 
     # Check if R2 is configured
     if not all([access_key_id, secret_access_key, endpoint_url]):
@@ -266,11 +266,11 @@ def delete_verification_document(object_name):
     Returns:
         bool: True if successful, False otherwise
     """
-    # Get R2 credentials from environment
-    access_key_id = os.getenv('R2_ACCESS_KEY_ID')
-    secret_access_key = os.getenv('R2_SECRET_ACCESS_KEY')
-    endpoint_url = os.getenv('R2_ENDPOINT_URL')
-    bucket_name = os.getenv('R2_BUCKET_NAME', 'ranksewa-documents')
+    # Get R2 credentials from environment (strip whitespace/newlines)
+    access_key_id = os.getenv('R2_ACCESS_KEY_ID', '').strip()
+    secret_access_key = os.getenv('R2_SECRET_ACCESS_KEY', '').strip()
+    endpoint_url = os.getenv('R2_ENDPOINT_URL', '').strip()
+    bucket_name = os.getenv('R2_BUCKET_NAME', 'ranksewa-documents').strip()
 
     # Check if R2 is configured
     if not all([access_key_id, secret_access_key, endpoint_url]):

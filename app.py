@@ -2409,5 +2409,96 @@ def change_password():
     return redirect(url_for('user_profile'))
 
 
+@app.route('/admin/debug/r2-config')
+@login_required
+@admin_required
+def debug_r2_config():
+    """Debug route to check R2 configuration (admin only)"""
+    import os
+
+    def mask_value(value, show_chars=4):
+        """Mask sensitive values but show length and special chars"""
+        if not value:
+            return "[NOT SET]"
+
+        # Show repr to see special characters like \n
+        repr_str = repr(value)
+
+        # Check for special characters
+        has_newline = '\\n' in repr_str
+        has_space = ' ' in value
+        has_tab = '\\t' in repr_str
+
+        # Mask middle characters
+        if len(value) > show_chars * 2:
+            masked = value[:show_chars] + '...' + value[-show_chars:]
+        else:
+            masked = value[:show_chars] + '...'
+
+        warnings = []
+        if has_newline:
+            warnings.append("⚠️ NEWLINE")
+        if has_space:
+            warnings.append("⚠️ SPACE")
+        if has_tab:
+            warnings.append("⚠️ TAB")
+
+        warning_str = ' '.join(warnings) if warnings else "✓"
+
+        return f"{masked} [len={len(value)}] {warning_str}"
+
+    # Read R2 config
+    r2_config = {
+        'R2_ACCESS_KEY_ID': os.getenv('R2_ACCESS_KEY_ID', ''),
+        'R2_SECRET_ACCESS_KEY': os.getenv('R2_SECRET_ACCESS_KEY', ''),
+        'R2_ENDPOINT_URL': os.getenv('R2_ENDPOINT_URL', ''),
+        'R2_BUCKET_NAME': os.getenv('R2_BUCKET_NAME', 'ranksewa-documents')
+    }
+
+    # After stripping
+    r2_config_stripped = {
+        'R2_ACCESS_KEY_ID': r2_config['R2_ACCESS_KEY_ID'].strip(),
+        'R2_SECRET_ACCESS_KEY': r2_config['R2_SECRET_ACCESS_KEY'].strip(),
+        'R2_ENDPOINT_URL': r2_config['R2_ENDPOINT_URL'].strip(),
+        'R2_BUCKET_NAME': r2_config['R2_BUCKET_NAME'].strip()
+    }
+
+    # Build debug info
+    debug_info = []
+    debug_info.append("=== R2 Configuration Debug ===\n")
+
+    for key in ['R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_ENDPOINT_URL', 'R2_BUCKET_NAME']:
+        raw = r2_config[key]
+        stripped = r2_config_stripped[key]
+
+        debug_info.append(f"\n{key}:")
+        debug_info.append(f"  Raw: {mask_value(raw)}")
+        if raw != stripped:
+            debug_info.append(f"  ⚠️ After strip: {mask_value(stripped)}")
+        else:
+            debug_info.append(f"  ✓ No whitespace issues")
+
+    # Test R2 connection
+    debug_info.append("\n\n=== R2 Connection Test ===")
+    try:
+        from r2_storage import R2Storage
+        if all([r2_config_stripped['R2_ACCESS_KEY_ID'],
+                r2_config_stripped['R2_SECRET_ACCESS_KEY'],
+                r2_config_stripped['R2_ENDPOINT_URL']]):
+            r2 = R2Storage(
+                r2_config_stripped['R2_ACCESS_KEY_ID'],
+                r2_config_stripped['R2_SECRET_ACCESS_KEY'],
+                r2_config_stripped['R2_ENDPOINT_URL'],
+                r2_config_stripped['R2_BUCKET_NAME']
+            )
+            debug_info.append("✓ R2Storage initialized successfully")
+        else:
+            debug_info.append("❌ Missing required credentials")
+    except Exception as e:
+        debug_info.append(f"❌ Error: {str(e)}")
+
+    return '<pre>' + '\n'.join(debug_info) + '</pre>'
+
+
 if __name__ == '__main__':
     app.run(debug=True)
