@@ -515,8 +515,7 @@ def claim_profile_submit(doctor_id):
         db.session.add(verification_request)
         db.session.commit()
 
-        flash('Verification request submitted successfully! Our admin team will review it within 2-3 business days.', 'success')
-        return redirect(url_for('user_profile'))
+        return redirect(url_for('verification_submitted'))
 
     except ValueError as e:
         flash(str(e), 'danger')
@@ -652,8 +651,7 @@ def doctor_self_register_submit():
         db.session.add(verification_request)
         db.session.commit()
 
-        flash('Registration submitted successfully! Our admin team will review your application within 2-3 business days. You will receive an email notification once reviewed.', 'success')
-        return redirect(url_for('user_profile'))
+        return redirect(url_for('verification_submitted'))
 
     except ValueError as e:
         flash(str(e), 'danger')
@@ -662,6 +660,14 @@ def doctor_self_register_submit():
         db.session.rollback()
         flash(f'An error occurred while processing your registration: {str(e)}', 'danger')
         return redirect(url_for('doctor_self_register'))
+
+
+@app.route('/verification/submitted')
+@login_required
+def verification_submitted():
+    """Show verification submitted confirmation page"""
+    user = User.query.get(session['user_id'])
+    return render_template('verification_submitted.html', user=user)
 
 
 # ============================================================================

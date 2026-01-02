@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Verification Submitted - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Success Card -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-body text-center py-5">
+                    <!-- Success Icon -->
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 80px;"></i>
+                    </div>
+
+                    <!-- Main Heading -->
+                    <h2 class="mb-3">
+                        <i class="fas fa-clipboard-check me-2"></i>Verification Request Submitted!
+                    </h2>
+
+                    <p class="lead text-muted mb-4">
+                        Thank you for registering with RankSewa. Your doctor profile is now under review.
+                    </p>
+
+                    <hr class="my-4">
+
+                    <!-- What Happens Next -->
+                    <div class="text-start">
+                        <h5 class="mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>What Happens Next?</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="flex-shrink-0">
+                                        <span class="badge bg-primary rounded-circle" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">1</span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <strong>Admin Review</strong>
+                                        <p class="small text-muted mb-0">Our team will verify your documents and credentials</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="flex-shrink-0">
+                                        <span class="badge bg-primary rounded-circle" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">2</span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <strong>Email Notification</strong>
+                                        <p class="small text-muted mb-0">You'll receive approval/rejection via email</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="flex-shrink-0">
+                                        <span class="badge bg-primary rounded-circle" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">3</span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <strong>Profile Goes Live</strong>
+                                        <p class="small text-muted mb-0">Your verified profile appears in search results</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="flex-shrink-0">
+                                        <span class="badge bg-primary rounded-circle" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">4</span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <strong>Dashboard Access</strong>
+                                        <p class="small text-muted mb-0">Manage reviews, respond to patients, view analytics</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Timeline -->
+                    <div class="alert alert-info">
+                        <i class="fas fa-clock me-2"></i>
+                        <strong>Expected Review Time:</strong> 2-3 business days
+                        <br>
+                        <small>We'll send an update to <strong>{{ user.email }}</strong></small>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                        <a href="{{ url_for('user_profile') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-user me-2"></i>View My Profile
+                        </a>
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i>Go to Homepage
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Info Card -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="mb-3"><i class="fas fa-question-circle me-2"></i>Frequently Asked Questions</h6>
+
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                    Can I edit my submission?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Once submitted, you cannot edit the request. If you made a mistake, please contact us at <strong>support@ranksewa.com</strong>.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                    What if my request is rejected?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    You'll receive an email explaining the reason. You can resubmit with corrected information or contact support for assistance.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                    How will I know when I'm approved?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    You'll receive an email notification, and you'll be able to access your Doctor Dashboard from the top menu.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Contact -->
+            <div class="text-center mt-4 mb-5">
+                <p class="text-muted">
+                    <i class="fas fa-envelope me-2"></i>
+                    Need help? Contact us at <a href="mailto:support@ranksewa.com">support@ranksewa.com</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
