@@ -298,11 +298,36 @@ def save_profile_photo(file, upload_folder, doctor_id, max_size_mb=5):
         if img.width > max_dimension or img.height > max_dimension:
             img.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
 
-        # Save optimized image
-        img.save(filepath, 'JPEG', quality=85, optimize=True)
+        # Save optimized image to BytesIO first (for R2 upload)
+        from io import BytesIO
+        img_bytes = BytesIO()
+        img.save(img_bytes, 'JPEG', quality=85, optimize=True)
 
-        # Return relative path
+        # Try to upload to R2 first
+        import r2_storage
+        r2_path = None
+        try:
+            r2_path = r2_storage.save_profile_photo(img_bytes, doctor_id, unique_filename)
+        except Exception as e:
+            print(f"[R2] Photo upload failed, falling back to local storage: {e}")
+
+        # If R2 upload succeeded, return R2 path
+        if r2_path:
+            print(f"[R2] Photo uploaded successfully to R2: {r2_path}")
+            return r2_path
+
+        # Fallback: Save to local storage
+        try:
+            img_bytes.seek(0)
+        except Exception:
+            pass
+
+        with open(filepath, 'wb') as f:
+            f.write(img_bytes.getvalue())
+
+        # Return relative path for local storage
         relative_path = os.path.join('photos', unique_filename)
+        print(f"[Local] Photo saved to local storage: {relative_path}")
         return relative_path
 
     except Exception as e:
@@ -314,11 +339,11 @@ def save_profile_photo(file, upload_folder, doctor_id, max_size_mb=5):
 
 def delete_profile_photo(upload_folder, relative_path):
     """
-    Delete a profile photo from filesystem
+    Delete a profile photo from R2 or local filesystem
 
     Args:
         upload_folder: Base upload folder path
-        relative_path: Relative path to the photo
+        relative_path: Relative path to the photo (R2 or local)
 
     Returns:
         Boolean indicating if deletion was successful
@@ -326,11 +351,27 @@ def delete_profile_photo(upload_folder, relative_path):
     if not relative_path:
         return False
 
+    # Check if this is an R2 path (format: photos/{doctor_id}/{filename})
+    # R2 paths have doctor ID in them, local paths are just photos/{filename}
+    import r2_storage
+
+    if relative_path.count('/') > 1:  # R2 path has multiple slashes
+        # Try to delete from R2
+        try:
+            result = r2_storage.delete_profile_photo(relative_path)
+            if result:
+                print(f"[R2] Photo deleted from R2: {relative_path}")
+                return True
+        except Exception as e:
+            print(f"[R2] Error deleting from R2, trying local: {e}")
+
+    # Try local storage (fallback or for old photos)
     full_path = os.path.join(upload_folder, relative_path)
 
     try:
         if os.path.exists(full_path):
             os.remove(full_path)
+            print(f"[Local] Photo deleted from local storage: {relative_path}")
             return True
         return False
     except Exception as e:

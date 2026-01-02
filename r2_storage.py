@@ -306,3 +306,81 @@ def delete_verification_document(object_name):
 
     # Delete file from R2
     return r2.delete_file(object_name)
+
+
+def save_profile_photo(file_obj, doctor_id, filename):
+    """
+    Save profile photo to R2
+
+    Args:
+        file_obj: File object (can be BytesIO from PIL or file from request.files)
+        doctor_id: Doctor ID
+        filename: Filename to use
+
+    Returns:
+        str: R2 object path if successful, None otherwise
+    """
+    # Get R2 credentials from environment (strip whitespace/newlines)
+    access_key_id = os.getenv('R2_ACCESS_KEY_ID', '').strip()
+    secret_access_key = os.getenv('R2_SECRET_ACCESS_KEY', '').strip()
+    endpoint_url = os.getenv('R2_ENDPOINT_URL', '').strip()
+    bucket_name = os.getenv('R2_BUCKET_NAME', 'ranksewa-documents').strip()
+
+    # Check if R2 is configured (all values must be non-empty after stripping)
+    if not all([access_key_id, secret_access_key, endpoint_url]):
+        print("[R2] Credentials not configured for photo upload, falling back to local storage")
+        return None
+
+    print(f"[R2] Initializing for photo upload: {filename}")
+
+    # Initialize R2 client
+    try:
+        r2 = R2Storage(access_key_id, secret_access_key, endpoint_url, bucket_name)
+    except Exception as e:
+        print(f"[R2] Failed to initialize R2Storage for photo: {type(e).__name__}: {e}")
+        return None
+
+    # Create R2 object path: photos/{doctor_id}/{filename}
+    object_name = f"photos/{doctor_id}/{filename}"
+
+    # Reset file pointer to beginning
+    try:
+        file_obj.seek(0)
+    except Exception:
+        pass  # File might not support seek
+
+    # Upload to R2
+    result = r2.upload_file(file_obj, object_name, 'image/jpeg')
+
+    if result:
+        return object_name
+    return None
+
+
+def delete_profile_photo(object_name):
+    """
+    Delete profile photo from R2
+
+    Args:
+        object_name: R2 object path
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    # Get R2 credentials from environment
+    access_key_id = os.getenv('R2_ACCESS_KEY_ID', '').strip()
+    secret_access_key = os.getenv('R2_SECRET_ACCESS_KEY', '').strip()
+    endpoint_url = os.getenv('R2_ENDPOINT_URL', '').strip()
+    bucket_name = os.getenv('R2_BUCKET_NAME', 'ranksewa-documents').strip()
+
+    # Check if R2 is configured
+    if not all([access_key_id, secret_access_key, endpoint_url]):
+        return False
+
+    # Initialize R2 client
+    try:
+        r2 = R2Storage(access_key_id, secret_access_key, endpoint_url, bucket_name)
+        return r2.delete_file(object_name)
+    except Exception as e:
+        print(f"[R2] Error deleting photo: {e}")
+        return False

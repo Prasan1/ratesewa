@@ -2197,19 +2197,46 @@ def serve_verification_document(request_id, doc_type):
     )
 
 
-@app.route('/uploads/photos/<filename>')
+@app.route('/uploads/photos/<path:filename>')
 def serve_photo(filename):
-    """Serve profile photos (publicly accessible)"""
-    from flask import send_from_directory
+    """Serve profile photos from R2 or local storage (publicly accessible)"""
+    from flask import send_from_directory, send_file
     import os
-
-    photos_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'photos')
+    from io import BytesIO
 
     # Security: Prevent directory traversal
     if '..' in filename or filename.startswith('/'):
         abort(404)
 
-    return send_from_directory(photos_folder, filename)
+    # If filename contains doctor ID (R2 format: {doctor_id}/{filename}), try R2 first
+    if '/' in filename:
+        # Try to fetch from R2
+        try:
+            from r2_storage import get_verification_document
+            # For photos, use photos/{doctor_id}/{filename} format
+            r2_path = f"photos/{filename}"
+            photo_data = get_verification_document(r2_path)
+            if photo_data:
+                return send_file(
+                    BytesIO(photo_data),
+                    mimetype='image/jpeg',
+                    as_attachment=False
+                )
+        except Exception as e:
+            print(f"[R2] Error fetching photo from R2: {e}")
+
+        # Extract just the filename for local fallback
+        filename = filename.split('/')[-1]
+
+    # Fallback: Try local storage
+    photos_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'photos')
+    local_path = os.path.join(photos_folder, filename)
+
+    if os.path.exists(local_path):
+        return send_from_directory(photos_folder, filename)
+
+    # Photo not found anywhere
+    abort(404)
 
 
 # --- Doctor Dashboard Routes ---

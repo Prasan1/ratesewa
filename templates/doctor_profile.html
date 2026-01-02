@@ -16,7 +16,18 @@
     <div class="col-md-4 mb-4">
         <div class="card shadow-sm doctor-profile-sidebar">
             <div class="card-body text-center">
-                <img src="{{ doctor.photo_url if doctor.photo_url else 'https://picsum.photos/seed/doctor' + doctor.id|string + '/200/200.jpg' }}" class="rounded-circle mb-3" alt="{{ doctor.name }}" onerror="this.src='https://picsum.photos/seed/doctor{{ doctor.id }}/200/200.jpg'">
+                {% if doctor.photo_url %}
+                <img src="{{ url_for('serve_photo', filename=doctor.photo_url.split('/')[-1]) }}"
+                     class="rounded-circle mb-3"
+                     alt="{{ doctor.name }}"
+                     style="width: 200px; height: 200px; object-fit: cover;"
+                     onerror="this.src='https://picsum.photos/seed/doctor{{ doctor.id }}/200/200.jpg'">
+                {% else %}
+                <img src="https://picsum.photos/seed/doctor{{ doctor.id }}/200/200.jpg"
+                     class="rounded-circle mb-3"
+                     alt="{{ doctor.name }}"
+                     style="width: 200px; height: 200px; object-fit: cover;">
+                {% endif %}
                 <h3 class="card-title">{{ doctor.name }}</h3>
                 {% if doctor.is_verified %}
                 <div class="mb-2">
