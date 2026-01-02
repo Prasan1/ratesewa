@@ -473,14 +473,20 @@ def claim_profile_submit(doctor_id):
             return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
 
         # Save files to R2 (with local fallback)
+        upload_folder = app.config['UPLOAD_FOLDER']
+        govt_id_path = None
+
         # Try R2 first
-        govt_id_path = r2_storage.save_verification_document(
-            govt_id, doctor_id, 'govt_id'
-        )
+        try:
+            govt_id_path = r2_storage.save_verification_document(
+                govt_id, doctor_id, 'govt_id'
+            )
+        except Exception as e:
+            print(f"R2 upload failed, falling back to local storage: {e}")
+            govt_id_path = None
 
         # Fallback to local storage if R2 fails
         if not govt_id_path:
-            upload_folder = app.config['UPLOAD_FOLDER']
             govt_id.seek(0)  # Reset file pointer
             govt_id_path = upload_utils.save_verification_document(
                 govt_id, upload_folder, doctor_id, 'govt_id'
@@ -492,12 +498,16 @@ def claim_profile_submit(doctor_id):
         # Optional medical degree
         medical_degree_path = None
         if medical_degree and medical_degree.filename:
-            medical_degree_path = r2_storage.save_verification_document(
-                medical_degree, doctor_id, 'medical_degree'
-            )
+            try:
+                medical_degree_path = r2_storage.save_verification_document(
+                    medical_degree, doctor_id, 'medical_degree'
+                )
+            except Exception as e:
+                print(f"R2 upload failed for medical_degree, falling back: {e}")
+                medical_degree_path = None
+
             # Fallback to local if R2 fails
             if not medical_degree_path:
-                upload_folder = app.config['UPLOAD_FOLDER']
                 medical_degree.seek(0)
                 medical_degree_path = upload_utils.save_verification_document(
                     medical_degree, upload_folder, doctor_id, 'medical_degree'
@@ -506,12 +516,16 @@ def claim_profile_submit(doctor_id):
         # Optional practice license
         practice_license_path = None
         if practice_license and practice_license.filename:
-            practice_license_path = r2_storage.save_verification_document(
-                practice_license, doctor_id, 'practice_license'
-            )
+            try:
+                practice_license_path = r2_storage.save_verification_document(
+                    practice_license, doctor_id, 'practice_license'
+                )
+            except Exception as e:
+                print(f"R2 upload failed for practice_license, falling back: {e}")
+                practice_license_path = None
+
             # Fallback to local if R2 fails
             if not practice_license_path:
-                upload_folder = app.config['UPLOAD_FOLDER']
                 practice_license.seek(0)
                 practice_license_path = upload_utils.save_verification_document(
                     practice_license, upload_folder, doctor_id, 'practice_license'
@@ -628,14 +642,20 @@ def doctor_self_register_submit():
         temp_doctor_id = f"new_{session['user_id']}"
 
         # Save files to R2 (with local fallback)
+        upload_folder = app.config['UPLOAD_FOLDER']
+        govt_id_path = None
+
         # Try R2 first
-        govt_id_path = r2_storage.save_verification_document(
-            govt_id, temp_doctor_id, 'govt_id'
-        )
+        try:
+            govt_id_path = r2_storage.save_verification_document(
+                govt_id, temp_doctor_id, 'govt_id'
+            )
+        except Exception as e:
+            print(f"R2 upload failed, falling back to local storage: {e}")
+            govt_id_path = None
 
         # Fallback to local storage if R2 fails
         if not govt_id_path:
-            upload_folder = app.config['UPLOAD_FOLDER']
             govt_id.seek(0)  # Reset file pointer
             govt_id_path = upload_utils.save_verification_document(
                 govt_id, upload_folder, temp_doctor_id, 'govt_id'
@@ -647,9 +667,14 @@ def doctor_self_register_submit():
         # Optional medical degree
         medical_degree_path = None
         if medical_degree and medical_degree.filename:
-            medical_degree_path = r2_storage.save_verification_document(
-                medical_degree, temp_doctor_id, 'medical_degree'
-            )
+            try:
+                medical_degree_path = r2_storage.save_verification_document(
+                    medical_degree, temp_doctor_id, 'medical_degree'
+                )
+            except Exception as e:
+                print(f"R2 upload failed for medical_degree, falling back: {e}")
+                medical_degree_path = None
+
             # Fallback to local if R2 fails
             if not medical_degree_path:
                 medical_degree.seek(0)
@@ -660,9 +685,14 @@ def doctor_self_register_submit():
         # Optional practice license
         practice_license_path = None
         if practice_license and practice_license.filename:
-            practice_license_path = r2_storage.save_verification_document(
-                practice_license, temp_doctor_id, 'practice_license'
-            )
+            try:
+                practice_license_path = r2_storage.save_verification_document(
+                    practice_license, temp_doctor_id, 'practice_license'
+                )
+            except Exception as e:
+                print(f"R2 upload failed for practice_license, falling back: {e}")
+                practice_license_path = None
+
             # Fallback to local if R2 fails
             if not practice_license_path:
                 practice_license.seek(0)
