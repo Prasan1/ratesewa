@@ -2598,6 +2598,66 @@ def debug_r2_config():
     return '<pre>' + '\n'.join(debug_info) + '</pre>'
 
 
+@app.route('/doctor/debug/my-photo')
+@login_required
+@doctor_required
+def debug_my_photo():
+    """Debug route to check doctor's photo status"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    debug_info = []
+    debug_info.append("=== Doctor Photo Debug ===\n")
+    debug_info.append(f"Doctor ID: {doctor.id}")
+    debug_info.append(f"Doctor Name: {doctor.name}\n")
+
+    # Check photo_url in database
+    debug_info.append(f"Photo URL in DB: {doctor.photo_url or '[NOT SET]'}\n")
+
+    if doctor.photo_url:
+        # Check if it's an R2 path or local path
+        if '/' in doctor.photo_url and doctor.photo_url.count('/') > 1:
+            debug_info.append("Photo Type: R2 Storage")
+            debug_info.append(f"R2 Path: {doctor.photo_url}")
+
+            # Try to fetch from R2
+            try:
+                from r2_storage import get_verification_document
+                photo_data = get_verification_document(doctor.photo_url)
+                if photo_data:
+                    debug_info.append(f"✓ Photo exists in R2 ({len(photo_data)} bytes)")
+                else:
+                    debug_info.append("✗ Photo NOT found in R2")
+            except Exception as e:
+                debug_info.append(f"✗ Error fetching from R2: {e}")
+        else:
+            debug_info.append("Photo Type: Local Storage")
+            debug_info.append(f"Local Path: {doctor.photo_url}")
+
+            # Check if file exists locally
+            import os
+            full_path = os.path.join(app.config['UPLOAD_FOLDER'], doctor.photo_url)
+            if os.path.exists(full_path):
+                size = os.path.getsize(full_path)
+                debug_info.append(f"✓ Photo exists locally ({size} bytes)")
+            else:
+                debug_info.append(f"✗ Photo NOT found locally at: {full_path}")
+
+        # Show the URL that will be used
+        filename = doctor.photo_url.split('/')[-1]
+        url = url_for('serve_photo', filename=doctor.photo_url.split('/')[-1] if doctor.photo_url.count('/') == 1 else doctor.photo_url.replace('photos/', ''), _external=True)
+        debug_info.append(f"\nPhoto URL: {url}")
+        debug_info.append("\nTo test, try accessing the photo URL above in your browser.")
+    else:
+        debug_info.append("No photo uploaded yet.")
+        debug_info.append("\nTo upload a photo:")
+        debug_info.append("1. Go to Doctor Dashboard")
+        debug_info.append("2. Click 'Edit Profile'")
+        debug_info.append("3. Upload a photo")
+
+    return '<pre>' + '\n'.join(debug_info) + '</pre>'
+
+
 @app.route('/admin/debug/test-r2-upload')
 @login_required
 @admin_required
