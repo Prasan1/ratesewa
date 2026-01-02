@@ -10,6 +10,22 @@
     <div class="col-lg-10">
         <div class="card shadow-sm border-0">
             <div class="card-body p-5">
+                <div class="alert alert-info border-0 shadow-sm mb-4">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <div>
+                            <h5 class="mb-1"><i class="fas fa-compass me-2"></i>Start here</h5>
+                            <div class="text-muted">Choose one option to get verified and access your doctor dashboard.</div>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="#claim-search" class="btn btn-outline-primary">
+                                <i class="fas fa-hand-paper me-2"></i>Claim Existing Profile
+                            </a>
+                            <a href="{{ url_for('doctor_self_register') }}" class="btn btn-primary">
+                                <i class="fas fa-plus-circle me-2"></i>Create New Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 <div class="text-center mb-5">
                     <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white mb-3" style="width: 64px; height: 64px;">
                         <i class="fas fa-user-md fa-2x"></i>
@@ -18,7 +34,7 @@
                     <p class="text-muted mb-0">Join verified providers on RankSewa and take control of your presence, reviews, and patient trust.</p>
                 </div>
 
-                <div class="row g-4 align-items-stretch mb-4">
+                <div id="claim-search" class="row g-4 align-items-stretch mb-4">
                     <div class="col-lg-7">
                         <div class="card h-100 border-0 bg-light">
                             <div class="card-body p-4">

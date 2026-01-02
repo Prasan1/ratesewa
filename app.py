@@ -487,7 +487,11 @@ def claim_profile_submit(doctor_id):
 
         # Fallback to local storage if R2 fails
         if not govt_id_path:
-            govt_id.seek(0)  # Reset file pointer
+            try:
+                govt_id.seek(0)  # Reset file pointer
+            except Exception:
+                pass  # File might be closed, try upload anyway
+
             govt_id_path = upload_utils.save_verification_document(
                 govt_id, upload_folder, doctor_id, 'govt_id'
             )
@@ -508,7 +512,10 @@ def claim_profile_submit(doctor_id):
 
             # Fallback to local if R2 fails
             if not medical_degree_path:
-                medical_degree.seek(0)
+                try:
+                    medical_degree.seek(0)
+                except Exception:
+                    pass
                 medical_degree_path = upload_utils.save_verification_document(
                     medical_degree, upload_folder, doctor_id, 'medical_degree'
                 )
@@ -526,7 +533,10 @@ def claim_profile_submit(doctor_id):
 
             # Fallback to local if R2 fails
             if not practice_license_path:
-                practice_license.seek(0)
+                try:
+                    practice_license.seek(0)
+                except Exception:
+                    pass
                 practice_license_path = upload_utils.save_verification_document(
                     practice_license, upload_folder, doctor_id, 'practice_license'
                 )
@@ -656,7 +666,11 @@ def doctor_self_register_submit():
 
         # Fallback to local storage if R2 fails
         if not govt_id_path:
-            govt_id.seek(0)  # Reset file pointer
+            try:
+                govt_id.seek(0)  # Reset file pointer
+            except Exception:
+                pass  # File might be closed, try upload anyway
+
             govt_id_path = upload_utils.save_verification_document(
                 govt_id, upload_folder, temp_doctor_id, 'govt_id'
             )
@@ -677,7 +691,10 @@ def doctor_self_register_submit():
 
             # Fallback to local if R2 fails
             if not medical_degree_path:
-                medical_degree.seek(0)
+                try:
+                    medical_degree.seek(0)
+                except Exception:
+                    pass
                 medical_degree_path = upload_utils.save_verification_document(
                     medical_degree, upload_folder, temp_doctor_id, 'medical_degree'
                 )
@@ -695,7 +712,10 @@ def doctor_self_register_submit():
 
             # Fallback to local if R2 fails
             if not practice_license_path:
-                practice_license.seek(0)
+                try:
+                    practice_license.seek(0)
+                except Exception:
+                    pass
                 practice_license_path = upload_utils.save_verification_document(
                     practice_license, upload_folder, temp_doctor_id, 'practice_license'
                 )

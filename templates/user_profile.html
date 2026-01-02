@@ -52,8 +52,9 @@
     </div>
 
     <div class="col-md-9">
-        <!-- Verification Pending Alert (if exists) -->
-        {% if pending_verification %}
+        <!-- Doctor Verification Status -->
+        {% if verification_request %}
+        {% if verification_request.status == 'pending' %}
         <div class="alert alert-warning border-warning shadow-sm mb-4">
             <div class="d-flex align-items-start">
                 <div class="flex-shrink-0">
@@ -61,16 +62,13 @@
                 </div>
                 <div class="flex-grow-1">
                     <h5 class="alert-heading mb-2">
-                        <i class="fas fa-check-circle me-2"></i>Doctor Verification Request Submitted
+                        <i class="fas fa-check-circle me-2"></i>Doctor Verification Pending
                     </h5>
-                    <p class="mb-2">
-                        Your application for doctor verification is currently under review by our admin team.
-                    </p>
-                    <hr>
+                    <p class="mb-2">Your verification request is under review by our admin team.</p>
                     <div class="row g-2 small">
                         <div class="col-md-4">
                             <strong><i class="fas fa-calendar me-1"></i>Submitted:</strong><br>
-                            {{ pending_verification.created_at.strftime('%b %d, %Y') }}
+                            {{ verification_request.created_at.strftime('%b %d, %Y') }}
                         </div>
                         <div class="col-md-4">
                             <strong><i class="fas fa-info-circle me-1"></i>Status:</strong><br>
@@ -86,6 +84,65 @@
                         <i class="fas fa-envelope me-1"></i>
                         You'll receive an email notification at <strong>{{ user.email }}</strong> once your profile is verified.
                     </p>
+                </div>
+            </div>
+        </div>
+        {% elif verification_request.status == 'rejected' %}
+        <div class="alert alert-danger border-danger shadow-sm mb-4">
+            <div class="d-flex align-items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-times-circle fa-2x text-danger me-3"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h5 class="alert-heading mb-2">Verification Rejected</h5>
+                    <p class="mb-2">{{ verification_request.admin_notes or 'Please contact support for details.' }}</p>
+                    {% if verification_request.is_new_doctor %}
+                    <a href="{{ url_for('doctor_self_register') }}" class="btn btn-outline-danger btn-sm">
+                        Resubmit Verification
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('claim_profile') }}" class="btn btn-outline-danger btn-sm">
+                        Resubmit Verification
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% elif verification_request.status == 'approved' %}
+        <div class="alert alert-success border-success shadow-sm mb-4">
+            <div class="d-flex align-items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle fa-2x text-success me-3"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h5 class="alert-heading mb-2">Verification Approved</h5>
+                    <p class="mb-2">Your doctor profile is verified and live.</p>
+                    {% if user.doctor_id %}
+                    <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-success btn-sm">
+                        Go to Doctor Dashboard
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% elif not user.doctor_id %}
+        <div class="alert alert-info border-info shadow-sm mb-4">
+            <div class="d-flex align-items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-user-md fa-2x text-info me-3"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h5 class="alert-heading mb-2">Get Your Doctor Profile Verified</h5>
+                    <p class="mb-2">Start your verification to appear in search results and access the doctor dashboard.</p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{{ url_for('claim_profile') }}" class="btn btn-outline-info btn-sm">
+                            Claim Existing Profile
+                        </a>
+                        <a href="{{ url_for('doctor_self_register') }}" class="btn btn-info btn-sm text-white">
+                            Create New Profile
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
