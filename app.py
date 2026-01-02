@@ -580,14 +580,21 @@ def doctor_self_register_submit():
             flash('This NMC number is already registered. Please claim your existing profile instead.', 'warning')
             return redirect(url_for('claim_profile'))
 
-        # Check for pending verification request with this NMC
+        # Check if THIS USER already has a pending verification request
         existing_request = VerificationRequest.query.filter_by(
-            nmc_number=nmc_number,
+            user_id=session['user_id'],
             status='pending'
         ).first()
         if existing_request:
             flash('You already have a pending verification request. Please wait for admin review.', 'info')
             return redirect(url_for('verification_submitted'))
+
+        # Note: We intentionally allow multiple users to submit with the same NMC number
+        # Admin will review all requests and approve the legitimate one
+        # This handles cases like:
+        # - Forgot password and created new account
+        # - Fraudulent impersonation attempts
+        # - Data entry errors
 
         # Handle file uploads - only govt_id is mandatory
         medical_degree = request.files.get('medical_degree')
@@ -1973,7 +1980,12 @@ def admin_verification_detail(request_id):
                     db.session.rollback()
                     flash(f'Error rejecting verification: {str(e)}', 'danger')
 
-    return render_template('admin_verification_detail.html', request=verification_request)
+    # Get all pending requests for duplicate NMC checking
+    all_requests = VerificationRequest.query.filter_by(status='pending').all()
+
+    return render_template('admin_verification_detail.html',
+                         request=verification_request,
+                         all_requests=all_requests)
 
 
 @app.route('/verification/document/<int:request_id>/<doc_type>')

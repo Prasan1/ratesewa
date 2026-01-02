@@ -36,6 +36,41 @@
                 </div>
             </div>
 
+            <!-- Duplicate NMC Warning -->
+            {% if request.nmc_number and request.status == 'pending' %}
+                {% set duplicate_requests = namespace(items=[]) %}
+                {% for other_request in all_requests %}
+                    {% if other_request.nmc_number == request.nmc_number and other_request.id != request.id and other_request.status == 'pending' %}
+                        {% set _ = duplicate_requests.items.append(other_request) %}
+                    {% endif %}
+                {% endfor %}
+                {% if duplicate_requests.items %}
+                <div class="alert alert-danger mb-4">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Duplicate NMC Number Detected!
+                    </h6>
+                    <p class="mb-2">
+                        <strong>{{ duplicate_requests.items|length }} other pending request(s)</strong> with the same NMC number <code>{{ request.nmc_number }}</code>.
+                    </p>
+                    <p class="mb-2 small">
+                        This could indicate: fraud attempt, duplicate account, or data entry error. Compare documents carefully before approving.
+                    </p>
+                    <hr>
+                    <p class="mb-0"><strong>Other requests:</strong></p>
+                    <ul class="mb-0">
+                        {% for dup in duplicate_requests.items %}
+                        <li>
+                            <a href="{{ url_for('admin_verification_detail', request_id=dup.id) }}" class="text-decoration-none">
+                                <strong>{{ dup.user.name }}</strong> ({{ dup.user.email }})
+                            </a>
+                            - Submitted {{ dup.created_at.strftime('%b %d, %Y') }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            {% endif %}
+
             <!-- Doctor Information -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header {% if request.is_new_doctor %}bg-success{% else %}bg-primary{% endif %} text-white">

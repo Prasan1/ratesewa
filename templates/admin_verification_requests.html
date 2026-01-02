@@ -87,7 +87,17 @@
                                         {{ request.user.name }}<br>
                                         <small class="text-muted">{{ request.user.email }}</small>
                                     </td>
-                                    <td>{{ request.nmc_number or '-' }}</td>
+                                    <td>
+                                        {{ request.nmc_number or '-' }}
+                                        {% if request.nmc_number %}
+                                            {% set duplicate_count = requests | selectattr('nmc_number', 'equalto', request.nmc_number) | selectattr('status', 'equalto', 'pending') | list | length %}
+                                            {% if duplicate_count > 1 %}
+                                            <br><span class="badge bg-danger" title="Multiple pending requests with this NMC number">
+                                                <i class="fas fa-exclamation-triangle"></i> Duplicate
+                                            </span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         {{ request.created_at.strftime('%b %d, %Y') }}<br>
                                         <small class="text-muted">{{ request.created_at.strftime('%I:%M %p') }}</small>
