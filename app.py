@@ -426,8 +426,8 @@ def claim_profile_form(doctor_id):
     ).first()
 
     if existing_request:
-        flash('You already have a pending verification request for this profile.', 'info')
-        return redirect(url_for('claim_profile'))
+        flash('You already have a pending verification request. Please wait for admin review.', 'info')
+        return redirect(url_for('verification_submitted'))
 
     # Get all cities for the dropdown
     cities = City.query.order_by(City.name).all()
@@ -586,8 +586,8 @@ def doctor_self_register_submit():
             status='pending'
         ).first()
         if existing_request:
-            flash('A verification request with this NMC number is already pending review.', 'warning')
-            return redirect(url_for('user_profile'))
+            flash('You already have a pending verification request. Please wait for admin review.', 'info')
+            return redirect(url_for('verification_submitted'))
 
         # Handle file uploads - only govt_id is mandatory
         medical_degree = request.files.get('medical_degree')
