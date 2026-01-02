@@ -62,6 +62,41 @@
     </div>
 </div>
 
+{# Featured Clinics - Hidden for MVP, can enable later
+{% if featured_clinics %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h3 class="mb-0">Featured Clinics</h3>
+                    <a href="{{ url_for('clinics') }}" class="btn btn-sm btn-outline-primary">View all clinics</a>
+                </div>
+                <div class="row g-3">
+                    {% for clinic in featured_clinics %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="mb-1">{{ clinic.name }}</h5>
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-map-marker-alt me-1"></i>{{ clinic.city.name }}
+                                </p>
+                                {% if clinic.description %}
+                                <p class="text-muted small mb-3">{{ clinic.description }}</p>
+                                {% endif %}
+                                <a href="{{ url_for('clinic_profile', slug=clinic.slug) }}" class="btn btn-outline-primary btn-sm">View clinic</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+#}
+
 <div class="row">
     <div class="col-12">
         <!-- Doctor Claim Profile CTA - IMPROVED COPY -->
@@ -194,9 +229,9 @@
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label for="nameSearch" class="form-label">
-                            <i class="fas fa-user-md me-2"></i>Search by Name
+                            <i class="fas fa-user-md me-2"></i>Search by Doctor or Clinic
                         </label>
-                        <input type="text" id="nameSearch" class="form-control" placeholder="Enter doctor's name...">
+                        <input type="text" id="nameSearch" class="form-control" placeholder="Enter doctor or clinic name...">
                     </div>
                     <div class="col-md-4">
                         <label for="citySelect" class="form-label">
@@ -305,6 +340,7 @@ $(document).ready(function() {
             const avgRating = hasRatings ? parseFloat(doctor.avg_rating).toFixed(1) : '';
             const starHtml = generateStarRatingHtml(doctor.avg_rating, ratingCount);
             const verifiedBadge = doctor.is_verified ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>' : '';
+            const clinicLine = doctor.clinic_name ? `<p class="card-text text-muted small mb-0"><i class="fas fa-hospital me-1"></i><a href="/clinic/${doctor.clinic_slug}" class="text-muted text-decoration-none">${doctor.clinic_name}</a></p>` : '';
 
             // IMPROVED: Better "no reviews" messaging
             const ratingText = hasRatings
@@ -326,6 +362,7 @@ $(document).ready(function() {
                                     </div>
                                     <p class="card-text text-muted mb-1">${doctor.specialty_name}</p>
                                     <p class="card-text text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>${doctor.city_name}</p>
+                                    ${clinicLine}
                                 </div>
                             </div>
                             <div class="doctor-details">
