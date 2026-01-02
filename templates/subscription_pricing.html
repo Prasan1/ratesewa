@@ -16,7 +16,7 @@
             <!-- Promotional Banner -->
             {% set promo = get_promotion_banner() %}
             {% if promo %}
-            <div class="alert alert-success shadow-lg mb-4" style="background: linear-gradient(135deg, {{ promo.color }} 0%, #059669 100%); border: none;">
+            <div class="alert alert-success shadow-lg mb-4" style="background: linear-gradient(135deg, {{ promo.color }} 0%, var(--brand) 100%); border: none;">
                 <div class="text-center text-white py-3">
                     <h3 class="mb-2"><i class="fas fa-gift me-2"></i>{{ promo.message }}</h3>
                     <p class="mb-0 h5">⏰ {{ promo.days_left }} days left - No credit card required!</p>
@@ -67,7 +67,7 @@
                                 {% if tier_key != 'free' %}
                                     {% if promo %}
                                     <div class="mb-2">
-                                        <h2 class="mb-0" style="color: #10b981;">FREE</h2>
+                                        <h2 class="mb-0 text-brand">FREE</h2>
                                         <small class="text-muted">(for {{ promo.days_left }} days)</small>
                                     </div>
                                     <div class="text-decoration-line-through text-muted">

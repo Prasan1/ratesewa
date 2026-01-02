@@ -27,16 +27,16 @@
         z-index: 1;
     }
     .gradient-purple {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--dash-1-start) 0%, var(--dash-1-end) 100%);
     }
     .gradient-blue {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        background: linear-gradient(135deg, var(--dash-2-start) 0%, var(--dash-2-end) 100%);
     }
     .gradient-orange {
-        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        background: linear-gradient(135deg, var(--dash-3-start) 0%, var(--dash-3-end) 100%);
     }
     .gradient-green {
-        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        background: linear-gradient(135deg, var(--dash-4-start) 0%, var(--dash-4-end) 100%);
     }
     .action-card {
         border-radius: 12px;
@@ -44,11 +44,11 @@
         border: 2px solid transparent;
     }
     .action-card:hover {
-        border-color: #7B2CBF;
+        border-color: var(--brand);
         transform: translateX(5px);
     }
     .profile-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--dash-1-start) 0%, var(--dash-1-end) 100%);
         border-radius: 20px;
         padding: 2rem;
         color: white;
@@ -103,11 +103,11 @@
                              style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 5px 20px rgba(0,0,0,0.2);"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div style="width: 100px; height: 100px; background: white; border-radius: 50%; display: none; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
-                            <i class="fas fa-user-md" style="font-size: 3rem; color: #667eea;"></i>
+                            <i class="fas fa-user-md text-brand" style="font-size: 3rem;"></i>
                         </div>
                         {% else %}
                         <div style="width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
-                            <i class="fas fa-user-md" style="font-size: 3rem; color: #667eea;"></i>
+                            <i class="fas fa-user-md text-brand" style="font-size: 3rem;"></i>
                         </div>
                         {% endif %}
                     </div>
@@ -174,7 +174,7 @@
     <!-- Promotional Banner -->
     {% set promo = get_promotion_banner() %}
     {% if promo and doctor.subscription_tier == 'free' %}
-    <div class="alert shadow-lg mb-4" style="background: linear-gradient(135deg, {{ promo.color }} 0%, #7B2CBF 100%); border: none; border-radius: 16px;">
+    <div class="alert shadow-lg mb-4" style="background: linear-gradient(135deg, {{ promo.color }} 0%, var(--brand) 100%); border: none; border-radius: 16px;">
         <div class="row align-items-center text-white">
             <div class="col-md-8">
                 <h4 class="mb-2"><i class="fas fa-gift me-2"></i>{{ promo.message }}</h4>
@@ -255,7 +255,7 @@
             <a href="{{ url_for('doctor_profile_edit') }}" class="text-decoration-none">
                 <div class="action-card card shadow-sm h-100">
                     <div class="card-body text-center p-4">
-                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--dash-1-start) 0%, var(--dash-1-end) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
                             <i class="fas fa-edit fa-2x text-white"></i>
                         </div>
                         <h6 class="mb-2">Edit Profile</h6>
@@ -269,7 +269,7 @@
             <a href="{{ url_for('doctor_reviews') }}" class="text-decoration-none">
                 <div class="action-card card shadow-sm h-100">
                     <div class="card-body text-center p-4">
-                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--dash-2-start) 0%, var(--dash-2-end) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
                             <i class="fas fa-comments fa-2x text-white"></i>
                         </div>
                         <h6 class="mb-2">Manage Reviews</h6>
@@ -283,7 +283,7 @@
             <a href="{{ url_for('doctor_analytics') }}" class="text-decoration-none">
                 <div class="action-card card shadow-sm h-100">
                     <div class="card-body text-center p-4">
-                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--dash-3-start) 0%, var(--dash-3-end) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
                             <i class="fas fa-chart-bar fa-2x text-white"></i>
                         </div>
                         <h6 class="mb-2">View Analytics</h6>
@@ -297,7 +297,7 @@
             <a href="{{ url_for('subscription_pricing') }}" class="text-decoration-none">
                 <div class="action-card card shadow-sm h-100">
                     <div class="card-body text-center p-4">
-                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--dash-4-start) 0%, var(--dash-4-end) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
                             <i class="fas fa-rocket fa-2x text-white"></i>
                         </div>
                         <h6 class="mb-2">Upgrade Plan</h6>
@@ -313,7 +313,7 @@
         <!-- Profile Details -->
         <div class="col-lg-6 mb-4">
             <div class="card shadow-sm" style="border-radius: 16px; border: none;">
-                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px 16px 0 0; border: none;">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--dash-1-start) 0%, var(--dash-1-end) 100%); border-radius: 16px 16px 0 0; border: none;">
                     <h5 class="mb-0 text-white"><i class="fas fa-user-md me-2"></i>Professional Information</h5>
                 </div>
                 <div class="card-body p-4">
@@ -341,12 +341,12 @@
                         <label class="text-muted small mb-1">Status</label>
                         <div>
                             {% if doctor.is_verified %}
-                            <span class="badge" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); padding: 0.5rem 1rem; border-radius: 50px;">
+                            <span class="badge" style="background: linear-gradient(135deg, var(--dash-4-start) 0%, var(--dash-4-end) 100%); padding: 0.5rem 1rem; border-radius: 50px;">
                                 <i class="fas fa-check-circle"></i> Verified Doctor
                             </span>
                             {% endif %}
                             {% if doctor.is_featured %}
-                            <span class="badge" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 0.5rem 1rem; border-radius: 50px;">
+                            <span class="badge" style="background: linear-gradient(135deg, var(--dash-3-start) 0%, var(--dash-3-end) 100%); padding: 0.5rem 1rem; border-radius: 50px;">
                                 <i class="fas fa-star"></i> Featured
                             </span>
                             {% endif %}
@@ -359,7 +359,7 @@
         <!-- Account Information -->
         <div class="col-lg-6 mb-4">
             <div class="card shadow-sm" style="border-radius: 16px; border: none;">
-                <div class="card-header" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 16px 16px 0 0; border: none;">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--dash-2-start) 0%, var(--dash-2-end) 100%); border-radius: 16px 16px 0 0; border: none;">
                     <h5 class="mb-0 text-white"><i class="fas fa-user-circle me-2"></i>Account Settings</h5>
                 </div>
                 <div class="card-body p-4">
