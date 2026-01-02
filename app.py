@@ -2255,14 +2255,18 @@ def user_profile():
     user_id = session['user_id']
     user = User.query.get(user_id)
 
+    # If user is an approved doctor, redirect to doctor dashboard
+    if user.role == 'doctor':
+        return redirect(url_for('doctor_dashboard'))
+
     # Check if user has pending verification request
     pending_verification = VerificationRequest.query.filter_by(
         user_id=user_id,
         status='pending'
     ).first()
 
-    # If user has pending verification and is not yet a doctor, show verification confirmation page
-    if pending_verification and user.role != 'doctor':
+    # If user has pending verification, show verification confirmation page
+    if pending_verification:
         return redirect(url_for('verification_submitted'))
 
     # Get user's appointments
