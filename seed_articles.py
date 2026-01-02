@@ -110,7 +110,7 @@ def seed_articles():
 
 <p>The key is working closely with healthcare providers, staying informed, and making sustainable lifestyle changes. In Nepal's evolving healthcare landscape, support and treatment are more accessible than ever before.</p>
                 """,
-                'featured_image': 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=800',
+                'featured_image': '/static/img/type-2-diabates.jpg',
                 'meta_description': 'Learn about Type 2 diabetes symptoms, risk factors, and management in Nepal. Essential guide to prevention and treatment options.',
                 'meta_keywords': 'diabetes Nepal, type 2 diabetes, diabetes symptoms, diabetes prevention Kathmandu, blood sugar',
                 'related_specialty_id': general.id if general else None,
@@ -258,7 +258,7 @@ def seed_articles():
 
 <p>High blood pressure is serious, but it's also manageable. With regular monitoring, healthy lifestyle choices, and medical treatment when needed, you can protect your heart, brain, and kidneys for years to come.</p>
                 """,
-                'featured_image': 'https://images.unsplash.com/photo-1615486511262-2b8b2b5cbd87?w=800',
+                'featured_image': '/static/img/heart-health.jpg',
                 'meta_description': 'High blood pressure affects 1 in 4 Nepalis. Learn symptoms, prevention, and management strategies for hypertension in Nepal.',
                 'meta_keywords': 'blood pressure Nepal, hypertension Kathmandu, high BP, blood pressure control, heart health Nepal',
                 'related_specialty_id': cardiology.id if cardiology else None,
@@ -422,7 +422,7 @@ def seed_articles():
 
 <p>In Nepal's evolving health landscape, knowledge is power. Understanding cholesterol and taking action puts you in control of your heart health future.</p>
                 """,
-                'featured_image': 'https://images.unsplash.com/photo-1628348068343-c6a8aaaa5e61?w=800',
+                'featured_image': '/static/img/cholesterol.jpg',
                 'meta_description': 'Learn about cholesterol management and heart health in Nepal. Practical diet and lifestyle tips for lowering cholesterol naturally.',
                 'meta_keywords': 'cholesterol Nepal, heart health Kathmandu, cholesterol diet, heart disease prevention, LDL HDL',
                 'related_specialty_id': cardiology.id if cardiology else None,

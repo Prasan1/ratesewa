@@ -1,6 +1,13 @@
 :root {
     --ink: #1f2a30;
     --muted: #5b6770;
+    --brand: #2f6f6d;
+    --brand-dark: #245756;
+    --brand-soft: #e2ece7;
+    --brand-contrast: #f5faf8;
+    --accent-gold: #c9b46a;
+    --accent-gold-dark: #a69048;
+    --accent-gold-soft: #f3ebd1;
     --accent: #2f6f6d;
     --accent-dark: #245756;
     --accent-soft: #dfe9e4;
@@ -9,6 +16,22 @@
     --border: #e3e7e8;
     --shadow-sm: 0 8px 24px rgba(17, 29, 35, 0.08);
     --shadow-md: 0 14px 30px rgba(17, 29, 35, 0.12);
+    --hero-grad-start: #f4f8f6;
+    --hero-grad-end: #e6f0ed;
+    --cta-grad-start: #eef6f2;
+    --cta-grad-end: #e8f1f6;
+    --footer-grad-start: #f4f7f5;
+    --footer-grad-end: #e6efec;
+    --promo-grad-start: #2f6f6d;
+    --promo-grad-end: #3c7a62;
+    --dash-1-start: #2f6f6d;
+    --dash-1-end: #245756;
+    --dash-2-start: #3c7a62;
+    --dash-2-end: #2f5f4c;
+    --dash-3-start: #c9b46a;
+    --dash-3-end: #a69048;
+    --dash-4-start: #5b6770;
+    --dash-4-end: #3f4a52;
 }
 
 * {
@@ -37,6 +60,54 @@ a {
 
 a:hover {
     color: var(--accent-dark);
+}
+
+/* Brand Utilities */
+.text-brand {
+    color: var(--brand) !important;
+}
+
+.text-accent {
+    color: var(--accent-gold) !important;
+}
+
+.hero-surface {
+    background: linear-gradient(135deg, var(--hero-grad-start) 0%, var(--hero-grad-end) 100%);
+    border-radius: 16px;
+}
+
+.cta-surface {
+    background: linear-gradient(120deg, var(--cta-grad-start) 0%, var(--cta-grad-end) 100%);
+}
+
+.highlight-surface {
+    background: linear-gradient(135deg, var(--hero-grad-start) 0%, var(--hero-grad-end) 100%);
+}
+
+.promo-surface {
+    background: linear-gradient(135deg, var(--promo-grad-start) 0%, var(--promo-grad-end) 100%);
+    border-radius: 12px;
+}
+
+.footer-surface {
+    background: linear-gradient(135deg, var(--footer-grad-start) 0%, var(--footer-grad-end) 100%) !important;
+    box-shadow: 0 -12px 24px rgba(17, 29, 35, 0.08);
+}
+
+.gradient-brand {
+    background: linear-gradient(135deg, var(--dash-1-start) 0%, var(--dash-1-end) 100%);
+}
+
+.gradient-sage {
+    background: linear-gradient(135deg, var(--dash-2-start) 0%, var(--dash-2-end) 100%);
+}
+
+.gradient-sand {
+    background: linear-gradient(135deg, var(--dash-3-start) 0%, var(--dash-3-end) 100%);
+}
+
+.gradient-slate {
+    background: linear-gradient(135deg, var(--dash-4-start) 0%, var(--dash-4-end) 100%);
 }
 
 /* Navbar */
@@ -116,7 +187,7 @@ a:hover {
 }
 
 .doctor-card.featured {
-    border-left: 4px solid #c9b46a;
+    border-left: 4px solid var(--accent-gold);
     position: relative;
 }
 
@@ -125,7 +196,7 @@ a:hover {
     position: absolute;
     top: -10px;
     right: 12px;
-    background: #f3ebd1;
+    background: var(--accent-gold-soft);
     color: #6c5a1f;
     padding: 3px 8px;
     border-radius: 12px;
@@ -177,7 +248,7 @@ a:hover {
 
 /* Rating Stars */
 .rating {
-    color: #c9b46a;
+    color: var(--accent-gold);
 }
 
 .rating .star {
@@ -187,7 +258,7 @@ a:hover {
 }
 
 .rating .star:hover {
-    color: #b39a4a;
+    color: var(--accent-gold-dark);
     transform: scale(1.08);
 }
 
@@ -385,13 +456,13 @@ a:hover {
 }
 
 .btn-primary {
-    background: var(--accent);
+    background: var(--brand);
     border: none;
     box-shadow: 0 8px 18px rgba(47, 111, 109, 0.2);
 }
 
 .btn-primary:hover {
-    background: var(--accent-dark);
+    background: var(--brand-dark);
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(36, 87, 86, 0.25);
 }
@@ -408,13 +479,13 @@ a:hover {
 }
 
 .btn-outline-primary {
-    color: var(--accent);
-    border-color: var(--accent);
+    color: var(--brand);
+    border-color: var(--brand);
 }
 
 .btn-outline-primary:hover {
-    background: var(--accent);
-    border-color: var(--accent);
+    background: var(--brand);
+    border-color: var(--brand);
 }
 
 /* Search Form */
@@ -621,6 +692,13 @@ footer {
 
     .table {
         font-size: 0.9rem;
+    }
+
+    .hero-surface,
+    .cta-surface,
+    .highlight-surface,
+    .promo-surface {
+        border-radius: 12px;
     }
 }
 

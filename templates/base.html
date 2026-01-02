@@ -144,7 +144,7 @@
         {{ render_ad(get_ad('footer_banner'), 'text-center') }}
     </div> #}
 
-    <footer style="background: linear-gradient(135deg, #f8f5ff 0%, #e8f5e9 100%); border-top: 3px solid #7B2CBF;" class="py-4 mt-5">
+    <footer class="py-4 mt-5 footer-surface">
         <div class="container">
             <div class="row align-items-center">
                 <!-- Logo, Brand, and Social Media -->
@@ -152,7 +152,7 @@
                     <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-2">
                         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="RankSewa" height="32" class="me-2"
                              onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/logo-temp.svg') }}';">
-                        <h5 class="mb-0 fw-bold" style="color: #7B2CBF;">RankSewa</h5>
+                        <h5 class="mb-0 fw-bold text-brand">RankSewa</h5>
                     </div>
                     <p class="mb-2 small" style="color: #666;">Find trusted healthcare providers in Nepal</p>
                     <!-- Social Media Icons -->
@@ -187,10 +187,10 @@
                 <div class="col-md-4 text-center text-md-end">
                     <div class="mb-2">
                         <a href="mailto:support@ranksewa.com" class="text-decoration-none small me-3" style="color: #666;">
-                            <i class="fas fa-envelope" style="color: #059669;"></i> support@ranksewa.com
+                            <i class="fas fa-envelope text-brand"></i> support@ranksewa.com
                         </a>
                         <a href="mailto:legal@ranksewa.com" class="text-decoration-none small" style="color: #666;">
-                            <i class="fas fa-gavel" style="color: #7B2CBF;"></i> legal@ranksewa.com
+                            <i class="fas fa-gavel text-brand"></i> legal@ranksewa.com
                         </a>
                     </div>
                     <p class="mb-0 small" style="color: #999;">&copy; 2025 RankSewa. All rights reserved.</p>
@@ -201,9 +201,9 @@
             <div class="row mt-3">
                 <div class="col-12 text-center">
                     <small style="color: #999;">
-                        <i class="fas fa-shield-alt" style="color: #7B2CBF;"></i> <span class="me-3">Verified Reviews</span>
-                        <i class="fas fa-lock" style="color: #059669;"></i> <span class="me-3">Secure Platform</span>
-                        <i class="fas fa-user-md" style="color: #7B2CBF;"></i> <span>Doctor Verified</span>
+                        <i class="fas fa-shield-alt text-brand"></i> <span class="me-3">Verified Reviews</span>
+                        <i class="fas fa-lock text-brand"></i> <span class="me-3">Secure Platform</span>
+                        <i class="fas fa-user-md text-brand"></i> <span>Doctor Verified</span>
                     </small>
                 </div>
             </div>
