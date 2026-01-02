@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} - Health Digest - RankSewa{% endblock %}
+
+{% block head %}
+<!-- SEO Meta Tags -->
+<meta name="description" content="{{ article.meta_description or (article.summary or article.content[:160]) }}">
+<meta name="keywords" content="{{ article.meta_keywords or article.category.name }}">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="article">
+<meta property="og:url" content="{{ request.url }}">
+<meta property="og:title" content="{{ article.title }}">
+<meta property="og:description" content="{{ article.meta_description or (article.summary or article.content[:160]) }}">
+<meta property="og:image" content="{{ article.featured_image or 'https://picsum.photos/1200/630' }}">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="{{ request.url }}">
+<meta property="twitter:title" content="{{ article.title }}">
+<meta property="twitter:description" content="{{ article.meta_description or (article.summary or article.content[:160]) }}">
+<meta property="twitter:image" content="{{ article.featured_image or 'https://picsum.photos/1200/630' }}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('health_digest') }}">Health Digest</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('health_digest', category=article.category.slug) }}">{{ article.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ article.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Main Article Content -->
+        <div class="col-lg-8">
+            <article class="article-content">
+                <!-- Article Header -->
+                <header class="mb-4">
+                    <span class="badge bg-primary mb-3">
+                        <i class="fas {{ article.category.icon }} me-1"></i>
+                        {{ article.category.name }}
+                    </span>
+                    <h1 class="display-5 fw-bold mb-3">{{ article.title }}</h1>
+
+                    <!-- Article Meta -->
+                    <div class="d-flex flex-wrap align-items-center text-muted small mb-3">
+                        <div class="me-4">
+                            <i class="fas fa-user-edit me-1"></i>
+                            <strong>{{ article.author_name }}</strong>
+                        </div>
+                        <div class="me-4">
+                            <i class="far fa-calendar me-1"></i>
+                            {{ article.published_at.strftime('%B %d, %Y') if article.published_at else article.created_at.strftime('%B %d, %Y') }}
+                        </div>
+                        <div class="me-4">
+                            <i class="far fa-clock me-1"></i>
+                            {{ article.read_time }} min read
+                        </div>
+                        <div>
+                            <i class="far fa-eye me-1"></i>
+                            {{ article.view_count }} views
+                        </div>
+                    </div>
+
+                    <!-- Social Share Buttons -->
+                    <div class="d-flex gap-2 mb-4">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}"
+                           target="_blank"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="fab fa-facebook-f me-1"></i>Share
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text={{ article.title }}"
+                           target="_blank"
+                           class="btn btn-sm btn-outline-info">
+                            <i class="fab fa-twitter me-1"></i>Tweet
+                        </a>
+                        <a href="https://wa.me/?text={{ article.title }}%20{{ request.url }}"
+                           target="_blank"
+                           class="btn btn-sm btn-outline-success">
+                            <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                        </a>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="copyLink()">
+                            <i class="fas fa-link me-1"></i>Copy Link
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Featured Image -->
+                {% if article.featured_image %}
+                <img src="{{ article.featured_image }}"
+                     class="img-fluid rounded mb-4 w-100"
+                     alt="{{ article.title }}"
+                     style="max-height: 500px; object-fit: cover;">
+                {% endif %}
+
+                <!-- Article Content -->
+                <div class="article-body">
+                    {{ article.content | safe }}
+                </div>
+
+                <!-- Related Doctors Section -->
+                {% if related_doctors %}
+                <div class="related-doctors mt-5 p-4 bg-light rounded">
+                    <h4 class="mb-4">
+                        <i class="fas fa-user-md text-primary me-2"></i>
+                        Consult Expert {{ article.related_specialty.name }}s in Nepal
+                    </h4>
+                    <p class="text-muted mb-4">Need personalized medical advice? Consult with our verified specialists.</p>
+                    <div class="row g-3">
+                        {% for doctor in related_doctors %}
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <img src="{{ doctor.photo_url or 'https://picsum.photos/seed/doctor' + doctor.id|string + '/60/60' }}"
+                                             class="rounded-circle me-3"
+                                             width="60"
+                                             height="60"
+                                             alt="{{ doctor.name }}">
+                                        <div>
+                                            <h6 class="mb-0">{{ doctor.name }}</h6>
+                                            <small class="text-muted">{{ doctor.specialty.name }}</small>
+                                            {% if doctor.is_verified %}
+                                            <span class="badge bg-success" style="font-size: 0.65rem;">✓ Verified</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <p class="small text-muted mb-2">
+                                        <i class="fas fa-map-marker-alt me-1"></i>{{ doctor.city.name }}
+                                        <span class="mx-2">•</span>
+                                        {{ doctor.experience }} years exp.
+                                    </p>
+                                    <a href="{{ url_for('doctor_profile', slug=doctor.slug) }}" class="btn btn-sm btn-outline-primary w-100">
+                                        View Profile
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Find More Doctors
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Social Share (Bottom) -->
+                <div class="text-center my-5 py-4 border-top border-bottom">
+                    <h5 class="mb-3">Found this helpful? Share with others!</h5>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}"
+                           target="_blank"
+                           class="btn btn-primary">
+                            <i class="fab fa-facebook-f me-2"></i>Facebook
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text={{ article.title }}"
+                           target="_blank"
+                           class="btn btn-info text-white">
+                            <i class="fab fa-twitter me-2"></i>Twitter
+                        </a>
+                        <a href="https://wa.me/?text={{ article.title }}%20{{ request.url }}"
+                           target="_blank"
+                           class="btn btn-success">
+                            <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Related Articles -->
+            {% if related_articles %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-newspaper me-2"></i>Related Articles
+                    </h5>
+                    {% for rel_article in related_articles %}
+                    <div class="mb-3 pb-3 {% if not loop.last %}border-bottom{% endif %}">
+                        <a href="{{ url_for('article_detail', slug=rel_article.slug) }}" class="text-decoration-none">
+                            <h6 class="mb-1 text-dark">{{ rel_article.title }}</h6>
+                        </a>
+                        <small class="text-muted">
+                            <i class="far fa-clock me-1"></i>{{ rel_article.read_time }} min read
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Browse More -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-book-medical me-2"></i>Browse More
+                    </h5>
+                    <a href="{{ url_for('health_digest') }}" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="fas fa-list me-2"></i>All Articles
+                    </a>
+                    <a href="{{ url_for('health_digest', category=article.category.slug) }}" class="btn btn-outline-primary w-100">
+                        <i class="fas {{ article.category.icon }} me-2"></i>{{ article.category.name }}
+                    </a>
+                </div>
+            </div>
+
+            <!-- Newsletter (Future) -->
+            <div class="card shadow-sm bg-light">
+                <div class="card-body text-center">
+                    <i class="fas fa-heartbeat fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Stay Healthy!</h5>
+                    <p class="small text-muted">Explore more health articles on RankSewa</p>
+                    <a href="{{ url_for('health_digest') }}" class="btn btn-primary btn-sm">
+                        Browse Health Digest
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(function() {
+        alert('Link copied to clipboard!');
+    }, function() {
+        alert('Failed to copy link');
+    });
+}
+</script>
+
+<style>
+.article-body {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #333;
+}
+
+.article-body h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #059669;
+}
+
+.article-body h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.article-body p {
+    margin-bottom: 1.25rem;
+}
+
+.article-body ul, .article-body ol {
+    margin-bottom: 1.25rem;
+    padding-left: 2rem;
+}
+
+.article-body li {
+    margin-bottom: 0.5rem;
+}
+
+.article-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+}
+
+.article-body blockquote {
+    border-left: 4px solid #059669;
+    padding-left: 1.5rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: #666;
+}
+</style>
+{% endblock %}

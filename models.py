@@ -101,12 +101,17 @@ class User(db.Model):
     role = db.Column(db.String(20), default='patient')  # 'patient', 'doctor', 'admin'
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=True)
 
+    # Gamification
+    points = db.Column(db.Integer, default=0)
+
     # Relationships
     ratings = db.relationship('Rating', backref='user', lazy=True)
     appointments = db.relationship('Appointment', backref='user', lazy=True)
     contact_messages = db.relationship('ContactMessage', backref='user', lazy=True)
     doctor_profile = db.relationship('Doctor', foreign_keys=[doctor_id], backref='user_account', uselist=False)
     verification_requests = db.relationship('VerificationRequest', foreign_keys='VerificationRequest.user_id', backref='user', lazy=True)
+    badges = db.relationship('UserBadge', backref='user', lazy=True)
+    helpful_votes = db.relationship('ReviewHelpful', backref='user', lazy=True)
 
     def set_password(self, password):
         """Hash and set the user's password"""
@@ -115,6 +120,42 @@ class User(db.Model):
     def check_password(self, password):
         """Check if the provided password matches the hash"""
         return check_password_hash(self.password, password)
+
+    @property
+    def tier(self):
+        """Get user tier based on points"""
+        if self.points >= 300:
+            return 'platinum'
+        elif self.points >= 151:
+            return 'gold'
+        elif self.points >= 51:
+            return 'silver'
+        else:
+            return 'bronze'
+
+    @property
+    def tier_name(self):
+        """Get display name for user tier"""
+        tier_names = {
+            'bronze': 'Basic Contributor',
+            'silver': 'Trusted Reviewer',
+            'gold': 'Expert Reviewer',
+            'platinum': 'Community Leader'
+        }
+        return tier_names.get(self.tier, 'Basic Contributor')
+
+    @property
+    def review_count(self):
+        """Get total number of reviews written"""
+        return len(self.ratings)
+
+    @property
+    def helpful_count(self):
+        """Get total number of helpful votes received on reviews"""
+        count = 0
+        for rating in self.ratings:
+            count += len(rating.helpful_votes)
+        return count
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -131,13 +172,19 @@ class Rating(db.Model):
     comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationship to doctor response
+    # Relationships
     doctor_response = db.relationship('DoctorResponse', backref='rating', uselist=False, lazy=True)
+    helpful_votes = db.relationship('ReviewHelpful', backref='rating', lazy=True)
 
     @property
     def user_name(self):
         """Get user name for the rating"""
         return self.user.name if self.user else 'Anonymous'
+
+    @property
+    def helpful_count(self):
+        """Get number of helpful votes for this review"""
+        return len(self.helpful_votes)
 
     def __repr__(self):
         return f'<Rating {self.rating} for Doctor ID {self.doctor_id}>'
@@ -344,3 +391,135 @@ class ReviewFlag(db.Model):
 
     def __repr__(self):
         return f'<ReviewFlag {self.id} - Rating {self.rating_id} - {self.reason}>'
+
+
+class BadgeDefinition(db.Model):
+    """
+    Defines available badges that users can earn
+    """
+    __tablename__ = 'badge_definitions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)  # e.g., "First Review"
+    slug = db.Column(db.String(100), unique=True, nullable=False)  # e.g., "first_review"
+    description = db.Column(db.Text, nullable=False)  # How to earn the badge
+    icon = db.Column(db.String(50))  # Emoji or icon class (e.g., "🌟", "fa-star")
+    tier = db.Column(db.String(20), default='bronze')  # 'bronze', 'silver', 'gold', 'platinum'
+    is_active = db.Column(db.Boolean, default=True)
+    display_order = db.Column(db.Integer, default=0)  # For sorting badges
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    user_badges = db.relationship('UserBadge', backref='badge_definition', lazy=True)
+
+    def __repr__(self):
+        return f'<BadgeDefinition {self.name}>'
+
+
+class UserBadge(db.Model):
+    """
+    Tracks badges earned by users
+    """
+    __tablename__ = 'user_badges'
+    __table_args__ = (db.UniqueConstraint('user_id', 'badge_id', name='unique_user_badge'),)
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    badge_id = db.Column(db.Integer, db.ForeignKey('badge_definitions.id'), nullable=False)
+    earned_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<UserBadge User {self.user_id} - Badge {self.badge_id}>'
+
+
+class ReviewHelpful(db.Model):
+    """
+    Tracks which users found which reviews helpful
+    Users can mark reviews as helpful (like upvoting)
+    """
+    __tablename__ = 'review_helpful'
+    __table_args__ = (db.UniqueConstraint('rating_id', 'user_id', name='unique_helpful_vote'),)
+
+    id = db.Column(db.Integer, primary_key=True)
+    rating_id = db.Column(db.Integer, db.ForeignKey('ratings.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<ReviewHelpful Rating {self.rating_id} by User {self.user_id}>'
+
+
+class ArticleCategory(db.Model):
+    """
+    Categories for health digest articles
+    """
+    __tablename__ = 'article_categories'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    slug = db.Column(db.String(100), nullable=False, unique=True)
+    description = db.Column(db.Text)
+    icon = db.Column(db.String(50))  # Font Awesome icon class
+    display_order = db.Column(db.Integer, default=0)
+
+    # Relationship
+    articles = db.relationship('Article', backref='category', lazy=True)
+
+    def __repr__(self):
+        return f'<ArticleCategory {self.name}>'
+
+
+class Article(db.Model):
+    """
+    Health digest articles
+    """
+    __tablename__ = 'articles'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    slug = db.Column(db.String(255), nullable=False, unique=True, index=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('article_categories.id'), nullable=False)
+
+    # Content
+    summary = db.Column(db.Text)  # Short excerpt for listing page
+    content = db.Column(db.Text, nullable=False)  # Full article content (HTML)
+    featured_image = db.Column(db.String(500))  # URL to featured image
+
+    # Author (can be admin or doctor in future)
+    author_type = db.Column(db.String(20), default='admin')  # 'admin' or 'doctor'
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # If doctor
+    author_name = db.Column(db.String(200), default='RankSewa Team')  # Display name
+
+    # SEO
+    meta_description = db.Column(db.String(160))  # For Google search results
+    meta_keywords = db.Column(db.String(255))  # SEO keywords
+
+    # Related specialty (to show related doctors)
+    related_specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=True)
+
+    # Status and analytics
+    is_published = db.Column(db.Boolean, default=False)
+    is_featured = db.Column(db.Boolean, default=False)  # Show on homepage
+    view_count = db.Column(db.Integer, default=0)
+
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    published_at = db.Column(db.DateTime, nullable=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    author = db.relationship('User', foreign_keys=[author_id], backref='articles')
+    related_specialty = db.relationship('Specialty', foreign_keys=[related_specialty_id])
+
+    @property
+    def read_time(self):
+        """Calculate estimated read time in minutes"""
+        if not self.content:
+            return 1
+        # Average reading speed: 200 words per minute
+        word_count = len(self.content.split())
+        minutes = max(1, round(word_count / 200))
+        return minutes
+
+    def __repr__(self):
+        return f'<Article {self.title}>'

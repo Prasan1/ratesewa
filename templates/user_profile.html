@@ -21,32 +21,126 @@
         <!-- Change Password Section -->
         <div class="card shadow-sm mt-3">
             <div class="card-body">
-                <h5 class="card-title mb-3">
+                <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#changePasswordForm" aria-expanded="false" aria-controls="changePasswordForm">
                     <i class="fas fa-lock me-2"></i>Change Password
+                </button>
+
+                <div class="collapse mt-3" id="changePasswordForm">
+                    <form method="POST" action="{{ url_for('change_password') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" required minlength="6">
+                            <div class="form-text">At least 6 characters</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="6">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-key me-2"></i>Update Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gamification Stats Card -->
+        <div class="card shadow-sm mt-3">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <i class="fas fa-trophy me-2 text-warning"></i>Reviewer Stats
                 </h5>
-                <form method="POST" action="{{ url_for('change_password') }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
-                    <div class="mb-3">
-                        <label for="current_password" class="form-label">Current Password</label>
-                        <input type="password" class="form-control" id="current_password" name="current_password" required>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Tier:</span>
+                        <strong class="
+                            {% if tier == 'platinum' %}text-info
+                            {% elif tier == 'gold' %}text-warning
+                            {% elif tier == 'silver' %}text-secondary
+                            {% else %}text-brown
+                            {% endif %}">
+                            {{ tier_name }}
+                        </strong>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="new_password" class="form-label">New Password</label>
-                        <input type="password" class="form-control" id="new_password" name="new_password" required minlength="6">
-                        <div class="form-text">At least 6 characters</div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Points:</span>
+                        <strong>{{ total_points }}</strong>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="confirm_password" class="form-label">Confirm New Password</label>
-                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="6">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Reviews Written:</span>
+                        <strong>{{ user.review_count }}</strong>
                     </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Helpful Votes:</span>
+                        <strong>{{ total_helpful_received }}</strong>
+                    </div>
+                </div>
 
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-key me-2"></i>Change Password
-                    </button>
-                </form>
+                <!-- Tier Progress Bar -->
+                <div class="mb-3">
+                    <small class="text-muted">Progress to next tier:</small>
+                    <div class="progress" style="height: 20px;">
+                        {% if tier == 'bronze' %}
+                        <div class="progress-bar bg-secondary" role="progressbar"
+                             style="width: {{ (total_points / 51 * 100) | round | int }}%"
+                             aria-valuenow="{{ total_points }}" aria-valuemin="0" aria-valuemax="51">
+                            {{ total_points }}/51
+                        </div>
+                        {% elif tier == 'silver' %}
+                        <div class="progress-bar bg-warning" role="progressbar"
+                             style="width: {{ ((total_points - 51) / 100 * 100) | round | int }}%"
+                             aria-valuenow="{{ total_points - 51 }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ total_points }}/151
+                        </div>
+                        {% elif tier == 'gold' %}
+                        <div class="progress-bar bg-warning" role="progressbar"
+                             style="width: {{ ((total_points - 151) / 149 * 100) | round | int }}%"
+                             aria-valuenow="{{ total_points - 151 }}" aria-valuemin="0" aria-valuemax="149">
+                            {{ total_points }}/300
+                        </div>
+                        {% else %}
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 100%">
+                            Max Tier!
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Badges -->
+                {% if user_badges %}
+                <div class="mt-3">
+                    <small class="text-muted d-block mb-2">Badges Earned:</small>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for user_badge in user_badges %}
+                        <span class="badge bg-light text-dark border"
+                              title="{{ user_badge.badge_definition.description }}"
+                              style="font-size: 1rem; padding: 0.5rem;">
+                            {{ user_badge.badge_definition.icon }} {{ user_badge.badge_definition.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="mt-3">
+                    <small class="text-muted">No badges earned yet. Write reviews to unlock badges!</small>
+                </div>
+                {% endif %}
+
+                <div class="mt-3">
+                    <a href="{{ url_for('leaderboard') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-trophy me-1"></i>View Leaderboard
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -127,24 +221,13 @@
         </div>
         {% endif %}
         {% elif not user.doctor_id %}
-        <div class="alert alert-info border-info shadow-sm mb-4">
-            <div class="d-flex align-items-start">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-user-md fa-2x text-info me-3"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <h5 class="alert-heading mb-2">Get Your Doctor Profile Verified</h5>
-                    <p class="mb-2">Start your verification to appear in search results and access the doctor dashboard.</p>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <a href="{{ url_for('claim_profile') }}" class="btn btn-outline-info btn-sm">
-                            Claim Existing Profile
-                        </a>
-                        <a href="{{ url_for('doctor_self_register') }}" class="btn btn-info btn-sm text-white">
-                            Create New Profile
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <div class="alert alert-light border-start border-info border-3 alert-dismissible fade show mb-4" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <small class="text-muted">
+                <i class="fas fa-user-md me-1"></i><strong>Are you a doctor?</strong>
+                <a href="{{ url_for('claim_profile') }}" class="alert-link">Claim your profile</a> or
+                <a href="{{ url_for('doctor_self_register') }}" class="alert-link">create a new one</a> to get verified.
+            </small>
         </div>
         {% endif %}
 

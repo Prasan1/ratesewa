@@ -6,7 +6,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from authlib.integrations.flask_client import OAuth
-from models import db, City, Specialty, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag
+from models import db, City, Specialty, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag, BadgeDefinition, UserBadge, ReviewHelpful, Article, ArticleCategory
 from config import Config
 import ad_manager
 import upload_utils
@@ -386,6 +386,130 @@ def terms():
 def pricing():
     """Pricing page for doctors - shows promotional offer"""
     return render_template('pricing.html')
+
+@app.route('/health-digest')
+def health_digest():
+    """Health digest article listing page"""
+    # Get filter parameters
+    category_slug = request.args.get('category')
+    search_query = request.args.get('q', '').strip()
+
+    # Base query - only published articles
+    query = Article.query.filter_by(is_published=True)
+
+    # Filter by category if specified
+    if category_slug:
+        category = ArticleCategory.query.filter_by(slug=category_slug).first_or_404()
+        query = query.filter_by(category_id=category.id)
+    else:
+        category = None
+
+    # Search if query provided
+    if search_query:
+        search_pattern = f'%{search_query}%'
+        query = query.filter(
+            db.or_(
+                Article.title.ilike(search_pattern),
+                Article.summary.ilike(search_pattern),
+                Article.content.ilike(search_pattern)
+            )
+        )
+
+    # Order by featured first, then by published date
+    articles = query.order_by(
+        Article.is_featured.desc(),
+        Article.published_at.desc()
+    ).all()
+
+    # Get all categories for filter menu
+    categories = ArticleCategory.query.order_by(ArticleCategory.display_order).all()
+
+    # Get featured articles for sidebar
+    featured_articles = Article.query.filter_by(
+        is_published=True,
+        is_featured=True
+    ).order_by(Article.published_at.desc()).limit(3).all()
+
+    return render_template('health_digest.html',
+                         articles=articles,
+                         categories=categories,
+                         current_category=category,
+                         featured_articles=featured_articles,
+                         search_query=search_query)
+
+
+@app.route('/health-digest/<slug>')
+def article_detail(slug):
+    """Individual article detail page"""
+    # Get article and increment view count
+    article = Article.query.filter_by(slug=slug, is_published=True).first_or_404()
+    article.view_count += 1
+    db.session.commit()
+
+    # Get related articles (same category, exclude current)
+    related_articles = Article.query.filter_by(
+        category_id=article.category_id,
+        is_published=True
+    ).filter(Article.id != article.id)\
+     .order_by(Article.published_at.desc())\
+     .limit(3).all()
+
+    # Get related doctors if article has a related specialty
+    related_doctors = []
+    if article.related_specialty_id:
+        related_doctors = Doctor.query.filter_by(
+            specialty_id=article.related_specialty_id,
+            is_active=True
+        ).order_by(Doctor.is_featured.desc())\
+         .limit(4).all()
+
+    return render_template('article_detail.html',
+                         article=article,
+                         related_articles=related_articles,
+                         related_doctors=related_doctors)
+
+
+@app.route('/leaderboard')
+def leaderboard():
+    """Show top reviewers leaderboard"""
+    from sqlalchemy import func, desc
+
+    # Get top reviewers by points
+    top_by_points = User.query.filter(User.points > 0)\
+        .order_by(desc(User.points))\
+        .limit(50).all()
+
+    # Get top reviewers by review count
+    top_by_reviews = db.session.query(User)\
+        .join(Rating)\
+        .group_by(User.id)\
+        .order_by(desc(func.count(Rating.id)))\
+        .limit(50).all()
+
+    # Get top reviewers by helpful votes (most helpful)
+    # This is more complex - need to count helpful votes across all their reviews
+    from sqlalchemy import select
+    helpful_subquery = db.session.query(
+        Rating.user_id,
+        func.count(ReviewHelpful.id).label('helpful_count')
+    ).join(ReviewHelpful, Rating.id == ReviewHelpful.rating_id)\
+     .group_by(Rating.user_id)\
+     .subquery()
+
+    top_by_helpful = db.session.query(User)\
+        .join(helpful_subquery, User.id == helpful_subquery.c.user_id)\
+        .order_by(desc(helpful_subquery.c.helpful_count))\
+        .limit(50).all()
+
+    # Get all badge definitions for display
+    badges = BadgeDefinition.query.filter_by(is_active=True)\
+        .order_by(BadgeDefinition.display_order).all()
+
+    return render_template('leaderboard.html',
+                         top_by_points=top_by_points,
+                         top_by_reviews=top_by_reviews,
+                         top_by_helpful=top_by_helpful,
+                         badges=badges)
 
 # --- Doctor Verification Routes ---
 @app.route('/claim-profile', methods=['GET'])
@@ -1462,6 +1586,127 @@ def admin_specialty_delete(specialty_id):
     flash('Specialty deleted successfully.', 'success')
     return redirect(url_for('admin_specialties'))
 
+# --- Admin Article Routes ---
+@app.route('/admin/articles')
+@admin_required
+def admin_articles():
+    """List all articles (published and drafts)"""
+    articles = Article.query.order_by(Article.created_at.desc()).all()
+    return render_template('admin_articles.html', articles=articles)
+
+@app.route('/admin/articles/new', methods=['GET', 'POST'])
+@admin_required
+def admin_article_new():
+    """Create new article"""
+    if request.method == 'POST':
+        title = request.form.get('title', '').strip()
+        category_id = request.form.get('category_id')
+        summary = request.form.get('summary', '').strip()
+        content = request.form.get('content', '').strip()
+        featured_image = request.form.get('featured_image', '').strip()
+        meta_description = request.form.get('meta_description', '').strip()
+        meta_keywords = request.form.get('meta_keywords', '').strip()
+        related_specialty_id = request.form.get('related_specialty_id') or None
+        is_published = request.form.get('is_published') == 'on'
+        is_featured = request.form.get('is_featured') == 'on'
+
+        if not title or not content or not category_id:
+            flash('Title, category, and content are required.', 'danger')
+            categories = ArticleCategory.query.order_by(ArticleCategory.display_order).all()
+            specialties = Specialty.query.order_by(Specialty.name).all()
+            return render_template('admin_article_form.html', article=None, categories=categories, specialties=specialties)
+
+        # Generate slug from title
+        import re
+        slug = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')
+        # Make sure slug is unique
+        base_slug = slug
+        counter = 1
+        while Article.query.filter_by(slug=slug).first():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+
+        article = Article(
+            title=title,
+            slug=slug,
+            category_id=category_id,
+            summary=summary or None,
+            content=content,
+            featured_image=featured_image or None,
+            meta_description=meta_description or None,
+            meta_keywords=meta_keywords or None,
+            related_specialty_id=related_specialty_id,
+            is_published=is_published,
+            is_featured=is_featured,
+            published_at=datetime.utcnow() if is_published else None
+        )
+        db.session.add(article)
+        db.session.commit()
+        flash('Article created successfully!', 'success')
+        return redirect(url_for('admin_articles'))
+
+    categories = ArticleCategory.query.order_by(ArticleCategory.display_order).all()
+    specialties = Specialty.query.order_by(Specialty.name).all()
+    return render_template('admin_article_form.html', article=None, categories=categories, specialties=specialties)
+
+@app.route('/admin/articles/<int:article_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def admin_article_edit(article_id):
+    """Edit existing article"""
+    article = Article.query.get_or_404(article_id)
+
+    if request.method == 'POST':
+        title = request.form.get('title', '').strip()
+        category_id = request.form.get('category_id')
+        summary = request.form.get('summary', '').strip()
+        content = request.form.get('content', '').strip()
+        featured_image = request.form.get('featured_image', '').strip()
+        meta_description = request.form.get('meta_description', '').strip()
+        meta_keywords = request.form.get('meta_keywords', '').strip()
+        related_specialty_id = request.form.get('related_specialty_id') or None
+        was_published = article.is_published
+        is_published = request.form.get('is_published') == 'on'
+        is_featured = request.form.get('is_featured') == 'on'
+
+        if not title or not content or not category_id:
+            flash('Title, category, and content are required.', 'danger')
+            categories = ArticleCategory.query.order_by(ArticleCategory.display_order).all()
+            specialties = Specialty.query.order_by(Specialty.name).all()
+            return render_template('admin_article_form.html', article=article, categories=categories, specialties=specialties)
+
+        article.title = title
+        article.category_id = category_id
+        article.summary = summary or None
+        article.content = content
+        article.featured_image = featured_image or None
+        article.meta_description = meta_description or None
+        article.meta_keywords = meta_keywords or None
+        article.related_specialty_id = related_specialty_id
+        article.is_published = is_published
+        article.is_featured = is_featured
+
+        # Set published_at if publishing for the first time
+        if is_published and not was_published:
+            article.published_at = datetime.utcnow()
+
+        db.session.commit()
+        flash('Article updated successfully!', 'success')
+        return redirect(url_for('admin_articles'))
+
+    categories = ArticleCategory.query.order_by(ArticleCategory.display_order).all()
+    specialties = Specialty.query.order_by(Specialty.name).all()
+    return render_template('admin_article_form.html', article=article, categories=categories, specialties=specialties)
+
+@app.route('/admin/articles/<int:article_id>/delete', methods=['POST'])
+@admin_required
+def admin_article_delete(article_id):
+    """Delete article"""
+    article = Article.query.get_or_404(article_id)
+    db.session.delete(article)
+    db.session.commit()
+    flash('Article deleted successfully.', 'success')
+    return redirect(url_for('admin_articles'))
+
 @app.route('/admin/users')
 @admin_required
 def admin_users():
@@ -1828,6 +2073,9 @@ def rate_doctor():
         doctor = Doctor.query.get(doctor_id)
         return redirect(url_for('doctor_profile', slug=doctor.slug))
 
+    # Check if this is the first review for this doctor
+    is_first_review = Rating.query.filter_by(doctor_id=doctor_id).count() == 0
+
     # Create new rating
     new_rating = Rating(
         doctor_id=doctor_id,
@@ -1836,8 +2084,19 @@ def rate_doctor():
         comment=comment
     )
     db.session.add(new_rating)
-    db.session.commit()
-    flash('Your review has been submitted!', 'success')
+    db.session.flush()  # Flush to get the rating ID
+
+    # Award points and badges using gamification system
+    from gamification import process_new_review
+    user = User.query.get(user_id)
+    result = process_new_review(user, new_rating, is_first_for_doctor=is_first_review)
+
+    # Show success message with points earned
+    points_msg = f"Your review has been submitted! You earned {result['points']} points"
+    if result['badges']:
+        badge_names = ', '.join([b.badge_definition.name for b in result['badges']])
+        points_msg += f" and unlocked: {badge_names}"
+    flash(points_msg, 'success')
 
     # Get the doctor's slug to redirect correctly
     doctor = Doctor.query.get(doctor_id)
@@ -1894,6 +2153,55 @@ def flag_review():
         db.session.rollback()
         app.logger.error(f"Error flagging review: {str(e)}")
         flash('Error submitting flag. Please try again.', 'danger')
+
+    return redirect(url_for('doctor_profile', slug=doctor_slug))
+
+
+@app.route('/mark_helpful', methods=['POST'])
+@login_required
+def mark_helpful():
+    """Mark a review as helpful"""
+    rating_id = request.form.get('rating_id')
+    doctor_slug = request.form.get('doctor_slug')
+    user_id = session['user_id']
+
+    if not rating_id:
+        flash('Invalid review.', 'danger')
+        return redirect(url_for('doctor_profile', slug=doctor_slug))
+
+    rating = Rating.query.get_or_404(rating_id)
+
+    # Don't allow users to mark their own reviews as helpful
+    if rating.user_id == user_id:
+        flash('You cannot mark your own review as helpful.', 'warning')
+        return redirect(url_for('doctor_profile', slug=doctor_slug))
+
+    # Check if already marked helpful by this user
+    existing_vote = ReviewHelpful.query.filter_by(
+        rating_id=rating_id,
+        user_id=user_id
+    ).first()
+
+    if existing_vote:
+        # Remove the helpful vote (toggle off)
+        db.session.delete(existing_vote)
+        db.session.commit()
+        flash('Helpful vote removed.', 'info')
+    else:
+        # Add helpful vote
+        helpful_vote = ReviewHelpful(
+            rating_id=rating_id,
+            user_id=user_id
+        )
+        db.session.add(helpful_vote)
+        db.session.flush()
+
+        # Award points to the review author
+        from gamification import process_helpful_vote
+        review_author = rating.user
+        result = process_helpful_vote(review_author, rating)
+
+        flash('Marked as helpful!', 'success')
 
     return redirect(url_for('doctor_profile', slug=doctor_slug))
 
@@ -2396,6 +2704,13 @@ def doctor_respond_to_review(rating_id):
                 response_text=response_text
             )
             db.session.add(new_response)
+            db.session.flush()
+
+            # Award points to the review author for getting a response
+            from gamification import process_doctor_response
+            review_author = rating.user
+            process_doctor_response(review_author)
+
             flash('Response added successfully!', 'success')
 
         db.session.commit()
@@ -2484,11 +2799,27 @@ def user_profile():
         user_id=user_id
     ).order_by(VerificationRequest.created_at.desc()).first()
 
+    # Get user's badges
+    user_badges = UserBadge.query.filter_by(user_id=user_id)\
+        .join(BadgeDefinition)\
+        .order_by(BadgeDefinition.display_order).all()
+
+    # Calculate gamification stats
+    total_helpful_received = user.helpful_count
+    total_points = user.points
+    tier = user.tier
+    tier_name = user.tier_name
+
     return render_template('user_profile.html',
                          user=user,
                          appointments=appointments,
                          ratings=ratings,
-                         verification_request=verification_request)
+                         verification_request=verification_request,
+                         user_badges=user_badges,
+                         total_helpful_received=total_helpful_received,
+                         total_points=total_points,
+                         tier=tier,
+                         tier_name=tier_name)
 
 @app.route('/change-password', methods=['POST'])
 @login_required

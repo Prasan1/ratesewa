@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Health Digest - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">Health Digest</h1>
+        <p class="lead text-muted">Expert health information and wellness tips for Nepal</p>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Category Filter & Search -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-filter me-2"></i>
+                                    {% if current_category %}{{ current_category.name }}{% else %}All Categories{% endif %}
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    <li><a class="dropdown-item" href="{{ url_for('health_digest') }}">All Categories</a></li>
+                                    {% for cat in categories %}
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('health_digest', category=cat.slug) }}">
+                                            <i class="fas {{ cat.icon }} me-2"></i>{{ cat.name }}
+                                        </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <form action="{{ url_for('health_digest') }}" method="GET">
+                                {% if current_category %}
+                                <input type="hidden" name="category" value="{{ current_category.slug }}">
+                                {% endif %}
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="q" placeholder="Search articles..." value="{{ search_query or '' }}">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Articles Grid -->
+            {% if articles %}
+                {% for article in articles %}
+                <div class="card shadow-sm mb-4 article-card {% if article.is_featured %}border-warning{% endif %}">
+                    {% if article.is_featured %}
+                    <div class="ribbon-featured">FEATURED</div>
+                    {% endif %}
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="{{ article.featured_image or 'https://picsum.photos/seed/article' + article.id|string + '/400/300' }}"
+                                 class="img-fluid rounded-start h-100 object-fit-cover"
+                                 alt="{{ article.title }}"
+                                 onerror="this.src='https://picsum.photos/seed/article{{ article.id }}/400/300'">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-primary">
+                                        <i class="fas {{ article.category.icon }} me-1"></i>
+                                        {{ article.category.name }}
+                                    </span>
+                                    <small class="text-muted">
+                                        <i class="far fa-clock me-1"></i>{{ article.read_time }} min read
+                                    </small>
+                                </div>
+                                <h5 class="card-title mb-2">
+                                    <a href="{{ url_for('article_detail', slug=article.slug) }}" class="text-decoration-none text-dark">
+                                        {{ article.title }}
+                                    </a>
+                                </h5>
+                                <p class="card-text text-muted small">{{ article.summary or (article.content[:150] + '...') }}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="text-muted small">
+                                        <i class="fas fa-user-edit me-1"></i>{{ article.author_name }}
+                                        <span class="mx-2">•</span>
+                                        <i class="far fa-calendar me-1"></i>{{ article.published_at.strftime('%b %d, %Y') if article.published_at else article.created_at.strftime('%b %d, %Y') }}
+                                    </div>
+                                    <a href="{{ url_for('article_detail', slug=article.slug) }}" class="btn btn-sm btn-outline-primary">
+                                        Read More <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                    <h4>No Articles Found</h4>
+                    <p class="text-muted">
+                        {% if search_query %}
+                            No articles match your search "{{ search_query }}"
+                        {% else %}
+                            Check back soon for new health articles!
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Categories Widget -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-list me-2"></i>Categories
+                    </h5>
+                    <div class="list-group list-group-flush">
+                        {% for cat in categories %}
+                        <a href="{{ url_for('health_digest', category=cat.slug) }}"
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span>
+                                <i class="fas {{ cat.icon }} me-2"></i>{{ cat.name }}
+                            </span>
+                            <span class="badge bg-primary rounded-pill">{{ cat.articles|length }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Articles Widget -->
+            {% if featured_articles %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-star text-warning me-2"></i>Featured Articles
+                    </h5>
+                    {% for article in featured_articles %}
+                    <div class="mb-3 pb-3 {% if not loop.last %}border-bottom{% endif %}">
+                        <a href="{{ url_for('article_detail', slug=article.slug) }}" class="text-decoration-none">
+                            <h6 class="mb-1 text-dark">{{ article.title }}</h6>
+                        </a>
+                        <small class="text-muted">
+                            <i class="far fa-calendar me-1"></i>{{ article.published_at.strftime('%b %d') if article.published_at else article.created_at.strftime('%b %d') }}
+                            <span class="mx-1">•</span>
+                            <i class="far fa-clock me-1"></i>{{ article.read_time }} min
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- CTA Widget -->
+            <div class="card shadow-sm bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-md fa-3x mb-3"></i>
+                    <h5 class="card-title">Need Medical Advice?</h5>
+                    <p class="card-text small">Consult with verified doctors across Nepal</p>
+                    <a href="{{ url_for('index') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-search me-1"></i>Find a Doctor
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.article-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.article-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+.ribbon-featured {
+    position: absolute;
+    top: 10px;
+    left: -30px;
+    background: #ffc107;
+    color: #000;
+    padding: 5px 30px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    transform: rotate(-45deg);
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.object-fit-cover {
+    object-fit: cover;
+}
+</style>
+{% endblock %}

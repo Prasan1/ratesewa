@@ -123,8 +123,8 @@ a:hover {
 .doctor-card.featured::before {
     content: "FEATURED";
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: -10px;
+    right: 12px;
     background: #f3ebd1;
     color: #6c5a1f;
     padding: 3px 8px;
@@ -134,6 +134,33 @@ a:hover {
     letter-spacing: 0.3px;
     box-shadow: 0 2px 4px rgba(108, 90, 31, 0.15);
     z-index: 10;
+}
+
+/* Make doctor cards equal height in their row */
+.doctor-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.doctor-card .card-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.doctor-card .doctor-details {
+    flex-grow: 1;
+}
+
+/* Limit description text to 3 lines to keep cards uniform */
+.doctor-card .doctor-details > p.text-muted:last-of-type {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 4.5em;
+    line-height: 1.5em;
 }
 
 .doctor-avatar {

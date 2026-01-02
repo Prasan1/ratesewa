@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+
+{% block title %}Top Reviewers Leaderboard{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4"><i class="fas fa-trophy text-warning me-3"></i>Reviewer Leaderboard</h1>
+        <p class="lead text-muted">Celebrating our top community contributors</p>
+    </div>
+
+    <!-- Tabs for different leaderboard views -->
+    <ul class="nav nav-tabs mb-4" id="leaderboardTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="points-tab" data-bs-toggle="tab" data-bs-target="#points" type="button" role="tab">
+                <i class="fas fa-star text-warning me-2"></i>Top by Points
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">
+                <i class="fas fa-pen text-primary me-2"></i>Most Reviews
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="helpful-tab" data-bs-toggle="tab" data-bs-target="#helpful" type="button" role="tab">
+                <i class="fas fa-thumbs-up text-success me-2"></i>Most Helpful
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="badges-tab" data-bs-toggle="tab" data-bs-target="#badges" type="button" role="tab">
+                <i class="fas fa-award text-info me-2"></i>Badge Gallery
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="leaderboardTabContent">
+        <!-- Top by Points Tab -->
+        <div class="tab-pane fade show active" id="points" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">
+                        <i class="fas fa-star text-warning me-2"></i>Top Reviewers by Points
+                    </h4>
+                    {% if top_by_points %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="60">Rank</th>
+                                    <th>Reviewer</th>
+                                    <th>Tier</th>
+                                    <th class="text-end">Points</th>
+                                    <th class="text-end">Reviews</th>
+                                    <th class="text-end">Helpful Votes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in top_by_points %}
+                                <tr>
+                                    <td>
+                                        {% if loop.index == 1 %}
+                                        <span class="badge bg-warning text-dark" style="font-size: 1.2rem;">1st</span>
+                                        {% elif loop.index == 2 %}
+                                        <span class="badge bg-secondary" style="font-size: 1.1rem;">2nd</span>
+                                        {% elif loop.index == 3 %}
+                                        <span class="badge bg-brown" style="font-size: 1.0rem;">3rd</span>
+                                        {% else %}
+                                        <span class="text-muted">#{{ loop.index }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ user.name }}</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-
+                                            {%- if user.tier == 'platinum' -%}info
+                                            {%- elif user.tier == 'gold' -%}warning
+                                            {%- elif user.tier == 'silver' -%}secondary
+                                            {%- else -%}light text-dark
+                                            {%- endif -%}">
+                                            {{ user.tier_name }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end"><strong>{{ user.points }}</strong></td>
+                                    <td class="text-end">{{ user.review_count }}</td>
+                                    <td class="text-end">{{ user.helpful_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-5">No reviewers yet. Be the first to write a review!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Most Reviews Tab -->
+        <div class="tab-pane fade" id="reviews" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">
+                        <i class="fas fa-pen text-primary me-2"></i>Most Prolific Reviewers
+                    </h4>
+                    {% if top_by_reviews %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="60">Rank</th>
+                                    <th>Reviewer</th>
+                                    <th>Tier</th>
+                                    <th class="text-end">Reviews</th>
+                                    <th class="text-end">Points</th>
+                                    <th class="text-end">Helpful Votes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in top_by_reviews %}
+                                <tr>
+                                    <td>
+                                        {% if loop.index == 1 %}
+                                        <span class="badge bg-warning text-dark" style="font-size: 1.2rem;">1st</span>
+                                        {% elif loop.index == 2 %}
+                                        <span class="badge bg-secondary" style="font-size: 1.1rem;">2nd</span>
+                                        {% elif loop.index == 3 %}
+                                        <span class="badge bg-brown" style="font-size: 1.0rem;">3rd</span>
+                                        {% else %}
+                                        <span class="text-muted">#{{ loop.index }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ user.name }}</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-
+                                            {%- if user.tier == 'platinum' -%}info
+                                            {%- elif user.tier == 'gold' -%}warning
+                                            {%- elif user.tier == 'silver' -%}secondary
+                                            {%- else -%}light text-dark
+                                            {%- endif -%}">
+                                            {{ user.tier_name }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end"><strong>{{ user.review_count }}</strong></td>
+                                    <td class="text-end">{{ user.points }}</td>
+                                    <td class="text-end">{{ user.helpful_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-5">No reviewers yet. Be the first to write a review!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Most Helpful Tab -->
+        <div class="tab-pane fade" id="helpful" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">
+                        <i class="fas fa-thumbs-up text-success me-2"></i>Most Helpful Reviewers
+                    </h4>
+                    {% if top_by_helpful %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="60">Rank</th>
+                                    <th>Reviewer</th>
+                                    <th>Tier</th>
+                                    <th class="text-end">Helpful Votes</th>
+                                    <th class="text-end">Reviews</th>
+                                    <th class="text-end">Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in top_by_helpful %}
+                                <tr>
+                                    <td>
+                                        {% if loop.index == 1 %}
+                                        <span class="badge bg-warning text-dark" style="font-size: 1.2rem;">1st</span>
+                                        {% elif loop.index == 2 %}
+                                        <span class="badge bg-secondary" style="font-size: 1.1rem;">2nd</span>
+                                        {% elif loop.index == 3 %}
+                                        <span class="badge bg-brown" style="font-size: 1.0rem;">3rd</span>
+                                        {% else %}
+                                        <span class="text-muted">#{{ loop.index }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ user.name }}</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-
+                                            {%- if user.tier == 'platinum' -%}info
+                                            {%- elif user.tier == 'gold' -%}warning
+                                            {%- elif user.tier == 'silver' -%}secondary
+                                            {%- else -%}light text-dark
+                                            {%- endif -%}">
+                                            {{ user.tier_name }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end"><strong>{{ user.helpful_count }}</strong></td>
+                                    <td class="text-end">{{ user.review_count }}</td>
+                                    <td class="text-end">{{ user.points }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-5">No helpful votes yet. Mark helpful reviews to reward quality contributors!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Badge Gallery Tab -->
+        <div class="tab-pane fade" id="badges" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">
+                        <i class="fas fa-award text-info me-2"></i>Badge Gallery
+                    </h4>
+                    <p class="text-muted mb-4">Earn badges by contributing quality reviews and helping the community!</p>
+
+                    {% if badges %}
+                    <div class="row g-4">
+                        {% for badge in badges %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 border-{{
+                                'info' if badge.tier == 'platinum' else
+                                'warning' if badge.tier == 'gold' else
+                                'secondary' if badge.tier == 'silver' else 'light'
+                            }}">
+                                <div class="card-body text-center">
+                                    <div style="font-size: 3rem;" class="mb-3">{{ badge.icon }}</div>
+                                    <h5 class="card-title">{{ badge.name }}</h5>
+                                    <p class="card-text text-muted">{{ badge.description }}</p>
+                                    <span class="badge bg-{{
+                                        'info' if badge.tier == 'platinum' else
+                                        'warning' if badge.tier == 'gold' else
+                                        'secondary' if badge.tier == 'silver' else 'light text-dark'
+                                    }}">
+                                        {{ badge.tier | capitalize }} Tier
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-5">No badges available yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How Points Work Section -->
+    <div class="card shadow-sm mt-5">
+        <div class="card-body">
+            <h4 class="card-title mb-4">
+                <i class="fas fa-question-circle text-info me-2"></i>How Does It Work?
+            </h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="mb-3">Earn Points</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-star text-warning me-2"></i>
+                            <strong>Write a review:</strong> 10 points
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-pen-fancy text-primary me-2"></i>
+                            <strong>Detailed review (100+ words):</strong> +5 bonus
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-thumbs-up text-success me-2"></i>
+                            <strong>Your review gets marked helpful:</strong> 2 points each
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-reply text-info me-2"></i>
+                            <strong>Doctor responds to your review:</strong> 3 points
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-medal text-warning me-2"></i>
+                            <strong>First to review a doctor:</strong> +5 bonus
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="mb-3">Reviewer Tiers</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <span class="badge bg-light text-dark me-2">Bronze</span>
+                            <strong>Basic Contributor:</strong> 0-50 points
+                        </li>
+                        <li class="mb-2">
+                            <span class="badge bg-secondary me-2">Silver</span>
+                            <strong>Trusted Reviewer:</strong> 51-150 points
+                        </li>
+                        <li class="mb-2">
+                            <span class="badge bg-warning me-2">Gold</span>
+                            <strong>Expert Reviewer:</strong> 151-300 points
+                        </li>
+                        <li class="mb-2">
+                            <span class="badge bg-info me-2">Platinum</span>
+                            <strong>Community Leader:</strong> 300+ points
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-search me-2"></i>Find a Doctor to Review
+        </a>
+        {% if 'user_id' in session %}
+        <a href="{{ url_for('user_profile') }}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-user me-2"></i>View My Profile
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

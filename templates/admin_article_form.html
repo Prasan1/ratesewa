@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}{% if article %}Edit Article{% else %}Create Article{% endif %} - Admin{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h2 class="mb-4">
+                <i class="fas fa-newspaper me-2"></i>
+                {% if article %}Edit Article{% else %}Create New Article{% endif %}
+            </h2>
+
+            <form method="POST" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="title" name="title"
+                           value="{{ article.title if article else '' }}" required>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="category_id" class="form-label">Category <span class="text-danger">*</span></label>
+                        <select class="form-select" id="category_id" name="category_id" required>
+                            <option value="">Select category...</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}"
+                                    {% if article and article.category_id == category.id %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="related_specialty_id" class="form-label">Related Specialty (optional)</label>
+                        <select class="form-select" id="related_specialty_id" name="related_specialty_id">
+                            <option value="">None</option>
+                            {% for specialty in specialties %}
+                            <option value="{{ specialty.id }}"
+                                    {% if article and article.related_specialty_id == specialty.id %}selected{% endif %}>
+                                {{ specialty.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Show related doctors at end of article</small>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="summary" class="form-label">Summary (short excerpt)</label>
+                    <textarea class="form-control" id="summary" name="summary" rows="2">{{ article.summary if article else '' }}</textarea>
+                    <small class="text-muted">Brief description shown in article listings</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="content" class="form-label">Content <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="content" name="content" rows="15" required>{{ article.content if article else '' }}</textarea>
+                    <small class="text-muted">You can use HTML for formatting</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="featured_image" class="form-label">Featured Image URL</label>
+                    <input type="url" class="form-control" id="featured_image" name="featured_image"
+                           value="{{ article.featured_image if article else '' }}"
+                           placeholder="https://example.com/image.jpg">
+                </div>
+
+                <div class="mb-3">
+                    <label for="meta_description" class="form-label">Meta Description (SEO)</label>
+                    <textarea class="form-control" id="meta_description" name="meta_description"
+                              rows="2" maxlength="160">{{ article.meta_description if article else '' }}</textarea>
+                    <small class="text-muted">Max 160 characters for Google search results</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="meta_keywords" class="form-label">Keywords (SEO)</label>
+                    <input type="text" class="form-control" id="meta_keywords" name="meta_keywords"
+                           value="{{ article.meta_keywords if article else '' }}"
+                           placeholder="diabetes, nepal, health">
+                    <small class="text-muted">Comma-separated keywords</small>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_published" name="is_published"
+                               {% if article and article.is_published %}checked{% endif %}>
+                        <label class="form-check-label" for="is_published">
+                            Publish article (make it visible to public)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
+                               {% if article and article.is_featured %}checked{% endif %}>
+                        <label class="form-check-label" for="is_featured">
+                            Featured article (show in featured section)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>{% if article %}Update Article{% else %}Create Article{% endif %}
+                    </button>
+                    <a href="{{ url_for('admin_articles') }}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

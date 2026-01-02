@@ -54,11 +54,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link position-relative" href="{{ url_for('pricing') }}">
+                        <a class="nav-link" href="{{ url_for('health_digest') }}">
+                            <i class="fas fa-heartbeat me-1 d-lg-none"></i>Health Digest
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pricing') }}">
                             <i class="fas fa-tag me-1 d-lg-none"></i>Pricing
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" style="font-size: 0.6rem;">
-                                FREE
-                            </span>
                         </a>
                     </li>
                     {% if session.get('role') != 'doctor' %}
@@ -75,6 +77,7 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="adminDropdown">
                             <li><a class="dropdown-item" href="{{ url_for('admin_doctors') }}"><i class="fas fa-user-md me-2"></i>Manage Doctors</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_articles') }}"><i class="fas fa-newspaper me-2"></i>Manage Articles</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin_cities') }}"><i class="fas fa-city me-2"></i>Manage Cities</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin_specialties') }}"><i class="fas fa-stethoscope me-2"></i>Manage Specialties</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('admin_users') }}"><i class="fas fa-users me-2"></i>Manage Users</a></li>
