@@ -1159,24 +1159,40 @@ def get_doctors():
     doctors_sorted = sorted(doctors, key=lambda d: (-d.is_featured, -d.avg_rating, d.name))
 
     # Serialize to JSON
-    doctors_list = [{
-        'id': d.id,
-        'name': d.name,
-        'slug': d.slug,
-        'city_id': d.city_id,
-        'city_name': d.city.name,
-        'specialty_id': d.specialty_id,
-        'specialty_name': d.specialty.name,
-        'experience': d.experience,
-        'education': d.education,
-        'college': d.college,
-        'description': d.description,
-        'photo_url': d.photo_url,
-        'is_featured': d.is_featured,
-        'is_verified': d.is_verified,
-        'avg_rating': d.avg_rating,
-        'rating_count': d.rating_count
-    } for d in doctors_sorted]
+    doctors_list = []
+    for d in doctors_sorted:
+        # Generate proper photo URL
+        photo_url = None
+        if d.photo_url:
+            # Extract filename/path for serve_photo route
+            if d.photo_url.count('/') > 1:
+                # R2 format: photos/{doctor_id}/{filename}
+                # Remove 'photos/' prefix for the route
+                photo_path = d.photo_url.replace('photos/', '')
+            else:
+                # Local format: photos/{filename}
+                photo_path = d.photo_url.split('/')[-1]
+
+            photo_url = url_for('serve_photo', filename=photo_path, _external=False)
+
+        doctors_list.append({
+            'id': d.id,
+            'name': d.name,
+            'slug': d.slug,
+            'city_id': d.city_id,
+            'city_name': d.city.name,
+            'specialty_id': d.specialty_id,
+            'specialty_name': d.specialty.name,
+            'experience': d.experience,
+            'education': d.education,
+            'college': d.college,
+            'description': d.description,
+            'photo_url': photo_url,
+            'is_featured': d.is_featured,
+            'is_verified': d.is_verified,
+            'avg_rating': d.avg_rating,
+            'rating_count': d.rating_count
+        })
 
     return jsonify(doctors_list)
 
