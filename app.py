@@ -472,15 +472,22 @@ def claim_profile_submit(doctor_id):
             flash('Government ID is required for verification.', 'danger')
             return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
 
-        # Save files to R2
-        # Save required govt_id
+        # Save files to R2 (with local fallback)
+        # Try R2 first
         govt_id_path = r2_storage.save_verification_document(
             govt_id, doctor_id, 'govt_id'
         )
 
+        # Fallback to local storage if R2 fails
         if not govt_id_path:
-            flash('Error uploading government ID. Please try again.', 'danger')
-            return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
+            upload_folder = app.config['UPLOAD_FOLDER']
+            govt_id.seek(0)  # Reset file pointer
+            govt_id_path = upload_utils.save_verification_document(
+                govt_id, upload_folder, doctor_id, 'govt_id'
+            )
+            if not govt_id_path:
+                flash('Error uploading government ID. Please try again.', 'danger')
+                return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
 
         # Optional medical degree
         medical_degree_path = None
@@ -488,6 +495,13 @@ def claim_profile_submit(doctor_id):
             medical_degree_path = r2_storage.save_verification_document(
                 medical_degree, doctor_id, 'medical_degree'
             )
+            # Fallback to local if R2 fails
+            if not medical_degree_path:
+                upload_folder = app.config['UPLOAD_FOLDER']
+                medical_degree.seek(0)
+                medical_degree_path = upload_utils.save_verification_document(
+                    medical_degree, upload_folder, doctor_id, 'medical_degree'
+                )
 
         # Optional practice license
         practice_license_path = None
@@ -495,6 +509,13 @@ def claim_profile_submit(doctor_id):
             practice_license_path = r2_storage.save_verification_document(
                 practice_license, doctor_id, 'practice_license'
             )
+            # Fallback to local if R2 fails
+            if not practice_license_path:
+                upload_folder = app.config['UPLOAD_FOLDER']
+                practice_license.seek(0)
+                practice_license_path = upload_utils.save_verification_document(
+                    practice_license, upload_folder, doctor_id, 'practice_license'
+                )
 
         # Create verification request
         verification_request = VerificationRequest(
@@ -606,15 +627,22 @@ def doctor_self_register_submit():
         # Create a temporary doctor ID for file storage (use user_id as placeholder)
         temp_doctor_id = f"new_{session['user_id']}"
 
-        # Save files to R2
-        # Save required govt_id
+        # Save files to R2 (with local fallback)
+        # Try R2 first
         govt_id_path = r2_storage.save_verification_document(
             govt_id, temp_doctor_id, 'govt_id'
         )
 
+        # Fallback to local storage if R2 fails
         if not govt_id_path:
-            flash('Error uploading government ID. Please try again.', 'danger')
-            return redirect(url_for('doctor_self_register'))
+            upload_folder = app.config['UPLOAD_FOLDER']
+            govt_id.seek(0)  # Reset file pointer
+            govt_id_path = upload_utils.save_verification_document(
+                govt_id, upload_folder, temp_doctor_id, 'govt_id'
+            )
+            if not govt_id_path:
+                flash('Error uploading government ID. Please try again.', 'danger')
+                return redirect(url_for('doctor_self_register'))
 
         # Optional medical degree
         medical_degree_path = None
@@ -622,6 +650,12 @@ def doctor_self_register_submit():
             medical_degree_path = r2_storage.save_verification_document(
                 medical_degree, temp_doctor_id, 'medical_degree'
             )
+            # Fallback to local if R2 fails
+            if not medical_degree_path:
+                medical_degree.seek(0)
+                medical_degree_path = upload_utils.save_verification_document(
+                    medical_degree, upload_folder, temp_doctor_id, 'medical_degree'
+                )
 
         # Optional practice license
         practice_license_path = None
@@ -629,6 +663,12 @@ def doctor_self_register_submit():
             practice_license_path = r2_storage.save_verification_document(
                 practice_license, temp_doctor_id, 'practice_license'
             )
+            # Fallback to local if R2 fails
+            if not practice_license_path:
+                practice_license.seek(0)
+                practice_license_path = upload_utils.save_verification_document(
+                    practice_license, upload_folder, temp_doctor_id, 'practice_license'
+                )
 
         # Create verification request with is_new_doctor=True
         verification_request = VerificationRequest(
