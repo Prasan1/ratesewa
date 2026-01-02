@@ -91,10 +91,12 @@
 
                 <!-- Featured Image -->
                 {% if article.featured_image %}
-                <img src="{{ article.featured_image }}"
+                <img src="{{ url_for('static', filename='img/' + article.featured_image) }}"
                      class="img-fluid rounded mb-4 w-100"
                      alt="{{ article.title }}"
                      loading="lazy"
+                     width="900"
+                     height="600"
                      style="max-height: 500px; object-fit: cover;">
                 {% endif %}
 
