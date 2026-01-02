@@ -28,8 +28,8 @@ SUBSCRIPTION_TIERS = {
     },
     'premium': {
         'name': 'Premium',
-        'price_usd': 22,  # ~NPR 2,999 at 135 NPR/USD
-        'price_npr': 2999,
+        'price_usd': 15,  # ~NPR 1,999 at 135 NPR/USD
+        'price_npr': 1999,
         'stripe_price_id': 'price_premium_monthly',  # Will be set from Stripe Dashboard
         'features': [
             'All Free features',
@@ -44,8 +44,8 @@ SUBSCRIPTION_TIERS = {
     },
     'featured': {
         'name': 'Featured Premium',
-        'price_usd': 37,  # ~NPR 4,999 at 135 NPR/USD
-        'price_npr': 4999,
+        'price_usd': 22,  # ~NPR 2,999 at 135 NPR/USD
+        'price_npr': 2999,
         'stripe_price_id': 'price_featured_monthly',  # Will be set from Stripe Dashboard
         'features': [
             'All Premium features',
