@@ -391,6 +391,29 @@ def pricing():
 @app.route('/claim-profile', methods=['GET'])
 def claim_profile():
     """Search for unclaimed doctor profiles"""
+    # If user is already a verified doctor, redirect to dashboard
+    if session.get('role') == 'doctor':
+        flash('You already have a verified doctor profile.', 'info')
+        return redirect(url_for('doctor_dashboard'))
+
+    # Check if user has any verification request
+    user_id = session.get('user_id')
+    if user_id:
+        existing_request = VerificationRequest.query.filter_by(
+            user_id=user_id
+        ).order_by(VerificationRequest.created_at.desc()).first()
+
+        if existing_request:
+            if existing_request.status == 'pending':
+                flash('You already have a pending verification request. Please wait for admin review.', 'info')
+                return redirect(url_for('verification_submitted'))
+            elif existing_request.status == 'approved':
+                flash('Your doctor profile is already verified.', 'success')
+                return redirect(url_for('doctor_dashboard'))
+            elif existing_request.status == 'rejected':
+                # Allow searching/claiming but show warning
+                flash(f'Your previous request was rejected: {existing_request.admin_notes}. You can submit a new request below.', 'warning')
+
     search_query = request.args.get('search', '').strip()
     unclaimed_doctors = []
 
@@ -418,16 +441,20 @@ def claim_profile_form(doctor_id):
         flash('This profile has already been claimed.', 'warning')
         return redirect(url_for('claim_profile'))
 
-    # Check if user already has a pending verification request for this doctor
+    # Check if user already has ANY pending or approved verification request
+    user_id = session['user_id']
     existing_request = VerificationRequest.query.filter_by(
-        doctor_id=doctor_id,
-        user_id=session['user_id'],
-        status='pending'
-    ).first()
+        user_id=user_id
+    ).order_by(VerificationRequest.created_at.desc()).first()
 
     if existing_request:
-        flash('You already have a pending verification request. Please wait for admin review.', 'info')
-        return redirect(url_for('verification_submitted'))
+        if existing_request.status == 'pending':
+            flash('You already have a pending verification request. Please wait for admin review.', 'info')
+            return redirect(url_for('verification_submitted'))
+        elif existing_request.status == 'approved':
+            flash('Your doctor profile is already verified.', 'success')
+            return redirect(url_for('doctor_dashboard'))
+        # If rejected, allow them to claim a different profile
 
     # Get all cities for the dropdown
     cities = City.query.order_by(City.name).all()
@@ -448,6 +475,16 @@ def claim_profile_submit(doctor_id):
     if doctor.user_account:
         flash('This profile has already been claimed.', 'warning')
         return redirect(url_for('claim_profile'))
+
+    # Check if user already has a pending or approved verification request
+    user_id = session['user_id']
+    existing_request = VerificationRequest.query.filter_by(
+        user_id=user_id
+    ).order_by(VerificationRequest.created_at.desc()).first()
+
+    if existing_request and existing_request.status in ['pending', 'approved']:
+        flash('You already have a verification request. Cannot submit another.', 'danger')
+        return redirect(url_for('user_profile'))
 
     try:
         # Get form data
@@ -575,6 +612,30 @@ def claim_profile_submit(doctor_id):
 @login_required
 def doctor_self_register():
     """Show self-registration form for doctors not in the database"""
+    # If user is already a verified doctor, redirect to dashboard
+    if session.get('role') == 'doctor':
+        flash('You already have a verified doctor profile.', 'info')
+        return redirect(url_for('doctor_dashboard'))
+
+    # Check if user has any verification request
+    user_id = session.get('user_id')
+    if user_id:
+        existing_request = VerificationRequest.query.filter_by(
+            user_id=user_id
+        ).order_by(VerificationRequest.created_at.desc()).first()
+
+        if existing_request:
+            if existing_request.status == 'pending':
+                flash('You already have a pending verification request. Please wait for admin review.', 'info')
+                return redirect(url_for('verification_submitted'))
+            elif existing_request.status == 'approved':
+                # User is approved but session might not be updated
+                flash('Your doctor profile is already verified.', 'success')
+                return redirect(url_for('doctor_dashboard'))
+            elif existing_request.status == 'rejected':
+                # Allow resubmission but show message
+                flash(f'Your previous request was rejected: {existing_request.admin_notes}. You can submit a new request below.', 'warning')
+
     cities = City.query.order_by(City.name).all()
     specialties = Specialty.query.order_by(Specialty.name).all()
     return render_template('doctor_self_register.html', cities=cities, specialties=specialties)
@@ -584,6 +645,16 @@ def doctor_self_register():
 @login_required
 def doctor_self_register_submit():
     """Process doctor self-registration submission"""
+    # Check if user already has a pending or approved verification request
+    user_id = session['user_id']
+    existing_request = VerificationRequest.query.filter_by(
+        user_id=user_id
+    ).order_by(VerificationRequest.created_at.desc()).first()
+
+    if existing_request and existing_request.status in ['pending', 'approved']:
+        flash('You already have a verification request. Cannot submit another.', 'danger')
+        return redirect(url_for('user_profile'))
+
     try:
         # Get form data - all fields are mandatory
         name = request.form.get('name', '').strip()
