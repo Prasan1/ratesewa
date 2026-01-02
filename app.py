@@ -166,6 +166,7 @@ def register():
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
+        is_doctor = request.form.get('is_doctor') == '1'
 
         if not name or not email or not password:
             flash('All fields are required.', 'danger')
@@ -184,8 +185,22 @@ def register():
         try:
             db.session.add(user)
             db.session.commit()
-            flash('Registration successful! Please log in.', 'success')
-            return redirect(url_for('login'))
+
+            # If user indicated they're a doctor, auto-login and redirect to claim profile
+            if is_doctor:
+                # Auto-login the user
+                session['user_id'] = user.id
+                session['user_name'] = user.name
+                session['user_email'] = user.email
+                session['is_admin'] = user.is_admin
+                session['role'] = user.role
+
+                flash('Account created! Now let\'s set up your doctor profile.', 'success')
+                return redirect(url_for('claim_profile'))
+            else:
+                flash('Registration successful! Please log in.', 'success')
+                return redirect(url_for('login'))
+
         except Exception as e:
             db.session.rollback()
             flash('An error occurred during registration.', 'danger')
