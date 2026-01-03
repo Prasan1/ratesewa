@@ -2399,7 +2399,16 @@ def doctor_profile(slug):
             analytics = DoctorAnalytics(
                 doctor_id=doctor.id,
                 date=today,
-                profile_views=1
+                profile_views=1,
+                search_appearances=0,
+                search_clicks=0,
+                phone_clicks=0,
+                website_clicks=0,
+                review_button_clicks=0,
+                source_search=0,
+                source_homepage=0,
+                source_google=0,
+                source_direct=0
             )
             db.session.add(analytics)
         else:
@@ -2408,16 +2417,16 @@ def doctor_profile(slug):
         # Track source
         referrer = request.referrer or ''
         if 'doctors?city' in referrer or 'doctors?specialty' in referrer or 'doctors?' in referrer:
-            analytics.source_search += 1
+            analytics.source_search = (analytics.source_search or 0) + 1
         elif 'google' in referrer.lower():
-            analytics.source_google += 1
+            analytics.source_google = (analytics.source_google or 0) + 1
         elif referrer == '' or 'ranksewa.com' not in referrer:
-            analytics.source_direct += 1
+            analytics.source_direct = (analytics.source_direct or 0) + 1
         elif referrer and 'ranksewa.com' in referrer:
             if 'index' in referrer or referrer.endswith('/'):
-                analytics.source_homepage += 1
+                analytics.source_homepage = (analytics.source_homepage or 0) + 1
             else:
-                analytics.source_direct += 1
+                analytics.source_direct = (analytics.source_direct or 0) + 1
 
         db.session.commit()
 
