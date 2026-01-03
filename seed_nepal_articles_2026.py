@@ -205,7 +205,7 @@ def seed_nepal_articles():
 
 <p><em>Remember: Clean air is a right, not a privilege. While we work toward systemic solutions, protect your health with the tools available today.</em></p>
 """,
-                'featured_image': 'kathmandu-pollution.jpg',
+                'featured_image': '/static/img/kathmandu-pollution.jpg',
                 'meta_description': 'Living in Kathmandu? Learn how air pollution affects your lungs and practical steps to protect your respiratory health. Nepal-specific air quality guidance.',
                 'meta_keywords': 'Kathmandu air pollution, lung health Nepal, AQI Kathmandu, air quality Nepal, respiratory health, PM2.5 Nepal, pollution mask Nepal',
                 'related_specialty_id': pulmonologist.id if pulmonologist else None,
@@ -468,7 +468,7 @@ def seed_nepal_articles():
 
 <p><em>Dengue is serious but manageable with early detection and proper care. Stay vigilant during monsoon, eliminate breeding sites, and seek prompt medical attention for fever. Together, we can reduce dengue's impact in Nepal.</em></p>
 """,
-                'featured_image': 'dengue-mosquito-nepal.jpg',
+                'featured_image': '/static/img/dengue-mosquito-nepal.jpg',
                 'meta_description': 'Dengue cases surge during Nepal\'s monsoon. Learn symptoms, when to seek care, prevention tips, and testing options in Kathmandu. Essential guide for Nepal residents.',
                 'meta_keywords': 'dengue Nepal, dengue symptoms, dengue test Kathmandu, monsoon diseases Nepal, dengue fever treatment, mosquito prevention Nepal, dengue hospital Nepal',
                 'related_specialty_id': general.id if general else None,
@@ -816,7 +816,7 @@ def seed_nepal_articles():
 
 <p><em>Pregnancy is a beautiful journey, and you don't have to navigate it alone. Whether you choose government or private care, the most important thing is that you and your baby receive safe, respectful, evidence-based care. Trust your instincts, ask questions, and embrace this incredible time in your life. Welcome to motherhood!</em></p>
 """,
-                'featured_image': 'pregnancy-care-nepal.jpg',
+                'featured_image': '/static/img/pregnancy-care-nepal.jpg',
                 'meta_description': 'Complete pregnancy care guide for Nepal: ANC schedule, tests, nutrition, hospital choices, costs in Kathmandu. Essential information for expecting mothers.',
                 'meta_keywords': 'pregnancy Nepal, prenatal care Kathmandu, pregnancy cost Nepal, delivery hospital Kathmandu, pregnancy tests Nepal, obstetrician Nepal, antenatal care',
                 'related_specialty_id': obgyn.id if obgyn else None,
@@ -830,6 +830,10 @@ def seed_nepal_articles():
         # Create articles
         created_count = 0
         for article_data in articles_data:
+            meta_description = article_data.get('meta_description')
+            if meta_description and len(meta_description) > 160:
+                article_data['meta_description'] = meta_description[:157].rstrip() + "..."
+
             # Check if article already exists
             existing = Article.query.filter_by(slug=article_data['slug']).first()
             if existing:
