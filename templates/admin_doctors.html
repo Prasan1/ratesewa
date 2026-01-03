@@ -34,6 +34,7 @@
                 <th>Name</th>
                 <th>Specialty</th>
                 <th>City</th>
+                <th>Clinic</th>
                 <th>Featured</th>
                 <th>Verified</th>
                 <th>Status</th>
@@ -49,6 +50,7 @@
                 </td>
                 <td>{{ doctor.specialty.name }}</td>
                 <td>{{ doctor.city.name }}</td>
+                <td>{{ doctor.clinic.name if doctor.clinic else '—' }}</td>
                 <td>
                     {% if doctor.is_featured %}
                         <span class="badge bg-success">Featured</span>

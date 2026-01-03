@@ -36,6 +36,12 @@
                 {% endif %}
                 <p class="card-text text-muted">{{ doctor.specialty.name }}</p>
                 <p class="card-text"><i class="fas fa-map-marker-alt me-2"></i>{{ doctor.city.name }}</p>
+                {% if doctor.clinic %}
+                <p class="card-text text-muted">
+                    <i class="fas fa-hospital me-2"></i>
+                    <a href="{{ url_for('clinic_profile', slug=doctor.clinic.slug) }}" class="text-muted text-decoration-none">{{ doctor.clinic.name }}</a>
+                </p>
+                {% endif %}
                 
                 <div class="mb-3">
                     <div class="rating mb-2">

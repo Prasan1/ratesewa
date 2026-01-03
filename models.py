@@ -32,6 +32,25 @@ class Specialty(db.Model):
         return f'<Specialty {self.name}>'
 
 
+class Clinic(db.Model):
+    __tablename__ = 'clinics'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    slug = db.Column(db.String(250), unique=True, nullable=False, index=True)
+    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
+    address = db.Column(db.Text, nullable=True)
+    phone_number = db.Column(db.String(20), nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    is_featured = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=True)
+
+    doctors = db.relationship('Doctor', backref='clinic', lazy=True)
+
+    def __repr__(self):
+        return f'<Clinic {self.name}>'
+
+
 class Doctor(db.Model):
     __tablename__ = 'doctors'
 
@@ -40,6 +59,7 @@ class Doctor(db.Model):
     slug = db.Column(db.String(250), unique=True, nullable=False, index=True)
     city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
     specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=False)
+    clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'), nullable=True)
     experience = db.Column(db.Integer)
     education = db.Column(db.Text)  # Educational qualifications (e.g., "MBBS, MD")
     college = db.Column(db.Text)  # Where they studied (e.g., "Tribhuvan University")
@@ -70,6 +90,7 @@ class Doctor(db.Model):
     contact_messages = db.relationship('ContactMessage', backref='doctor', lazy=True)
     verification_requests = db.relationship('VerificationRequest', backref='doctor', lazy=True)
     review_responses = db.relationship('DoctorResponse', backref='doctor', lazy=True)
+    clinic_managers = db.relationship('ClinicManagerDoctor', backref='doctor', lazy=True)
 
     @property
     def avg_rating(self):
@@ -112,6 +133,8 @@ class User(db.Model):
     verification_requests = db.relationship('VerificationRequest', foreign_keys='VerificationRequest.user_id', backref='user', lazy=True)
     badges = db.relationship('UserBadge', backref='user', lazy=True)
     helpful_votes = db.relationship('ReviewHelpful', backref='user', lazy=True)
+    managed_doctors = db.relationship('ClinicManagerDoctor', backref='manager', lazy=True, foreign_keys='ClinicManagerDoctor.manager_user_id')
+    clinic_accounts = db.relationship('ClinicAccount', backref='manager', lazy=True, foreign_keys='ClinicAccount.manager_user_id')
 
     def set_password(self, password):
         """Hash and set the user's password"""
@@ -159,6 +182,33 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.email}>'
+
+
+class ClinicManagerDoctor(db.Model):
+    __tablename__ = 'clinic_manager_doctors'
+
+    id = db.Column(db.Integer, primary_key=True)
+    manager_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<ClinicManagerDoctor manager={self.manager_user_id} doctor={self.doctor_id}>'
+
+
+class ClinicAccount(db.Model):
+    __tablename__ = 'clinic_accounts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    manager_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    name = db.Column(db.String(200), nullable=True)
+    subscription_tier = db.Column(db.String(50), default='clinic_starter')
+    max_doctors = db.Column(db.Integer, default=3)
+    subscription_expires_at = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<ClinicAccount manager={self.manager_user_id} tier={self.subscription_tier}>'
 
 
 class Rating(db.Model):

@@ -88,7 +88,15 @@
                         </div>
                         <div class="col-md-3 order-1 order-md-2">
                             <a href="{{ url_for('article_detail', slug=article.slug) }}" class="digest-thumb">
-                                <img src="{{ article.featured_image if article.featured_image else 'https://picsum.photos/seed/article' + article.id|string + '/400/300' }}"
+                                {% if article.featured_image %}
+                                    {% if article.featured_image.startswith('/static/') or article.featured_image.startswith('http') %}
+                                        <img src="{{ article.featured_image }}"
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename='img/' + article.featured_image) }}"
+                                    {% endif %}
+                                {% else %}
+                                    <img src="https://picsum.photos/seed/article{{ article.id }}/400/300"
+                                {% endif %}
                                      alt="{{ article.title }}"
                                      loading="lazy"
                                      width="400"

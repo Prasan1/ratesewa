@@ -1,12 +1,13 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
 from sqlalchemy.orm import joinedload
+from sqlalchemy import or_
 import re
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from authlib.integrations.flask_client import OAuth
-from models import db, City, Specialty, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag, BadgeDefinition, UserBadge, ReviewHelpful, Article, ArticleCategory
+from models import db, City, Specialty, Clinic, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag, BadgeDefinition, UserBadge, ReviewHelpful, Article, ArticleCategory, ClinicManagerDoctor, ClinicAccount
 from config import Config
 import ad_manager
 import upload_utils
@@ -127,6 +128,164 @@ def doctor_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+def clinic_manager_required(f):
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Please log in first.', 'warning')
+            return redirect(url_for('login'))
+        user = User.query.get(session['user_id'])
+        if not user or not user.is_active:
+            session.clear()
+            flash('Your account has been deactivated. Please contact support.', 'danger')
+            return redirect(url_for('login'))
+        if user.role != 'clinic_manager':
+            flash('Clinic manager access required.', 'warning')
+            return redirect(url_for('clinic_manager_dashboard'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def build_doctor_analytics_context(doctor):
+    """Build analytics context for doctor or clinic manager views."""
+    tier_order = ['free', 'premium', 'featured']
+    effective_tier = doctor.subscription_tier or 'free'
+    promo_tier = promo_config.get_promotional_tier()
+    if promo_tier in tier_order:
+        promo_index = tier_order.index(promo_tier)
+        current_index = tier_order.index(effective_tier) if effective_tier in tier_order else 0
+        if promo_index > current_index:
+            effective_tier = promo_tier
+    has_enhanced_analytics = effective_tier == 'featured'
+
+    ratings = doctor.ratings
+    review_count = len(ratings)
+    avg_rating = doctor.avg_rating
+    now = datetime.utcnow()
+    last_30_days = now - timedelta(days=30)
+    last_90_days = now - timedelta(days=90)
+
+    recent_reviews = sorted(
+        [r for r in ratings if r.created_at],
+        key=lambda r: r.created_at,
+        reverse=True
+    )
+    reviews_last_30 = [r for r in recent_reviews if r.created_at >= last_30_days]
+    reviews_prev_30 = [
+        r for r in recent_reviews
+        if r.created_at < last_30_days and r.created_at >= (last_30_days - timedelta(days=30))
+    ]
+    avg_rating_last_90 = 0.0
+    if recent_reviews:
+        ratings_last_90 = [r.rating for r in recent_reviews if r.created_at >= last_90_days]
+        if ratings_last_90:
+            avg_rating_last_90 = sum(ratings_last_90) / len(ratings_last_90)
+
+    response_count = DoctorResponse.query.filter_by(doctor_id=doctor.id).count()
+    response_rate = (response_count / review_count * 100) if review_count > 0 else 0
+    responded_reviews = [r for r in recent_reviews if r.doctor_response]
+    average_response_hours = None
+    if responded_reviews:
+        total_seconds = 0
+        for r in responded_reviews:
+            delta = r.doctor_response.created_at - r.created_at
+            total_seconds += max(delta.total_seconds(), 0)
+        average_response_hours = total_seconds / len(responded_reviews) / 3600
+    unanswered_reviews = [r for r in recent_reviews if not r.doctor_response][:3]
+
+    response_speed = None
+    if has_enhanced_analytics and responded_reviews:
+        within_24 = 0
+        within_72 = 0
+        over_72 = 0
+        for r in responded_reviews:
+            delta_hours = max((r.doctor_response.created_at - r.created_at).total_seconds() / 3600, 0)
+            if delta_hours <= 24:
+                within_24 += 1
+            elif delta_hours <= 72:
+                within_72 += 1
+            else:
+                over_72 += 1
+        total_responded = len(responded_reviews)
+        response_speed = {
+            'within_24': within_24,
+            'within_72': within_72,
+            'over_72': over_72,
+            'within_24_pct': (within_24 / total_responded * 100) if total_responded else 0,
+            'within_72_pct': (within_72 / total_responded * 100) if total_responded else 0,
+            'over_72_pct': (over_72 / total_responded * 100) if total_responded else 0
+        }
+
+    rating_trend_delta = None
+    ratings_prev_90 = [r.rating for r in recent_reviews if r.created_at < last_90_days and r.created_at >= (last_90_days - timedelta(days=90))]
+    if ratings_prev_90 and avg_rating_last_90:
+        avg_prev_90 = sum(ratings_prev_90) / len(ratings_prev_90)
+        rating_trend_delta = avg_rating_last_90 - avg_prev_90
+
+    def month_start(dt, months_back):
+        month = dt.month - months_back
+        year = dt.year
+        while month <= 0:
+            month += 12
+            year -= 1
+        return datetime(year, month, 1)
+
+    review_trend = []
+    if has_enhanced_analytics:
+        for i in range(5, -1, -1):
+            start = month_start(now, i)
+            end = month_start(now, i - 1) if i > 0 else datetime(now.year, now.month, 1) + timedelta(days=32)
+            end = datetime(end.year, end.month, 1)
+            month_reviews = [r for r in recent_reviews if r.created_at >= start and r.created_at < end]
+            month_avg = sum(r.rating for r in month_reviews) / len(month_reviews) if month_reviews else 0
+            review_trend.append({
+                'label': start.strftime('%b %Y'),
+                'count': len(month_reviews),
+                'avg_rating': month_avg
+            })
+
+    profile_fields = [
+        ('photo', bool(doctor.photo_url)),
+        ('bio', bool(doctor.description)),
+        ('education', bool(doctor.education)),
+        ('workplace', bool(doctor.workplace)),
+        ('address', bool(doctor.practice_address)),
+        ('phone', bool(doctor.phone_number))
+    ]
+    profile_strength_pct = round(sum(1 for _, present in profile_fields if present) / len(profile_fields) * 100)
+    missing_profile_fields = [name for name, present in profile_fields if not present]
+
+    rating_breakdown = {
+        5: len([r for r in ratings if r.rating == 5]),
+        4: len([r for r in ratings if r.rating == 4]),
+        3: len([r for r in ratings if r.rating == 3]),
+        2: len([r for r in ratings if r.rating == 2]),
+        1: len([r for r in ratings if r.rating == 1])
+    }
+
+    return {
+        'review_count': review_count,
+        'avg_rating': avg_rating,
+        'response_count': response_count,
+        'response_rate': response_rate,
+        'rating_breakdown': rating_breakdown,
+        'reviews_last_30': reviews_last_30,
+        'reviews_prev_30': reviews_prev_30,
+        'avg_rating_last_90': avg_rating_last_90,
+        'rating_trend_delta': rating_trend_delta,
+        'average_response_hours': average_response_hours,
+        'response_speed': response_speed,
+        'unanswered_reviews': unanswered_reviews,
+        'recent_reviews': recent_reviews[:5],
+        'profile_strength_pct': profile_strength_pct,
+        'missing_profile_fields': missing_profile_fields,
+        'review_trend': review_trend,
+        'has_enhanced_analytics': has_enhanced_analytics,
+        'effective_tier': effective_tier
+    }
+
 # --- Helper Function for Slugs ---
 def generate_slug(name):
     """Generates a URL-friendly slug from a name."""
@@ -159,6 +318,18 @@ def generate_unique_slug(name, doctor_id=None):
         slug = f"{base_slug}-{counter}"
         counter += 1
 
+
+def generate_unique_clinic_slug(name, clinic_id=None):
+    base_slug = generate_slug(name)
+    slug = base_slug
+    counter = 2
+    while True:
+        existing = Clinic.query.filter_by(slug=slug).first()
+        if not existing or (clinic_id and existing.id == clinic_id):
+            return slug
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+
 # --- Authentication Routes ---
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -167,9 +338,13 @@ def register():
         email = request.form['email']
         password = request.form['password']
         is_doctor = request.form.get('is_doctor') == '1'
+        is_clinic_manager = request.form.get('is_clinic_manager') == '1'
 
         if not name or not email or not password:
             flash('All fields are required.', 'danger')
+            return redirect(url_for('register'))
+        if is_doctor and is_clinic_manager:
+            flash('Please select either doctor or clinic manager, not both.', 'danger')
             return redirect(url_for('register'))
 
         # Check if email already exists
@@ -181,6 +356,10 @@ def register():
         # Create new user
         user = User(name=name, email=email)
         user.set_password(password)
+        if is_clinic_manager:
+            user.role = 'clinic_manager'
+        if is_doctor or is_clinic_manager:
+            user.is_active = False
 
         try:
             db.session.add(user)
@@ -188,15 +367,11 @@ def register():
 
             # If user indicated they're a doctor, auto-login and redirect to claim profile
             if is_doctor:
-                # Auto-login the user
-                session['user_id'] = user.id
-                session['user_name'] = user.name
-                session['user_email'] = user.email
-                session['is_admin'] = user.is_admin
-                session['role'] = user.role
-
-                flash('Account created! Now let\'s set up your doctor profile.', 'success')
-                return redirect(url_for('claim_profile'))
+                flash('Registration received. Please wait for admin approval before logging in.', 'info')
+                return redirect(url_for('login'))
+            if is_clinic_manager:
+                flash('Registration received. Please wait for admin approval before logging in.', 'info')
+                return redirect(url_for('login'))
             else:
                 flash('Registration successful! Please log in.', 'success')
                 return redirect(url_for('login'))
@@ -218,7 +393,7 @@ def login():
 
         if user and user.check_password(password):
             if not user.is_active:
-                flash('Your account has been deactivated. Please contact support.', 'danger')
+                flash('Your account is not active yet. Please wait for admin approval.', 'warning')
                 return redirect(url_for('login'))
             if is_admin_email(user.email) and not user.is_admin:
                 user.is_admin = True
@@ -1223,6 +1398,9 @@ def index():
     total_cities = City.query.count()
     total_reviews = Rating.query.count()
     verified_doctors = Doctor.query.filter_by(is_verified=True, is_active=True).count()
+    featured_clinics = Clinic.query.filter_by(is_active=True)\
+        .order_by(Clinic.is_featured.desc(), Clinic.name.asc())\
+        .limit(6).all()
 
     return render_template('index.html',
                          cities=cities,
@@ -1230,7 +1408,8 @@ def index():
                          total_doctors=total_doctors,
                          total_cities=total_cities,
                          total_reviews=total_reviews,
-                         verified_doctors=verified_doctors)
+                         verified_doctors=verified_doctors,
+                         featured_clinics=featured_clinics)
 
 @app.route('/test-homepage')
 def test_homepage():
@@ -1243,6 +1422,9 @@ def test_homepage():
     total_cities = City.query.count()
     total_reviews = Rating.query.count()
     verified_doctors = Doctor.query.filter_by(is_verified=True, is_active=True).count()
+    featured_clinics = Clinic.query.filter_by(is_active=True)\
+        .order_by(Clinic.is_featured.desc(), Clinic.name.asc())\
+        .limit(6).all()
 
     return render_template('index_improved.html',
                          cities=cities,
@@ -1250,11 +1432,20 @@ def test_homepage():
                          total_doctors=total_doctors,
                          total_cities=total_cities,
                          total_reviews=total_reviews,
-                         verified_doctors=verified_doctors)
+                         verified_doctors=verified_doctors,
+                         featured_clinics=featured_clinics)
 
 @app.route('/clinics')
 def clinics():
-    return render_template('clinics.html')
+    clinics = Clinic.query.filter_by(is_active=True).order_by(Clinic.is_featured.desc(), Clinic.name.asc()).all()
+    return render_template('clinics.html', clinics=clinics)
+
+
+@app.route('/clinic/<slug>')
+def clinic_profile(slug):
+    clinic = Clinic.query.filter_by(slug=slug, is_active=True).first_or_404()
+    doctors = Doctor.query.filter_by(clinic_id=clinic.id, is_active=True).order_by(Doctor.name.asc()).all()
+    return render_template('clinic_profile.html', clinic=clinic, doctors=doctors)
 
 @app.route('/doctors')
 def get_doctors():
@@ -1272,8 +1463,13 @@ def get_doctors():
         query = query.filter(Doctor.specialty_id == int(specialty_id))
 
     if name_search:
-        # Search by name (case-insensitive partial match)
-        query = query.filter(Doctor.name.ilike(f'%{name_search}%'))
+        # Search by doctor or clinic name (case-insensitive partial match)
+        query = query.outerjoin(Clinic).filter(
+            or_(
+                Doctor.name.ilike(f'%{name_search}%'),
+                Clinic.name.ilike(f'%{name_search}%')
+            )
+        )
 
     # Order by is_featured first, then avg_rating, then name
     # Note: We'll sort by avg_rating in Python since it's a property
@@ -1305,6 +1501,8 @@ def get_doctors():
             'slug': d.slug,
             'city_id': d.city_id,
             'city_name': d.city.name,
+            'clinic_name': d.clinic.name if d.clinic else None,
+            'clinic_slug': d.clinic.slug if d.clinic else None,
             'specialty_id': d.specialty_id,
             'specialty_name': d.specialty.name,
             'experience': d.experience,
@@ -1323,7 +1521,7 @@ def get_doctors():
 @app.route('/admin/doctors')
 @admin_required
 def admin_doctors():
-    query = Doctor.query.options(joinedload(Doctor.city), joinedload(Doctor.specialty))
+    query = Doctor.query.options(joinedload(Doctor.city), joinedload(Doctor.specialty), joinedload(Doctor.clinic))
     search = request.args.get('q', '').strip()
     if search:
         query = query.filter(Doctor.name.ilike(f"%{search}%"))
@@ -1335,10 +1533,12 @@ def admin_doctors():
 def admin_doctor_new():
     cities = City.query.order_by(City.name.asc()).all()
     specialties = Specialty.query.order_by(Specialty.name.asc()).all()
+    clinics = Clinic.query.order_by(Clinic.name.asc()).all()
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         city_id = request.form.get('city_id')
         specialty_id = request.form.get('specialty_id')
+        clinic_id = request.form.get('clinic_id') or None
         experience_raw = request.form.get('experience', '').strip()
         education = request.form.get('education', '').strip()
         college = request.form.get('college', '').strip()
@@ -1349,7 +1549,7 @@ def admin_doctor_new():
 
         if not name or not city_id or not specialty_id:
             flash('Name, city, and specialty are required.', 'danger')
-            return render_template('admin_doctor_form.html', doctor=None, cities=cities, specialties=specialties)
+            return render_template('admin_doctor_form.html', doctor=None, cities=cities, specialties=specialties, clinics=clinics)
 
         experience = int(experience_raw) if experience_raw.isdigit() else None
         slug = generate_unique_slug(name)
@@ -1359,6 +1559,7 @@ def admin_doctor_new():
             slug=slug,
             city_id=int(city_id),
             specialty_id=int(specialty_id),
+            clinic_id=int(clinic_id) if clinic_id else None,
             experience=experience,
             education=education or None,
             college=college or None,
@@ -1389,7 +1590,7 @@ def admin_doctor_new():
         flash('Doctor added successfully.', 'success')
         return redirect(url_for('admin_doctors'))
 
-    return render_template('admin_doctor_form.html', doctor=None, cities=cities, specialties=specialties)
+    return render_template('admin_doctor_form.html', doctor=None, cities=cities, specialties=specialties, clinics=clinics)
 
 @app.route('/admin/doctors/<int:doctor_id>/edit', methods=['GET', 'POST'])
 @admin_required
@@ -1397,11 +1598,13 @@ def admin_doctor_edit(doctor_id):
     doctor = Doctor.query.get_or_404(doctor_id)
     cities = City.query.order_by(City.name.asc()).all()
     specialties = Specialty.query.order_by(Specialty.name.asc()).all()
+    clinics = Clinic.query.order_by(Clinic.name.asc()).all()
 
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         city_id = request.form.get('city_id')
         specialty_id = request.form.get('specialty_id')
+        clinic_id = request.form.get('clinic_id') or None
         experience_raw = request.form.get('experience', '').strip()
         education = request.form.get('education', '').strip()
         college = request.form.get('college', '').strip()
@@ -1412,7 +1615,7 @@ def admin_doctor_edit(doctor_id):
 
         if not name or not city_id or not specialty_id:
             flash('Name, city, and specialty are required.', 'danger')
-            return render_template('admin_doctor_form.html', doctor=doctor, cities=cities, specialties=specialties)
+            return render_template('admin_doctor_form.html', doctor=doctor, cities=cities, specialties=specialties, clinics=clinics)
 
         if name != doctor.name:
             doctor.slug = generate_unique_slug(name, doctor_id=doctor.id)
@@ -1420,6 +1623,7 @@ def admin_doctor_edit(doctor_id):
         doctor.name = name
         doctor.city_id = int(city_id)
         doctor.specialty_id = int(specialty_id)
+        doctor.clinic_id = int(clinic_id) if clinic_id else None
         doctor.experience = int(experience_raw) if experience_raw.isdigit() else None
         doctor.education = education or None
         doctor.college = college or None
@@ -1455,7 +1659,7 @@ def admin_doctor_edit(doctor_id):
         flash('Doctor updated successfully.', 'success')
         return redirect(url_for('admin_doctors'))
 
-    return render_template('admin_doctor_form.html', doctor=doctor, cities=cities, specialties=specialties)
+    return render_template('admin_doctor_form.html', doctor=doctor, cities=cities, specialties=specialties, clinics=clinics)
 
 @app.route('/admin/doctors/<int:doctor_id>/status', methods=['POST'])
 @admin_required
@@ -1475,6 +1679,99 @@ def admin_doctor_status(doctor_id):
 def admin_cities():
     cities = City.query.order_by(City.name.asc()).all()
     return render_template('admin_cities.html', cities=cities)
+
+
+@app.route('/admin/clinics')
+@admin_required
+def admin_clinics():
+    clinics = Clinic.query.options(joinedload(Clinic.city)).order_by(Clinic.name.asc()).all()
+    return render_template('admin_clinics.html', clinics=clinics)
+
+
+@app.route('/admin/clinics/new', methods=['GET', 'POST'])
+@admin_required
+def admin_clinic_new():
+    cities = City.query.order_by(City.name.asc()).all()
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        city_id = request.form.get('city_id')
+        address = request.form.get('address', '').strip()
+        phone_number = request.form.get('phone_number', '').strip()
+        description = request.form.get('description', '').strip()
+        is_featured = bool(request.form.get('is_featured'))
+        is_active = bool(request.form.get('is_active'))
+
+        if not name or not city_id:
+            flash('Clinic name and city are required.', 'danger')
+            return render_template('admin_clinic_form.html', clinic=None, cities=cities)
+
+        slug = generate_unique_clinic_slug(name)
+        clinic = Clinic(
+            name=name,
+            slug=slug,
+            city_id=int(city_id),
+            address=address or None,
+            phone_number=phone_number or None,
+            description=description or None,
+            is_featured=is_featured,
+            is_active=is_active
+        )
+        db.session.add(clinic)
+        db.session.commit()
+        flash('Clinic added successfully.', 'success')
+        return redirect(url_for('admin_clinics'))
+
+    return render_template('admin_clinic_form.html', clinic=None, cities=cities)
+
+
+@app.route('/admin/clinics/<int:clinic_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def admin_clinic_edit(clinic_id):
+    clinic = Clinic.query.get_or_404(clinic_id)
+    cities = City.query.order_by(City.name.asc()).all()
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        city_id = request.form.get('city_id')
+        address = request.form.get('address', '').strip()
+        phone_number = request.form.get('phone_number', '').strip()
+        description = request.form.get('description', '').strip()
+        is_featured = bool(request.form.get('is_featured'))
+        is_active = bool(request.form.get('is_active'))
+
+        if not name or not city_id:
+            flash('Clinic name and city are required.', 'danger')
+            return render_template('admin_clinic_form.html', clinic=clinic, cities=cities)
+
+        if name != clinic.name:
+            clinic.slug = generate_unique_clinic_slug(name, clinic_id=clinic.id)
+
+        clinic.name = name
+        clinic.city_id = int(city_id)
+        clinic.address = address or None
+        clinic.phone_number = phone_number or None
+        clinic.description = description or None
+        clinic.is_featured = is_featured
+        clinic.is_active = is_active
+
+        db.session.commit()
+        flash('Clinic updated successfully.', 'success')
+        return redirect(url_for('admin_clinics'))
+
+    return render_template('admin_clinic_form.html', clinic=clinic, cities=cities)
+
+
+@app.route('/admin/clinics/<int:clinic_id>/delete', methods=['POST'])
+@admin_required
+def admin_clinic_delete(clinic_id):
+    clinic = Clinic.query.get_or_404(clinic_id)
+    if Doctor.query.filter_by(clinic_id=clinic.id).count() > 0:
+        flash('Clinic cannot be deleted while doctors are assigned.', 'warning')
+        return redirect(url_for('admin_clinics'))
+
+    db.session.delete(clinic)
+    db.session.commit()
+    flash('Clinic deleted successfully.', 'success')
+    return redirect(url_for('admin_clinics'))
 
 @app.route('/admin/cities/new', methods=['GET', 'POST'])
 @admin_required
@@ -2729,31 +3026,116 @@ def doctor_analytics():
     user = User.query.get(session['user_id'])
     doctor = user.doctor_profile
 
-    # Get review statistics
-    ratings = doctor.ratings
-    review_count = len(ratings)
-    avg_rating = doctor.avg_rating
-
-    # Response statistics
-    response_count = DoctorResponse.query.filter_by(doctor_id=doctor.id).count()
-    response_rate = (response_count / review_count * 100) if review_count > 0 else 0
-
-    # Rating breakdown
-    rating_breakdown = {
-        5: len([r for r in ratings if r.rating == 5]),
-        4: len([r for r in ratings if r.rating == 4]),
-        3: len([r for r in ratings if r.rating == 3]),
-        2: len([r for r in ratings if r.rating == 2]),
-        1: len([r for r in ratings if r.rating == 1])
-    }
+    analytics_context = build_doctor_analytics_context(doctor)
 
     return render_template('doctor_analytics.html',
                          doctor=doctor,
-                         review_count=review_count,
-                         avg_rating=avg_rating,
-                         response_count=response_count,
-                         response_rate=response_rate,
-                         rating_breakdown=rating_breakdown)
+                         viewer_role='doctor',
+                         **analytics_context)
+
+
+@app.route('/clinic/manager')
+@login_required
+def clinic_manager_dashboard():
+    """Clinic manager dashboard for managing doctor profiles"""
+    user = User.query.get(session['user_id'])
+    if user.role != 'clinic_manager':
+        return render_template('clinic_manager_start.html', user=user)
+
+    clinic_account = ClinicAccount.query.filter_by(manager_user_id=user.id).first()
+    if not clinic_account:
+        tier_info = subscription_config.get_clinic_tier_info('clinic_starter')
+        clinic_account = ClinicAccount(
+            manager_user_id=user.id,
+            subscription_tier='clinic_starter',
+            max_doctors=tier_info['max_doctors']
+        )
+        db.session.add(clinic_account)
+        db.session.commit()
+
+    search_query = request.args.get('search', '').strip()
+    search_results = []
+    if search_query:
+        search_results = Doctor.query.filter(
+            Doctor.name.ilike(f'%{search_query}%'),
+            Doctor.is_active == True
+        ).all()
+
+    managed_links = ClinicManagerDoctor.query.filter_by(manager_user_id=user.id).all()
+
+    return render_template('clinic_manager_dashboard.html',
+                         user=user,
+                         clinic_account=clinic_account,
+                         managed_links=managed_links,
+                         search_query=search_query,
+                         search_results=search_results)
+
+
+@app.route('/clinic/manager/activate', methods=['POST'])
+@login_required
+def clinic_manager_activate():
+    user = User.query.get(session['user_id'])
+    if user.role == 'doctor':
+        flash('Your account is already a doctor profile. Please use the doctor dashboard.', 'warning')
+        return redirect(url_for('doctor_dashboard'))
+    if user.role != 'clinic_manager':
+        user.role = 'clinic_manager'
+        user.is_active = False
+        db.session.commit()
+        session.clear()
+        flash('Clinic manager request submitted. Please wait for admin approval.', 'info')
+        return redirect(url_for('login'))
+    return redirect(url_for('clinic_manager_dashboard'))
+
+
+@app.route('/clinic/manager/add/<int:doctor_id>', methods=['POST'])
+@clinic_manager_required
+def clinic_manager_add_doctor(doctor_id):
+    user = User.query.get(session['user_id'])
+    doctor = Doctor.query.get_or_404(doctor_id)
+    clinic_account = ClinicAccount.query.filter_by(manager_user_id=user.id).first()
+    if clinic_account:
+        current_count = ClinicManagerDoctor.query.filter_by(manager_user_id=user.id).count()
+        if current_count >= clinic_account.max_doctors:
+            flash('Clinic plan limit reached. Please upgrade to add more doctors.', 'warning')
+            return redirect(url_for('clinic_manager_dashboard'))
+    existing = ClinicManagerDoctor.query.filter_by(manager_user_id=user.id, doctor_id=doctor.id).first()
+    if existing:
+        flash('This doctor is already managed by your account.', 'info')
+        return redirect(url_for('clinic_manager_dashboard'))
+    link = ClinicManagerDoctor(manager_user_id=user.id, doctor_id=doctor.id)
+    db.session.add(link)
+    db.session.commit()
+    flash(f'You are now managing {doctor.name}.', 'success')
+    return redirect(url_for('clinic_manager_dashboard'))
+
+
+@app.route('/clinic/manager/remove/<int:link_id>', methods=['POST'])
+@clinic_manager_required
+def clinic_manager_remove_doctor(link_id):
+    user = User.query.get(session['user_id'])
+    link = ClinicManagerDoctor.query.filter_by(id=link_id, manager_user_id=user.id).first_or_404()
+    doctor_name = link.doctor.name if link.doctor else 'this doctor'
+    db.session.delete(link)
+    db.session.commit()
+    flash(f'Stopped managing {doctor_name}.', 'info')
+    return redirect(url_for('clinic_manager_dashboard'))
+
+
+@app.route('/clinic/manager/analytics/<int:doctor_id>')
+@clinic_manager_required
+def clinic_manager_analytics(doctor_id):
+    user = User.query.get(session['user_id'])
+    link = ClinicManagerDoctor.query.filter_by(manager_user_id=user.id, doctor_id=doctor_id).first()
+    if not link:
+        flash('You do not have access to this doctor profile.', 'danger')
+        return redirect(url_for('clinic_manager_dashboard'))
+    doctor = Doctor.query.get_or_404(doctor_id)
+    analytics_context = build_doctor_analytics_context(doctor)
+    return render_template('doctor_analytics.html',
+                         doctor=doctor,
+                         viewer_role='clinic_manager',
+                         **analytics_context)
 
 
 @app.route('/doctor/delete-account', methods=['GET'])

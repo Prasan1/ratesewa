@@ -39,6 +39,15 @@
                     </select>
                 </div>
                 <div class="col-md-3">
+                    <label for="clinic_id" class="form-label">Clinic (optional)</label>
+                    <select class="form-select" id="clinic_id" name="clinic_id">
+                        <option value="" {% if not doctor or not doctor.clinic_id %}selected{% endif %}>No clinic</option>
+                        {% for clinic in clinics %}
+                        <option value="{{ clinic.id }}" {% if doctor and doctor.clinic_id == clinic.id %}selected{% endif %}>{{ clinic.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <label for="experience" class="form-label">Years of experience</label>
                     <input type="number" class="form-control" id="experience" name="experience" min="0" value="{{ doctor.experience if doctor and doctor.experience is not none else '' }}">
                 </div>
