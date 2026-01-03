@@ -562,6 +562,32 @@ def pricing():
     """Pricing page for doctors - shows promotional offer"""
     return render_template('pricing.html')
 
+@app.route('/sitemap.xml')
+def sitemap():
+    """Generate sitemap for Google Search Console"""
+    from sitemap import generate_sitemap
+    sitemap_xml = generate_sitemap(app, db)
+
+    response = make_response(sitemap_xml)
+    response.headers['Content-Type'] = 'application/xml'
+    return response
+
+@app.route('/robots.txt')
+def robots():
+    """Robots.txt for search engines"""
+    robots_txt = """User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /doctor/dashboard
+Disallow: /doctor/analytics
+
+Sitemap: https://ranksewa.com/sitemap.xml
+"""
+    response = make_response(robots_txt)
+    response.headers['Content-Type'] = 'text/plain'
+    return response
+
 @app.route('/health-digest')
 def health_digest():
     """Health digest article listing page"""

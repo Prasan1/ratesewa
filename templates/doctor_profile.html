@@ -1,14 +1,55 @@
 {% extends "base.html" %}
 
-{% block title %}{{ doctor.name }} - Doctor Profile{% endblock %}
+{% block title %}{{ doctor.name }} - {{ doctor.specialty.name }} in {{ doctor.city.name }}, Nepal | RankSewa{% endblock %}
+
+{% block head %}
+<!-- SEO Meta Tags -->
+<meta name="description" content="Dr. {{ doctor.name }}, {{ doctor.specialty.name }} in {{ doctor.city.name }}, Nepal. {{ doctor.experience }} years experience.{% if doctor.education %} {{ doctor.education }}.{% endif %}{% if doctor.avg_rating > 0 %} Rated {{ "%.1f"|format(doctor.avg_rating) }}/5 by {{ doctor.rating_count }} patients.{% endif %}{% if doctor.workplace %} Practices at {{ doctor.workplace }}.{% endif %}">
+
+<meta name="keywords" content="{{ doctor.name }}, {{ doctor.specialty.name }}, {{ doctor.city.name }}, Nepal doctor, {{ doctor.specialty.name }} {{ doctor.city.name }}, best {{ doctor.specialty.name }} Nepal{% if doctor.workplace %}, {{ doctor.workplace }}{% endif %}">
+
+<!-- Schema.org Markup for Google Rich Results -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Physician",
+  "name": "{{ doctor.name }}",
+  {% if doctor.photo_url %}
+  "image": "{{ request.url_root }}{{ doctor.photo_url }}",
+  {% endif %}
+  "address": {
+    "@type": "PostalAddress",
+    {% if doctor.practice_address %}
+    "streetAddress": "{{ doctor.practice_address }}",
+    {% endif %}
+    "addressLocality": "{{ doctor.city.name }}",
+    "addressCountry": "NP"
+  },
+  "medicalSpecialty": "{{ doctor.specialty.name }}",
+  {% if doctor.phone_number %}
+  "telephone": "{{ doctor.phone_number }}",
+  {% endif %}
+  {% if doctor.avg_rating > 0 %}
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ "%.1f"|format(doctor.avg_rating) }}",
+    "reviewCount": "{{ doctor.rating_count }}",
+    "bestRating": "5",
+    "worstRating": "1"
+  },
+  {% endif %}
+  "description": "{{ doctor.specialty.name }} with {{ doctor.experience }} years of experience{% if doctor.workplace %}, practicing at {{ doctor.workplace }}{% endif %}"
+}
+</script>
+{% endblock %}
 
 {% block og_type %}profile{% endblock %}
 {% block og_title %}{{ doctor.name }} - {{ doctor.specialty.name }} in {{ doctor.city.name }}{% endblock %}
-{% block og_description %}{{ doctor.description[:160] }}{% endblock %}
+{% block og_description %}{{ doctor.specialty.name }} with {{ doctor.experience }} years experience in {{ doctor.city.name }}, Nepal.{% if doctor.avg_rating > 0 %} Rated {{ "%.1f"|format(doctor.avg_rating) }}/5 by {{ doctor.rating_count }} patients.{% endif %}{% endblock %}
 {% block og_image %}{{ doctor.photo_url if doctor.photo_url else request.url_root + 'static/img/logo.png' }}{% endblock %}
 
 {% block twitter_title %}{{ doctor.name }} - {{ doctor.specialty.name }} in {{ doctor.city.name }}{% endblock %}
-{% block twitter_description %}{{ doctor.description[:200] }}{% endblock %}
+{% block twitter_description %}{{ doctor.specialty.name }} with {{ doctor.experience }} years experience in {{ doctor.city.name }}, Nepal{% endblock %}
 {% block twitter_image %}{{ doctor.photo_url if doctor.photo_url else request.url_root + 'static/img/logo.png' }}{% endblock %}
 
 {% block content %}
