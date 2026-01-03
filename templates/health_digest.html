@@ -2,6 +2,15 @@
 
 {% block title %}Health Digest - RankSewa{% endblock %}
 
+{% block head %}
+<style>
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container my-5">
     <!-- Header Section -->
@@ -87,7 +96,7 @@
                             </div>
                         </div>
                         <div class="col-md-3 order-1 order-md-2">
-                            <a href="{{ url_for('article_detail', slug=article.slug) }}" class="digest-thumb">
+                            <a href="{{ url_for('article_detail', slug=article.slug) }}" class="digest-thumb" style="background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite;">
                                 {% if article.featured_image %}
                                     {% if article.featured_image.startswith('/static/') or article.featured_image.startswith('http') %}
                                         <img src="{{ article.featured_image }}"
@@ -101,7 +110,9 @@
                                      loading="lazy"
                                      width="400"
                                      height="300"
-                                     onerror="this.src='https://picsum.photos/seed/article{{ article.id }}/400/300'">
+                                     style="opacity: 0; transition: opacity 0.3s;"
+                                     onload="this.style.opacity=1; this.parentElement.style.animation='none'; this.parentElement.style.background='transparent';"
+                                     onerror="this.src='https://picsum.photos/seed/article{{ article.id }}/400/300'; this.style.opacity=1;">
                             </a>
                         </div>
                     </div>

@@ -1517,9 +1517,16 @@ def get_doctors():
     city_id = request.args.get('city_id', '')
     specialty_id = request.args.get('specialty_id', '')
     name_search = request.args.get('name', '')
+    page = request.args.get('page', 1, type=int)
+    per_page = 50  # Limit results per page
 
-    # Build query with filters
-    query = Doctor.query.filter_by(is_active=True)
+    # Build query with filters and eager loading to prevent N+1 queries
+    from sqlalchemy.orm import joinedload
+    query = Doctor.query.options(
+        joinedload(Doctor.city),
+        joinedload(Doctor.specialty),
+        joinedload(Doctor.ratings)  # Eager load ratings to prevent N+1
+    ).filter_by(is_active=True)
 
     if city_id:
         query = query.filter(Doctor.city_id == int(city_id))
@@ -1536,9 +1543,12 @@ def get_doctors():
             )
         )
 
-    # Order by is_featured first, then claimed status, then avg_rating, then name
-    # Note: We'll sort by avg_rating in Python since it's a property
-    doctors = query.all()
+    # Order by database fields first (faster than Python sorting)
+    # Featured doctors first, then by name
+    query = query.order_by(Doctor.is_featured.desc(), Doctor.name)
+
+    # Paginate results
+    doctors = query.limit(per_page).all()
 
     # Sort doctors:
     # 1. Featured first
