@@ -75,11 +75,11 @@
                                         <small class="text-muted">(for {{ promo.days_left }} days)</small>
                                     </div>
                                     <div class="text-decoration-line-through text-muted">
-                                        <small>Regular: ${{ tier.price_usd }}/month</small>
+                                        <small>Regular: NPR {{ tier.price_npr }}/month</small>
                                     </div>
                                     {% else %}
-                                    <h2 class="mb-1">${{ tier.price_usd }}<small class="text-muted">/month</small></h2>
-                                    <small class="text-muted">~NPR {{ tier.price_npr }}</small>
+                                    <h2 class="mb-1">NPR {{ "{:,}".format(tier.price_npr) }}<small class="text-muted">/month</small></h2>
+                                    <small class="text-muted">~${{ tier.price_usd }} USD</small>
                                     {% endif %}
                                 {% else %}
                                 <h2 class="mb-1">Free</h2>
@@ -229,9 +229,9 @@
                             </h2>
                             <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    After the promotion ends on {{ doctor.subscription_expires_at.strftime('%B %d, %Y') if doctor.subscription_expires_at else 'Feb 26, 2025' }}, you can choose to:
+                                    After the promotion ends on {{ doctor.subscription_expires_at.strftime('%B %d, %Y') if doctor.subscription_expires_at else 'April 25, 2026' }}, you can choose to:
                                     <ul>
-                                        <li>Continue with a paid subscription ($22-37/month) to keep premium features</li>
+                                        <li>Continue with a paid subscription (NPR 1,999-2,999/month) to keep premium features</li>
                                         <li>Downgrade to the free tier (you'll keep all your data and reviews)</li>
                                     </ul>
                                     We'll send reminders before the promotion ends!
