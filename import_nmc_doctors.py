@@ -109,22 +109,30 @@ class NMCImporter:
     def parse_csv_row(self, row):
         """
         Parse a CSV row into doctor data.
-        Adjust column names based on your CSV structure.
-
-        Expected columns:
-        - nmc_number
-        - name
-        - city
-        - specialty
-        - education (optional)
-        - workplace (optional)
+        NMC CSV columns:
+        - nmc_no (required)
+        - full_name (required)
+        - address (contains city - format: "Place , District,")
+        - gender (not used)
+        - degree (maps to education)
         """
+        # Extract city from address field (format: "Place , District,")
+        address = row.get('address', '').strip()
+        city_name = ''
+        if address:
+            # Address is like "Besishar , Lamjung," - extract the district (after comma)
+            parts = address.split(',')
+            if len(parts) >= 2:
+                city_name = parts[1].strip()  # Get district name
+            elif len(parts) == 1:
+                city_name = parts[0].strip()  # Use place name if no comma
+
         return {
-            'nmc_number': row.get('nmc_number', '').strip(),
-            'name': row.get('name', '').strip(),
-            'city': row.get('city', '').strip(),
-            'specialty': row.get('specialty', '').strip(),
-            'education': row.get('education', '').strip(),
+            'nmc_number': row.get('nmc_no', '').strip(),
+            'name': row.get('full_name', '').strip(),
+            'city': city_name,
+            'specialty': row.get('specialty', '').strip(),  # Will be empty for NMC data
+            'education': row.get('degree', '').strip(),
             'workplace': row.get('workplace', '').strip(),
             'phone_number': row.get('phone', '').strip(),
         }
@@ -137,8 +145,7 @@ class NMCImporter:
             return False, "Missing name"
         if not data['city']:
             return False, "Missing city"
-        if not data['specialty']:
-            return False, "Missing specialty"
+        # Specialty is optional for NMC data (will default to General Physician)
         return True, None
 
     def create_doctor(self, data, city, specialty):
@@ -211,8 +218,14 @@ class NMCImporter:
                     city = self.get_or_create_city(data['city'])
                     specialty = self.get_or_create_specialty(data['specialty'])
 
-                    if not city or not specialty:
+                    # If specialty is missing (common for NMC data), default to General Physician
+                    if not specialty:
+                        specialty = self.get_or_create_specialty('General Physician')
+
+                    if not city:
                         self.stats['skipped_invalid'] += 1
+                        if self.stats['total_rows'] <= 10:  # Show first few errors
+                            print(f"  ⚠ Row {self.stats['total_rows']}: Invalid city: {data['city']}")
                         continue
 
                     # Create doctor
