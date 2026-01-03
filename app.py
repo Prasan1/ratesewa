@@ -1536,12 +1536,25 @@ def get_doctors():
             )
         )
 
-    # Order by is_featured first, then avg_rating, then name
+    # Order by is_featured first, then claimed status, then avg_rating, then name
     # Note: We'll sort by avg_rating in Python since it's a property
     doctors = query.all()
 
-    # Sort doctors: featured first, then by avg_rating, then by name
-    doctors_sorted = sorted(doctors, key=lambda d: (-d.is_featured, -d.avg_rating, d.name))
+    # Sort doctors:
+    # 1. Featured first
+    # 2. Claimed/verified profiles (has phone or is_verified)
+    # 3. Then by avg_rating
+    # 4. Then by name
+    def sort_key(d):
+        is_claimed = bool(d.phone_number) or d.is_verified
+        return (
+            -d.is_featured,      # Featured first (1 → -1, 0 → 0)
+            not is_claimed,      # Claimed profiles first (True → False, False → True)
+            -d.avg_rating,       # Higher rating first
+            d.name               # Alphabetical
+        )
+
+    doctors_sorted = sorted(doctors, key=sort_key)
 
     # Serialize to JSON
     doctors_list = []

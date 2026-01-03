@@ -102,9 +102,18 @@ class NMCImporter:
             print(f"  [DRY RUN] Would create specialty: {specialty_name}")
             return None
 
-    def doctor_exists(self, nmc_number):
-        """Check if doctor with NMC number already exists"""
-        return Doctor.query.filter_by(nmc_number=nmc_number).first() is not None
+    def doctor_exists(self, nmc_number, name):
+        """Check if doctor with NMC number or similar name already exists"""
+        # Check by NMC number (most reliable)
+        if Doctor.query.filter_by(nmc_number=nmc_number).first():
+            return True
+
+        # Check by exact name match (case-insensitive)
+        # This catches duplicates where NMC number wasn't filled in
+        if Doctor.query.filter(Doctor.name.ilike(name)).first():
+            return True
+
+        return False
 
     def parse_csv_row(self, row):
         """
@@ -209,8 +218,8 @@ class NMCImporter:
                             print(f"  ⚠ Row {self.stats['total_rows']}: {error}")
                         continue
 
-                    # Check if exists
-                    if self.doctor_exists(data['nmc_number']):
+                    # Check if exists (by NMC number or name)
+                    if self.doctor_exists(data['nmc_number'], data['name']):
                         self.stats['skipped_existing'] += 1
                         continue
 
