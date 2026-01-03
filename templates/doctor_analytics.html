@@ -27,6 +27,135 @@
             </div>
             {% endif %}
 
+            <!-- 30-Day Performance Overview -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card shadow-sm h-100" style="border-left: 4px solid #7B2CBF;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="text-muted mb-1">30-Day Views</p>
+                                    <h3 class="mb-0">{{ "{:,}".format(total_views_30d or 0) }}</h3>
+                                    <small class="text-success">
+                                        <i class="fas fa-arrow-up"></i> {{ "%.1f"|format(avg_daily_views or 0) }}/day
+                                    </small>
+                                </div>
+                                <i class="fas fa-chart-line fa-2x" style="color: #7B2CBF; opacity: 0.3;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="card shadow-sm h-100" style="border-left: 4px solid #3AA76D;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="text-muted mb-1">Search Appearances</p>
+                                    <h3 class="mb-0">{{ "{:,}".format(total_search_appearances or 0) }}</h3>
+                                    <small class="text-muted">Times shown in results</small>
+                                </div>
+                                <i class="fas fa-search fa-2x" style="color: #3AA76D; opacity: 0.3;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="card shadow-sm h-100" style="border-left: 4px solid #FF6B35;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="text-muted mb-1">Phone Clicks</p>
+                                    <h3 class="mb-0">{{ "{:,}".format(total_phone_clicks or 0) }}</h3>
+                                    <small class="text-muted">Patient contact actions</small>
+                                </div>
+                                <i class="fas fa-phone fa-2x" style="color: #FF6B35; opacity: 0.3;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="card shadow-sm h-100" style="border-left: 4px solid #1982C4;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="text-muted mb-1">Total Reviews</p>
+                                    <h3 class="mb-0">{{ "{:,}".format(review_count or 0) }}</h3>
+                                    <small class="text-muted">Patient feedback</small>
+                                </div>
+                                <i class="fas fa-comments fa-2x" style="color: #1982C4; opacity: 0.3;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traffic Sources Breakdown -->
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-traffic-light me-2"></i>Traffic Sources (Last 30 Days)</h5>
+                        </div>
+                        <div class="card-body">
+                            {% set total_traffic = traffic_sources.search + traffic_sources.google + traffic_sources.homepage + traffic_sources.direct %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span><i class="fas fa-search me-2 text-primary"></i> Internal Search</span>
+                                    <strong>{{ traffic_sources.search }}</strong>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" style="width: {{ (traffic_sources.search / total_traffic * 100) if total_traffic > 0 else 0 }}%"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span><i class="fab fa-google me-2 text-success"></i> Google Search</span>
+                                    <strong>{{ traffic_sources.google }}</strong>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: {{ (traffic_sources.google / total_traffic * 100) if total_traffic > 0 else 0 }}%"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span><i class="fas fa-home me-2 text-warning"></i> Homepage</span>
+                                    <strong>{{ traffic_sources.homepage }}</strong>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: {{ (traffic_sources.homepage / total_traffic * 100) if total_traffic > 0 else 0 }}%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span><i class="fas fa-link me-2 text-info"></i> Direct Link</span>
+                                    <strong>{{ traffic_sources.direct }}</strong>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-info" style="width: {{ (traffic_sources.direct / total_traffic * 100) if total_traffic > 0 else 0 }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-chart-area me-2"></i>Profile Views Trend</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="viewsChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Overview Cards -->
             <div class="row mb-4">
                 <div class="col-md-4 mb-3">
@@ -503,4 +632,65 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Profile Views Chart
+const ctx = document.getElementById('viewsChart');
+if (ctx) {
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_data.dates|tojson }},
+            datasets: [{
+                label: 'Profile Views',
+                data: {{ chart_data.views|tojson }},
+                borderColor: '#7B2CBF',
+                backgroundColor: 'rgba(123, 44, 191, 0.1)',
+                tension: 0.3,
+                fill: true,
+                borderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+}
+</script>
 {% endblock %}

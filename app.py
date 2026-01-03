@@ -265,6 +265,38 @@ def build_doctor_analytics_context(doctor):
         1: len([r for r in ratings if r.rating == 1])
     }
 
+    # Get daily analytics for last 30 days
+    from models import DoctorAnalytics
+    from datetime import date
+    end_date = date.today()
+    start_date = end_date - timedelta(days=30)
+
+    daily_analytics = DoctorAnalytics.query.filter(
+        DoctorAnalytics.doctor_id == doctor.id,
+        DoctorAnalytics.date >= start_date,
+        DoctorAnalytics.date <= end_date
+    ).order_by(DoctorAnalytics.date.asc()).all()
+
+    # Calculate totals from daily analytics
+    total_views_30d = sum(a.profile_views for a in daily_analytics)
+    total_search_appearances = sum(a.search_appearances for a in daily_analytics)
+    total_phone_clicks = sum(a.phone_clicks for a in daily_analytics)
+    avg_daily_views = total_views_30d / 30 if total_views_30d > 0 else 0
+
+    # Traffic sources breakdown
+    traffic_sources = {
+        'search': sum(a.source_search for a in daily_analytics),
+        'google': sum(a.source_google for a in daily_analytics),
+        'homepage': sum(a.source_homepage for a in daily_analytics),
+        'direct': sum(a.source_direct for a in daily_analytics)
+    }
+
+    # Prepare chart data for last 30 days
+    chart_data = {
+        'dates': [a.date.strftime('%b %d') for a in daily_analytics],
+        'views': [a.profile_views for a in daily_analytics]
+    }
+
     return {
         'review_count': review_count,
         'avg_rating': avg_rating,
@@ -283,7 +315,14 @@ def build_doctor_analytics_context(doctor):
         'missing_profile_fields': missing_profile_fields,
         'review_trend': review_trend,
         'has_enhanced_analytics': has_enhanced_analytics,
-        'effective_tier': effective_tier
+        'effective_tier': effective_tier,
+        # New analytics data
+        'total_views_30d': total_views_30d,
+        'avg_daily_views': avg_daily_views,
+        'total_search_appearances': total_search_appearances,
+        'total_phone_clicks': total_phone_clicks,
+        'traffic_sources': traffic_sources,
+        'chart_data': chart_data
     }
 
 # --- Helper Function for Slugs ---
@@ -2344,7 +2383,42 @@ def doctor_profile(slug):
             user_is_doctor = True
 
     if not user_is_doctor:
+        # Increment total profile views
         doctor.profile_views = (doctor.profile_views or 0) + 1
+
+        # Track daily analytics
+        from datetime import date
+        from models import DoctorAnalytics
+        today = date.today()
+        analytics = DoctorAnalytics.query.filter_by(
+            doctor_id=doctor.id,
+            date=today
+        ).first()
+
+        if not analytics:
+            analytics = DoctorAnalytics(
+                doctor_id=doctor.id,
+                date=today,
+                profile_views=1
+            )
+            db.session.add(analytics)
+        else:
+            analytics.profile_views += 1
+
+        # Track source
+        referrer = request.referrer or ''
+        if 'doctors?city' in referrer or 'doctors?specialty' in referrer or 'doctors?' in referrer:
+            analytics.source_search += 1
+        elif 'google' in referrer.lower():
+            analytics.source_google += 1
+        elif referrer == '' or 'ranksewa.com' not in referrer:
+            analytics.source_direct += 1
+        elif referrer and 'ranksewa.com' in referrer:
+            if 'index' in referrer or referrer.endswith('/'):
+                analytics.source_homepage += 1
+            else:
+                analytics.source_direct += 1
+
         db.session.commit()
 
     # Get ratings sorted by ID descending

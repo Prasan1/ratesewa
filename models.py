@@ -573,3 +573,39 @@ class Article(db.Model):
 
     def __repr__(self):
         return f'<Article {self.title}>'
+
+
+class DoctorAnalytics(db.Model):
+    """Track detailed analytics for doctors"""
+    __tablename__ = 'doctor_analytics'
+
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+
+    # Views
+    profile_views = db.Column(db.Integer, default=0)
+    search_appearances = db.Column(db.Integer, default=0)  # How many times shown in search
+    search_clicks = db.Column(db.Integer, default=0)  # How many times clicked from search
+
+    # Engagement
+    phone_clicks = db.Column(db.Integer, default=0)  # "Call Now" button clicks
+    website_clicks = db.Column(db.Integer, default=0)
+    review_button_clicks = db.Column(db.Integer, default=0)
+
+    # Sources
+    source_search = db.Column(db.Integer, default=0)  # From search page
+    source_homepage = db.Column(db.Integer, default=0)  # From homepage featured
+    source_google = db.Column(db.Integer, default=0)  # From Google search
+    source_direct = db.Column(db.Integer, default=0)  # Direct link
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    doctor = db.relationship('Doctor', backref='analytics')
+
+    # Unique constraint: one row per doctor per day
+    __table_args__ = (db.UniqueConstraint('doctor_id', 'date', name='_doctor_date_uc'),)
+
+    def __repr__(self):
+        return f'<DoctorAnalytics doctor_id={self.doctor_id} date={self.date}>'
