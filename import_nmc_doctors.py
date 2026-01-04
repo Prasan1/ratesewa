@@ -195,6 +195,8 @@ class NMCImporter:
         self.load_caches()
 
         doctors_batch = []
+        batch_slugs = set()  # Track slugs in current batch to avoid duplicates
+        batch_nmc_numbers = set()  # Track NMC numbers in current batch
 
         with app.app_context():
             with open(self.file_path, 'r', encoding='utf-8') as f:
@@ -223,6 +225,11 @@ class NMCImporter:
                         self.stats['skipped_existing'] += 1
                         continue
 
+                    # Check for duplicates in current batch (by NMC number)
+                    if data['nmc_number'] in batch_nmc_numbers:
+                        self.stats['skipped_existing'] += 1
+                        continue
+
                     # Get or create city and specialty
                     city = self.get_or_create_city(data['city'])
                     specialty = self.get_or_create_specialty(data['specialty'])
@@ -240,25 +247,25 @@ class NMCImporter:
                     # Create doctor
                     if not self.dry_run:
                         doctor = self.create_doctor(data, city, specialty)
-                        doctors_batch.append(doctor)
+                        db.session.add(doctor)  # Regular add instead of bulk
+                        batch_nmc_numbers.add(data['nmc_number'])  # Track in batch
                         self.stats['created'] += 1
 
-                        # Batch insert
-                        if len(doctors_batch) >= self.batch_size:
-                            db.session.bulk_save_objects(doctors_batch)
+                        # Batch commit (commit after accumulating batch_size records)
+                        if self.stats['created'] % self.batch_size == 0:
                             db.session.commit()
-                            print(f"  ✓ Inserted batch of {len(doctors_batch)} doctors")
-                            doctors_batch = []
+                            print(f"  ✓ Committed {self.stats['created']} doctors so far...")
+                            batch_slugs = set()  # Clear batch tracking
+                            batch_nmc_numbers = set()  # Clear batch tracking
                     else:
                         self.stats['created'] += 1
                         if self.stats['total_rows'] <= 10:
                             print(f"  [DRY RUN] Would create: {data['name']} ({data['nmc_number']})")
 
-                # Insert remaining doctors
-                if doctors_batch and not self.dry_run:
-                    db.session.bulk_save_objects(doctors_batch)
+                # Commit any remaining doctors
+                if not self.dry_run and self.stats['created'] > 0:
                     db.session.commit()
-                    print(f"  ✓ Inserted final batch of {len(doctors_batch)} doctors")
+                    print(f"  ✓ Final commit completed!")
 
         self.print_summary()
 

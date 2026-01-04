@@ -141,6 +141,22 @@
                             </small>
                         </div>
 
+                        <!-- Workplace/Clinic -->
+                        <div class="mb-3">
+                            <label for="workplace" class="form-label">
+                                <i class="fas fa-hospital me-1"></i><strong>Workplace/Hospital/Clinic</strong>
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="workplace"
+                                   name="workplace"
+                                   value="{{ doctor.workplace or '' }}"
+                                   placeholder="e.g., Clinic One, Nepal Mediciti, B&C Medical College">
+                            <small class="form-text text-muted">
+                                Where do you currently practice?
+                            </small>
+                        </div>
+
                         <!-- Practice Address -->
                         <div class="mb-3">
                             <label for="practice_address" class="form-label">
@@ -154,6 +170,66 @@
                             <small class="form-text text-muted">
                                 Patients will use this to find your practice
                             </small>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="mb-3">
+                            <label for="phone_number" class="form-label">
+                                <i class="fas fa-phone me-1"></i><strong>Phone Number</strong>
+                            </label>
+                            <input type="tel"
+                                   class="form-control"
+                                   id="phone_number"
+                                   name="phone_number"
+                                   value="{{ doctor.phone_number or '' }}"
+                                   placeholder="e.g., 9841234567">
+                            <small class="form-text text-muted">
+                                Patients will use this to contact you
+                            </small>
+                        </div>
+
+                        <!-- Years of Experience -->
+                        <div class="mb-3">
+                            <label for="experience" class="form-label">
+                                <i class="fas fa-briefcase me-1"></i><strong>Years of Experience</strong>
+                            </label>
+                            <input type="number"
+                                   class="form-control"
+                                   id="experience"
+                                   name="experience"
+                                   value="{{ doctor.experience or 0 }}"
+                                   min="0"
+                                   max="60"
+                                   placeholder="e.g., 10">
+                            <small class="form-text text-muted">
+                                Total years of medical practice
+                            </small>
+                        </div>
+
+                        <!-- NMC Number -->
+                        <div class="mb-3">
+                            <label for="nmc_number" class="form-label">
+                                <i class="fas fa-id-card me-1"></i><strong>NMC Registration Number</strong>
+                            </label>
+                            {% if doctor.nmc_number %}
+                            <input type="text"
+                                   class="form-control"
+                                   value="{{ doctor.nmc_number }}"
+                                   readonly>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-lock me-1"></i>NMC number cannot be changed after verification. Contact support if incorrect.
+                            </small>
+                            {% else %}
+                            <input type="text"
+                                   class="form-control"
+                                   id="nmc_number"
+                                   name="nmc_number"
+                                   value=""
+                                   placeholder="e.g., 8325">
+                            <small class="form-text text-muted">
+                                Nepal Medical Council registration number (can only be set once)
+                            </small>
+                            {% endif %}
                         </div>
 
                         <hr class="my-4">

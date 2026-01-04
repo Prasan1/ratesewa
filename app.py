@@ -3038,6 +3038,27 @@ def doctor_profile_edit():
             doctor.education = request.form.get('education', '').strip()
             doctor.college = request.form.get('college', '').strip()
             doctor.practice_address = request.form.get('practice_address', '').strip()
+            doctor.workplace = request.form.get('workplace', '').strip()
+            doctor.phone_number = request.form.get('phone_number', '').strip()
+
+            # Experience (convert to int)
+            experience_str = request.form.get('experience', '0').strip()
+            try:
+                doctor.experience = int(experience_str) if experience_str else 0
+            except ValueError:
+                doctor.experience = 0
+
+            # NMC number (can only be set once)
+            if not doctor.nmc_number:
+                nmc_input = request.form.get('nmc_number', '').strip()
+                if nmc_input:
+                    # Check if NMC number already exists for another doctor
+                    existing = Doctor.query.filter_by(nmc_number=nmc_input).first()
+                    if existing and existing.id != doctor.id:
+                        flash('This NMC number is already registered to another doctor.', 'danger')
+                    else:
+                        doctor.nmc_number = nmc_input
+                        flash('NMC number added successfully!', 'success')
 
             # Handle profile photo removal
             if 'remove_photo' in request.form and doctor.photo_url:
