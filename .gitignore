@@ -1,6 +1,3 @@
-# Environment variables
-.env
-
 # Python
 __pycache__/
 *.py[cod]
@@ -11,28 +8,35 @@ __pycache__/
 dist/
 build/
 
-# Virtual environments
-venv/
+# Virtual Environment
 .venv/
+venv/
 ENV/
-env/
 
-# Flask
+# Database (local only)
+*.db
+*.db-journal
 instance/
-.webassets-cache
 
-# IDEs
+# Logs and temporary files
+*.log
+import_log.txt
+import_complete_log.txt
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
+# CSV files (EXCEPT the one we need for production)
+*.csv
+!nmc_doctors_complete.csv
+
+# Environment variables
+.env
+.env.local

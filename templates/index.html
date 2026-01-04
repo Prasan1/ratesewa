@@ -398,6 +398,7 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <div class="doctor-details">
+                                ${doctor.nmc_number ? `<p class="card-text small mb-1"><strong>NMC#:</strong> ${doctor.nmc_number}</p>` : ''}
                                 ${doctor.experience && doctor.experience > 0 ? `<p class="card-text small mb-1"><strong>Experience:</strong> ${doctor.experience} years</p>` : ''}
                                 ${doctor.education ? `<p class="card-text small mb-1"><strong>Education:</strong> ${doctor.education}</p>` : ''}
                                 ${doctor.workplace ? `<p class="card-text small mb-2"><strong>Works At:</strong> ${doctor.workplace}</p>` : ''}

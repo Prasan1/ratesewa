@@ -1459,7 +1459,7 @@ def index():
     specialties = Specialty.query.all()
 
     # Get stats for social proof section
-    total_doctors = Doctor.query.filter_by(is_active=True).count()
+    total_doctors = Doctor.query.filter_by(is_active=True).count()  # All doctors (NMC city = practice location)
     total_cities = City.query.count()
     total_reviews = Rating.query.count()
     verified_doctors = Doctor.query.filter_by(is_verified=True, is_active=True).count()
@@ -1526,7 +1526,7 @@ def get_doctors():
         joinedload(Doctor.city),
         joinedload(Doctor.specialty),
         joinedload(Doctor.ratings)  # Eager load ratings to prevent N+1
-    ).filter_by(is_active=True)
+    ).filter_by(is_active=True)  # Show all active doctors (NMC city = practice location)
 
     if city_id:
         query = query.filter(Doctor.city_id == int(city_id))
@@ -1598,6 +1598,8 @@ def get_doctors():
             'clinic_slug': d.clinic.slug if d.clinic else None,
             'specialty_id': d.specialty_id,
             'specialty_name': d.specialty.name,
+            'nmc_number': d.nmc_number,
+            'workplace': d.workplace,
             'experience': d.experience,
             'education': d.education,
             'college': d.college,
@@ -1842,8 +1844,19 @@ def admin_cities():
 @app.route('/admin/clinics')
 @admin_required
 def admin_clinics():
-    clinics = Clinic.query.options(joinedload(Clinic.city)).order_by(Clinic.name.asc()).all()
-    return render_template('admin_clinics.html', clinics=clinics)
+    # Pagination for better performance
+    page = request.args.get('page', 1, type=int)
+    per_page = 50
+
+    pagination = Clinic.query.options(joinedload(Clinic.city)).order_by(Clinic.name.asc()).paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+
+    return render_template('admin_clinics.html',
+                         clinics=pagination.items,
+                         pagination=pagination)
 
 
 @app.route('/admin/clinics/new', methods=['GET', 'POST'])
@@ -1986,8 +1999,19 @@ def admin_city_delete(city_id):
 @app.route('/admin/specialties')
 @admin_required
 def admin_specialties():
-    specialties = Specialty.query.order_by(Specialty.name.asc()).all()
-    return render_template('admin_specialties.html', specialties=specialties)
+    # Pagination for better performance and consistency
+    page = request.args.get('page', 1, type=int)
+    per_page = 50
+
+    pagination = Specialty.query.order_by(Specialty.name.asc()).paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+
+    return render_template('admin_specialties.html',
+                         specialties=pagination.items,
+                         pagination=pagination)
 
 @app.route('/admin/specialties/new', methods=['GET', 'POST'])
 @admin_required
@@ -2560,6 +2584,13 @@ def rate_doctor():
     if not doctor_id or not rating_value:
         flash('Please provide a rating.', 'danger')
         return redirect(url_for('index'))
+
+    # CRITICAL FIX: Prevent doctors from rating themselves
+    user = User.query.get(user_id)
+    if user.doctor_id and int(user.doctor_id) == int(doctor_id):
+        flash('You cannot rate yourself. Reviews must be from patients.', 'warning')
+        doctor = Doctor.query.get(doctor_id)
+        return redirect(url_for('doctor_profile', slug=doctor.slug))
 
     existing_rating = Rating.query.filter_by(
         doctor_id=doctor_id,

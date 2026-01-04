@@ -1,15 +1,7 @@
-1. City is too many and scrolling down to select one is a problem
-2. Upper case lower case capitalization are mixed in doctors name this needs to be arranged nicely.
-3. I don't know how we got over 1000 cities in Nepal, i do't know fi we could arrange these data based on major cities instead of smaller city. Like we have separate 
-   listing for kathmandu and kathmandu metro politial city. This should have been the same. 
-4. In phone, the searching experience is little messy. Sometime entering name resets the form. i don't know if this is due to the phone UI or keyboard or something else.
-5. movinng from bottom to top is just scrolling and its time consuming I don't if ther's some good way to navigate end and begining of the page both 
-   in cell phone and in computer.
-6. While editing once profile, doctor can not edit theri name, I think this is intentional
-7. When I open an app on browser or cell phone it automatically moves to the Doctors list. Users should start from the top(I guess)
-8. in experience section of the card, I see 0 years and null years. People will not understand null years. 
-9. I got first request to put phone number, hopefully doctors will claim their profile and put phone number.
-10. some of the users in Nepal were asking can we comment on Nepali, i don't know if there's unicode feature available. I think they can copy and paste nepali 
-    font right? 
-11. Please give #10 a low priority for now. The biggest one is : the app should be fast in cell phone as well as desktop. 
+# Major: When you are logged in as a doctor, you can open your profile in public view and rate yourself.
 
+1. The webpage is not that fast maybe this is because of the massive data that we have but we will have 20k + doctor profile what will we do?
+2. There are several duplicate specialization listed. such as ENT and ENT specialized are the same ENT. No need to keep two category. 
+3. We need to be extra careful now. There have been 7 new users in the platform 2 of them were doctors and they haven't created profile yet and their 
+   profile is not in the system yet. So I don't know if that created this friction or maybe they will come back. 
+4. We have to be very careful on making chnages now . Few people are gainig interest. 

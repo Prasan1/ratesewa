@@ -121,20 +121,22 @@ class NMCImporter:
         NMC CSV columns:
         - nmc_no (required)
         - full_name (required)
-        - address (contains city - format: "Place , District,")
+        - address (contains city - format: "Place , District," OR "City,")
         - gender (not used)
         - degree (maps to education)
         """
-        # Extract city from address field (format: "Place , District,")
+        # Extract city from address field
+        # Formats: "Place, District," OR "City," OR "Place, District"
         address = row.get('address', '').strip()
         city_name = ''
         if address:
-            # Address is like "Besishar , Lamjung," - extract the district (after comma)
-            parts = address.split(',')
+            parts = [p.strip() for p in address.split(',') if p.strip()]
             if len(parts) >= 2:
-                city_name = parts[1].strip()  # Get district name
+                # Format: "Place, District" - use district
+                city_name = parts[1]
             elif len(parts) == 1:
-                city_name = parts[0].strip()  # Use place name if no comma
+                # Format: "City," or "City" - use first part
+                city_name = parts[0]
 
         return {
             'nmc_number': row.get('nmc_no', '').strip(),
