@@ -305,15 +305,15 @@ $(document).ready(function() {
         width: '100%'
     });
 
-    loadDoctors();
+    loadDoctors(); // Initial load - no scroll
 
     $('#filterBtn').click(function() {
-        loadDoctors();
+        loadDoctors(1, true); // User clicked search - scroll to results
     });
 
     // Use Select2 change event instead of regular change
     $('#citySelect, #specialtySelect').on('select2:select select2:clear', function() {
-        loadDoctors();
+        loadDoctors(1, true); // User changed filter - scroll to results
     });
 
     // Search as user types (with debounce)
@@ -321,18 +321,20 @@ $(document).ready(function() {
     $('#nameSearch').on('input', function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(function() {
-            loadDoctors();
+            loadDoctors(1, true); // User searched by name - scroll to results
         }, 500); // Wait 500ms after user stops typing
     });
 });
 
     let currentPage = 1;
+    let shouldScroll = false; // Track if we should scroll after loading doctors
 
-    function loadDoctors(page = 1) {
+    function loadDoctors(page = 1, scroll = false) {
         const cityId = $('#citySelect').val();
         const specialtyId = $('#specialtySelect').val();
         const nameSearch = $('#nameSearch').val();
         currentPage = page;
+        shouldScroll = scroll; // Remember if we should scroll
 
         $('#doctorList').html('<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>');
 
@@ -396,7 +398,7 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <div class="doctor-details">
-                                <p class="card-text small mb-1"><strong>Experience:</strong> ${doctor.experience} years</p>
+                                ${doctor.experience && doctor.experience > 0 ? `<p class="card-text small mb-1"><strong>Experience:</strong> ${doctor.experience} years</p>` : ''}
                                 ${doctor.education ? `<p class="card-text small mb-1"><strong>Education:</strong> ${doctor.education}</p>` : ''}
                                 ${doctor.workplace ? `<p class="card-text small mb-2"><strong>Works At:</strong> ${doctor.workplace}</p>` : ''}
                                 <div class="d-flex align-items-center mb-2">
@@ -422,7 +424,7 @@ $(document).ready(function() {
 
         // Previous button
         if (pagination.has_prev) {
-            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(${pagination.page - 1}); return false;">Previous</a></li>`;
+            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(${pagination.page - 1}, true); return false;">Previous</a></li>`;
         } else {
             paginationHtml += '<li class="page-item disabled"><span class="page-link">Previous</span></li>';
         }
@@ -432,7 +434,7 @@ $(document).ready(function() {
         let endPage = Math.min(pagination.total_pages, pagination.page + 2);
 
         if (startPage > 1) {
-            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(1); return false;">1</a></li>`;
+            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(1, true); return false;">1</a></li>`;
             if (startPage > 2) {
                 paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
             }
@@ -442,7 +444,7 @@ $(document).ready(function() {
             if (i === pagination.page) {
                 paginationHtml += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
             } else {
-                paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(${i}); return false;">${i}</a></li>`;
+                paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(${i}, true); return false;">${i}</a></li>`;
             }
         }
 
@@ -450,12 +452,12 @@ $(document).ready(function() {
             if (endPage < pagination.total_pages - 1) {
                 paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
             }
-            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(${pagination.total_pages}); return false;">${pagination.total_pages}</a></li>`;
+            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(${pagination.total_pages}, true); return false;">${pagination.total_pages}</a></li>`;
         }
 
         // Next button
         if (pagination.has_next) {
-            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(${pagination.page + 1}); return false;">Next</a></li>`;
+            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(${pagination.page + 1}, true); return false;">Next</a></li>`;
         } else {
             paginationHtml += '<li class="page-item disabled"><span class="page-link">Next</span></li>';
         }
@@ -466,10 +468,12 @@ $(document).ready(function() {
 
         $('#doctorList').append(paginationHtml);
 
-        // Scroll to top of results
-        $('html, body').animate({
-            scrollTop: $("#doctorList").offset().top - 100
-        }, 500);
+        // Only scroll to results if user actively searched/filtered/paginated (not on initial load)
+        if (shouldScroll) {
+            $('html, body').animate({
+                scrollTop: $("#doctorList").offset().top - 100
+            }, 500);
+        }
     }
     }
 
