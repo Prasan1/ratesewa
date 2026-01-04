@@ -1624,12 +1624,26 @@ def get_doctors():
 @app.route('/admin/doctors')
 @admin_required
 def admin_doctors():
+    # Pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 50  # Show 50 doctors per page
+
     query = Doctor.query.options(joinedload(Doctor.city), joinedload(Doctor.specialty), joinedload(Doctor.clinic))
     search = request.args.get('q', '').strip()
     if search:
         query = query.filter(Doctor.name.ilike(f"%{search}%"))
-    doctors = query.order_by(Doctor.name.asc()).all()
-    return render_template('admin_doctors.html', doctors=doctors, search=search)
+
+    # Paginate instead of loading all at once
+    pagination = query.order_by(Doctor.name.asc()).paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+
+    return render_template('admin_doctors.html',
+                         doctors=pagination.items,
+                         pagination=pagination,
+                         search=search)
 
 @app.route('/admin/doctors/new', methods=['GET', 'POST'])
 @admin_required
@@ -1780,8 +1794,19 @@ def admin_doctor_status(doctor_id):
 @app.route('/admin/cities')
 @admin_required
 def admin_cities():
-    cities = City.query.order_by(City.name.asc()).all()
-    return render_template('admin_cities.html', cities=cities)
+    # Pagination to handle 1000+ cities
+    page = request.args.get('page', 1, type=int)
+    per_page = 50
+
+    pagination = City.query.order_by(City.name.asc()).paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+
+    return render_template('admin_cities.html',
+                         cities=pagination.items,
+                         pagination=pagination)
 
 
 @app.route('/admin/clinics')
@@ -2110,8 +2135,19 @@ def admin_article_delete(article_id):
 @app.route('/admin/users')
 @admin_required
 def admin_users():
-    users = User.query.order_by(User.name.asc()).all()
-    return render_template('admin_users.html', users=users)
+    # Pagination for scalability
+    page = request.args.get('page', 1, type=int)
+    per_page = 50
+
+    pagination = User.query.order_by(User.name.asc()).paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+
+    return render_template('admin_users.html',
+                         users=pagination.items,
+                         pagination=pagination)
 
 @app.route('/admin/users/<int:user_id>/status', methods=['POST'])
 @admin_required

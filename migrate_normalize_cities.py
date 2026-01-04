@@ -88,6 +88,10 @@ CITY_NORMALIZATIONS = {
     # Itahari variations
     "itahari municipality": "Itahari",
     "itahari sub-metropolitan city": "Itahari",
+
+    # Birtamod variations (Jhapa district)
+    "birtamode": "Birtamod",
+    "birtamod municipality": "Birtamod",
 }
 
 def normalize_city_name(name):
