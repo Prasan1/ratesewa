@@ -92,6 +92,7 @@ CITY_NORMALIZATIONS = {
     # Birtamod variations (Jhapa district)
     "birtamode": "Birtamod",
     "birtamod municipality": "Birtamod",
+    "anarmani": "Birtamod",  # Anarmani is in Birtamod
 }
 
 def normalize_city_name(name):
