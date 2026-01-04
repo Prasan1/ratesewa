@@ -1,0 +1,3193 @@
+nmc_no,full_name,address,gender,degree
+25466,Dr. Aakriti Shrestha,"Aanbookhaireni Tanahun, Aanbookhaireni",Female,BDS
+25466,Dr. Aakriti Shrestha,"Aanbookhaireni Tanahun, Aanbookhaireni",Female,BDS
+25467,Dr. Pratikshya Koirala,"Babarmahal, Kathmandu",Female,MBBS
+25468,Dr. Anju Chaudhary,"KHAIRAHANI, Sultana",Female,MBBS
+25469,Dr. Madan Prajapati,"Thimi, Madhyapur Thimi",Male,MBBS
+25470,Dr. Shiva Chaudhary,"Pidrahani, Somani",Male,BDS
+25471,Dr. Krishnaa Dongol,"Hadigaun, Kathmandu",Female,BDS
+25472,Dr. Pradipta Shrestha,"Biratnagar, Biratnagar",Female,BDS
+25473,Dr. Nishant Bhatta,"Mahottari, Dhirapur",Male,MBBS
+25474,Dr. Ram Prakash Shah,"Khairshal Tole, Rajbiraj",Male,MBBS
+25475,Dr. Ambika Yadav,"Sahaphi, Dhanusha, Sahaphi",Female,BDS
+25476,Dr. Rabiya Manandhar,"Balaju, Kathmandu",Female,BDS
+25477,Dr. Mahima Bhusal,"Bankatta, Parroha",Female,BDS
+25478,Dr. Pabitra Regmi,"Bardiya, Mainapokhar",Female,BDS
+25479,Dr. Navaraj Ghimire,"Murtiya, Barahathawa",Male,BDS
+25480,Dr. Dilip Jaiswal,"Rajpur Pharahadawa, Rajpur",Male,MBBS
+25481,Dr. Ashkal Basi,"Jenla Tole, Bhaktapur",Male,MBBS
+25482,Dr. Manish Kumar Sah,"Parariya, Parariya",Male,MBBS
+25483,Dr. Gaurav Karki,"Morang, Hoklabari",Male,MBBS
+25484,Dr. Swati Dhungel,"Bhat Bhateni, Kathmandu",Female,MBBS
+25485,Dr. Ashutosh Ghimire,"Balaju, kathmandu",Male,MBBS
+25486,Dr. Shraddha Bhattarai,"ITAHARI, Itahari",Female,MBBS
+25487,Dr. Prasanna Thike Shrestha,"Koteshwor, Kathmandu",Female,BDS
+25488,Dr. Srijana Koju,"Bhaktapur, Bhaktapur",Female,MBBS
+25489,Dr. Ankita Simkhada,"Balaju, Kathmandu Metropolitan City",Female,MBBS
+25490,Dr. Arjan Singh,"hemantabada, Hemantabada",Male,MBBS
+25491,Dr. Tsering Dolma Gurung,"KMC, Kathmandu",Female,MBBS
+25492,Dr. Samiksha Lamichhane,"Uniyachaur, Putalibazar Municipality",Female,MBBS
+25493,Dr. Karuna Rayamajhi,"Rupandehi, Basantapur",Female,MBBS
+25494,Dr. Ananda Dahal,"Adarshanagar, Butwal",Male,MBBS
+25495,Dr. Monica Bohara,"SAYLAPAKHA, Saylapakha",Female,MBBS
+25496,Dr. Chandranshu Pandey,"Patapati, Vastu",Female,MBBS
+25497,Dr. Nirjala Timsina,"Buttabari, Anarmani",Female,MBBS
+25498,Dr. Puja Pahari,"Lakeside, Pokhara",Female,MBBS
+25499,Dr. Pranodan Poudel,"Gobaddihawa, Banganga",Male,MBBS
+25500,Dr. Manasil Malla,"Kupondole, Lalitpur",Male,MBBS
+25501,Dr. Shuvaraj Pokharel,"Mahadevsthan, Malu",Male,MBBS
+25502,Dr. Bidhi Regmi,"Kathmandu, Kathmandu",Female,MBBS
+25503,Dr. Punam Mishra,"Kathmandu, Kathmandu",Female,MBBS
+25504,Dr. Siddhartha Gautam,"Sishuwa, Lekha Nath",Male,MBBS
+25505,Dr. Sumina Rai,"Tinkune, Kathmandu",Female,MBBS
+25506,Dr. Pankaj Dhungana,"NAINPUR, Dhangadhi",Male,MBBS
+25507,Dr. Ankit Agrawal,"Biratnagar, Biratnagar",Male,MBBS
+25508,Dr. Nischal Shrestha,"kushadevi, kushadevi",Male,MBBS
+25509,Dr. Robinjung Bhandari,"Kshemadevi, Bahrabise",Male,MBBS
+25510,Dr. Dikshanta Acharya,"Kusma, Shivalaya",Male,MBBS
+25511,Dr. Kamal Ghimire,"Bairiya, Banganga",Male,MBBS
+25512,Dr. Sushmita Bhattarai,"ARCHALE, Manakamana",Female,MBBS
+25513,Dr. Sagun Baral,"BASPANI, Pumdibhumdi",Male,MBBS
+25514,Dr. Suraj K.C,"Kuwatol, Bishnu Budhanilkantha",Male,MBBS
+25515,Dr. Kshitiz Raj Pokhrel,"DANG, Bijauri",Male,MBBS
+25516,Dr. Barsha Karki,"GODAMCHAUR, Godamchaur",Female,MBBS
+25517,Dr. Riyaz Shrestha,"Dhulikhel, Dhulikhel",Male,MBBS
+25518,Dr. Sushil Dahal,"Kathmandu, Kathmandu",Male,MBBS
+25519,Dr. Saugat Lamichhane,"Lekhnath, Lekhnath",Female,MBBS
+25520,Dr. Krishnakant Yadav,"Biratnagar, Biratnagar Metropolitan",Male,MBBS
+25521,Dr. Suman Khanal,"Koiralachet, kharanitar",Male,MBBS
+25522,Dr. Lalan Kumar Mahato,"Nokailawa, Nokailawa",Male,MBBS
+25523,Dr. Md. Aazam,"NEPALGUNJ, Nepalgunj",Male,MBBS
+25524,Dr. Harshit Pathak,"Tribhuwan chowk,nepalgunj_11,nepal, Nepalgunj",Male,MBBS
+25525,Dr. Prithu Jyoti Nepal,"Koteshwor, Kathmandu",Male,MBBS
+25526,Dr. Eva Deep,"nepal, Kathmandu",Female,MBBS
+25527,Dr. Asmita Acharya,"Sandhikharka, Sandhikharka",Female,MBBS
+25528,Dr. ASHRU NEUPANE,"NEPAL, Shyamgha",Female,MBBS
+25529,Dr. Pritha Acharya,"Dhunge dhara, Ichangu Narayan",Female,MBBS
+25530,Dr. Ramesh Roka,"Shahartara, Shahartara",Male,MBBS
+25531,Dr. Ajaya Shrestha,"Puranagaun, Puranagaun",Male,MBBS
+25532,Dr. Jamuna Shrestha,"Gorkha, Dhuwakot",Female,MBBS
+25533,Dr. Sabita Baral,"Chanauli, Gunjanagar",Female,MBBS
+25534,Dr. Lokaratna Gyawali,"Satyawati 4,Limgha, Gulmi, Satyawati Rular Municipality",Female,MBBS
+25535,Dr. Rojan Basnet,"Gatthaghar, Madhyapur Thimi",Male,MBBS
+25536,Dr. Surendra Bahadur Chhetri,"Pragatinagar, Devchuli municipality",Male,MBBS
+25537,Dr. Pratik Bhattarai,"Kathmandu, Kathmandu Mahanagar Palika",Male,MBBS
+25538,Dr. Sreya Shah,"Lalitpur, Lalitpur",Female,MBBS
+25539,Dr. Sumina Adhikari,"Tanahun, Ramjakot",Female,MBBS
+25540,Dr. Prashant Chaulagain,"Depalgaun, Depalgaun",Male,MBBS
+25541,Dr. Prakash Banjade,"Kishana, Thoolapokhara",Male,MBBS
+25542,Dr. Dipesh Upreti,"BHULBHULE, CHAUGHADA, Hatauda",Male,MBBS
+25543,Dr. Prasun Khanal,"Gunadi, Jamune",Male,MBBS
+25544,Dr. Anjali Shrestha,"SYANGJA, Walling",Female,MBBS
+25545,Dr. Sagun Adhikari,"PARBAT, Shankerpokhari",Female,MBBS
+25546,Dr. Kamal Kandel,"Bihunkot, Bihunkot",Male,MBBS
+25547,Dr. Surendra Das,"Parbaha, Deuri Parbaha",Male,MBBS
+25548,Dr. Alina Upreti,"Gaikhur, Gaikhur",Female,MBBS
+25549,Dr. Alishna Batajoo,"Siddharthachowk, Pokhara, Pokhara",Female,MBBS
+25550,Dr. Dipendra Nepali Paudyal,"Butwal, Butwal Municipality",Male,MBBS
+25551,Dr. Sujata Dahal,"Kabre, Baiteshwor",Female,MBBS
+25552,Dr. Roshan Lama,"Dadhikot, Dadhikot",Male,MBBS
+25553,Dr. Prashant Simkhada,"Bharmale, Jyamrung",Male,MBBS
+25554,Dr. Sujan Dhital,"Kaule, Tandrang",Male,MBBS
+25555,Dr. Prithivi Adhikari,"Bhairahawa, Sidhharthanagar",Female,BDS
+25556,Dr. Dipesh Adhikari,"lamjung, Dudhpokhari",Male,BDS
+25557,Dr. Rojina Shrestha,"Damak, Damak",Female,BDS
+25558,Dr. Melina Shrestha,"Mahendranagar, Baglung, Mahendranagar",Female,BDS
+25559,Dr. Loojaw Shrestha,"Madhyapur thimi, Madhyapur Thimi",Male,BDS
+25560,Dr. Bishow Deep Poudel,"Lekhnath, Lekhnath",Male,BDS
+25561,Dr. Mandira Budhathoki,"Phasku Dolakha, Phasku",Female,BDS
+25562,Dr. Ashim Shrestha,"Ason, Kathmandu",Male,BDS
+25563,Dr. Namika Dhakal,"Sunsari, Itahari",Female,BDS
+25564,Dr. Laxman Aryal,"DHADING BENSI, Neelkantha",Male,MBBS
+25565,Dr. Prabha Bhandari,"BRAMHAKHEL, Danchhi",Female,MBBS
+25566,Dr. Ninda Tashi Tenzing Sherpa,"olangchung gola 8, Olangchung Gola",Male,MBBS
+25567,Dr. Dibasa Adhikari,"Satdobato, Lalitpur, Lalitpur",Female,MBBS
+25568,Dr. Kajol Ghimire,"Dharmasthali, Kathmandu",Female,MBBS
+25569,Dr. Nita Lohala,"Taumadhi, Bhaktapur",Female,MBBS
+25570,Dr. Diksha Nepal,"Khasyauli 4, Khasyauli",Female,MBBS
+25571,Dr. Prasesh Dhakal,"Maitidevi, Kathmandu",Male,MBBS
+25572,Dr. Nistha Ulak,"Khopasi, Panauti",Female,MBBS
+25573,Dr. Kipa Shrestha,"Nawalpur, Nawalpur",Female,MBBS
+25574,Dr. Sujita Manandhar,"Chaukot, Panauti",Female,MBBS
+25575,Dr. Akhilendra Jha,"Murlibagaicha, Birganj",Male,MBBS
+25576,Dr. Pukar K.C.,"Chaukot, Panauti",Male,MBBS
+25577,Dr. aakash prabhakar,"siraha, lagdi gotha",Male,MBBS
+25578,Dr. Sashit Shrestha,"Siddhipur, Siddhipur",Male,MBBS
+25579,Dr. Kuber Singh Thapa,"Birendranagar, Latikoili",Male,MBBS
+25580,Dr. Rishab Khanal,"Pipra, Banganga",Male,MBBS
+25581,Dr. Sajan Baral,"POKHARA, Pokhara Metropolitan",Male,MBBS
+25582,Dr. Aliza Shakya,"GWARKO,LALITPUR, Lalitpur",Female,MBBS
+25583,Dr. NIKU THAPA,"PITHUWA, Pithuwa",Female,MBBS
+25584,Dr. Sudip Bastakoti,"Srijanachowk, Pokhara",Male,MBBS
+25585,Dr. Bishal Tiwari,"Shishuwa, Lekhnath",Male,MBBS
+25586,Dr. Sandip Shrestha,"Ritthepani, Baguwa",Male,MBBS
+25587,Dr. sachita subedi,"Lekhnath, Pokharalekhnath",Female,MBBS
+25588,Dr. Rukshar Thapa,"Nuwakot, Panchakanya",Female,MBBS
+25589,Dr. Sandip Paudel,"Gulariya, Gulariya",Male,MBBS
+25590,Dr. Rudra Mani Bhandari,"Gulmi, Amarpur",Male,MBBS
+25591,Dr. Sandeep Kumar Yadav,"Chhatauna, Pacharukhi",Male,MBBS
+25592,Dr. Brindan Gyawali,"Nawalpur, Ghorahi",Male,MBBS
+25593,Dr. Anil Maharjan,"Lalitpur 7, Lalitpur",Male,MBBS
+25594,Dr. Sunita Bhandari,"Pokhara, Pokhara",Female,MBBS
+25595,Dr. Kamal Jung Shahi,"Dhambojhi, Nepalgunj",Male,MBBS
+25596,Dr. Nimish Joshi,"Bagnaha, Bagnaha",Male,MBBS
+25597,Dr. Nirajan Bhandari,"Hunga, Hunga",Male,MBBS
+25598,Dr. Mahima Adhikari,"Barre, Simpani",Female,MBBS
+25599,Dr. Shodip Shrestha,"Nagbahal, Lalitpur",Male,MBBS
+25600,Dr. Nisha Mahaseth,"Hetauda,Makawanpur, Hetauda",Female,MBBS
+25601,Dr. Rabin Baniya,"Battisputali, Kathmandu",Male,MBBS
+25602,Dr. Aayushma Paudel,"Baglung, Chhisti",Female,MBBS
+25603,Dr. Sabina Nhemafuki,"Kamal binayak, Bhaktapur",Female,MBBS
+25604,Dr. NEHA GAUTAM,"BASANTA MARG, BABARMAHAL, Kathmandu",Female,MBBS
+25605,Dr. Kamal Raj Roka,"Nepal, Darbung",Male,MBBS
+25606,Dr. Seema Sharma,"Kathmandu, Gongabu",Female,BDS
+25607,Dr. Sadeekshya Joshi,"Gyaneshwor, Kathmandu",Female,BDS
+25608,Dr. Susmita Bhandari,"Dolakha, Magapawa",Female,BDS
+25609,Dr. Jenisha Shrestha,"Biratnagar, Babiyabirta",Female,BDS
+25610,Dr. Sadikshya Prajapati,"Mitrapark, Kathmandu",Female,BDS
+25611,Dr. Ghanshyam Yadav,"Madhepura, Loharpatti",Male,MBBS
+25612,Dr. GHANSHYAM THAKUR,"GAUR MUNICIPALITY WARD NO. 9 SIRSIYA, STATE NO.2, NEPAL, Gaur",Male,MBBS
+25613,Dr. MANISHA KARN,"INARWA, Bhagwanpur",Female,MBBS
+25614,Dr. Shristi Pourel,"Anandaban, Anandaban",Female,BDS
+25615,Dr. sanjay sigdel,"Bheri, kohalpur",Male,MBBS
+25616,Dr. Mohammed Raja Ansari,"Jeelani Tole, Malangawa",Male,MBBS
+25617,Dr. ABDUS SABOOD KHAN,"BANDIHULI, Niglihawa",Male,MBBS
+25618,Dr. Ishu Sharma,"KATHMANDU BALKHU, Kathmandu",Female,MBBS
+25619,Dr. Arati Thapa,"Mandikhatar, Mahankal",Female,MBBS
+25620,Dr. suman gautam,"hatiya, Juvung",Female,MBBS
+25621,Dr. Sarina Gurung,"Kalopool, Kathmandu",Female,MBBS
+25622,Dr. Samundra Gautam,"Bhalam, Bhalam",Male,MBBS
+25623,Dr. Newton Gyawali,"Kathmandu, Naikap Nayabhanjyang",Male,MBBS
+25624,Dr. Bisesh Regmi,"Butwal, Butwal Na.Pa",Male,MBBS
+25625,Dr. Samiksha Bastakoti,"Bharatpur 10,Chitwan, Bharatpur",Female,MBBS
+25626,Dr. Anjan Dhoj Lama,"Tinpipal, Pokhari Narayansthan",Male,MBBS
+25627,Dr. Aarju Lamichhane,"Old baneshwor, Kathmandu",Female,MBBS
+25628,Dr. Sushant Dhungel,"Mulpani, Kageshwori Manohara",Male,MBBS
+25629,Dr. Raj Kumar Sah,"Baluwa, Dumariya",Male,MBBS
+25630,Dr. Abhikanta Khatiwada,"Srijana chowk, Pokhara",Male,MBBS
+25631,Dr. Sharada K. C.,"Ramsi, Pooja",Female,MBBS
+25632,Dr. Pramita Shrestha,"Gwarko, lalitpur, Lalitpur",Female,MBBS
+25633,Dr. Divash Acharya,"Rolpa, Liwang",Male,MBBS
+25634,Dr. Krishu Adhikari,"Nuwakot, Tupche",Female,MBBS
+25635,Dr. Pratistha Bhattarai,"Khotang Bazzar, Khotang Bazzar",Female,MBBS
+25636,Dr. Wishad Shrestha,"Kathmandu, Kathmandu",Male,MBBS
+25637,Dr. saroj sitaula,"Sunkhani, Chainpur",Male,MBBS
+25638,Dr. Gaurab Bhatta,"Kasinthok, Baguwa",Male,MBBS
+25639,Dr. Yubraj Paudel,"Gaurighat, Sunwal",Male,MBBS
+25640,Dr. Samrachana Acharya,"Ramrekha, Baglung",Female,MBBS
+25641,Dr. Pramod Kumar Sah,"Birendra bazaar, Bharatpur",Male,MBBS
+25642,Dr. Roshan Jha,"Thera, Thera kachuri",Male,MBBS
+25643,Dr. Mandira Karki,"Manthali, Manthali",Female,BDS
+25644,Dr. Anusca Tripathi,"Benighat, dhading, Benighat",Female,MBBS
+25645,Dr. Bijaya Dhital,"THARPA, Ruga",Male,MBBS
+25646,Dr. Manish Kumar Yadav,"INARWA, Inarwa",Male,MBBS
+25647,Dr. Suraj Kharbuja,"Ittachhen, Bhaktapur",Male,MBBS
+25648,Dr. SHUBHECHCHHYA AMATYA,"MANBHAWAN, Lalitpur",Female,MBBS
+25649,Dr. Ram Mohan Jha,"Bhagawati road, Inaruwa",Male,MBBS
+25650,Dr. Prithul Koirala,"gitanagar, Gitanagar",Male,MBBS
+25651,Dr. Shraban Kumar Mahato,"Bateshwor, Bateshwor",Male,MBBS
+25652,Dr. Trishna Kattel,"Lalitpur, Lalitpur",Female,MBBS
+25653,Dr. Binisha Joshi,"Kathmandu, Kathmandu",Female,MBBS
+25654,Dr. Barsha Shrestha,"Lalitpur, Lalitpur",Female,MBBS
+25655,Dr. dristi lamichhane,"lekhnath, lekhnath",Female,MBBS
+25656,Dr. Mahesh Bishwokarma,"phinam_5 , GORKHA_, Phinam",Male,MBBS
+25657,Dr. Sukriti Pradhananga,"Bhairav Tol, Pokhara",Female,MBBS
+25658,Dr. GOURAV KUMAR DEV,"Pahade tole, Harinagara VDC",Male,MBBS
+25659,Dr. LISA THAPA,"Balaju, Manamaiju",Female,MBBS
+25660,Dr. MANOJ DHAMALA,"TRIJUGA, Dulari",Male,MBBS
+25661,Dr. Bipana K C,"CHANAUTE, Lamachaur",Female,MBBS
+25662,Dr. Ela Thapa,"POKHARA, Lekh Nath",Female,MBBS
+25663,Dr. shreelal yadav,"Prasotipur, Lalparsa",Male,MBBS
+25664,Dr. Swechhya Pradhan,"Thamel, Kathmandu, Kathmandu",Female,MBBS
+25665,Dr. Ashmita Wagle,"Pokhara 16,kaski, Pokhara",Female,MBBS
+25666,Dr. Srishti Gurung,"Dhampus, Dhampus",Female,MBBS
+25667,Dr. Sagar Basnet,"Pokhara, Pokhara",Male,MBBS
+25668,Dr. Manish Pandey,"Mahendranagar, Bheemdatt",Male,MBBS
+25669,Dr. Smriti Piya,"Bandipur, Bandipur",Female,MBBS
+25670,Dr. Asmita Bhattarai,"Bandipur 1, Birendranagar",Female,MBBS
+25671,Dr. Govinda Prasad Tharu,"Rajhena, Rajhena",Male,MBBS
+25672,Dr. Sudikshya Acharya,"Magaragadi, Magaragadi",Female,MBBS
+25673,Dr. Sandesh Budhathoki,"Ratanpur, Ghorahi",Male,MBBS
+25674,Dr. Shailes Paudel,"Tarauli, Bachhauli",Male,MBBS
+25675,Dr. Amrit Bhattarai,"Bartung, Tansen",Male,MBBS
+25676,Dr. Shiva Aryal,"Madhawalia, Tilottama",Male,MBBS
+25677,Dr. Sadichhya Shrestha,"Jawalamukhi gaupika, Jwalamukhi 2 dhading",Female,MBBS
+25678,Dr. Pradip Kumar Tharu,"Suhpur, Jagarnathpur",Male,MBBS
+25679,Dr. Tulsi Raj Khanal,"Betahi, Sou Farsatikar",Male,MBBS
+25680,Dr. PALPASA BHUI,"Gatthaghar, Madhyapur Thimi",Female,MBBS
+25681,Dr. Ashok Paudel,"Pang, Pang",Male,MBBS
+25682,Dr. Prem Shrestha,"Chhirke, Chaysing Kharka",Male,MBBS
+25683,Dr. Bijaya Shrestha,"Adarsanagar, Hetauda",Female,MBBS
+25684,Dr. Diksha Sainju,"Banepa, Banepa",Female,MBBS
+25685,Dr. Smritee Pandey,"Kathmandu, Kathmandu",Female,BDS
+25686,Dr. Pratistha Acharya,"Satdobato, Lalitpur",Female,MBBS
+25687,Dr. ANUP SUBEDI,"Basundol, Badbhanjyang",Male,MBBS
+25688,Dr. Smarika Upadhyaya,"Kathmandu, Naikap Nayabhanjyang",Female,MBBS
+25689,Dr. Samir Raut,"Lalitpur, Lubhu",Male,MBBS
+25690,Dr. Anisha Ghimire,"Maurighat, Lalmatiya",Female,MBBS
+25691,Dr. Renu Kumari Sah,"Malhaniya, Malhaniya Khori",Female,BDS
+25692,Dr. Bhupesh Joshi,"madala, Dashrathchand",Male,BDS
+25693,Dr. Sumitra Lama,"Kavrepalanchok, Gothapani",Female,BDS
+25694,Dr. Shreeya Shrestha,"Kathmandu, Kathmandu",Female,BDS
+25695,Dr. Meenu Shrestha,"Bhaktapur, Madhyapur Thimi",Female,BDS
+25696,Dr. Sujina Prajapati,"Bhaktapur, Bhaktapur",Female,MBBS
+25697,Dr. Varsha Thapa,"Murgiya, Parroha",Female,MBBS
+25698,Dr. Dependra Bhandari,"Shankarnagar, Tilottama",Male,MBBS
+25699,Dr. Sapana K C,"Syangja, Arjun Chaupari",Female,MBBS
+25700,Dr. Priyasa Adhikari,"chitwan, Chainpur",Female,MBBS
+25701,Dr. Subika Banjade,"Ghochekhola, Kimdanda",Female,MBBS
+25702,Dr. Elisha Shrestha,"Besishahar, Besishahar",Female,MBBS
+25703,Dr. Rajesh Kumar Ray,"Janakinagar, Baryarpatti",Male,MBBS
+25704,Dr. Rabin Kumar Shrestha,"Ambote, Dhuwakot",Male,MBBS
+25705,Dr. Bhumika Nayak,"Bhediya, Bhediya",Female,MBBS
+25706,Dr. bidhya jyoti shrestha,"DUMKIBAS,NAWALPARASI, Dumkibas",Female,MBBS
+25707,Dr. Arpana Chhetri Budhathoki,"Thecho, Thecho",Female,MBBS
+25708,Dr. Raj Kumar Gupta,"Belashpur, Kushma",Male,MBBS
+25709,Dr. Sunita Gurung,"Majhakot, Majhakot",Female,MBBS
+25710,Dr. CHHOTE KUMAR YADAV,"Dhanusha, Gopalpur",Male,MBBS
+25711,Dr. VIVEK PANDEY,"Gulmi, Simichaur",Male,MBBS
+25712,Dr. Sushmita Neupane,"Nawalparsi, Pragatinagar",Female,MBBS
+25713,Dr. Niraj Kumar Sah,"Siraha, Siraha",Male,MBBS
+25714,Dr. Nischal Babu Neupane,"yagyapuri, Bharatpur",Male,MBBS
+25715,Dr. Rubi Thapa,"Mirlung, Mirlung",Female,MBBS
+25716,Dr. Brinda Dhungana,"Khaireni, Devdaha",Female,MBBS
+25717,Dr. Prakash Neupane,"Asnaiya, Sunwal",Male,MBBS
+25718,Dr. Sunil Bardewa,"Khaireni, Devdaha",Male,MBBS
+25719,Dr. Sudhakar Jha,"Kharihani, Kharihani",Male,MBBS
+25720,Dr. Sristi Ghimire,"Dhungedhara, Kathmandu",Female,MBBS
+25721,Dr. Sabud Regmi,"Kathar, Kathar",Male,MBBS
+25722,Dr. Brijesh Kumar Yadav,"Sanhaitha, Siraha",Male,MBBS
+25723,Dr. Bishal Kumar Barun,"Belhaiya, Siddharthanagar",Male,MBBS
+25724,Dr. Sunita Silwal,"Dhading, Salang",Female,MBBS
+25725,Dr. Prashant Dwivedi,"Taulihawa, Kapilvastu",Male,MBBS
+25726,Dr. Rhitu Baniya,"Gorkha, Aamppipal",Female,MBBS
+25727,Dr. Prakash Gurung,"Ranipauwa,pokhara 12, Pokhara",Male,MBBS
+25728,Dr. Deepak Sharma,"Biratnagar, Biratnagar",Male,MBBS
+25729,Dr. Surakshya Pandey,"Shankarnagar, Tilottama",Female,MBBS
+25730,Dr. Anil Shrestha,"Bhanu 8, tanahun, Bhanu",Male,MBBS
+25731,Dr. pratibha chaudhary,"lahan, Mauwahi",Female,MBBS
+25732,Dr. Vivek paudyal,"surunga, Surunga",Male,MBBS
+25733,Dr. Shreejan Shakhakarmi,"Tulachhen, Bhaktapur",Male,MBBS
+25734,Dr. AVINASH KUMAR CHAUDHARY,"Garuda birya, Garuda",Male,MBBS
+25735,Dr. Juhi Agarwal,"bhairawa, Sidharthnagar",Female,BDS
+25736,Dr. Sanjeev Adhikari,"Mandre, Subarnakhar",Male,MBBS
+25737,Dr. sona sharma,"Bharatpur 11, chitwan, nepal, Bharatpur",Female,MBBS
+25738,Dr. Ranjan Kumar Barnawal,"Chhinnamasta, Chhinnamasta",Male,MBBS
+25739,Dr. Nilkantha Aryal,"Kalikanagar, Butwal",Male,MBBS
+25740,Dr. Rupesh Kumar Mandal,"SHREE RAMPUR TOLE, Biratnagar",Male,MBBS
+25741,Dr. Rakesh Nyasur,"Lalitpur, Godawari",Male,MBBS
+25742,Dr. Subash Thapa,"Jamtoki, Katahari",Male,MBBS
+25743,Dr. Summi Karn,"Dhanusha, Basahiya",Female,MBBS
+25744,Dr. Malati Thapa,"Sukepokhari, Harion",Female,MBBS
+25745,Dr. Riya Sharma,"Sindhuli, Purano Jhangajholi",Female,MBBS
+25746,Dr. Arun Giri,"Shreepur, Birgunj",Male,MBBS
+25747,Dr. Pritha Adhikari,"Chabahil, Kathmandu",Female,MBBS
+25748,Dr. Shreya Shrestha,"Tahachal, Kathmandu",Female,MBBS
+25749,Dr. Neeti Ranjitkar,"Kathmandu, Kathmandu",Female,MBBS
+25750,Dr. Shreeya Sharma,"Manthali, Manthali",Female,MBBS
+25751,Dr. sajan shrestha,"dharapani, devchuli",Male,MBBS
+25752,Dr. Suman Siwakoti,"Jhapa, Chandragadi",Male,MBBS
+25753,Dr. Sumit Singh,"Janakpur, Lakhauri",Male,MBBS
+25754,Dr. Sadma Banu,"Butwal, Butwal",Female,MBBS
+25755,Dr. SHRIJANA BASHYAL,"SHALIGRAM, SHALIGRAM",Female,MBBS
+25756,Dr. Divyata Adhikari,"Thumka, Bidur",Female,MBBS
+25757,Dr. Shriya Shrestha,"Sundhara,Lalitpur, Lalitpur",Female,MBBS
+25758,Dr. Shivani Singh,"Chhatauna, Balra",Female,MBBS
+25759,Dr. Shisir Chhetri,"Nimdanda, Nuwakot",Male,MBBS
+25760,Dr. Prasansa Sharma,"Parbat, Bhangara",Female,MBBS
+25761,Dr. Neha Shrestha,"Lokanthali, Madhyapur Thimi",Female,MBBS
+25762,Dr. Bidit Bhattarai,"Baneshwor, Kathmandu",Male,MBBS
+25763,Dr. Celeste Shakya,"Dharan, Dharan",Female,MBBS
+25764,Dr. Rajendra Joshi,"Bajhang, Chainpur",Male,MBBS
+25765,Dr. MANOJ BHATTA,"DHANGADHI, Dhangadhi",Male,MBBS
+25766,Dr. aashish bastakoti,"Arghaun, Pokhara",Male,MBBS
+25767,Dr. Surendra Bhatt,"Pipalkot, Dasharathchand",Male,MBBS
+25768,Dr. Lochan Babu Sanjel,"Jhapa, Chandragadi",Male,MBBS
+25769,Dr. Rahul Jha,"Jawakha, Sandha",Male,MBBS
+25770,Dr. Amir Raj Giri,"Ramkot, Nagarjun",Male,MBBS
+25771,Dr. Jyamiti Lamichhane,"Saimarang 03, Saimarang",Female,MBBS
+25772,Dr. Shristi Kafle,"Khahare, waling, Waling",Female,MBBS
+25773,Dr. Manisha K. C.,"Minbhawan, Kathmandu",Female,MBBS
+25774,Dr. Prakriti Pachhai,"Chahara 01, palpa, Chahara",Female,MBBS
+25775,Dr. Simran Chaudhary,"Jaleshwar, Jaleshwar",Female,MBBS
+25776,Dr. Sudhir Shah,"Gaur, Gaur",Male,MBBS
+25777,Dr. Sulav Shrestha,"Khotang, Buipa",Male,MBBS
+25778,Dr. Shatrughan Prasad Yadav,"dhangadhi, Bode Barsien",Male,MBBS
+25779,Dr. Roshna Adhikari,"Biratnagar, Biratnagar",Female,MBBS
+25780,Dr. Sunil Dhunagana,"Serunga, Waling",Male,MBBS
+25781,Dr. Kaushal Sigdel,"Biratnagar, Biratnagar",Male,MBBS
+25782,Dr. Sameen Khatiwada,"Darbesha, Darbesha",Male,MBBS
+25783,Dr. Kamal Kant Chaudhary,"Itaharwa, Sitapur",Male,MBBS
+25784,Dr. Anjil K. C.,"Gokuwa, Tankisinuwari",Male,MBBS
+25785,Dr. Prabal Hada,"Suryabinayak, Bhaktapur",Male,MBBS
+25786,Dr. PRAVIN KUMAR JHA,"Mouwaha, Mouwaha",Male,MBBS
+25787,Dr. PRATIMA KHANIYA,"IBRD, Kalika",Female,MBBS
+25788,Dr. Aashutosh Sah,"Kachuri thera 8, Kachuri thera",Male,MBBS
+25789,Dr. Karan Sharma,"Ghorahi, Ghorai",Male,MBBS
+25790,Dr. chandra bhushan singh,"Barwachhotaily, Biruwaguthi",Male,MBBS
+25791,Dr. Prakash kumar gupta,"Rampur, Belaka",Male,MBBS
+25792,Dr. Neha K. C.,"Jharuwarashi, Jharuwaarashi",Female,MBBS
+25793,Dr. Rabindra Dhakal,"Nakhipot, Nakhipot",Male,MBBS
+25794,Dr. Anisha Ghimire,"Bhorletar, Madhyanepal",Female,MBBS
+25795,Dr. Ujjwal Shah,"Gonarpura, Gonarpura",Male,MBBS
+25796,Dr. avinash adhikari,"Balwa, Balwa",Male,MBBS
+25797,Dr. Shreeya Adhikari,"Dhumbharai, Kathmandu",Female,MBBS
+25798,Dr. Diya Kumari Agrawal,"Birtamode, Anarmani",Female,MBBS
+25799,Dr. Indra Raj Patel,"Parsauni, Parsauni",Male,MBBS
+25800,Dr. Dinesh Giri,"Odigaon, Kharkada",Male,MBBS
+25801,Dr. AMARNATH JHA,"HANUMAN NAGAR, Hanuman Nagar Pra Dha",Male,MBBS
+25802,Dr. ARATI SHRESTHA,"BASANTAPUR, Basantapur",Female,MBBS
+25803,Dr. Mamata Shrestha,"Rudrabeni, Aslewa",Female,MBBS
+25804,Dr. Sajan Shrestha,"Bastu, Bastu",Male,MBBS
+25805,Dr. Sujata Panta,"Bhamarkot, Panchkhal",Female,MBBS
+25806,Dr. Devendra Joshi,"Gorkha, Khoplang",Male,MBBS
+25807,Dr. Krishna Gharti,"Sakcha, Nuwakot",Male,MBBS
+25808,Dr. Tej Bahadur KC,"Rapti,Dang, Tulsipur",Male,MBBS
+25809,Dr. Sanjay Sonkar,"Dallapur, Mahammadpur",Male,MBBS
+25810,Dr. Tek Narayan Shrestha,"Ramechhap, Rampur",Male,MBBS
+25811,Dr. Durga Mishra,"LAMJUNG, Kunchha",Female,MBBS
+25812,Dr. shweta giri,"shanti chowk, Ratnanagar",Female,MBBS
+25813,Dr. Rekha Kumari Gupta,"Gahawa, Birganj",Female,MBBS
+25814,Dr. Madhu Kumari,"HARIHARPUR, Hariharpur",Female,MBBS
+25815,Dr. Rupesh Kumar Chaurasia,"KUMHAL TOLE, Birgunj",Male,MBBS
+25816,Dr. Udesh Pandey,"Kafaldanda, Thanapati",Male,MBBS
+25817,Dr. Bishal Tiwari,"Majhthana, Majhthana",Male,MBBS
+25818,Dr. Suraj Singh,"Gaushala, Gaushala",Male,MBBS
+25819,Dr. Kamal Karki,"Baglung, Resha",Male,MBBS
+25820,Dr. Umang Gupta,"Tulsipur, Tulsipur",Male,MBBS
+25821,Dr. Suman Verma,"Indrapur, Indrapur",Female,MBBS
+25822,Dr. Pragyik Pandey,"Khoplang, Khoplang",Male,MBBS
+25823,Dr. Shristi Thapa Chhetri,"Kalikanagar, Butwal",Female,MBBS
+25824,Dr. Riya Timalsina,"Makawanpur, Hetauda",Female,MBBS
+25825,Dr. Ravi Thapa,"Milan tole, Anbookhaireni",Male,MBBS
+25826,Dr. Ankit Poudel,"Gugepani, Rupakot",Male,MBBS
+25827,Dr. Kabita Sapkota,"Manigram 4 nom, Tilottama",Female,MBBS
+25828,Dr. Praju Adhikari,"Naubise, Khanalthok",Female,BDS
+25829,Dr. Pooja Chaudhary,"Belahiya, Siddhartha",Female,BDS
+25830,Dr. Amita Shrestha,"Naya thimi, Madhyapur thimi",Female,BDS
+25831,Dr. Shraddha Adhikari,"Saudiyar, Saudiyar",Female,BDS
+25832,Dr. Priya Jaiswal,"Birganj, Birganj",Female,BDS
+25833,Dr. Sumit Dhakal,"Phutung, Phutung",Male,BDS
+25834,Dr. Jenish Shrestha,"Bhimsenthan, Dhulikhel",Female,BDS
+25835,Dr. Merina Biraji,"Madhwapur, Madhwapur",Female,BDS
+25836,Dr. Jyoti Gyawali,"Gulmi, Gwadi",Female,BDS
+25837,Dr. Yamuna Sapkota,"Tupche, Nuwakot, Tupche",Female,BDS
+25838,Dr. Jyoti Prakash Sah,"Bhasedwa, Bhasedwa",Male,MBBS
+25839,Dr. Pralisha Maharjan,"Kathmandu, kathmandu",Female,MBBS
+25840,Dr. Suprita Shrestha,"Main road, Biratnagar",Female,MBBS
+25841,Dr. Deepa Dhungana,"Panchkhal, kavre, Panchkhal",Female,MBBS
+25842,Dr. Prameshwar Kumar Sah,"Narayani,Parsa, Bahuarwabhatha",Male,MBBS
+25843,Dr. Sulav Khanal,"Narayangarh, Bharatpur",Male,MBBS
+25844,Dr. Laxmi Narayan Kamat,"koshi, Morang, BIratnagar",Male,MBBS
+25845,Dr. subhash chandra yadav,"mahottari, gonarpura",Male,MBBS
+25846,Dr. Anjani Kumar Yadav,"Siraha, Siraha",Male,MBBS
+25847,Dr. Rojina Shrestha,"kuleshwor, kathmandu",Female,MBBS
+25848,Dr. Saurav Gurung,"Ramghat, Pokhara",Male,MBBS
+25849,Dr. SHILA POUDEL,"AMALACHAUR, Amalachaur",Female,MBBS
+25850,Dr. Bibek Pokhrel,"Dang, Manpur",Male,MBBS
+25851,Dr. Dhanik Lal Yadav,"Sitapur, Sitapur",Male,MBBS
+25852,Dr. Binita Sanjel,"Morang, Biratnagar",Female,MBBS
+25853,Dr. Gaurab Khatri,"Gorkha, Chyangli",Male,MBBS
+25854,Dr. karun shrestha,"Jhapa Nepal, Mechinagar",Male,MBBS
+25855,Dr. TEJ NARAYAN SHAH,"Mahadeva, Dadha",Male,MBBS
+25856,Dr. Dristi Silwal,"Nampha, Golche",Female,MBBS
+25857,Dr. Dipesh Chhetri,"Nirmal Batika Tol, Gongabu",Male,MBBS
+25858,Dr. PRADIP RIMAL,"Besishahar, Besishahar",Male,MBBS
+25859,Dr. Nayan Sapkota,"New Baneshwor, Kathmandu",Female,MBBS
+25860,Dr. Nishma Pokharel,"Dhumbarahi, Kathmandu",Female,MBBS
+25861,Dr. SUBODH CHAPAGAIN,"KHANDBARI, Khandbari",Male,MBBS
+25862,Dr. SANJEEB LAMA,"JORPATI, Jorpati",Male,MBBS
+25863,Dr. Shiv Ram Krishn Yadav,"Ramdaiya bhabadi, kshireshwarnath",Male,MBBS
+25864,Dr. Sabnam Mali,"Bungamati, Lalitpur",Female,BDS
+25865,Dr. SHRISTI NAPIT,"Yachhen, Bhaktapur",Female,BDS
+25866,Dr. Divya Ghimire,"Biratnagar, Biratnagar",Female,BDS
+25867,Dr. Seema Sharma,"Kalikanagar, Butwal",Female,MBBS
+25868,Dr. Subash Sing Lo,"Makwanpurgadhi, Makwanpurgadhi",Male,BDS
+25869,Dr. Smriti K. C.,"Koteshwor, Kathmandu",Female,BDS
+25870,Dr. Suman Paudel,"Koshi, sunsari, Singiya",Male,MBBS
+25871,Dr. SUNIL YADAV,"RAYPUR, Rupani Gaunpalika",Male,MBBS
+25872,Dr. Shailaj Bhandari,"Khudi, Khudi",Male,MBBS
+25873,Dr. Rabindra Oli,"Birtamode, Anarmani",Male,MBBS
+25874,Dr. Om Prakash Thapa Magar,"Nalsu, Taluwa",Male,MBBS
+25875,Dr. Saroj Thapa,"keware bhanjyang , 04 syangja, keware bhanjyang",Male,MBBS
+25876,Dr. PRASHANT RAJAURE,"RAJAURA, Tulsipur",Male,MBBS
+25877,Dr. SONIYA SHARMA,"Pokhara, Pokhara",Female,MBBS
+25878,Dr. Aditya Dahal,"Gairigau, Kuntadevi",Male,MBBS
+25879,Dr. Kushal Ranjit,"Lalitpur, Lalitpur",Male,MBBS
+25880,Dr. Satchit Acharya,"MHEPI, Kathmandu",Male,MBBS
+25881,Dr. Prashanna Bajracharya,"Mikhabahal, Lalitpur",Male,MBBS
+25882,Dr. Arpana Karki,"Dahachowk, Kathmandu",Female,MBBS
+25883,Dr. Nabina Guidel,"Arukharka, Arukharka",Female,MBBS
+25884,Dr. Kaustuv Mani Adhikari,"Kavee, Panchkhal",Male,MBBS
+25885,Dr. Renuka Agrawal,"Chhetrapati,Kathmandu, Kathmandu",Female,MBBS
+25886,Dr. Sambidha Karki,"Pokhara, Pokhara",Female,MBBS
+25887,Dr. Sushant Singh,"Sagarmatha,saptari,koiladi3, Koiladi",Male,MBBS
+25888,Dr. Ritesh Jha,"Sahorawa, Sahorawa",Male,MBBS
+25889,Dr. Yukti Karki,"Kathmandu, Kathmandu",Female,MBBS
+25890,Dr. Bhaskar Jha,"Birganj, Birganj",Male,MBBS
+25891,Dr. Ramesh Jha,"khajuwa, Pipladi",Male,MBBS
+25892,Dr. Abishkar Ghimire,"Kapan, Kathmandu",Male,MBBS
+25893,Dr. Manisha Shah,"Hanumannagar, Hanumannagar",Female,MBBS
+25894,Dr. Shreya Thapa,"Bharatpur, Bharatpur",Female,MBBS
+25895,Dr. SAURAVI SHRESTHA,"SAURPANI, Saurpani",Female,MBBS
+25896,Dr. Priyanka Sharma,"Aspara, Dhikpur",Female,MBBS
+25897,Dr. BIBEK SHAHA,"SUKADHIK, Sukadhik",Male,MBBS
+25898,Dr. Saswat Kumar Jha,"Madhwapur, Madhwapur",Male,MBBS
+25899,Dr. Akriti Baral,"Pokhara, Pokhara",Female,MBBS
+25900,Dr. Subash Timalsina,"Kaping, Pangretar",Male,MBBS
+25901,Dr. BIKALPA SHIWAKOTI,"Sunkhani, Sunkhani",Male,MBBS
+25902,Dr. Ankit Acharya,"Kathmandu, Kathmandu",Male,MBBS
+25903,Dr. Sharmila Banjade,"sandhikharka, Sandhikharka",Female,MBBS
+25904,Dr. Barsha Deo,"Boriya, Boriya",Female,MBBS
+25905,Dr. Om Prakash Anal,"Babiya, Babiya",Male,MBBS
+25906,Dr. Nitesh Mandal,"Ramaul,Siraha, Siraha",Male,MBBS
+25907,Dr. Ayesha Iffat Ansari,"Imadol, Mahalaxmi",Female,MBBS
+25908,Dr. Ranjita Guragain,"Itahara, Itahara",Female,MBBS
+25909,Dr. Ayusha Gautam,"Pokharia, Biratnagar",Female,MBBS
+25910,Dr. Niraj Niroula,"Baigundhura, Gauradaha",Male,MBBS
+25911,Dr. Prastuti Shrestha,"Purano Bazar, Dharan",Female,MBBS
+25912,Dr. Sofiya Makajoo,"Nadipur, Pokhara",Female,MBBS
+25913,Dr. Ashmita Pant,"SHAHID MARG, GYANESHWOR, Kathmandu",Female,MBBS
+25914,Dr. Anil Kumar Thapa,"Sahaji, Besishahar",Male,MBBS
+25915,Dr. Prabhat Shah,"Dhanusha, Sabaila",Male,MBBS
+25916,Dr. Sandhya Sharma,"Chitwan, Bharatpur",Female,MBBS
+25917,Dr. shubash bhagat,"bode barshain, bode barshain",Male,MBBS
+25918,Dr. Manab Tiwari,"Shankarpokhari, Phalewas",Male,MBBS
+25919,Dr. Rajesh Rokaya,"Basantpur, Bhimdattanagarpalika",Male,MBBS
+25920,Dr. Rajesh Kumar Yadav,"Sanhaitha, Sanahaitha",Male,MBBS
+25921,Dr. Ramchandra Karki,"baglung, baglung",Male,MBBS
+25922,Dr. Janak Thapa,"Panauti, Panauti",Male,MBBS
+25923,Dr. Shiksha Sapkota,"Lumbini, Butwal",Female,MBBS
+25924,Dr. Nabin Devkota,"Amppipal, Amppipal",Male,MBBS
+25925,Dr. Ramji Pokharel,"Baljyoti, Dhola",Male,BDS
+25926,Dr. dipak makaju,"kamalbinayak, Bhaktapur",Male,BDS
+25927,Dr. Drishti Dhakal,"Shanti Chowk, Biratnagar",Female,BDS
+25928,Dr. Bishwas Kumar Dhakal,"Gadyauli, Piple",Male,BDS
+25929,Dr. Anjela Ligal,"Kathmandu, Kathmandu",Female,BDS
+25930,Dr. Aishwarya Shrestha,"Birganj, Parsa, Birganj",Female,BDS
+25931,Dr. Diana Karki,"Namgyal chowk, Ichangu Narayan",Female,BDS
+25932,Dr. Roshan Prasad Jaisawal,"Rautahat, Pothiyahi",Male,MBBS
+25933,Dr. Nabita Mahato,"Thalha, Gautari",Female,MBBS
+25934,Dr. Subhash Kumar Raut,"Tulsiyahi jabdi, Tulsiyahi jabdi",Male,MBBS
+25935,Dr. Bikash Bhaila,"Ichhu tole, Bhaktapur",Male,MBBS
+25936,Dr. Manjul Bhattarai,"Pulchowk, Butwal",Male,MBBS
+25937,Dr. Dakshata Shakya,"Wotu, Kathmandu",Female,MBBS
+25938,Dr. Ayush Sagar Shrestha,"Banepa, Banepa",Male,MBBS
+25939,Dr. Rejina Niraula,"Janapath tole, Biratnagar",Female,MBBS
+25940,Dr. Pratik Pokhrel,"Okharkot, Okharkot",Male,MBBS
+25941,Dr. Brian Pokharel,"Kichnas, Kichnas",Male,MBBS
+25942,Dr. Natasha Choudhary,"Duhabi, Duhabi",Female,MBBS
+25943,Dr. Purnima K. C.,"Aanboo khaireni, Aanboo khaireni",Female,MBBS
+25944,Dr. Manish K. C. Gautam,"Ramrekha, Baglung",Male,MBBS
+25945,Dr. iswor karki,"KAMERAKHOLSA, Resha",Male,MBBS
+25946,Dr. Archana Regmi,"Rupendhi, Parroha",Female,MBBS
+25947,Dr. Suju Bhattarai,"Tangkhuwa, Chattar Jorpati",Female,MBBS
+25948,Dr. Bidhi Amatya,"Malangawa, Malangawa",Female,MBBS
+25949,Dr. Shiva Sharma Aryal,"Pokharabari, Arjai",Male,MBBS
+25950,Dr. Shreya Pokharel,"Mahendra Marga, Biratnagar",Female,MBBS
+25951,Dr. Divya Laxmi Karki,"Biratnagar, Biratnagar",Female,MBBS
+25952,Dr. Sujan Kumar Yadav,"Bhokraha Narsingh, Narsingh",Male,MBBS
+25953,Dr. Naresh karki,"Gramin Chowk, Lahan",Male,MBBS
+25954,Dr. Ziya Khan,"Sukhrampur, Ajigara",Male,MBBS
+25955,Dr. Kanti Mahara,"Nepal, Kaphallekhi",Female,MBBS
+25956,Dr. Adina Bataju,"Baghbazar, Kathmandu",Female,MBBS
+25957,Dr. Sanjay Mahaseth,"Chikana, Kalyanpur",Male,MBBS
+25958,Dr. RUPAK SUBEDI,"Subedithok, Naubise",Male,MBBS
+25959,Dr. Sandesh Dhakal,"Tanahun, Tanahunsur",Male,MBBS
+25960,Dr. Sanam Subedi,"Belbari, Belbari",Male,MBBS
+25961,Dr. Subigya Thapa,"Kusunti, Lalitpur",Male,MBBS
+25962,Dr. Bipin Poudel,"Kristinachnechour, Kristi",Male,MBBS
+25963,Dr. Bishal Pokharel,"Kathmandu, Sinamangal",Male,MBBS
+25964,Dr. Neelima Bhattarai,"Biratnagar, Biratnagar",Female,BDS
+25965,Dr. Alisha Karki,"Biratnagar, Biratnagar",Female,BDS
+25966,Dr. Sujata chaudhary,"Chhatapipara, Chhatapipara",Female,BDS
+25967,Dr. Aastha Dahal,"Dakshindhoka, Gokarneshwor",Female,BDS
+25968,Dr. Curie Shrestha,"Pakhlati, Bhimeshwor",Female,BDS
+25969,Dr. Luniva Shrestha,"Dhulikhel, Dhulikhel",Female,BDS
+25970,Dr. Parija Sarkar,"Bhadrapur, Bhadrapur",Female,MBBS
+25971,Dr. Avinash Kumar Chaurasia,"Amarpatti, Amarpatti",Male,MBBS
+25972,Dr. AMAN KUMAR JHA,"EKDARABELA, Ekdarabela",Male,MBBS
+25973,Dr. Priyanka Pradhan,"Tansen, Palpa",Female,MBBS
+25974,Dr. DHARMENDRA KUMAR YADAV,"BAGADA, Bagada",Male,MBBS
+25975,Dr. Priya Sherpa,"Kathmandu, Kathmandu",Female,MBBS
+25976,Dr. rupam pandey,"jaleshwar, jaleshwar",Female,MBBS
+25977,Dr. Swarup Nepal,"Bhojpur, Lekharka",Female,MBBS
+25978,Dr. Rahul Yadav,"Babhangama katti, Babhangama katti",Male,MBBS
+25979,Dr. Shishir Kumar Patel,"loharauli, palhi",Male,MBBS
+25980,Dr. Aliza Bajracharya,"Lalitpur, Lalitpur",Female,MBBS
+25981,Dr. Sunam Adhikari,"Biratnagar, Biratnagar",Female,MBBS
+25982,Dr. Suja Gurung,"Kathmandu, Kathmandu",Female,MBBS
+25983,Dr. Preksha Kumari Sah,"Mirchaiya, Ramnagar",Female,MBBS
+25984,Dr. Sanju Kumari Karn,"Nepal, Janakpur",Female,MBBS
+25985,Dr. Liza Puri,"manpur, manpur",Female,MBBS
+25986,Dr. Kyoko Singh,"Om shanti marg, Nepalgunj",Female,MBBS
+25987,Dr. Shristi Bhattarai,"Ghattaghar, Madhyapurthimi",Female,MBBS
+25988,Dr. Azan Kidwai,"Nepalgunj, Nepalgunj",Male,MBBS
+25989,Dr. Rekha Phuyel,"Ilam, Jeetpur",Female,MBBS
+25990,Dr. Monika Jha,"Nepal, Basatpur",Female,MBBS
+25991,Dr. Pragya Jha,"Matsari, Matsari",Female,MBBS
+25992,Dr. Neha Shrestha,"Baglung, Baglung",Female,MBBS
+25993,Dr. Abhishek Chaudhary,"Bindhi, Janakpur",Male,MBBS
+25994,Dr. Aanchal Tamrakar,"Lalitpur, Lalitpur",Female,MBBS
+25995,Dr. Soujanya Sharma,"Tarahara, Itahari",Male,MBBS
+25996,Dr. Kriti Shrestha,"Chapagaun, Chapagaun",Female,MBBS
+25997,Dr. Om Murti Nikhil,"Dhamaura, Dhamaura",Male,MBBS
+25998,Dr. Machhindra Baduwal,"Hurikot, Kaigaun",Male,MBBS
+25999,Dr. Jigyasha Shrestha,"Sindhupalchowk, Jalbire",Female,MBBS
+26000,Dr. Dikshyant Malla,"Rijalthok, Sunaula bazaar",Male,MBBS
+26001,Dr. Anusha Magar,"Sarlahi, Hariwan",Female,BDS
+26002,Dr. Rakshak Manandhar,"Jhochhen, Kathmandu",Male,BDS
+26003,Dr. Snigdha Gautam,"Kavre, Pokhari Chauri",Female,BDS
+26004,Dr. Dependra Yadav,"Sarlahi, Nokailwa",Male,BDS
+26005,Dr. Shreeya Singh,"Yetkha,Tamugalli, Kathmandu",Female,BDS
+26006,Dr. Rakshya Adhikari,"Biratnagar, Biratnagar",Female,BDS
+26007,Dr. Suprina Prajapati,"Thimi, Madhyapur Thimi",Female,BDS
+26008,Dr. Nisha Kusum Sapkota,"Tikapur, Tikapur",Female,MBBS
+26009,Dr. Bikash Kurmi,"Birgunj ,pipara 17, Birgunj",Male,MBBS
+26010,Dr. Santosh Kumar Yadav,"Bhramarapura, Bharamarapura",Male,MBBS
+26011,Dr. Manoj Khadka,"Ghorahi, Ghorahi",Male,MBBS
+26012,Dr. Sujit Huzdar,"Nepal, Hadiya",Male,MBBS
+26013,Dr. Nisha Regmi,"Dhumbarahi, Kathmandu",Female,MBBS
+26014,Dr. Adarsh Kumar Jha,"Maharajgunj, Kathmandu",Male,MBBS
+26015,Dr. Aakash Koirala,"Pokhara,Prashyang, Pokhara",Male,MBBS
+26016,Dr. Sanjay Kumar Kushwaha,"Bagdah, Bagdah",Male,MBBS
+26017,Dr. Samjhauta Bhattarai,"Gulmi, Myalpokhari",Female,MBBS
+26018,Dr. Satyam Kharga,"Marar, Marar",Male,MBBS
+26019,Dr. Rajiv Yadav,"Inarwa, Telkuwa",Male,MBBS
+26020,Dr. Prakriti Kunwar,"Kailali, Dhansingpur",Female,MBBS
+26021,Dr. Bishnu Kumar Jha,"Bathnaha, Bathnaha",Male,MBBS
+26022,Dr. Vatsal Namit,"Jaleshwar, Jaleshwar",Male,MBBS
+26023,Dr. Hari Sapkota,"Gongabu, Gongabu",Male,MBBS
+26024,Dr. Nitisha Koirala,"Bhatta Chowk, Biratnagar",Female,MBBS
+26025,Dr. Suprava Shakya,"Urlabari, Urlabari",Female,MBBS
+26026,Dr. Ranjita Kamti,"Majhauliya, Majhauliya",Female,MBBS
+26027,Dr. Harshit Rayamajhi,"Silkhantole, Tansen",Male,MBBS
+26028,Dr. Namaraj Rai,"Nuwakot, Khanigaun",Male,MBBS
+26029,Dr. Javed Akhtar Khan,"Daldalha, Kapilvastu",Male,MBBS
+26030,Dr. Abhishek Sharma,"Taulihawa, Kapilvastu",Male,MBBS
+26031,Dr. Bibeka Rai,"Sunsari, Dharan",Female,MBBS
+26032,Dr. Ayushi Awale,"Patan, Lalitpur",Female,MBBS
+26033,Dr. ASHWINI GURUNG,"sitala devi, pokhara",Female,MBBS
+26034,Dr. Ishu Shrestha,"pulchok, bharatpur",Female,MBBS
+26035,Dr. Aman Jha,"neta chowk, maleth",Male,MBBS
+26036,Dr. Sushant Pandit,"Baraghare, Bharatpur",Male,MBBS
+26037,Dr. Yogendra khati,"Golai, Jayaprithivi",Male,MBBS
+26038,Dr. SANIYA AMNA ANSARI,"BAHUWARI, Birganj",Female,MBBS
+26039,Dr. KRISHNA NEUPANE,"Belbas, Butwal",Male,MBBS
+26040,Dr. Prashansha Gyawali,"Nepalgunj, Banke, Nepalgunj",Female,BDS
+26041,Dr. Usmita Lohani,"madanpur, madanpur",Female,BDS
+26042,Dr. Pratibha B. K.,"BA.NA.PA, Baglung",Female,BDS
+26043,Dr. Neha Pokhrel,"Morang, Nepal",Female,BDS
+26044,Dr. Pranaya Shrestha Nepali,"Babiya, Inaruwa",Male,MBBS
+26045,Dr. Savnam Shahi,"Kalikot, Kalika",Female,MBBS
+26046,Dr. Pradip Chaudhary,"Baandi, Joshipur",Male,MBBS
+26047,Dr. Nischal Timsina,"Sunsari, Inaruwa",Male,MBBS
+26048,Dr. Saransh Pokhrel,"Duhabi, Duhabi",Male,MBBS
+26049,Dr. Sujan Pokhrel,"Kalleri, Kharpa",Male,MBBS
+26050,Dr. Mona Poudel,"Kusalchowk, Shanishchare",Female,MBBS
+26051,Dr. SABINA SHAH,"Janakpur, Janakpur",Female,MBBS
+26052,Dr. SURAJ DAHAL,"INARUWA, Inaruwa",Male,MBBS
+26053,Dr. Siddhant Rayamajhi,"Sangam tole, Ramgram",Male,MBBS
+26054,Dr. Nitesh Jha,"zeromile, gaushala",Male,MBBS
+26055,Dr. Sudip Thapa,"Majheripatan, Chauthe, Pokhara",Male,MBBS
+26056,Dr. Nisha Shrestha,"Salt Trading Road, Dhangadhi",Female,MBBS
+26057,Dr. Bhanu Priya Jha,"Sewa marg, Biratnagar",Female,MBBS
+26058,Dr. Shweta Jaiswal,"Ramnagari, Ramnagari",Female,MBBS
+26059,Dr. Puja Bhattarai,"LAURUK, Kaskikot",Female,MBBS
+26060,Dr. AKASH THAKUR,"Banauli, Banauli",Male,MBBS
+26061,Dr. Sriya Karmacharya,"Khusibu town planning, Kathmandu",Female,MBBS
+26062,Dr. Preshita Banskota,"Balaju, Kathmandu",Female,MBBS
+26063,Dr. Nirmal Karki,"Bhuchakrapur, Bhuchakrapur",Male,MBBS
+26064,Dr. Kusum K. C.,"Gokuwa, Hattimuda",Female,BDS
+26065,Dr. SANDHYA GHIMIRE,"Chandreshwor1, Lamjung, Chandreshwor",Female,BDS
+26066,Dr. Raj Kamal Karki,"Rawatkot, Rawatkot",Male,MBBS
+26067,Dr. Diwakar Phuyal,"Goldhunga, Tarkeshwor",Male,MBBS
+26068,Dr. Rupashi Mukhia,"Bhaisepati, Sainbu",Female,MBBS
+26069,Dr. Sujit Singh,"Golbazar, Golbazar",Male,MBBS
+26070,Dr. Surakchhya Dhakal,"Phaparthum, Phaparthum",Female,MBBS
+26071,Dr. Riya Shrestha,"Tatopani, Tatopani",Female,MBBS
+26072,Dr. Situ Manandhar,"Chhetrapaty, Kathmandu",Female,MBBS
+26073,Dr. Karuna Bista,"Bishankhunarayanthan, Bishankhunarayanthan",Female,MBBS
+26074,Dr. Bijan Kadel,"Gorkha, Palungtar",Male,MBBS
+26075,Dr. Simran Shrestha,"Paknajol, Bagaicha Galli, Kathmandu",Female,MBBS
+26076,Dr. Biraj Bhattarai,"Sukedhara, Kathmandu",Male,MBBS
+26077,Dr. Soniya Thapa,"Kathmandu, Kapan",Female,MBBS
+26078,Dr. Shreya Pokharel,"Bhadrapur, Chandragadhi",Male,MBBS
+26079,Dr. Sarika Timilsina,"Kavrepalanchowk, Mathurapati Fulbari",Female,MBBS
+26080,Dr. Aryan Paudel,"Gitanagar 6, Gitanagar",Male,MBBS
+26081,Dr. Bibek Adhikari,"Pipalneta, Salyan, Pipalneta",Male,MBBS
+26082,Dr. Aaradhya Bahadur K. C.,"Imadol,Lalitpur, Mahalaxmi",Male,MBBS
+26083,Dr. Muna Khanal,"Chitwan, Bharatpur",Female,MBBS
+26084,Dr. Sachita Regmi,"Salyan, Phalawang",Female,MBBS
+26085,Dr. Arzoo Khadka,"Duruwa, Ghorahi",Female,MBBS
+26086,Dr. Manisha Koirala,"Jhapa, Budhabare",Female,MBBS
+26087,Dr. Sadikshya Yogi,"Ghorahi, Ghorahi",Female,MBBS
+26088,Dr. Aayusha karki,"Madhesha, Madhesha",Female,MBBS
+26089,Dr. shambhav mainali,"Mid Baneshwor, Kathmandu",Male,MBBS
+26090,Dr. Sarah Suwal,"Lalitpur, Lalitpur",Female,MBBS
+26091,Dr. Smriti Gautam,"arghakhanchi, pokharathok",Female,MBBS
+26092,Dr. Sarbagya Manandhar,"Hetauda,, Hetauda",Male,MBBS
+26093,Dr. Reeya Shrestha,"Newroad, Kathmandu",Female,MBBS
+26094,Dr. Paritosh Bhaskar,"Janakpurdham, Banaulidanauli",Male,MBBS
+26095,Dr. Aman Kumar Yadav,"Siraha, Tenuwapatti",Male,MBBS
+26096,Dr. Milan Basnet,"kathmandu, Kathmandu",Male,MBBS
+26097,Dr. Melina Shrestha,"Boudha, Kathmandu",Female,MBBS
+26098,Dr. Rashila Lamichhane,"Sankhupatichaur, Sankhupatichaur",Female,MBBS
+26099,Dr. Supriya Lamichhane,"Kathmandu, Kathmandu",Female,MBBS
+26100,Dr. Samana Sapkota,"Kathmandu, Tinthana",Female,MBBS
+26101,Dr. Priya Shrestha,"Kuleshwor, Kathmandu",Female,MBBS
+26102,Dr. Aprajita Sharma,"Bhaisepati, Sainbu",Female,MBBS
+26103,Dr. Anee Pant,"Macchapokhari,bajalu, Kathmandu",Female,MBBS
+26104,Dr. Ashma K. C.,"Dholahiti, Lalitpur",Female,MBBS
+26105,Dr. Sahira Shrestha,"Kuleshowr, Kathmandu",Female,MBBS
+26106,Dr. Prakriti Sapkota,"Dhading, Jiwanpur",Female,MBBS
+26107,Dr. SUBASH SAPKOTA,"RAYALE 03 KAVRE, PANAUTI",Male,MBBS
+26108,Dr. Sujha Ghimire,"Gongabu, Gongabu",Female,MBBS
+26109,Dr. Shreeyanshu Parajuli,"Koteshwor 35, Kathmandu",Male,MBBS
+26110,Dr. Rajiv Sharma,"Lalitpur, Lalitpur",Male,MBBS
+26111,Dr. Sneh Rajya Laxmi Rana,"Devanandanpur, Siddharthanagar",Female,MBBS
+26112,Dr. Shraddha Satyal,"Chabahil,Kathmandu, Kathmandu",Female,MBBS
+26113,Dr. Sumi Singh,"Dumariya, Sarlahi",Female,MBBS
+26114,Dr. Tamanna Gurung,"Parbat, Chitre",Female,MBBS
+26115,Dr. oshin sah,"Matihani, Matihani",Female,MBBS
+26116,Dr. Nilisha Shrestha,"New Baneshwor, Kathmandu",Female,MBBS
+26117,Dr. Rabina Shrestha,"Dhulikhel, Dhulikhel",Female,MBBS
+26118,Dr. Shikha Pradhan,"295 Mahakavi Marga, Maiti Devi, Kathmandu",Female,MBBS
+26119,Dr. Yogesh Sharma,"Mahottari, Ankar",Male,MBBS
+26120,Dr. Nawanit Maskey,"Kamalpokhari, Kathmandu",Male,MBBS
+26121,Dr. Amresh Yadav,"Saptari, khadagpur",Male,MBBS
+26122,Dr. Sagar Burlakoti,"Khairahani, khairahani",Male,MBBS
+26123,Dr. kajal mahto,"Malhaniyakhori, Mirchaiya",Female,MBBS
+26124,Dr. Sagar Bhagat,"kalyanpur, kalyanpur",Male,MBBS
+26125,Dr. Ranju Panta,"Dharampani, Hardineta",Female,MBBS
+26126,Dr. Ram Mandal,"Manharpur, Mansinghpatti",Male,MBBS
+26127,Dr. sabin shrestha,"Chitwan, Bharatpur",Male,MBBS
+26128,Dr. KRISHNA BHUSAL,"Gulmi, Banjhakateri",Male,MBBS
+26129,Dr. Chhabi Paudel,"Bhurigaun, Thakurbaba",Male,MBBS
+26130,Dr. Ajmeri Khan,"Pipra, Chanai",Male,MBBS
+26131,Dr. Santosh Yadav,"Balhi, Sukhipur",Male,MBBS
+26132,Dr. Sunil Prasad Mahato,"Naukatola, Jeetpur",Male,MBBS
+26133,Dr. Swikriti Roka,"Kamdi, Nepalganj",Female,MBBS
+26134,Dr. Amit Gupta,"Malangwa, Malangwa",Male,MBBS
+26135,Dr. Anika Yadav,"Banigama, Sapahi",Female,MBBS
+26136,Dr. Suresh Man Tamang,"Chautara, Semjong",Male,MBBS
+26137,Dr. Akash Mishra,"Tengraha, Tengraha",Male,MBBS
+26138,Dr. LAXMI GURUNG,"Lapsibot, Phaleni",Female,MBBS
+26139,Dr. Raj Kumar Shah,"Prashurampur, Prashurampur",Male,MBBS
+26140,Dr. Dikshya Rai,"tikhedeol, lalitpur",Female,MBBS
+26141,Dr. Tapeshwar Mandal,"Nauwakhor parsahi, Nauwakhor parsahi",Male,MBBS
+26142,Dr. Pradip Bhattarai,"Nabin Tole, Damak",Male,MBBS
+26143,Dr. Bipin Yadav,"Jijhaul, Bariyarpatti",Male,MBBS
+26144,Dr. Kalpana Yadav,"Kataha, Sonmati Majhaura",Female,MBBS
+26145,Dr. pramod prasad deo,"mahadeva, Mahadeva",Male,MBBS
+26146,Dr. Arika Yadav,"jamuni madhepura, Jamuni, Madhepura",Female,MBBS
+26147,Dr. Avinash Kumar Shah,"Gaura, Sarswar",Male,MBBS
+26148,Dr. Gunjan Rai,"Phattepur, Saptakoshi",Female,MBBS
+26149,Dr. Ashish Shakya,"Sindhuli, Jhangajholi",Male,MBBS
+26150,Dr. Ramu Ramdam,"Myagdi, Beni",Male,MBBS
+26151,Dr. PREKSHYA BASNET,"Manjushree itahari, Itahari",Female,MBBS
+26152,Dr. chintan pokharel,"biratnagar, biratnagar",Male,MBBS
+26153,Dr. Rupesh Kumar Mahato,"Kuthanama, Ramnagar Mirchaiya",Male,MBBS
+26154,Dr. Rashmi Jha,"Sahorwa, Sahorwa",Female,MBBS
+26155,Dr. Dikshya Pokharel,"Biratnagar, Biratnagar",Female,MBBS
+26156,Dr. Sadiksha Karki,"Gaighat, Triyuga",Female,BDS
+26157,Dr. Azima Khatoon,"KrishnaNagar, KrishnaNagar",Female,BDS
+26158,Dr. Deepika K. c.,"Tanahun, Khairenitar",Female,BDS
+26159,Dr. Rabina shrestha,"Baglung, Baglung",Female,BDS
+26160,Dr. Sneha Rana,"Hattiban, Dhapakhel",Female,BDS
+26161,Dr. Sukriti Sharma,"Pragati Mukh Marga, Swoyambhu, Kathmandu",Female,BDS
+26162,Dr. Deepa Acharya,"Samakhushi, Gongabu",Female,BDS
+26163,Dr. Swechchha Pokhrel,"Kristinachnechaur, Kaski, Kristinachnechaur",Female,BDS
+26164,Dr. Mohammad Amaan,"Kathmandu, Kathmandu",Male,BDS
+26165,Dr. Shristi Shrestha,"Madhyapur Thimi,Bhaktapur, Madhyapur Thimi",Female,BDS
+26166,Dr. Roshna Lamichhane,"Namjung, Namjung",Female,BDS
+26167,Dr. Babita Bhetwal,"Nuwakot, Thanapati",Female,BDS
+26168,Dr. Pratikshya Udaya,"Palpa, Tansen",Female,BDS
+26169,Dr. Aastha Neupane,"Jhaukhel, Changunarayan",Female,BDS
+26170,Dr. Srijana Khadka,"Phungling, Phungling",Female,BDS
+26171,Dr. Ayushma Bhandari,"Sipadol, Sipadol",Female,BDS
+26172,Dr. Kajal Rana,"Bhaktapur, Suryabinayak",Female,BDS
+26173,Dr. deepika pandey,"Udipur, Udipur",Female,BDS
+26174,Dr. LUNA BISTA,"Shivanagar 2, Chitwan, Shivanagar",Female,MBBS
+26175,Dr. Jyoti Gupta,"Birgunj, Birgunj",Female,MBBS
+26176,Dr. Sandhya K. C.,"Basundhara, Dhapasi",Female,BDS
+26177,Dr. Suman Chaudhary,"Lalitpur, Brahmapur",Male,MBBS
+26178,Dr. santosh kumar yadav,"Gaur rautahat, gaur",Male,MBBS
+26179,Dr. shrana sulpe,"kathmandu, kathmandu",Female,MBBS
+26180,Dr. Farhin Pradhan,"dolakha, Bhimeshwor",Female,MBBS
+26181,Dr. Shree Krishna Tandukar,"Lamatar, Mahalaxmi",Male,MBBS
+26182,Dr. Sagun Shrestha,"Balaju, Tarkeshwor",Male,MBBS
+26183,Dr. Alisha Shah,"Dhangadhi, Dhangadhi",Female,MBBS
+26184,Dr. Supriya Bhandari,"Maligaun, Kalopul, Kathmandu",Female,BDS
+26185,Dr. Ashim Raj Shrestha,"Lalitpur, Lalitpur",Male,BDS
+26186,Dr. Rishi Raj Chaudhary,"Lahan, lahan",Male,MBBS
+26187,Dr. Roshan Rajbanshi,"Baijnathpur, Baijnathpur",Male,MBBS
+26188,Dr. kamal raj neupane,"buligaun, Garjayankot",Male,MBBS
+26189,Dr. Pranay Kumar,"G. Maheshpur, G. Maheshpur",Male,MBBS
+26190,Dr. Dip Manandhar,"Bagbazar, kathmandu",Male,MBBS
+26191,Dr. Eva Shrestha,"Kathmandu, Kathmandu",Female,MBBS
+26192,Dr. Shivang Singh,"Babhangama Katti, Babhangama Katti",Male,MBBS
+26193,Dr. Asmit K. C.,"Kailali,Dhangadhi, Dhangadhi",Male,MBBS
+26194,Dr. tenzin norphel sherpa,"Chhetrapati, Chhetrapati",Male,MBBS
+26195,Dr. Rishi Ram Adhikari,"Janakpur, Baniniya",Male,MBBS
+26196,Dr. Sandhya Shrestha,"Tamghas, Tamghas",Female,BDS
+26197,Dr. Aman Kumar Sah,"Gautampur, Gautampur",Male,MBBS
+26198,Dr. Pragya Shree Chamlagai,"Birtamode, Jhapa, Anarmani",Female,BDS
+26199,Dr. Ranjit Kumar Yadav,"pipara, Pipara",Male,MBBS
+26200,Dr. Nikhil Kumar Gupta,"Main road,Duhabi 7, Duhabi",Male,MBBS
+26201,Dr. Abish Kumar Thapa,"MADHUMARA, PRAGATI BINAYAK TOLE, Biratnagar",Male,MBBS
+26202,Dr. Ranjit Siwa,"Dhimdhime, Gauradaha",Male,MBBS
+26203,Dr. Puja Sedhai,"Jayamangala, Ratnanagar",Female,BDS
+26204,Dr. Dikshya Neupane,"Duwakot, Changunarayan",Female,MBBS
+26205,Dr. Navneet Bichha,"Pigauna, Pigauna",Male,MBBS
+26206,Dr. Sachin Awasthi,"Sankharpur, Malikarjuna",Male,MBBS
+26207,Dr. Manoj Raj Giri,"Dharapani, Palumtar",Male,BDS
+26208,Dr. Pramodman Singh Yadav,"Mahadeva, Mahadeva",Male,MBBS
+26209,Dr. Suhel Lama Thing,"Musharniya, Dhangadi",Male,MBBS
+26210,Dr. Renuka Banjara,"Panauti, Panauti",Female,MBBS
+26211,Dr. Deepak Yadav,"Siraha, Siraha",Male,MBBS
+26212,Dr. Ajit Thakur,"Bathnaha, Bathnaha",Male,MBBS
+26213,Dr. Mahananda Mehta,"Inaruwa, Inaruwa",Male,MBBS
+26214,Dr. MEELAN THAPA,"MULPANI, Mulpani",Female,MBBS
+26215,Dr. Bigyan Paudel,"Ekatabasti, Mandikhatar, Budhanilkantha Municipality",Male,MBBS
+26216,Dr. Roshani Bista,"Jahada road, Biratnagar",Female,MBBS
+26217,Dr. Hira Katwal,"Okhaldhunga, Chyanam",Male,MBBS
+26218,Dr. Anup Yadav,"laxminagar, Dhakdhai",Male,MBBS
+26219,Dr. Abhishek Amar,"Rajbiraj, Rajbiraj",Male,MBBS
+26220,Dr. Amit Kumar Mandal,"Ekarhiya, Ekarhiya",Male,MBBS
+26221,Dr. Benju Sharma,"Budhabare, Budhabare",Female,BDS
+26222,Dr. Kumari Khushbu,"Janakpur, Janakpur",Female,MBBS
+26223,Dr. Shranav Jha,"Tilathi, Tilathi Koiladi",Male,MBBS
+26224,Dr. Oshin Thapa,"Aanbookhaireni, Aanbookhaireni",Female,BDS
+26225,Dr. Sanjiv Kumar Shah,"Jaleshwor, Jaleshwor",Male,MBBS
+26226,Dr. Samyak Bajracharya,"Takshar, Tansen",Male,MBBS
+26227,Dr. Alice Dhakal,"Salakpur, Mrigaulaiya",Male,MBBS
+26228,Dr. Prabesh Ghimire,"Inaruwa, Inaruwa",Male,BDS
+26229,Dr. Ashima Ghimire,"Dhapasi, Tokha Municipality",Female,MBBS
+26230,Dr. Rajan Kumar Yadav,"Hajminiya, Hajminiya",Male,MBBS
+26231,Dr. Nona Shrestha,"Neelkantha, Neelkantha",Female,MBBS
+26232,Dr. JITENDRA PRASAD MANDAL,"Lalparsa, Lalparsa",Male,MBBS
+26233,Dr. Ajit Kumar Thakur,"Mahuliya, Nanupatti",Male,MBBS
+26234,Dr. Biwek Adhikari,"Nepal, Bharatpur",Male,MBBS
+26235,Dr. Shyam Sundar Mandal,"Thadi, Inarwa",Male,MBBS
+26236,Dr. Annapurna Agrawal,"Adarshnagar, Birgunj",Female,MBBS
+26237,Dr. Samira Byanjankar,"Chyasal, Chyasal",Female,MBBS
+26238,Dr. Abha Shah,"Kathmandu, Kathmandu",Female,BDS
+26239,Dr. Anish Dhami,"Dhampanyar, Chhapari",Male,MBBS
+26240,Dr. Kripa Koirala,"Biratnagar, Biratnagar",Female,MBBS
+26241,Dr. Krishna Sodari,"Darbesha, Darbesha",Male,BDS
+26242,Dr. Nadin Gautam,"Kathmandu, Naikap Purano Bhanjyang",Male,BDS
+26243,Dr. Ganesh Kharal,"Damkada, Tansen municipality",Male,MBBS
+26244,Dr. gopal prasad shah,"Paita, Amahi baryati",Male,MBBS
+26245,Dr. Sumit Kumar Yadav,"Siraha, Siraha",Male,MBBS
+26246,Dr. Indra Bhattarai,"Dang, Tulsipur",Female,BDS
+26247,Dr. pappu kumar yadav,"paudeswor, paudeshwar, janakpur",Male,BDS
+26248,Dr. Gita Khadka,"Phulbari, Phulbari",Female,BDS
+26249,Dr. Pooja Shrestha,"Saping, Saping",Female,BDS
+26250,Dr. ganga shrestha,"Dhuwakot, Dhuwakot",Female,BDS
+26251,Dr. Rahul Sharma,"Bhramarpura, Bhramarpura",Male,MBBS
+26252,Dr. Diwash sharma,"Butwal, Mangalapur",Male,MBBS
+26253,Dr. Aayushi Sitaula,"Krishithok Bazar, Birtamode",Female,MBBS
+26254,Dr. Ashmina Koirala,"Bhramhapuri, Patihani",Female,BDS
+26255,Dr. Rusha Pote,"Harion, Sarlahi, Nepal, Harion",Female,BDS
+26256,Dr. Ruby Gurung,"Pokhara, Pokhara",Female,BDS
+26257,Dr. Shova Adhikari,"Ichangunarayan,kathmandu, Ichangunarayan",Female,BDS
+26258,Dr. Roji Shrestha,"Dhulikhel, Dhulikhel",Female,BDS
+26259,Dr. Karuna Gyawali,"Bhairahawa, Siddharthanagar",Female,BDS
+26260,Dr. Shakti Kumar B K,"Mallhaniya, Malahaniya",Male,BDS
+26261,Dr. Nikita Chhetry,"Battisputali, Kathmandu Metropolitan City",Female,BDS
+26262,Dr. Rojina Joshi,"Lamjung, Ramgha",Female,BDS
+26263,Dr. Anjana Bhattarai,"Tanahun, Raipur",Female,BDS
+26264,Dr. Ayasha Uprety,"Chitwan, Khairahani",Female,BDS
+26265,Dr. Karishma Guragain,"Kakarvitta Jhapa, Mechinagar",Female,BDS
+26266,Dr. Ranjeet Kumar Prasad Sah,"Chhotaul, Chhotaul",Male,BDS
+26267,Dr. Jibesh Munankarmi,"Bhaktapur, Bhaktapur",Male,BDS
+26268,Dr. samdup,"Olangchunggola, Olangchunggola",Male,BDS
+26269,Dr. Pawan Kumar Gupta,"mahuwa, baripur",Male,BDS
+26270,Dr. Arpan Pratik Bhandari,"DHIKALETHAR, POKHARA, Pokhara",Male,MBBS
+26271,Dr. Begam khushnama,"Sugauli Birta, Sugauli Birta",Female,MBBS
+26272,Dr. pratima khanal,"Balaju,Purna Chandra Marg, Kathmandu",Female,MD (EQUIVALENT TO MBBS)
+26273,Dr. SHARON SHERPA,"KATHMANDU, Kirtipur",Female,MBBS
+26274,Dr. Ajay Chaudhary,"Basopatti, Nainhi",Male,MBBS
+26275,Dr. Sheejan Shrestha,"Raniban, Nagarjun",Female,BDS
+26276,Dr. SAJITA SHRESTHA DHAUGODA,"Nasikasthan, Sanga, Banepa",Female,BDS
+26277,Dr. Shreya Shrestha,"Bhimsensthan, Kathmandu, Bhimsensthan",Female,BDS
+26278,Dr. Akankshya Regmi,"Bijauri, Dang, Bijauri",Female,BDS
+26279,Dr. Injila Batas,"Damauli, Vyas",Female,BDS
+26280,Dr. Samriti Baral,"Jorpati, Kathmandu, Jorpati",Female,BDS
+26281,Dr. Suraksha Adhikari,"Shivanagar, Shivanagar",Female,BDS
+26282,Dr. Anuja Ruwali,"Aginchowk, Aginchowk",Female,BDS
+26283,Dr. Sumit Yadav,"Janakpur, Sapahi",Male,MBBS
+26284,Dr. Saroj Baidya,"Bhaktapur, Bhaktapur",Male,MBBS
+26285,Dr. Dibyandra Singh,"Siraha, Chandrodayapur",Male,MD
+26286,Dr. Juli kumari Roy,"Laukahi, Inaruwa",Female,MBBS
+26287,Dr. SUBHANI SHRESTHA,"Lalitpur, Sundhara 06, Lalitpur",Female,MBBS
+26288,Dr. Binita Adhikari,"Katarait, Anduptti, Katarait",Female,BDS
+26289,Dr. Anita Kumari Yadav,"Bisharbhora, Bisharbhora",Female,BDS
+26290,Dr. Lalita Kumari Yadav,"Bisharbhora, Bisharbhora",Female,BDS
+26291,Dr. Sneha Batas,"Bhaktapur, Bhaktapur",Female,MBBS
+26292,Dr. Pooja Das Mool,"Baluwatar, Kathmandu",Female,MBBS
+26293,Dr. Roshid Jha,"sindhuli, kamalamai",Male,MBBS
+26294,Dr. murli kumar sah,"siraha, kalyanpur jabdi",Male,MBBS
+26295,Dr. Pushpa Jha,"Sisaut, Sisaut",Female,BDS
+26296,Dr. Umesh Kumar Yadav,"Rajpur, Rajpur",Male,MBBS
+26297,Dr. Pradip Diyali,"Tatapani, Uttarganga",Male,BDS
+26298,Dr. Sailesh Karki,"Tinthana, Kathmandu",Male,BDS
+26299,Dr. Kiran Kumari Sah,"Siraha, Lalpur",Female,BDS
+26300,Dr. Reyazul Haque,"Birgunj, Birgunj",Male,BDS
+26301,Dr. Aashma Karki,"SARLAHI, HARIWON, Hariwon",Female,BDS
+26302,Dr. Oshin Amatya,"Battar Bazar, Bidur",Female,BDS
+26303,Dr. Aliza Awale,"Bhindolachi, Lalitpur",Female,MBBS
+26304,Dr. Niraj kumar singh,"Biruwa guthi, Biruwa guthi",Male,MBBS
+26305,Dr. Souryaa Poudel,"Manbhawan, Lalitpur",Female,BDS
+26306,Dr. Prerna Singh Parmar,"Birgunj, Birgunj",Female,BDS
+26307,Dr. Dipendra kumar yadav,"Jijhaul, Bariyarpatti",Male,MBBS
+26308,Dr. Aditya Kumar Singh,"Janakpur, Janakpur",Male,MBBS
+26309,Dr. SUMIT KUMAR RAJAK,"Chhatauna, Chhatauna",Male,MBBS
+26310,Dr. Noori Kumari Shah,"karjhanha, karjhanha",Female,MD
+26311,Dr. Srijeeta Shakya,"Khaskarkandau, Khaskarkandau",Female,BDS
+26312,Dr. pragyan jyoti,"gobarahi, duhabi",Female,BDS
+26313,Dr. Manita Maharjan,"Solteemode, Kathmandu",Female,BDS
+26314,Dr. Riza Shakya,"Banepa, Banepa",Female,BDS
+26315,Dr. pranisha bajracharya,"Bubahal 18,gabahal, Lalitpur",Female,BDS
+26316,Dr. Samiksha Gupta,"Birgunj, Birgunj",Female,BDS
+26317,Dr. Alina Lama,"kanpur, kanpur kalapani",Female,BDS
+26318,Dr. Nizaswota Shrestha,"Krishna Mandir, Imadol",Female,BDS
+26319,Dr. Rikee Duwal,"Bhaktapur, Bhaktapur",Female,BDS
+26320,Dr. Nischal Paudel,"Sinamangal, Kathmandu",Male,MBBS
+26321,Dr. Rachana Khadka,"tulsipur, Tulsipur",Female,MBBS
+26322,Dr. Nabin Bikram Pandeya,"Dang, Rampur",Male,MBBS
+26323,Dr. Mahesh Shrestha,"Lubhu, Mahalaxmi",Male,BDS
+26324,Dr. Sumitra Rokka,"Morang, Sanischare",Female,BDS
+26325,Dr. Rojina Giri,"Maitidevi, Kathmandu",Female,BDS
+26326,Dr. Roja Maharjan,"Gabahal, Lalitpur",Female,BDS
+26327,Dr. Andi Tamang Lama,"Mahure, Bolde Phediche",Female,MBBS
+26328,Dr. Manita Acharya,"Pitchara, Biratnagar",Female,BDS
+26329,Dr. Ruja Rajkarnikar,"Mangalbazar, Lalitpur",Female,MBBS
+26330,Dr. Preeti Shah,"Shankarpur, Biratnagar",Female,BDS
+26331,Dr. Aayushi Kasaju,"Shantinagarmarg, Kathmandu",Female,BDS
+26332,Dr. Simpal Gupta,"sindhuli, kamalamai",Female,BDS
+26333,Dr. Kalpana Limbu,"Nakhipot, Lalitpur",Female,BDS
+26334,Dr. Bibhuti Shrestha,"K.M.C. 32 Kathmandu, Kathmandu",Female,BDS
+26335,Dr. Utsab Devkota,"Deurali, Deurali",Male,MBBS
+26336,Dr. Shivanand Sah,"Nainpur, Dhangadhi",Male,MBBS
+26337,Dr. NAGENDRA KUMAR SAH,"Kurtha, Kurtha",Male,MBBS
+26338,Dr. INDU KUMARI YADAV,"Janakpur Nagarpalika, Janakpur Nagarpalika",Female,MBBS
+26339,Dr. OM PRAKASH YADAV,"SEHARA, Rautahat",Male,MBBS
+26340,Dr. Shreya Shamvhavi,"Jaleshwar, Jaleshwar",Female,MBBS
+26341,Dr. Amit Kumar Khatiwada,"Itahari, Itahari",Male,MBBS
+26342,Dr. kaushal kumar shah,"janakpur dham, janakpur",Male,MBBS
+26343,Dr. Punam Sah,"Phatepur, Dharampur",Female,BDS
+26344,Dr. Niraj Yadav,"Auraiya, Auraiya",Male,MBBS
+26345,Dr. POONAM SHAH,"Mahanauri, Dhangadhi",Female,BDS
+26346,Dr. Prerana Bhandari,"Sarlahi, Jabdi",Female,BDS
+26347,Dr. Sandhya Shrestha,"Budhanilkantha, Bishnu Budhanilkantha",Female,MBBS
+26348,Dr. Reeta Parajuli,"RATNACHOWK, Pokhara",Female,MBBS
+26349,Dr. Suman Chaudhary,"Mahottari, Mahottari",Female,MD
+26350,Dr. Sampada Thapa,"Panipokhari, Kathmandu",Female,BDS
+26351,Dr. Sunil Ale,"boughapokharathok, boughapokharathok",Male,BDS
+26352,Dr. Dilip Kumar Shah,"Balwa, Balwa",Male,MBBS
+26353,Dr. Rajiv Kumar Singh,"Arnaha, Arnaha",Male,MBBS
+26354,Dr. Nirpana K. C.,"Dhumbarahi, Kathmandu",Female,BDS
+26355,Dr. Sunayan Subedi,"Kaski, Bharatpokhari",Male,BDS
+26356,Dr. Jyoti Pudasaini,"Kathmandu, Bhadrabas",Female,MBBS
+26357,Dr. Roshan Kumar Purbey,"SIKAJOYATI, Lagadi Gadiyani",Male,MBBS
+26358,Dr. SANGAM DHAMALA,"BOUDHA, Kathmandu",Female,MBBS
+26359,Dr. ROSHANI LAMICHHANE,"BARALTOLE, Gokarneshwor",Female,MBBS
+26360,Dr. Surachhit Neupane,"Bharatpur, Bharatpur",Male,BDS
+26361,Dr. RASHMI SHRESTHA,"BAFAL, Kathmandu",Female,MBBS
+26362,Dr. Rina khadka,"Kathmandu, Ghattekulo",Female,BDS
+26363,Dr. Pushpa Gyawali,"Baletaksar, Baletaksar",Female,BDS
+26364,Dr. NITESH MANDAL,"Bathnaha, Bathnaha",Male,MBBS
+26365,Dr. BINITA MAJHI,"JAMTOKI, Katahari",Female,MBBS
+26366,Dr. Kaushal Adhikari,"Hattigauda, Mahankal Municipality",Male,MBBS
+26367,Dr. Raju mahaseth,"Dhanusha, Kurtha",Male,MBBS
+26368,Dr. Sonu Thapa magar,"Thankot, Kathmandu, Chandragiri Municipality",Female,BDS
+26369,Dr. Rubees Prajapati,"Baluwatar, Baluwatar",Male,BDS
+26370,Dr. Shilpi Moktan,"JAMADAHA, Jamadaha",Female,BDS
+26371,Dr. Isha Lamichhane,"pokhara, Pokhara",Female,BDS
+26372,Dr. Arati Dangal,"kathmandu, lapsephedi",Female,BDS
+26373,Dr. Shivani Pradhan,"Anamnagar, Kathmandu",Female,BDS
+26374,Dr. SUMAN KUMAR JHA,"JANAKPUR 4 DHANUSHA, Janakpur Municipality",Male,MBBS
+26375,Dr. Kajal Pradhan,"Bhairahawa, Siddharthanagar",Female,BDS
+26376,Dr. Samikshya Thapa,"Nepal, Bahundangi",Female,BDS
+26377,Dr. SONU BHANDARI,"Biratnagar, Biratnagar",Female,BDS
+26378,Dr. Divya Jha,"birganj, laxmanuwa",Female,BDS
+26379,Dr. manita pakhrin,"Imadol,lalitpur, imadol",Female,BDS
+26380,Dr. Sagar Dhital,"Jumla, Dhapa",Male,BDS
+26381,Dr. Mahesh Regmi,"Beni Bagar, Purkot",Male,BDS
+26382,Dr. pujan gyawali,"Majhgaun, Butwal",Male,MBBS
+26383,Dr. Rajkumar Shrestha,"Dhapasi, Dhapasi",Male,BDS
+26384,Dr. Suman Pudasaini,"Madhavpur, Ratnanagar",Male,BDS
+26385,Dr. Ayam Chhatkuli,"Jyamire, Khairahani",Male,BDS
+26386,Dr. Kriti Shrestha,"Bhairahawa, Siddharthanagar",Female,BDS
+26387,Dr. shophiya Sharma,"Jamune, Jamune",Female,BDS
+26388,Dr. Samjhana Adhikari,"Hemja, Hemja",Female,BDS
+26389,Dr. Hari Bahadur Rai,"Naya basti, Khandbari",Male,BDS
+26390,Dr. Smriti Pandit,"Janakpur, Kurtha",Female,BDS
+26391,Dr. Sundar Acharya,"Dhainkot, Dhainkot",Male,BDS
+26392,Dr. Ramkrishna Tajpuria,"Banduchouk,panchgachhi, Shivasatakshi",Male,MBBS
+26393,Dr. JAMUNA GURUNG,"MADHWALIYA, Tilottama Madhwaliya",Female,MBBS
+26394,Dr. Shivani Bhandari,"Bharatpur, Bharatpur",Female,BDS
+26395,Dr. Shashi Khatri,"Duwakot, Changunarayan",Female,BDS
+26396,Dr. saroj balami,"Majhgaun, Chitlang",Male,BDS
+26397,Dr. Abhishek Shah,"Duhabi, Duhabi Bhaluwa",Male,MBBS
+26398,Dr. Susma Karki,"Bharatganj, Bharatganj Singol",Female,BDS
+26399,Dr. Silesh Maharjan,"Kiritpur, Kirtipur",Male,BDS
+26400,Dr. Samish Thapa,"Bhutandevi road, Hetauda",Male,BDS
+26401,Dr. Jyoti Mahato,"Satoshar, Satoshar",Female,BDS
+26402,Dr. ASHMITA JHA,"BANAUTA, Banauta",Female,MBBS
+26403,Dr. Ashik khadka,"chitwan, Sharadanagar",Male,BDS
+26404,Dr. Prashansa Poudel,"Bharatpur, Bharatpur",Female,BDS
+26405,Dr. Aayushma Khanal,"Chitwan, Pithuwa",Female,BDS
+26406,Dr. Priyanka Yadav,"Sitapur, Jamuniya",Female,MBBS
+26407,Dr. Shreesti Shrestha,"Dathu Tole, Madhyapur Thimi",Female,BDS
+26408,Dr. Umanga Timilsina,"Dapcha, Chattrebajha",Male,MBBS
+26409,Dr. srijana Dev,"biratnagar, Biratnagar",Female,MBBS
+26410,Dr. Rujina Prajapati,"Suryamadhi, Bhaktapur",Female,BDS
+26411,Dr. Smriti Pokharel,"Dolakha, Malu",Female,BDS
+26412,Dr. Anil Kharga,"Janakpur Ward no 2, Janakpur",Male,MBBS
+26413,Dr. Smriti Karki,"Myaldada, Durbar devisthan",Female,MBBS
+26414,Dr. Nisha Khati,"Tansen, Tansen",Female,MBBS
+26415,Dr. Shyam Bahadur Kami,"DAMKADA, Madanpokhara",Male,MBBS
+26416,Dr. Shriya Bhattarai,"Panchamukhi chowk, Biratnagar",Female,MBBS
+26417,Dr. Reshma Shrestha,"Dailekh, Narayan",Female,MBBS
+26418,Dr. Amod Nepal,"Palpa nepal, Chidipani",Male,MBBS
+26419,Dr. Chandni Sharma,"Nepal, Ankar",Female,MBBS
+26420,Dr. Jay Kumar Yadav,"Diman, Diman",Male,MBBS
+26421,Dr. SHRITIK DEVKOTA,"DEVINAGAR, Butwal",Male,MBBS
+26422,Dr. Alisha Chamlagain,"Biratnagar, Biratnagar",Female,BDS
+26423,Dr. RABINA THAPA MAGAR,"Kathmandu, Kathmandu",Female,BDS
+26424,Dr. Ashish Bhattarai,"Narayangarh, chitwan, Bharatpur",Male,MBBS
+26425,Dr. Nishan Bhandari,"Balaju, Ka. Ma. Pa",Male,MBBS
+26426,Dr. Pankaj Kumar Sah,"Janakpurdham, janakpur",Male,MBBS
+26427,Dr. Seluja Hingmang,"Dhankuta, Dhankuta",Female,MBBS
+26428,Dr. Sabina Dahal,"Daha, Gauri",Female,MBBS
+26429,Dr. Sumedha Paudel,"Phatakshila, Phatakshila",Female,MBBS
+26430,Dr. Pooja Bam,"Pipalchauri, Pipalchauri",Female,MBBS
+26431,Dr. Yogendra Mani Basnet,"Pupangu, Ankhibhuin",Male,MBBS
+26432,Dr. Sunil Kumar Daha,"Umaprempur 9, Umaprempur",Male,MBBS
+26433,Dr. BIBEK GURUNG,"GUMI, Gumi",Male,MBBS
+26434,Dr. Sanjay Rana Magar,"Mural, Kanku",Male,MBBS
+26435,Dr. Nabin Kishor Malla,"Bagthala, Banjh",Male,MBBS
+26436,Dr. ADHAR OLI,"chhiwang, chautara, Chiwang",Male,MBBS
+26437,Dr. Soniya Shrestha,"Bhaktapur, Nepal",Female,MBBS
+26438,Dr. Prakash Raj Joshi,"Subeda, Subeda",Male,MBBS
+26439,Dr. Bimal Duwadi,"Kaphaldanda, Hanshapur",Male,MBBS
+26440,Dr. sushil malla,"Mugu, Shreenagar",Male,MBBS
+26441,Dr. Janny Karmacharya,"Chapagaun, Chapagaun",Female,MBBS
+26442,Dr. Shiksha Ojha,"Makwanpur, Hetauda",Female,MBBS
+26443,Dr. Saru Pradhan,"Dolakha, Bhimeshwor MC",Female,MBBS
+26444,Dr. Sistu K C,"NAWALPARASI, Kawasoti",Female,MBBS
+26445,Dr. Dev Raj Gajmer,"Makwanpur, Sisnera",Male,MBBS
+26446,Dr. Jeevan Chaudhary,"Padampur, Padampur",Male,MBBS
+26447,Dr. Prem Prasad Dhungana,"Kudabasti, Mangalsen",Male,MBBS
+26448,Dr. Prakash Thakulla,"Nawathana, Nawathana",Male,MBBS
+26449,Dr. Abinash Yadav,"Bhoil, Sonamai",Male,MBBS
+26450,Dr. Kiran Shahi,"Manma, Manma",Female,MBBS
+26451,Dr. Dipak Kumar Sah,"Brahampur, Brahampur",Male,MBBS
+26452,Dr. Sonal Ramprasad Sharma,"Paththardanda, Madhwaliya",Female,BDS
+26453,Dr. Abik Budha Magar,"Tallo Sera, Taksera",Male,MBBS
+26454,Dr. Prashant Yadav,"Tamasuiya 6, Bhagwatipur Ta. Su",Male,MBBS
+26455,Dr. Aashish Koirala,"PARSAHAWA, Madhawaliya",Male,MBBS
+26456,Dr. Rashmi Yadav,"Basbitti, Basbiti",Female,MBBS
+26457,Dr. Anish Karn,"Nagarain, Nagarain",Male,MBBS
+26458,Dr. Prakash Acharya,"Chitwan, Khairahani",Male,MBBS
+26459,Dr. Bishnu Ranjan Patel,"Gaur, Gaur",Male,MBBS
+26460,Dr. Aashish Kumar Jha,"Suga Bhawani Patti, Suga Bhawani Patti",Male,MBBS
+26461,Dr. Dipesh Pandit,"Thori, Thori",Male,MBBS
+26462,Dr. Mohit Shahi,"Tansen, Tansen",Male,MBBS
+26463,Dr. Saurav Karki,"Paiyuntar, Dharmasthali",Male,MBBS
+26464,Dr. Lukash Adhikari,"Bharatpur, Bharatpur",Male,MBBS
+26465,Dr. Aman Rajak,"DHOBIGHAT, Lalitpur",Male,MBBS
+26466,Dr. shiksha acharya,"Kathmandu, Kathmandu",Female,MBBS
+26467,Dr. kriti neupane,"Gaindakot, Gaindakot",Female,MBBS
+26468,Dr. Sinda Karkee,"Pauwai, Putalibazaar",Female,MBBS
+26469,Dr. Puja Sainju,"Nasikasthan, Nasikasthan",Female,MBBS
+26470,Dr. BIVEK KUMAR YADAV,"Musaili, Musaili",Male,MBBS
+26471,Dr. Roshan Raj Nishad,"Parsa, Shreesiya khalwatola",Male,MBBS
+26472,Dr. Rimesh Subedi,"Kuleshwor, Kathmandu",Male,MBBS
+26473,Dr. RUPESH JUNG KARKI,"Pathari, Pathari",Male,MBBS
+26474,Dr. Manjil Bharati,"Bahundangi, Mechinagar",Male,MBBS
+26475,Dr. Basant Kunwar,"Sau. Pharsatikar, Sau. Pharsatikar",Male,MBBS
+26476,Dr. Rashmit Shah,"Janakpur, Janakpur",Male,MBBS
+26477,Dr. Sunil Baniya,"Supare, Mirkot",Male,MBBS
+26478,Dr. Gaurab basnet,"kathmandu, kathmandu",Male,MBBS
+26479,Dr. Nabin Thapa,"Urlabari, Urlabari",Male,MBBS
+26480,Dr. Anisha Khadka,"Duwakot, Duwakot",Female,MBBS
+26481,Dr. Dipsana Bista,"Jhamsikhel,Lalitpur, lalitpur",Female,MBBS
+26482,Dr. Niramika Pathak,"Baghdol, Bhandara",Female,MBBS
+26483,Dr. Sony Ghimire,"Himganga, Ramechhap, Himganga",Female,MBBS
+26484,Dr. SANDEEP GHIMIRE,"patawari, kolhuwa",Male,MBBS
+26485,Dr. Sandeep Poudel,"Thum, Chilaunebas",Male,MBBS
+26486,Dr. Manish Poudel,"Gaighat, Triyuga",Male,MBBS
+26487,Dr. Navin Bhattarai,"Dangal tole, Itahari",Male,MBBS
+26488,Dr. Prashanna Bogati,"Gorkha, Harmi",Male,MBBS
+26489,Dr. Kanchan Bogati,"Jafati, Bidur",Male,MBBS
+26490,Dr. BASANT DANGI,"URAHARI, Urahari",Male,MBBS
+26491,Dr. Saurab Karki,"Jadibuti, Kathmandu",Male,MBBS
+26492,Dr. Anjala khadka,"Nawalpur, Netragunj",Female,MBBS
+26493,Dr. Amit Shrestha,"Phadani, Budhnagar",Male,MBBS
+26494,Dr. Sunil Shahi,"Jhaukhel, Bhaktapur, Jhaukhel",Male,MBBS
+26495,Dr. Bikash Yadav,"Akwarpur, Mahadewa",Male,MBBS
+26496,Dr. Aakanshya Adhikari,"Danchhi, Danchhi",Female,MBBS
+26497,Dr. ABILASHA RANA,"KATHMANDU, Kathmandu",Female,MBBS
+26498,Dr. Anil Aryal,"Ramghatar, Basantapur",Male,MBBS
+26499,Dr. Prashant Pant,"Ramche, Limithana",Male,MBBS
+26500,Dr. Sudat Shrestha,"Tansen, Tansen",Male,MBBS
+26501,Dr. Binaya Dhakal,"Amppipal, Amppipal",Male,MBBS
+26502,Dr. Chirag Priya,"Sarpallo, Sarpallo",Male,MBBS
+26503,Dr. Samikshya Basnet,"Chabahil, Kathmandu",Female,MBBS
+26504,Dr. Devendra Bhandari,"Hulaki ko Dil, Dhikurpokhari",Male,MBBS
+26505,Dr. Sagar Thapa,"Mirkot, Mirkot",Male,MBBS
+26506,Dr. Bibek Timilsina,"Malepatan, Pokhara",Male,MBBS
+26507,Dr. sandhya kiran neupane,"Shitalnagar, devdaha",Female,MBBS
+26508,Dr. Manish Pokhrel,"Deuwapar, Dudharaksha",Male,MBBS
+26509,Dr. shekhar Gurung,"Gaidahal, Chainpur",Male,MBBS
+26510,Dr. SHARAN THAPA,"GAGAN GAUNDA, Lekha Nath",Male,MBBS
+26511,Dr. Manish Shrestha,"Kathmandu, Gokarneshwor",Male,MBBS
+26512,Dr. Rupika Adhikari,"Danchhi, Danchhi",Female,MBBS
+26513,Dr. Samish Adhikari,"Bhagwanpur, Shivanagar",Male,MBBS
+26514,Dr. Binit Bajracharya,"Gautam Path, Dharan",Male,MBBS
+26515,Dr. SUNIL PATHAK,"BUTWAL, Butwal",Male,MBBS
+26516,Dr. Sandesh Rayamajhi,"Siddhipur, Gajehada",Male,MBBS
+26517,Dr. Sulochana Khadka,"Kathmandu, Manamaiju",Female,MBBS
+26518,Dr. Pramod Khatri,"Sirutar, Sirutar",Male,MBBS
+26519,Dr. Suhail Sapkota,"Surkhet, Uttarganga",Male,MBBS
+26520,Dr. Anupama Thapa,"Gulmi, Simichaur",Female,MBBS
+26521,Dr. Bidushi Pokhrel,"Dhobhidhara, Ilam",Female,MBBS
+26522,Dr. Kamana Dhaubanjar,"Dudhpati, Bhaktapur",Female,MBBS
+26523,Dr. Nima Wagle,"Damauli, Vyas",Female,MBBS
+26524,Dr. Rupesh Kumar Yadav,"Dhanchhabar, Laxmipur Patari",Male,MBBS
+26525,Dr. Shristi Bhandari,"Palpa, Hungi",Female,MBBS
+26526,Dr. Sudesha Karki,"Kathmandu, Naikap",Female,MBBS
+26527,Dr. Gauri Adhikari,"Narayantar, Jorpati",Female,MBBS
+26528,Dr. Rashmi Karki,"Harion, Harion",Female,MBBS
+26529,Dr. Shivani Rayamajhi,"Teenkune,subidhanagar, Kathmandu",Female,MBBS
+26530,Dr. Deepak Yadav,"Nahara Rigaul, Nahara Rigaul",Male,MBBS
+26531,Dr. Adhish Pokharel,"Nirmal Pokhari, Nirmalpokhari",Male,MBBS
+26532,Dr. pawan budhathoki,"jorpati, Jorpati",Male,MBBS
+26533,Dr. Pooja Pandeya,"Kajitol, Limithana",Female,MBBS
+26534,Dr. Subi Acharya,"Ratnanagar, Chitwan, Ratnanagar",Female,MBBS
+26535,Dr. Dipendra Budha,"wai, wai",Male,MBBS
+26536,Dr. Rahul Pandey,"jaleshwar, jaleshwar",Male,MBBS
+26537,Dr. Binita Lamichhane,"Kahun, kahun",Female,MBBS
+26538,Dr. Ayush Adhikari,"Achanetar, Tripureshwor",Male,MBBS
+26539,Dr. Sanjaya Shrestha,"14 K.M., Gorkha",Male,MBBS
+26540,Dr. Vikram Singh,"Devi Chowk, Janakpur N.P",Male,MBBS
+26541,Dr. Aayush Rizal,"Urlabari, Urlabari",Male,MBBS
+26542,Dr. Manish Shrestha,"Kushma, Parbat, Shivalaya",Male,MBBS
+26543,Dr. SHUVASHISH SUNUWAR,"MAITIDEVI, KATHMANDU, Kathmandu",Male,MBBS
+26544,Dr. Bipana Regmi,"Bhansar road, Gulariya",Female,MBBS
+26545,Dr. Anup Basnet,"kirtipur, Shanishchare",Male,MBBS
+26546,Dr. Saurav Tuladhar,"Bungmati, Bungmati",Male,MBBS
+26547,Dr. Ayush B. C.,"Bijaura, Bijaura",Male,MBBS
+26548,Dr. Kristi Thapa,"Tamghas, Tamghas",Female,MBBS
+26549,Dr. ANUJ POKHAREL,"KANCHANPUR, Kanchanpur",Male,MBBS
+26550,Dr. Sanjit Kumar Sah,"Chandranigahpur Bazar, Chandranigahpur",Male,MBBS
+26551,Dr. saroj tamli,"jhapa, sarnamati",Male,MBBS
+26552,Dr. SHAKTI CHAURASIYA,"Bahuarwabhatha, Bahuarbabhatha",Male,MBBS
+26553,Dr. Sunil Paudel,"Gyadi, Katuwachupari",Male,MBBS
+26554,Dr. Simin Kunwar,"Dhangadhi, Dhangadhi",Female,MBBS
+26555,Dr. Roshan Gaire,"Kalunchowk, Birendranagar",Male,MBBS
+26556,Dr. Prakash Sharma,"Kurgha, Phalewas",Male,MBBS
+26557,Dr. Krishnaraj Aryal,"Subarna chwok, Katunje",Male,MBBS
+26558,Dr. Aashna Bhandari,"Bhadrapur,Jhapa, Bhadrapur",Female,MBBS
+26559,Dr. Anupama Bhattarai,"Bhaisekhar, Bandipur",Female,MBBS
+26560,Dr. Bhushan Shrestha,"Bahrabise, Mahadevsthan",Male,MBBS
+26561,Dr. Prajwal Ram Ghimire,"Betali, Betali",Male,MBBS
+26562,Dr. Diwakar Subedi,"Thulochaur, Duwachaur",Male,MBBS
+26563,Dr. Milan Shrestha,"Dhading Bensi, Neelakantha",Male,MBBS
+26564,Dr. Sharmila Chaudhary,"Tutaha, Simariya",Female,MBBS
+26565,Dr. Anisha Shrestha,"Chabahil, Kathmandu",Female,MBBS
+26566,Dr. Ashes Rijal,"Jhungapar, Gajedi",Male,MBBS
+26567,Dr. Prashant Gyawali,"kaithalawa, Daya Nagar",Male,MBBS
+26568,Dr. SHRADHA ACHARYA,"MANPUR, Manpur",Female,MBBS
+26569,Dr. Roshan Gami,"Sabaila 02, Sabaila",Male,MBBS
+26570,Dr. Prashanna Karki,"Barchaur, Jamune",Male,MBBS
+26571,Dr. Suskera Pandey,"Damauli, Vyas Municipality",Female,MBBS
+26572,Dr. Sinchan Pandey,"Damauli, Vyas Municipality",Male,MBBS
+26573,Dr. Kapil Belbase,"Aulipokhari, Balkot",Male,MBBS
+26574,Dr. Sushi Shrestha,"Gongabu, Gongabu",Female,MBBS
+26575,Dr. Binod Poudel,"Kaule, Salyan",Male,MBBS
+26576,Dr. Sagar Panta,"Madhavpur, Pithuwa",Male,MBBS
+26577,Dr. Bishad Dahal,"Katunje, Katunje",Male,MBBS
+26578,Dr. Sajan Duwal,"Thalachhen, Bhaktapur",Male,MBBS
+26579,Dr. Nahakul Poudel,"Bagaincha, Kushma",Male,MBBS
+26580,Dr. Sudip chandra Subedi,"Chaura, Pang",Male,MBBS
+26581,Dr. SUNIL ARYAL,"BAGALTHOK, Putalibazar",Male,MBBS
+26582,Dr. Suraj Shrestha,"Butwal, Butwal",Male,MBBS
+26583,Dr. Birat Kumar Gautam,"Dasharathchand, Dasharathchand Mun",Male,MBBS
+26584,Dr. Sagar Adhikari,"Birtamode, Charpane",Male,MBBS
+26585,Dr. Hitesh Kumar Pandit,"Chhotaul, Chhotaul",Male,MBBS
+26586,Dr. Sanukaji Basnet,"Jyamrung, Jyamrung",Male,MBBS
+26587,Dr. Binita Timilsina,"Koilapani, Shivamandir",Female,MBBS
+26588,Dr. ROSHAN PATHAK,"Phullhatta parikauli, Phulhatta Parikauli",Male,MBBS
+26589,Dr. Anil Suryabanshi,"Birbas, Birbas",Male,MBBS
+26590,Dr. saurav dahal,"biratnagar, Biratnagar",Male,MBBS
+26591,Dr. Gopal Khanal,"Waling, Waling",Male,MBBS
+26592,Dr. Apil Upreti,"Kathmandu 09, Kathmandu",Male,MBBS
+26593,Dr. Sanjaya Wagle,"Basandol, Badbhanjyang",Male,MBBS
+26594,Dr. Dinesh Barakoti,"Barabise, Barhabise",Male,MBBS
+26595,Dr. Santosh Regmi,"Lamage, Putalibazar",Male,MBBS
+26596,Dr. Anish Kumar Shrestha,"Basundhara, Kathmandu",Male,MBBS
+26597,Dr. Basanta Sharma Paudel,"Bihadi Barrachour, Bihadi Barrachour",Male,MBBS
+26598,Dr. Arun Kharel,"MANIGRAM, Anandavan",Male,MBBS
+26599,Dr. Shikhar Karna,"Ganesh Chowk, Lahan",Male,MBBS
+26600,Dr. Subhechchha Thapa,"Patlekhet, Patlekhet",Female,MBBS
+26601,Dr. Ichchha Kayastha,"Gaur, Gaur",Female,MBBS
+26602,Dr. Prativa subedi,"dang, Laxmipur",Female,MBBS
+26603,Dr. Sampada Singh Basnyat,"Kathmandu, Kathmandu",Female,MBBS
+26604,Dr. Elina Maharjan,"Kirtipur, Kirtipur Municipality",Female,MBBS
+26605,Dr. Bijay Bhusal,"Bajheri, Bangi",Male,MBBS
+26606,Dr. Dipesh Khadka,"Dadhikot, Dadhikot",Male,MBBS
+26607,Dr. Abina Chapagain,"Sankhamul, kathmandu, Kathmandu",Female,MBBS
+26608,Dr. Sadiksha Adhikari,"Gorkha, Mirkot",Female,MBBS
+26609,Dr. Kristi Upadhyaya,"Bajhang, Parakatne",Female,MBBS
+26610,Dr. Sudeshana Adhikari,"Sunpadeli, Kalika",Female,MBBS
+26611,Dr. Prashant Chhetri,"Nayabazar, Pokhara",Male,MBBS
+26612,Dr. Leena Shrestha,"Lamjung, Tarkughat",Female,MBBS
+26613,Dr. Sepiya Shrestha,"Bhairahawa, Siddharthanagar",Female,MBBS
+26614,Dr. Suraj Kumar Poudel,"Nirmalpokhari, Nirmalpokhari",Male,MBBS
+26615,Dr. Jeebita Shahi,"Surkhet, Latikoili",Female,MBBS
+26616,Dr. Gunjan Kumar Sah,"padariya, padariya",Male,MBBS
+26617,Dr. MICHAEL KUMAR SAH,"MALANGWA, Malangwa",Male,MBBS
+26618,Dr. Sakar Raj Pandey,"Samakhusi, Kathmandu, Kathmandu",Male,MBBS
+26619,Dr. Soniya Shrestha,"Chautara 4, Sindhupalchok, Chautara",Female,MBBS
+26620,Dr. Tek Bahadur Bista,"Pitargada, Dhaku",Male,MBBS
+26621,Dr. KANCHAN TWATI,"KULMANANI, Bhaktapur",Female,MBBS
+26622,Dr. Abhishek Shah,"Dhapasi, Dhapasi",Male,MBBS
+26623,Dr. Pratikshya Shrestha,"Audhyogik chhetra, Pokhara",Female,MBBS
+26624,Dr. Rakesh Kumar Mahato,"Malhaniyakhori, Malhaniyakhori",Male,BDS
+26625,Dr. Rajesh Paudel,"Kole, Khurkot",Male,MBBS
+26626,Dr. Mani Chandra Kandel,"Dhuwankot 1 , Gorkha, Dhuwankot",Male,MBBS
+26627,Dr. Apsara Ranabhat,"Pokharakhet, Thumakodanda",Female,MBBS
+26628,Dr. Rosy Dhakal,"Lakeside, Pokhara",Female,MBBS
+26629,Dr. Ashwini Gurung,"Mohoriya, Rupakot",Female,MBBS
+26630,Dr. Roshan Kumar Shah,"Pandhare, Itahari",Male,MBBS
+26631,Dr. NISHA SHARMA,"Bishalnagar, Kathmandu",Female,MBBS
+26632,Dr. BANDEJ RANA,"PALPA, Bougha Gumha",Male,MBBS
+26633,Dr. Pratima Sapkota,"Dhobighat, Lalitpur",Female,MBBS
+26634,Dr. Shriya Bista,"Makwanpur, Hatiya",Female,MBBS
+26635,Dr. Asmita Itani,"Rampur, Chainpur",Female,MBBS
+26636,Dr. Awaz Upadhayaya,"Sauthar, Putalibazaar",Male,MBBS
+26637,Dr. Sunil Timilsina,"Khaniya kharka, Kumari",Male,MBBS
+26638,Dr. Ankit Gyawali,"Arghakhanchi, Chidika",Male,MBBS
+26639,Dr. SONAM NUPPA BHOTE,"HUNGGUNG, Hatiya",Male,MBBS
+26640,Dr. BHUBAN MOKTAN,"Godar, Lav Toli",Male,MBBS
+26641,Dr. anjuli basnet,"narayanpur, narayanpur",Female,MBBS
+26642,Dr. RENU SILWAL,"KURINTAR, Darechok",Female,MBBS
+26643,Dr. Ujwal Raut,"Basantapatti, Basantapatti",Male,MBBS
+26644,Dr. Ashish Subedi,"Khaula lakuri, Khaula lakuri",Male,MBBS
+26645,Dr. Niraj Khanal,"Mulpani, Mulpani",Male,MBBS
+26646,Dr. Seema Adhikari,"Biratnagar, Biratnagar",Female,MBBS
+26647,Dr. Sumit Sharma,"Chhapaki, Bakdhuwa",Male,MBBS
+26648,Dr. Aayush Kharel,"Manglabare, Jalthal",Male,MBBS
+26649,Dr. Niraj Koirala,"Biratngar, Biratnagar S. Mtr. City",Male,MBBS
+26650,Dr. Baidh Gupta,"Kanchanpur, Kanchanpur",Male,MBBS
+26651,Dr. Milan Jung K. C.,"Dolakha, Bhedpu",Male,MBBS
+26652,Dr. Gyanendra Chaudhary,"Baijanathpur, Santapur",Male,MBBS
+26653,Dr. Kedar Babu Dangar,"Sukadhik, Sukadhik",Male,MBBS
+26654,Dr. KHUSHBOO YADAV,"Saptari, trikaul 4, Trikaul",Female,MBBS
+26655,Dr. KRISHNA CHANDRA MANDAL,"AJMARPATTY, Bhatauliya",Male,MBBS
+26656,Dr. ARUN SHRESTHA,"JUMLA BAZAAR, Chandannath",Male,MBBS
+26657,Dr. ASTHA ACHARYA,"KHOLE GAUN, Samundradevi",Female,MBBS
+26658,Dr. Sunny Chhetri,"PERSANI, Halwar",Male,MBBS
+26659,Dr. Hari Shankar Neupane,"Kartikaswmi, Kartikaswmi",Male,MBBS
+26660,Dr. Rajat Chaudhary,"Santapur, chandrapur",Male,MBBS
+26661,Dr. Saroj Mandal,"Nabnagar, Trikaul",Male,MBBS
+26662,Dr. Manoj Rajbanshi,"Dhulabari, Mechinagar",Male,MBBS
+26663,Dr. PRATIGYA PANTA,"UDIPUR,LAMJUNG, Udipur",Female,MBBS
+26664,Dr. Tushar Sah,"Shreenagar, Gaurishankar",Male,MBBS
+26665,Dr. Bibekanand Yadav,"Rajbiraj, Rajbiraj",Male,MBBS
+26666,Dr. Niskarsha Rijal Sharma,"Putali Line, Dharan",Male,MBBS
+26667,Dr. Bibham Raj Gupta,"Janakpur, Dhanusa, Nepal, Janakpur",Male,MBBS
+26668,Dr. Gopal Kumar Yadav,"Sisiyadi, Bairiyabirta (Da.Pu.)",Male,MBBS
+26669,Dr. JITENDRA RAJ KOIRALA,"Kaski, Pokhara",Male,MBBS
+26670,Dr. Shreeya Pangeni,"Kathmandu, Kathmandu",Female,MBBS
+26671,Dr. Anjali Chaurasia,"birgunj, harpatgunj",Female,MBBS
+26672,Dr. CHANDRA KIRAN BASNET,"Gachhiya, Biratnagar",Female,MBBS
+26673,Dr. Anu Dutta,"Malangawa, Brahmapuri",Female,BDS
+26674,Dr. Shiva Nath Yadav,"Laxmipur Patari, Laxmipur Patari",Male,MBBS
+26675,Dr. AMIT SHAH,"INARUWA, Inaruwa",Male,MBBS
+26676,Dr. SANJAYA BARAL,"Namunatole, Baseri",Male,MBBS
+26677,Dr. Kripa Shree Shrestha,"Dhulikhel, Dhulikhel",Female,MBBS
+26678,Dr. Ankit Gupta Kalwar,"Birgunj, Birgunj",Male,BDS
+26679,Dr. Suvin Chaudhary,"Pokhariya, Baswalpur",Male,BDS
+26680,Dr. Jibeshwori Wagle,"Chitwan, Bharatpur",Female,MBBS
+26681,Dr. siddhartha upadhaya,"Bhairahawa, Siddharthanagar",Male,MBBS
+26682,Dr. Utsav Shrestha,"Dharan, Dharan",Male,BDS
+26683,Dr. Nishu Jha,"Janakpur Dham, Janakpur Nagarpalika",Female,BDS
+26684,Dr. Brajesh Bhattarai,"Biratnagar, Biratnagar",Male,BDS
+26685,Dr. Anumesh Dahal,"Teenpainee, Biratnagar",Male,BDS
+26686,Dr. Ashmi Baral,"Pokhara, Pumdibhumdi",Female,BDS
+26687,Dr. Rebika Shrestha,"Dharan, Dharan",Female,BDS
+26688,Dr. Shishir Lamsal,"Kawasoti, Kawasoti",Male,BDS
+26689,Dr. Shristi Gautam,"Dharan, Dharan",Female,BDS
+26690,Dr. JAGRITI RIJAL,"BIRATNAGAR, Biratnagar",Female,BDS
+26691,Dr. Smriti Chaudhary,"Bhadgaunsinuwari, Bhadgaun Sinuwari",Female,BDS
+26692,Dr. Asha Rai,"Dharan, Mattim",Female,BDS
+26693,Dr. Sushant Pandey,"Bharmarpura, Bharmarpura",Male,BDS
+26694,Dr. Regina Dahait,"BELWA, Belwa",Female,BDS
+26695,Dr. Rabindra Kumar Mishra,"Parshohiya, Parshohiya",Male,BDS
+26696,Dr. Prakriti Pathak,"Chitwan, Bhandara",Female,BDS
+26697,Dr. Prawin Chandra Kushwaha,"Arnama, Arnama Pra. Pi",Male,BDS
+26698,Dr. Tanisha Das,"Rajbiraj, Rajbiraj",Female,BDS
+26699,Dr. ABISEK KUMAR SHARMA,"RAJGADH, Rajgadh",Male,BDS
+26700,Dr. PRASHANT YADAV,"PIPRAHI, Goithi",Male,MBBS
+26701,Dr. Santosh Pokhrel,"Gharipatan, Pokhara",Male,MBBS
+26702,Dr. Bishwodip Baral,"Thapatol, Laxminiya",Male,MBBS
+26703,Dr. Sagar Poudel,"Poudeldihi, Suryapal",Male,MBBS
+26704,Dr. Suraj Subedi,"Sauraha Pharsatikar, Sau. Pharsatikar",Male,MBBS
+26705,Dr. Nisha Chapagain,"Khaireni, Baghauda",Female,MBBS
+26706,Dr. Asmita Poudel,"Sharadpur, Bharatpur",Female,MBBS
+26707,Dr. Binod Paudel,"Bagaincha, Khurkot",Male,MBBS
+26708,Dr. Suroj Hakuduwa,"Sipadol, Sipadol",Male,MBBS
+26709,Dr. Kiran Bishwakarma,"Khanyakharka, Leguwa",Male,MBBS
+26710,Dr. Suman Kumar Khadka,"Dhulabari, Mechinagar",Male,MBBS
+26711,Dr. Swapnil Sharma,"Patichaur, Bajung",Male,MBBS
+26712,Dr. Jitendra Yadav,"Jijhaul, Jijhaul",Male,MBBS
+26713,Dr. Krishna Kumar Sah,"Sapahi, Sapahi",Male,MBBS
+26714,Dr. Saru Nhisutu,"Taumadhi, Khanla, Bhaktapur",Female,MBBS
+26715,Dr. Ramita Dangol,"Tokha, Tokha Saraswati",Female,MBBS
+26716,Dr. Nixon Dangol,"Kathmandu, Kathmandu",Male,MBBS
+26717,Dr. Naniram Sapkota,"Jaisithok, Mandan Deupur",Male,MBBS
+26718,Dr. AVINAB PRASAD SHRESTHA,"Baluwatar, Kathmandu",Male,MBBS
+26719,Dr. Aakriti Pandey,"Srijana Nagar, Katunje",Female,MBBS
+26720,Dr. Bibechan Thapa,"CHARGHARE, Kirtipur",Male,MBBS
+26721,Dr. Mamata Rimal,"Chitwan, 12, Bharatpur",Female,MBBS
+26722,Dr. Anish Neupane,"Bikash Marga, Dharan",Male,MBBS
+26723,Dr. Sanjit Lama,"Charigang, Bhimeshwor",Male,MBBS
+26724,Dr. Nishant Kumar Raut,"Biratnagar, Biratnagar",Male,MBBS
+26725,Dr. sudip mishra,"Damauli, Vyas",Male,MBBS
+26726,Dr. Kailash Lama,"punarwas, Tribhuwanbasti",Male,MBBS
+26727,Dr. RAJINA SHRESTHA,"BHOJPUR, Bhojpur",Female,MBBS
+26728,Dr. Hritika Rathi,"Inaruwa, Inaruwa",Female,MBBS
+26729,Dr. Noopur Jha,"Rautahat, Basatpur",Female,MBBS
+26730,Dr. June Thapa,"Waksa, Waksa",Female,MBBS
+26731,Dr. Bharat Khatri,"Butwal 13, Kalikanagar, Butwal",Male,MBBS
+26732,Dr. Laxman Khati,"Kuldevmandu, Kuldevmandu",Male,MBBS
+26733,Dr. Basanti Pun,"Kankri, Kankri",Female,MBBS
+26734,Dr. Dambar Jung Singh,"SUBEDA, Subeda",Male,MBBS
+26739,Dr. Nilam Rai,"Janpath, Dharan",Female,BDS
+26739,Dr. Nilam Rai,"Janpath, Dharan",Female,BDS
+26740,Dr. Akanksha Chaurasia,"Bhanu Tole, Biratnagar",Female,MBBS
+26741,Dr. Sugat Adhikari,"Putali LIne, Dharan",Male,MBBS
+26742,Dr. SUDIP NIROULA,"AMARDAHA, Amardaha",Male,MBBS
+26743,Dr. NITESH SAH,"Zeromile, Janakpur Nagarpalika",Male,MBBS
+26744,Dr. Roshan Kumar Yadav,"Dewangunj, Dewangunj",Male,BDS
+26745,Dr. Ranjana Ghimire,"Hapur, Hapur",Female,BDS
+26746,Dr. Srijana Jairu,"Dandabazar, Dandabazar",Female,BDS
+26747,Dr. Eden Kafle,"Chandrapur, Chandranigahapur",Male,BDS
+26748,Dr. Ajay Kamat,"Ramganj Belgachhiya, Ramganj Belgachhiya",Male,BDS
+26749,Dr. Nitika Santhaliya,"Janaki path, Biratnagar",Female,BDS
+26750,Dr. Bimal Chand,"Baitadi, Dasharathchand",Male,BDS
+26751,Dr. Shiva Pratik Sah,"Kharihani, Kharihani",Male,MBBS
+26752,Dr. Mahima Upadhyay,"Siraha, Siraha",Female,MBBS
+26753,Dr. Pradip Ghimire,"Chisapani, Ratnanagar",Male,MBBS
+26754,Dr. ANJALI BIJAYA ADHIKARI,"kailali, Basauti",Female,MBBS
+26755,Dr. Prabhat Kiran Devkota,"Naukhor, Palumtar",Male,MBBS
+26756,Dr. Sandesh Kumar Shrestha,"Nigaul, Nigaul",Male,MBBS
+26757,Dr. Kriti Mahato,"Baghauda, Baghauda",Female,MBBS
+26758,Dr. Arjun Budhathoki,"Dhikpur, Dhikpur",Male,MBBS
+26759,Dr. Ojaswee Sharma,"Bedi Chowk, Bharatpur",Female,MBBS
+26760,Dr. Amrita Gurung,"Bhozard, Bharatpur",Female,MBBS
+26761,Dr. KALPANA BAJRACHARYA,"Chovar, Kirtipur Municipality",Female,MBBS
+26762,Dr. Mukesh Sapkota,"Gulmi, Wami",Male,BDS
+26763,Dr. Srijal Bhujel,"Budol,Banepa, Banepa",Male,BDS
+26764,Dr. Deepali Adhikari,"Chabahil, Kathmandu, Kathmandu",Female,MBBS
+26765,Dr. Ashma Dhakal,"Baneshwor, Kathmandu",Female,MBBS
+26766,Dr. Aastha Malla,"Sankhu, Shankharapur",Female,MBBS
+26767,Dr. Shrinkhala Timsina,"Khairenitar9 , Tanahun, Khairenitar",Female,MBBS
+26768,Dr. Sareena Maharjan,"thecho, Thecho",Female,MBBS
+26769,Dr. Pramod Tripathi,"Bhandara, Bhandara",Male,MBBS
+26770,Dr. Nishant sapkota,"tandi, Ratnanagar",Male,MBBS
+26771,Dr. Shubhani Sharma,"Swotha, Lalitpur",Female,MBBS
+26772,Dr. Pratigya Aryal,"Nareshwor, Nareshwor",Female,MBBS
+26773,Dr. SUDIP SUBEDI,"KASKIKOT, Kaskikot",Male,MBBS
+26774,Dr. Vivek Acharya Chetri,"Manigram, Makrahar",Male,MBBS
+26775,Dr. Ankit Shrestha,"Dharan, Dharan",Male,MBBS
+26776,Dr. Ambu Thapa,"Itram, Birendranagar",Female,MBBS
+26777,Dr. Aditya Kumar Yadav,"Ramdaiya Bhawadi, Ramdaiya Bhawadi",Male,MBBS
+26778,Dr. Tirth Raj Joshi,"Gobaraiya, Bheemdatt",Male,MBBS
+26779,Dr. Ashoo Joshi,"Purnachandi, Lalitpur",Female,MBBS
+26780,Dr. Aastha Lamsal,"Falebas, Khanigaun",Female,MBBS
+26781,Dr. Susmita Shrestha,"Changunarayan, Changunarayan",Female,BDS
+26782,Dr. Shabnam Gurung,"Madi, Madi",Female,BDS
+26783,Dr. Sunita Yadav,"Lalapatti, Lalapatti",Female,BDS
+26784,Dr. shivani jha,"Nepal, Basatpur",Female,MBBS
+26785,Dr. Shiv Kumar Shah,"KHOKSHAHA, Buddhanagar",Male,MBBS
+26786,Dr. sagar yadav,"Lalapatti, Lalapatti",Male,MBBS
+26787,Dr. Prashant Shah,"Dharan, Bakdhuwa",Male,MBBS
+26788,Dr. Rohan Basnet,"Mahendranagar, Mahendranagar",Male,MBBS
+26789,Dr. shivanee shrestha,"Jhamsikhel, Lalitpur",Female,MBBS
+26790,Dr. SANGAM WAGLE,"Annapurna tole, Dulegaunda",Male,MBBS
+26791,Dr. Nizya Joshi,"Saugal, Lalitpur",Female,MBBS
+26792,Dr. Santosh Babu Poudel,"Gauriganj, Bharatpur",Male,MBBS
+26793,Dr. Junu Giri,"Damak, Damak",Female,MBBS
+26794,Dr. Manisha Gaire,"Yegyapuri, Bharatpur",Female,MBBS
+26795,Dr. Saurav Shrestha,"Sundarbazar, Parewadanda",Male,MBBS
+26796,Dr. Susmita poudel,"RAMBAGH, Bharatpur",Female,MBBS
+26797,Dr. Prashansa Pradhan,"Jaleshwor, Jaleshwor",Female,MBBS
+26798,Dr. Sandesh Neupane,"Manakamana Marg, Ichangu Narayan",Male,MBBS
+26799,Dr. Sarita Bishowkarma,"Dahachok, Dahachok",Female,MBBS
+26800,Dr. Sagun Khanal,"Gorkha, Deurali",Female,MBBS
+26801,Dr. Surya Kumar Rajbanshi,"Mahespur, Katahari",Male,MBBS
+26802,Dr. Sagar Shrestha,"Lankoo, Bharatpur",Male,MBBS
+26803,Dr. Rojina Kapri,"Kangresschowk, Gaindakot",Female,MBBS
+26804,Dr. Md Shahnwaz Hussain,"Dharan, Dharan",Male,MBBS
+26805,Dr. MRIDUL MISHRA,"PIPARA, Pipara",Male,MBBS
+26806,Dr. Raman Dhungel,"Madhumalla, Madhumalla",Male,BDS
+26807,Dr. Amit Mishra,"kadam chowk, Janakpur Nagarpalika",Male,MBBS
+26808,Dr. Amar Jayswal,"Dipahi, Dipahi",Male,MBBS
+26809,Dr. Shrawan Kumar Mandal,"Lohajara, Lohajara",Male,MBBS
+26810,Dr. Binesh Kumar Mandal,"Betauna, Betauna",Male,MBBS
+26811,Dr. Rajesh Limbu,"BADAHARA, Shi. Badahara",Male,MBBS
+26812,Dr. Nimisha Risal,"Jawalakhel, Lalitpur",Female,MBBS
+26813,Dr. Monika Pandit,"Jhapardi, Gaindakot",Female,MBBS
+26814,Dr. Pratima Bhandari,"Butwal, Dudharaksha",Female,MBBS
+26815,Dr. Arzoo Sana,"Siswa, kapilvastu, Siswa",Female,MBBS
+26816,Dr. Sonam Shrestha,"Gaushala, Kathmandu",Female,MBBS
+26817,Dr. Abhinandan Sah,"Katti, Boria",Male,MBBS
+26818,Dr. Pratima Paudel,"Saraswotinagar, Kathmandu",Female,MBBS
+26819,Dr. pooja jha,"Madhwa, Bathnaha",Female,MBBS
+26820,Dr. Shruchi Chaurasia,"Jhauwaguthi, Jhauwaguthi",Female,MBBS
+26821,Dr. Geeta Bashyal,"Gairagaun, Tansen",Female,MBBS
+26822,Dr. Ranjana Kumari Pandit,"bahuarwa bhatta, Bahuarwa Bhatha",Female,MBBS
+26823,Dr. Priyanka khadka,"Bishnu Budhanilkantha 4,kathmandu, Bishnu Budhanilkantha",Female,MBBS
+26824,Dr. Aishwarya Tandon,"Nepalgunj, Nepalgunj",Female,MBBS
+26825,Dr. Riyasa Sangraula,"Budhabare, Budhabare",Female,MBBS
+26826,Dr. Nancy Goyal,"Mahendra Path, Dharan",Female,MBBS
+26827,Dr. Swarn Singh,"Saptari, Koilari",Male,MBBS
+26828,Dr. Shreyashi Khanal,"Basundhara, Kathmandu",Female,MBBS
+26829,Dr. Sabin Acharya,"Kharkhutte, Kathar",Male,MBBS
+26830,Dr. Shashi Singh,"Koilari, Koilari",Male,MBBS
+26831,Dr. Sarthak Regmi,"Govindapur, Govindapur",Male,MBBS
+26832,Dr. Manu Paudel,"Damauli, Vyas Municipality",Female,MBBS
+26833,Dr. Leeza Shah,"Sahebgunj, Sahebgunj",Female,MBBS
+26834,Dr. PRASHANT SAGAR YADAV,"Basantapur, Basantapur",Male,MBBS
+26835,Dr. Aayush Shrestha,"NARESHWOR, Nareshwor",Male,MBBS
+26836,Dr. Dejina Karki,"Kathmandu, Kathmandu",Female,MBBS
+26837,Dr. Sagar Ghimire,"Bazabari, Darbar devisthan",Male,MBBS
+26838,Dr. Sanjay Paudel,"Ghorahi, Laxmipur",Male,MBBS
+26839,Dr. Sagar Poudel,"Barakhutti, Lalmatiya",Male,MBBS
+26840,Dr. Pujash Karmacharya,"Belkhu, Pinda",Male,MBBS
+26841,Dr. Pragya Gautam,"Chitwan, Bharatpur",Female,MBBS
+26842,Dr. Ajay Mandal,"Itahari, Itahari",Male,MBBS
+26843,Dr. Shankar Shrestha,"Nareshwortar, Bhanu",Male,MBBS
+26844,Dr. Shahrukh K . C.,"Challing 6 bhaktapur, Chhaling",Male,MBBS
+26845,Dr. Nirashan Gansi,"Bhaktapur, Bhaktapur",Female,MBBS
+26846,Dr. NITISH KURMI,"ranighat, Ramgadhawa",Male,MBBS
+26847,Dr. Roji Gubhaju,"Marming, Marming",Female,MBBS
+26848,Dr. Subash Swar,"Dhangadhi, Dhangadhi",Male,MBBS
+26849,Dr. Mrigendra Kumar Singh Yadav,"Aurraiya, Auraiya",Male,MBBS
+26850,Dr. Susil Tyata,"Chhaling, Chhaling",Male,MBBS
+26851,Dr. Simran Agrawal,"Bhadrapur, Bhadrapur",Female,BDS
+26852,Dr. alan pandey,"Urlabari, Urlabari",Male,MBBS
+26853,Dr. sudikshya basnet,"BHALAM, Bhalam",Female,MBBS
+26854,Dr. Bishal Rai Khenyung,"dharan, Dharan",Male,MBBS
+26855,Dr. Kuldip Triptahi,"Kapilvastu, Purushottampur",Male,MBBS
+26856,Dr. Chhaya B. K.,"Damauli, Vyas Municipality",Female,MBBS
+26857,Dr. Arpana Nagila,"Sisaghat, Shyamgha",Female,MBBS
+26858,Dr. Sudipta Bhakta Rajbhandary,"Kwalakhu, Lalitpur",Male,BDS
+26859,Dr. Bijay Prasad Rauniyar,"Birgunj, Bahuari Pidari",Male,MBBS
+26860,Dr. Subhash Mishra,"Pigauna, Pigauna",Male,MBBS
+26861,Dr. Pallavi Subedi,"Nepalgunj, Nepalgunj N.P.",Female,MBBS
+26862,Dr. Surakshya Ghimire,"Tansen, Tansen",Female,MBBS
+26863,Dr. Sarina Tamang,"Khaskarkandau5, Khaskarkandau",Female,MBBS
+26864,Dr. Pratik Ghimire,"Ghorahi, Dang, Ghorahi",Male,MBBS
+26865,Dr. Janaki Shah,"KHARIHAN 5, Kharihani",Female,MBBS
+26866,Dr. shaphal gyawali,"Basundhara, Gajehada",Male,MBBS
+26867,Dr. JANAK PATHAK,"Rajghara, Darchha",Male,MBBS
+26868,Dr. Dipesh Gaire,"Hospital line, Maitri path, Butwal",Male,MBBS
+26869,Dr. Pragati Rana,"Rajabas, Gauribas",Female,MBBS
+26870,Dr. Anil Mijar,"Kottar, Godawari",Male,MBBS
+26871,Dr. Nirajan Kandel,"Malekhu, Gajuri",Male,MBBS
+26872,Dr. Monika Chaudhary,"Pratappur, Pratappur",Female,MBBS
+26873,Dr. Deeven Karki,"Jhamsikhel, Lalitpur",Male,MBBS
+26874,Dr. Avinash Thakur,"Siraha, Siraha",Male,MBBS
+26875,Dr. Aarati Sapkota,"Hemja, Hemja",Female,MBBS
+26876,Dr. Akriti basnyat,"Lalitpur, Lalitpur",Female,MBBS
+26877,Dr. Prabin Prajapati,"madhyapur thimi, madhyapur thimi",Male,MBBS
+26878,Dr. Ojaswi Bannu Koirala,"Basundhara Marg, Kathmandu",Female,MBBS
+26879,Dr. Sushil Rayamajhi,"Rainadebi, Chhahara",Male,MBBS
+26880,Dr. Sashank Prajoo,"Gallamandi, Siddharthanagar",Male,MBBS
+26881,Dr. Sanjana Bhandari,"Batuwa, Jagatradevi",Female,MBBS
+26882,Dr. Bijaya Shrestha,"Gorkha, Ashrang",Male,MBBS
+26883,Dr. Bikram Manandhar,"Golmadhi, Bhaktapur",Male,MBBS
+26884,Dr. PRAKASH ADHIKARI,"Naurange, Bharatpur",Male,MBBS
+26885,Dr. Ankit Aryal,"Nayamil, Anandavan",Male,MBBS
+26886,Dr. Padam Raj Joshi,"Beldandi, Beldandi",Male,MBBS
+26887,Dr. Ashmita Tuladhar,"Nayabazar, Kathmandu",Female,MBBS
+26888,Dr. Aashika Thapa,"Bhangal, Chapali Bhadrakali",Female,MBBS
+26889,Dr. Ramesh Dangol,"Tokha, Tokha Saraswati",Male,MBBS
+26890,Dr. AMRIT REGMI,"TAKSAR, Samari",Male,MBBS
+26891,Dr. Ajay Kumar Maharan,"Dhanusha, Thadhi jhijha",Male,MBBS
+26892,Dr. Pradip Sigdel,"Kirtipur, Kirtipur Municipality",Male,MBBS
+26893,Dr. Kalyan Regmi,"Chuchebari, Tansen",Male,MBBS
+26894,Dr. Prashant Gyawali,"Dangshir, Bamgha",Male,MBBS
+26895,Dr. Rabindra Agrahari,"Bhalwari, Karahiya",Male,MBBS
+26896,Dr. Asmita Kharel,"Gulmi, Anpchaur",Female,MBBS
+26897,Dr. Kshitiz Pandey,"kathar, khairahani",Male,MBBS
+26898,Dr. Anoj Tumbahangphe,"URLABARI, Rajghat",Male,MBBS
+26899,Dr. Krishna Ghimire,"Adarsha tole, Sunwal",Male,MBBS
+26900,Dr. Muni Yadav,"Janakpur, Thadhi Jhijha",Female,MBBS
+26901,Dr. Parikshit Oli,"Solabang, Khalanga",Male,MBBS
+26902,Dr. Zainul Haque,"Chatra Line, Dharan",Male,MBBS
+26903,Dr. Bibek Kumar Yadav,"Khairwa, Khairwa",Male,MBBS
+26904,Dr. Md. Jahur Rain,"Janakpur, Janakpur N. P.",Male,MBBS
+26905,Dr. Rashmita Shrestha,"Kathmandu, Kathmandu",Female,MBBS
+26906,Dr. Suresh Pun,"Beni, Arthunge",Male,MBBS
+26907,Dr. Rishav Joshi,"Jhigni, Debal debyapur",Male,MBBS
+26908,Dr. SARITA K. C.,"PYUTHAN, Dharampani",Female,MBBS
+26910,Dr. saurav mishra,"kumhraura, laxmipur bageba",Male,MBBS
+26910,Dr. saurav mishra,"kumhraura, laxmipur bageba",Male,MBBS
+26911,Dr. Radheshyam Shah,"Sapahi _5, Sapahi",Male,MBBS
+26912,Dr. Ashish Mishra,"Loharpatti, Loharpatti",Male,MBBS
+26913,Dr. Premendra Vimal,"Shreepur, Shreepur",Male,MBBS
+26914,Dr. Dikshya Gorkhali,"Nayabazar, Kathmandu",Female,MBBS
+26915,Dr. Ashish Mishra,"Simardahi, Simardhi",Male,MBBS
+26916,Dr. Sanjay Roy,"lahan, lahan",Male,MBBS
+26917,Dr. Sumit Jha,"Laxmipur, Balara",Male,MBBS
+26918,Dr. john shrestha,"Sankhu, Bajrayogini",Male,MBBS
+26919,Dr. ANUP BIMALI,"JHAPA, Arjundhara",Male,MBBS
+26920,Dr. Arika Ranabhat,"Pokhara, Thumakodanda",Female,MBBS
+26921,Dr. Jay Kant Sah,"Janakpurdham, Satokhar",Male,MBBS
+26922,Dr. Seeba Shukla,"Baraipur, Bhraipur",Female,BDS
+26923,Dr. Sunil Rouniyar,"Janpath tole, Biratnagar",Male,MBBS
+26924,Dr. gulshan kumar jha,"godaita, Godita",Male,MBBS
+26925,Dr. Prashanna Karki,"Nepal, Nayapati",Male,MBBS
+26926,Dr. Harendra Singh,"Patagaun, Kadel",Male,MBBS
+26927,Dr. Sunita Tamang,"kavre, Mechchhe",Female,MBBS
+26928,Dr. Isha Shrestha,"Bhadaiya, Kalyanpur",Female,MBBS
+26929,Dr. Deepmala Dongol,"Kathmandu, Kathmandu",Female,MBBS
+26930,Dr. Ramit Raj,"Koiladi, Saptari, Koiladi",Male,MBBS
+26931,Dr. sumit kumar mandal,"Bhardaha, Bhardah",Male,BDS
+26932,Dr. ABISHAN THAPA,"ITAHARI, Itahari",Male,BDS
+26933,Dr. Bhuwan Raj Aryal,"Bhirmuni, Pang",Male,MBBS
+26934,Dr. Sandeep Sharma,"dang, Saudiyar",Male,MBBS
+26935,Dr. Mahesh Kumar Kamat,"Malanma Tole, Biratnagar",Male,MBBS
+26936,Dr. Pramisha Pokharel,"Sunsari, Inaruwa",Female,MBBS
+26937,Dr. Aayusha K. C.,"Maidan, Argha, Argha",Female,MBBS
+26938,Dr. Anu Gurung,"Kahare, Chalnakhel",Female,MBBS
+26939,Dr. Sweta Yadav,"Sapahi, Dhanusha, Sapahi",Female,MBBS
+26940,Dr. Keyur Bhattarai,"New baneshwor, Kathmandu",Male,MBBS
+26941,Dr. Bishal karki,"Mala, Bijayakharka",Male,MBBS
+26942,Dr. Sonam Gupta,"SHREESIYA, Shreesiya Kha. To.",Female,MBBS
+26943,Dr. Anny Kharel,"Kathmandu, Kathmandu",Female,MBBS
+26944,Dr. sunita sharma,"bankegaun,nepalgunj, Nepalgunj",Female,MBBS
+26945,Dr. Jyoti Pandey,"Dhankauli_3 kapilvastu, Dhankauli",Female,MBBS
+26947,Dr. Dipesh Kumar Chaudhary,"Siswa belhi, Siswa Belhi",Male,MBBS
+26947,Dr. Dipesh Kumar Chaudhary,"Siswa belhi, Siswa Belhi",Male,MBBS
+26948,Dr. Gopal Shrestha,"Bhirpani, Bhirpani",Male,MBBS
+26949,Dr. Shila Acharya,"K.M.C.35,Kathmandu, Kathmandu",Female,MBBS
+26950,Dr. Jyotshna Ghimire,"Tulasha tole, Itahari",Female,BDS
+26951,Dr. AYUSH GURAGAIN,"POKHARIA, Sijuwa",Male,BDS
+26952,Dr. Suman Pajiyar,"kapleshwor, janakpur",Female,MBBS
+26953,Dr. Bibek Ojha,"SIDDHA, Siddha",Male,MBBS
+26954,Dr. Sangay Chultim Sherpa,"Jorpati, Jorpati",Male,MBBS
+26955,Dr. Shandesh Khanal,"Gangauliya, Banganga",Male,MBBS
+26956,Dr. Deepankar Raj Pathak,"Kathmandu, Jorpati, Jorpati",Male,MBBS
+26957,Dr. Suprad Bista,"Kupondol, Lalitpur",Male,MBBS
+26958,Dr. Manish Paneru,"Suda, Suda",Male,MBBS
+26959,Dr. Pooja Khadka,"Baletaksar, Baletaksar",Female,MBBS
+26960,Dr. Sangharsh Chand,"Chhing, Syalapakha",Male,MBBS
+26961,Dr. Keshav Roka Chhetri,"Khalte, Arjun Chaupari",Male,MBBS
+26962,Sandesh Pradhan,"Biratnagar-15, Morang",Male,MBBS
+26963,Dr. Anit Dev,"Rajbiraj-06, Saptari",Male,MBBS
+26964,Sunita Lama,"Kakani-03, Nawakot",Female,MBBS
+26965,Dr. Prakshit Giri,"Tulsipur-05, Dang Deukhuri",Male,MBBS
+26966,Dr. Janak Adhikari,"BHALWARI, Tillotama",Male,MBBS
+26967,Suraj Kumar Yadav,"Lahan-03, Siraha",Male,MBBS
+26968,Nandan Kumar Shah,"Thalha Katha-04, Siraha",Male,MBBS
+26969,Shriya Upadhayay,"Sihokhor-04, Kapilvastu",Female,MBBS
+26970,Suman Suwal,Dash Kumar Suwal,Male,MBBS
+26971,Nabin Poudel,"Bichari Chautara-06, Syangja",Male,MBBS
+26972,Bijay Poudel,"Devdaha-05, Rupandehi",Male,MBBS
+26973,Sabina Basnet,"Itahari-01, Sunsari",Female,BDS
+26974,Sapana Chapagain,"Urlabari-04, Morang",Female,MBBS
+26975,Dr. Ritesh Mehta,"Harinagara-09, Sunsari",Male,MBBS
+26976,Dr. Santosh Kumar Yadav,"Sonama, Sonama",Male,MBBS
+26977,Dr. Arjun Bham,"Karkibada-06, Mugu",Male,MBBS
+26978,Dr. Rochak Dahal,"Katunje-01, Bhaktapur",Male,MBBS
+26979,Dr. Chandra Prakash Shahu,"Nepalgunj-13, Banke",Male,MBBS
+26980,Dr. Deepak Gupta,"Nepalgunj-14, Banke",Male,MBBS
+26981,Dr. Angila Khadka,"Urlabari-04, Morang",Female,MBBS
+26982,Dr. Alina Paudel,"Hangdewa-03, Taplejung",Female,MBBS
+26983,Dr. Ashmita Sharma,"Kathmandu-33, Kathmandu",Female,BDS
+26984,Dr. Bidur Mainali,"Satasidham-07, Jhapa",Male,MBBS
+26985,Dr. Keshari Shah,Jamdaha-01. Siraha,Male,MBBS
+26986,Dr. Rakchhya Shrestha,"Banepa-05, Kavrepalanchok",Female,MBBS
+26987,Dr. Pravakar Yadav,"Fulkahakatti-05, Siraha",Male,MBBS
+26988,Dr. Victor Poudel,"Dhorphirdi-03, Tanahu",Male,MBBS
+26989,Dr. Amol Kumar Yadav,"B. Birpur-01, Saptari",Male,MBBS
+26990,Dr. Mahesh Acharya,"Laharepauwa-03, Rasuwa",Male,MBBS
+26991,Dr. Jit Narayan Kapari,"Harsahi-07, Sindhuli",Male,MBBS
+26992,Dr. Pooja Pandey,"Naubise-04, Dhading",Female,MBBS
+26993,Dr. Rajswee Rana,"Kathmandu-07, Kathmandu",Female,MBBS
+26994,Navin Kumar Shah,"Ramdaiya Bhawadi-07, Dhanusha",Male,MBBS
+26995,Dr. Pratistha Chaudhary,"Santapur-01, Rautahat",Female,MBBS
+26996,Dr. Gopal Rawat,"Bageshwori-07, Banke",Male,MBBS
+26997,Dr. Sharmila Rimal,"Ralukadevi-07, Nuwakot",Female,MBBS
+26998,Dr. Bishal Kunwar,"Thumpokhara-07, Syangja",Male,MBBS
+26999,Dr. Sudha Kumari Sah,"Ramnagar Mirchaiya-03, Siraha",Female,MBBS
+27000,Dr. Dikshya Khanal,"Ramkot-05, Kathmandu",Female,BDS
+27001,Dr. Sanjog Adhikari,"Jorpati-06, Kathmandu",Male,BDS
+27002,Dr. Maheshwor Silwal,"Go. Na. Pa-09, Gorkha",Male,BDS
+27003,Dr. Neema Mishra,"Ganga Pipara-02, Rautahat",Female,MBBS
+27004,Dr. Karishma Limbu,"Dharan-16, Sunsari",Female,MBBS
+27005,Dr. Jenish Mahat,"Tilahar-03, Parbat",Male,BDS
+27006,Dr. Rakshya Thapa,"Gothatar-08, Kathmandu",Female,MBBS
+27007,Dr. Bharati Kukmari Pandit,"Harinagar-05, Sunsari",Female,MBBBS
+27008,Dr. Khushboo Chaudhary,"Pidariguthi-01, Parsa",Female,MBBS
+27009,Dr. Biraj Gautam,"Gulariya-08, Bardiya",Male,MBBS
+27010,Dr. Kritika Paudel,"Topgachhi-05, Jhapa",Female,BDS
+27011,Dr. Pragya Dev,"Saptari, Boriya",Female,MBBS
+27012,Dr. Luna Prajapati,"Kamerotar, Madhyapur thimi",Female,BDS
+27013,Dr. Vaskar Prasad Parajuli,"Pipraya, Kerwani",Male,BDS
+27014,Dr. Bikki Shah,"Duhabi, Duhabi",Male,MBBS
+27015,Dr. Ananda Adhikari,"Mahendrakot, Mahendrakot",Male,MBBS
+27016,Dr. Nimisha Dhakal,"Hospital Mode, Bhadrapur",Female,BDS
+27017,Dr. Manika Makaju,"Kaski, Pokhara",Female,MBBS
+27018,Dr. Sadiksha Khadka,"Saraswati Tol, Biratnagar",Female,BDS
+27019,Dr. anil khadka,"kotdeval, Kotdeval",Male,MBBS
+27020,Dr. Bikram simkhada,"chitwan, Piple",Male,MBBS
+27021,Dr. Niroj Bhainato,"Jenla, Bhaktapur",Male,MBBS
+27022,Dr. Dhan Prasad Gurung,"Chahare, Mirlung",Male,MBBS
+27023,Dr. Garima Shrestha,"Gairigaun, Kathmandu",Female,MBBS
+27024,Dr. Rojina Khatri,"Ilam, Ilam N. P.",Female,MBBS
+27025,Dr. Shankar Pokharel,"Chhatraganj, Arghakhanchi",Male,MBBS
+27026,Dr. Shreya Ghimire,"Kathmandu, Kathmandu",Female,MBBS
+27027,Dr. Shreebridhi Pande,"Kathmandu, Kathmandu",Female,MBBS
+27028,Dr. Amardeep Kumar Shah,"Sapahi, Sapahi",Male,MBBS
+27029,Dr. Laxmi Shrestha,"Dhading, Neelkantha",Female,MBBS
+27030,Dr. Pradeepta Pokhrel,"Dang, Bijauri",Female,BDS
+27031,Dr. Rajiv Kumar Mandal,"Dhanusha, Mithileswor Mauwahi",Male,BDS
+27032,Dr. Kusum Shrestha,"Ugrachandi Nala, Kavre",Female,MBBS
+27033,Dr. Barsha Thapa,"Pathari Sanischare, Pathari",Female,MBBS
+27034,Dr. jitendra kumar sah,"sankar chwok, Jaleshwor",Male,MBBS
+27035,Dr. MILAN BHANDARI,"PYUTHAN, Maranthana",Male,MBBS
+27036,Dr. Anu Tiwari,"BASUNDHARA, Kathmandu",Female,MBBS
+27037,Dr. jitendra prasad sah,"Maujerampur, Maheshpur",Male,MBBS
+27038,Dr. Aditi Mahara,"Dang, Ghorahi",Female,MBBS
+27039,Dr. MANISH RAZ,"GAUSHALA, Gaushala",Male,MBBS
+27040,Dr. Surya Prakash Sah,"Jhatiyahi-03, Dhanusha",Male,MBBS
+27041,Dr. Siemerik K. C.,"Kathmandu, Kathmandu",Female,MBBS
+27042,Dr. Shailendra karki,"Bhurunge, dulegaunda",Male,MBBS
+27043,Dr. Ram Khadka,"Dulegaunda, Dulegaunda",Male,MBBS
+27044,Dr. Sandeep Dhakal,"Labdhutar, Khanigaun",Male,MBBS
+27045,Dr. Pooja Yadav,"Aurraiya, Aauraiya",Female,MBBS
+27046,Dr. Abhi Devkota,"Gyaneshwor, Kathmandu",Male,MBBS
+27047,Dr. Ujjwal Jha,"Mahottari, Ekarhiya",Male,MBBS
+27048,Dr. Chetana Jha,"Ekdarabelaa, Ekdarabela",Female,MBBS
+27049,Dr. Sujata Karki,"Solmari, Topgachhi",Female,MBBS
+27050,Dr. Sabu Pokharel,"Kathmandu, Bhimdhunga",Female,MBBS
+27051,Dr. NEHA SHAH,"AURHI, Aurhi",Female,BDS
+27052,Dr. Niroj Chhetri,"Pokhara, Pokhara",Male,BDS
+27053,Dr. Astha Upadhyaya,"Kathmandu, Kathmandu",Female,BDS
+27054,Dr. Aligma Timsina,"Kathmandu, Gongabu",Female,BDS
+27055,Dr. Dilip Kumar Yadav,"Siraha, Chandrayodhapur",Male,MBBS
+27056,Dr. Sushil Kumar Yadav,"Kalaiya, Kalaiya",Male,MBBS
+27057,Dr. Ranjit Kumar Panjiyar,"Bharamarpura, Bharmarpura",Male,MBBS
+27058,Dr. Homendra Kumar Sah,"Bhatin, Bode Barsain",Male,MBBS
+27059,Dr. Avishek Kumar Mishra,"Nainhi 9,mahottari, Nainhi",Male,MBBS
+27060,Dr. Rojina Gautam chhetri,"Rupandehi, Shankarnagar",Female,MBBS
+27061,Dr. Pammi Das,"Sunwal, Sunwal",Female,MBBS
+27062,Dr. Saugat Bhandari,"Biratnagar, Biratnagar",Male,MBBS
+27063,Dr. Suprim Gautam,"Dang,Hapur 8, Hapur",Female,MBBS
+27064,Dr. Anil Lamichhane,"Dhadhing, Kumpur",Male,BDS
+27065,Dr. Umesh Yadav,"Sitapur, Sitapur",Male,MBBS
+27066,Dr. Shashi Kumar Yadav,"Mohanpur Kamalpur, Mohanpur Kamalpur",Male,MBBS
+27067,Dr. Rahul Udaya,"Butwal, Butwal",Male,MBBS
+27068,Dr. Rudish Jaz Shrestha,"Balaju, Kathmandu",Male,MBBS
+27069,Dr. Aslam Ansari,"RAMNAGAR,Bhutaha, Ramnagar Bhutaha",Male,MBBS
+27070,Dr. Prabhuti Kunwar,"lazimpat, kathmandu",Female,MBBS
+27071,Dr. Sunil Yadav,"DIMAN, Diman",Male,MBBS
+27072,Dr. Rizawan Ansari,"Ramnagar Bhutaha, Ramnagar Bhutaha",Male,MBBS
+27073,Dr. Nirajan Subedi,"Jabdi, Jabdi",Male,MBBS
+27074,Dr. Rawab Ansari,"BIRGANJ, Birganj",Female,MBBS
+27075,Dr. Hasanul Banna,"Ramnagar Bhutaha, Ramnagar Bhutaha",Male,MBBS
+27076,Dr. SANJEEV SHAHI,"DHANGADHI, Dhangadhi",Male,MBBS
+27077,Dr. chandra kant bhatta,"kailali, dhangadhi",Male,MBBS
+27078,Dr. Somika Basnet,"MORANG, Pathari",Female,MBBS
+27079,Dr. Rabisha Adhikari,"Dhobighat, Lalitpur",Female,MBBS
+27080,Dr. Sushma Shah,"Jamuni madhepura, Jamuni madhepura",Female,MBBS
+27081,Dr. SAMRAT SITAULA,"Biratnagar, Biratnagar",Male,MBBS
+27082,Dr. Santosh Prasad Rauniyar,"Bhawanipur, Bhawanipur",Male,MBBS
+27083,Dr. Govinda Pokhrel,"Parbat, Chuwa",Male,MBBS
+27084,Dr. Anusha Kharel,"Bayarghari, Attarpur",Female,MBBS
+27085,Dr. Narayan Kandel,"Chirpani, Bihun",Male,MBBS
+27086,Dr. Shankar Bhandari,"Jargaha, Ramnagar",Male,MBBS
+27087,Dr. Apurwa Jha,"Matsari, Matsari",Female,MBBS
+27088,Dr. Anuj Mani Neupane,"Kapan, Kapan",Male,MBBS
+27089,Dr. ujwal shrestha,"jwagal, lalitpur",Male,MBBS
+27090,Dr. tibbin kumar shiwakoti,"sunkhani, sunkhani",Male,MBBS
+27091,Dr. Shiv Narayan Pandit,"Pandit tole, Amahibelha",Male,MBBS
+27092,Dr. Nishan Uprety,"Bhumlutar, Bhumlutar",Male,MBBS
+27093,Dr. Pratigya Acharya,"Dang, Halwar",Female,MBBS
+27094,Dr. Sayal Chaudhary,"Udayapur, Tapeswori",Female,MBBS
+27095,Dr. Sekh Imtiyaj,"Jeetpur, Bh. Jeetpur",Male,MBBS
+27096,Dr. Rakesh Lama,"Mirchaiya, Badaharamal",Male,MBBS
+27097,Dr. PRAMANAND SINGH,"CHOHARWA, Chandralalpur",Male,MBBS
+27098,Dr. SARU SHRESTHA,"KAUSHALTAR, Madhyapurthimi",Female,MBBS
+27099,Dr. Radheshyam Yadav,"SAPTARI, Raypur",Male,MD
+27100,Dr. Anita Baral,"Pokhara, Pokhara",Female,BDS
+27101,Dr. Chanchal Shah,"Chakkar, Chakkar",Female,BDS
+27102,Dr. Puja Kunwar,"Thumkila, Palungmainadi",Female,BDS
+27103,Dr. Parmila Paudel,"Annapurna 4 kaski, Annapurna",Female,BDS
+27104,Dr. Prabita Karki,"Kathmandu, Dhapasi",Female,MBBS
+27105,Dr. AJIT SAH,"DAINIYA, Dainiya",Male,MBBS
+27106,Dr. Asadullah Ansari,"Harinagara, Harinagara",Male,MBBS
+27107,Dr. Tek Raj Khatri,"Baitadi, Nepal",Male,MBBS
+27108,Dr. Kamlesh Kumar Shah,"Padariya, Padariya",Male,MBBS
+27109,Dr. Isha G. C.,"Baglung, Baglung",Female,MD
+27110,Dr. SULAV POKHREL,"Roopnagar 2, Kanchanpur",Male,MD
+27111,Dr. Pooja Maharjan,"Harisiddhi, Harisiddhi",Female,BDS
+27112,Dr. Jyoti Kharel,"Parsha, Chainpur",Female,BDS
+27113,Dr. Arpana Dangi,"Rukum, Chunbang",Female,MBBS
+27114,Dr. merisha kansakar,"piganani,kathmandu, kathmandu",Female,MBBS
+27115,Dr. Ajay Joshi,"Bhairahawa, Sidharthanagar",Male,MBBS
+27116,Dr. Subigya Parajuli,"Khairahani, Khairahani",Male,MBBS
+27117,Dr. Pankaj Yadav,"Salempur, Salempur",Male,MBBS
+27118,Dr. Ram Shankar Yadav,"Nengra, Nengra",Male,MBBS
+27119,Dr. Udaya Subedi,"simpani, Pokhara",Male,MBBS
+27120,Dr. Rajesh Kumar Yadav,"Basatpur, Basatpur",Male,MBBS
+27121,Dr. Amogh Upadhyay,"Kathmandu, Kathmandu",Male,MBBS
+27122,Dr. Ashutosh Sharma,"New baneshwor, Kathmandu",Male,MBBS
+27123,Dr. Santosh Dhakal,"Tanahu, Dulegaunda",Male,MBBS
+27124,Dr. NILAN CHAKRADHAR,"BODE, Madhyapur Thimi",Male,MBBS
+27125,Dr. DIWAS BHANDARI,"LALITPUR, Lalitpur",Male,MBBS
+27126,Dr. sukrita sah,"malhanama, malhanama",Female,MBBS
+27127,Dr. gurbi khanal,"SYUCHATAR, syuchatar",Female,MBBS
+27128,Dr. Smriti Bhatta,"Dewalhat, Dasharathchand",Female,MBBS
+27129,Dr. SANTOSH DANI,"Gorkha, Nareshwor",Male,MBBS
+27130,Dr. Abiral Katuwal,"Sunsari, Inaruwa",Male,MBBS
+27131,Dr. Bhuvan Chapain,"Chanaute, Birendranagar",Male,MBBS
+27132,Dr. Bipu Dhakal,"Sintitar, Madhyapur Thimi",Male,MBBS
+27133,Dr. Varsha Khadka,"Damauli, Vyas",Female,MBBS
+27134,Dr. Oma sapkota,"Masuriya, Masuriya",Female,MBBS
+27135,Dr. Rajesh Adhikari,"Lahachok, Lahachok",Male,MBBS
+27136,Dr. suresh tamrakar tamatta,"murtiya, pathraiya",Male,MBBS
+27137,Dr. SATISH KUMAR THAKUR,"Gaur, Gaur",Male,MBBS
+27138,Dr. Sheetal Khattri,"Wahakithanti, Parbat, Wahakithanti",Female,MBBS
+27139,Dr. Nimisha Kandel,"Lazikot, Mirkot",Female,MBBS
+27140,Dr. Nidhi Thapa,"Bheri, Birendranagar",Female,MD
+27141,Dr. pankaj kumar sah,"mahottari, Ekdara",Male,MD
+27142,Dr. aashish koirala,"sindhuli, kamalamai",Male,MD
+27143,Dr. Prajwal Raj Katuwal,"Ringwa, Shanishchare",Male,MBBS
+27144,Dr. Arogya Neupane,"Gorkha, Chhoprak",Male,MBBS
+27145,Dr. SUPREME BANJADE,"BANSGADI, Dudharaksha",Male,MBBS
+27146,Dr. Chandra kumar Rai,"Okhaldhunga, Barnalu",Male,MBBS
+27147,Dr. Prakash Chaudhary,"Dhangadi, Fulbari",Male,MBBS
+27148,Dr. shreeya Thapa,"Kathmandu, Kathmandu",Female,MBBS
+27149,Dr. Sneha Rajbanshi,"Thahity, Kathmandu",Female,BDS
+27150,Dr. Hemant Thakur,"loharpatty, loharpatty",Male,BDS
+27151,Dr. Angeela Khatiwada,"Changunarayan, Changunarayan",Female,BDS
+27152,Dr. Neha Batas,"Bhaktapur, Bhaktapur",Female,BDS
+27153,Dr. Lal Mani Subedi,"Nepal, Laxmipur",Male,BDS
+27154,Dr. Julee Mishra,"Gaur, Gaur",Female,BDS
+27155,Dr. Manish Thapa,"Tathali, Tathali",Male,MBBS
+27156,Dr. Sajan Mahara,"Doti, Ranagau",Male,MBBS
+27157,Dr. samina Bhattarai,"Gulmi, Mehalpokhari",Female,MBBS
+27158,Dr. Pragya Karki,"Naikapnayabhanjyang, Naikap Nayabhanjyang",Female,MBBS
+27159,Dr. Optics Sapkota,"Sinamangal, kalimatidole 9, Kathmandu",Male,MBBS
+27160,Dr. Salma Shahi Thakuri,"Kathmandu, Sitapaila",Female,MBBS
+27161,Dr. Laxman Khadka,"Dulegaunda, Dulegaunda",Male,MBBS
+27162,Dr. Ashish Wagle,"Bansdol, Mahendrajyoti",Male,MBBS
+27163,Dr. Jyotsna Bhandari,"Baneshwor, Kathmandu",Female,MBBS
+27164,Dr. ASHIK RAJAK,"KALDHARA, Kathmandu",Male,MBBS
+27165,Dr. Binita Thapa,"Janagal, Ugratara Janagal",Female,MBBS
+27166,Dr. sabir rahi mansuri,"pipra tol, bishrampur",Male,MBBS
+27167,Dr. SRIJANA PURI,"RUPANDEHI, Devdaha",Female,MBBS
+27168,Dr. Swatee Mahato,"Janakpurdham, Ishworpur",Female,BDS
+27169,Dr. Binod Karki,"Humla, Surkedue",Male,BDS
+27170,Dr. Megha Sah,"Matihani, Mathihani",Female,BDS
+27171,Dr. Priyambada Karna,"Majhaura Bishnupur, Janakpur Municipality",Female,BDS
+27172,Dr. Sanjana Gupta,"Rajbiraj, Rajbiraj",Female,BDS
+27173,Dr. Rajan Kumar Das,"Rajbiraj, Dighawa",Male,BDS
+27174,Dr. JAY RAM MANDAL,"Dubarkot Hathletwa, Janakpur",Male,BDS
+27175,Dr. Kabita Shrestha,"Bhaktapur, Bhaktapur",Female,BDS
+27176,Dr. Ashutosh Shukla,"Kapilvastu, Nepal",Male,BDS
+27177,Dr. Bhawana Shrestha,"Okhaldhunga, Manebhanjyang",Female,BDS
+27178,Dr. Manish Shrestha,"Okhaldhunga, Okhaldhunga",Male,BDS
+27179,Dr. ABRAR HAIDER,"Bairagiya laxminiya, B. Laxminiya",Male,MBBS
+27180,Dr. Khagendra Singh Dhami,"Khandeshwari 9, Dharchula, Khandeshwari",Male,MBBS
+27181,Dr. MAMUN RASHID ANSARI,"Bhokraha, Bhokraha",Male,MBBS
+27182,Dr. BABITA YADAV,"KURSANDI, Nawarajpur",Female,MBBS
+27183,Dr. SOVIT KUMAR GURUNG,"BANDIPUR, Satrasaye",Male,MBBS
+27184,Dr. ZAFAR ANSARI,"BIRGANJ, Birganj",Male,MBBS
+27185,Dr. Qamran ansari,"BIRGANJ, Birganj",Male,MBBS
+27186,Dr. Baiju Jha,"SANDHA, Sandha",Male,MBBS
+27187,Dr. Ritu Raj Pandey,"Jaleshwar, Suga bhawani patti",Male,MBBS
+27188,Dr. Kajal Panjiyar,"Kanakpatti 6, Kanakpatti",Female,MBBS
+27189,Dr. Sunita Gurung,"Parche, Parche",Female,BDS
+27190,Dr. Prerna Jha,"sarvoday toal, Rajbiraj",Female,BDS
+27191,Dr. ALINA NHISUTU,"Bhaktapur, Bhaktapur",Female,BDS
+27192,Dr. Vijay Rai,"Makpali Gaun, Sittalpati",Male,BDS
+27193,Dr. Surajan Shrestha,"Thalachhen, Bhaktapur",Male,BDS
+27194,Dr. Ruby Joshi,"Samakhushi, Kathmandu",Female,BDS
+27195,Dr. bindu shrestha,"Khahare, Bhanu",Female,DDM (EQUIVALENT TO BDS)
+27196,Dr. Priyanka Joshi,"Kathmandu, Kathmandu",Female,DDM (EQUIVALENT TO BDS)
+27197,Dr. Sabina Timalsina,"Jyamrung, Jyamrung",Female,MD
+27198,Dr. Reshal Pokharel,"Fatepur 08, Fatepur",Male,MBBS
+27199,Dr. kushal kharel,"Daduwa, Bhandara",Male,MBBS
+27200,Dr. abhishek chaurasiya,"Birganj, jhauwaguthi",Male,MBBS
+27201,Dr. Swapnil Pandit,"Tikapur, Tikapur",Male,MBBS
+27202,Dr. Anoop Adhikari,"Ghartikhola, Daman",Male,MBBS
+27203,Dr. RANJAN SINGH,"Bara Udhoran, Bara Udhoran",Male,MBBS
+27204,Dr. Preeti Jaiswal,"Janakpurdham, Janakpur nagarpalika",Female,MBBS
+27205,Dr. Mugdha Mrinal,"Tilathi, Tilathi",Female,MBBS
+27206,Dr. Prakriti Shah,"Kanchanpur, Kanchanpur",Female,MBBS
+27207,Dr. Rojis Timilsina,"Khudepani, Arunodaya 04, Tanahun, Arunodaya",Male,MBBS
+27208,Dr. Mukesh Kumar Sharma,"siraha, siraha",Male,MBBS
+27209,Dr. Koushik Sapkota,"Golakharka, Ilam",Male,MBBS
+27210,Dr. Anil Kumar Shah,"Mirchaiya, Rampurbirta",Male,MBBS
+27211,Dr. Shishir Saurabh,"Balwa, Balwa",Male,MBBS
+27212,Dr. Kabita Adhikari,"Jamune, Jamune",Female,BDS
+27213,Dr. Krishma Shakya,"kathmandu, Kathmandu",Female,BDS
+27214,Dr. Bhumi Raj Tilija,"Gadpar, Narchyang",Male,BDS
+27215,Dr. Kunjan Khanal,"Kshetrapur, Bharatpur",Male,MBBS
+27216,Dr. Pradeep Dhaulakoti,"Birendranagar, Birendranagar",Male,MBBS
+27217,Dr. Sweta Mandal,"Rangeli, Amgachhi",Female,MBBS
+27218,Dr. Santosh Kumar Yadav,"Parsauni birta, Prasaunibirta",Male,MBBS
+27219,Dr. Arbind Adhikari,"Nokailwa, Sarlahi",Male,MBBS
+27220,Dr. Prateek Ray,"gamhariya, gamhariya",Male,BDS
+27221,Dr. Sneha Mahato,"Malhaniyakhori, Malhaniyakhori",Female,BDS
+27222,Dr. Roshani Adhikari,"Dhading, Dhuwakot",Female,BDS
+27223,Dr. Mani Mishra,"Matsari, Matsari",Female,BDS
+27224,Dr. Pratima Pokhrel,"Kathmandu, Kathmandu",Female,BDS
+27225,Dr. Shalu Prajapati,"Jyatha, Kathmandu",Female,BDS
+27226,Dr. Sabina Adhikari,"Budhathum, Budhathum",Female,BDS
+27227,Dr. Krishna Milan Pandey,"Phulpingkot, Phulpingkot",Male,BDS
+27228,Dr. Abda Khatun Ansari,"Kathmandu, Kathmandu",Female,MBBS
+27229,Dr. Rajesh Shrestha,"bhaktapur, bageshwori",Male,BDS
+27230,Dr. Dilshad Mohammad Khan,"Kajarahawa, Kajarahawa",Male,MBBS
+27231,Dr. suman Khatri,"chidipani, juniya",Male,MBBS
+27232,Dr. RAKSHYA THAKUR,"JANAKPUR, Janakpur",Female,MBBS
+27233,Dr. BINOD KUMAR YADAV,"DHANUSHA, Yadukuha",Male,MBBS
+27234,Dr. Abishek Adhikari,"Lamjung, Dhuseni",Male,MBBS
+27235,Dr. Aman Shrestha,"Narayangarh, Bharatpur",Male,MBBS
+27236,Dr. saicharan sharma,"chitwan, bharatpur",Male,MBBS
+27237,Dr. Shriya Devkota,"Bharatpur, Bharatpur",Female,MBBS
+27238,Dr. Nisha Khati,"Sitapaila, Sitapaila",Female,BDS
+27239,Dr. Pratik Uprety,"Dharan, Anarmani",Male,MBBS
+27240,Dr. Jyoti Sah,"Bhangaha, Bhangaha",Female,BDS
+27241,Dr. Milan Shrestha,"Chhapakot, Butwal",Male,BDS
+27242,Dr. Nirjala Achhami,"New Baneshwor, Kathmandu",Female,BDS
+27243,Dr. Sagun Adhikari,"Sunrise Tole, Bharatpur",Female,BDS
+27244,Dr. Pushpa Thakur,"Laxminiya, Jatahara",Female,BDS
+27245,Dr. Ashesh Tripathi,"Satbise, Chakratirtha",Male,MBBS
+27246,Dr. MD SHAKILUR RAHAMAN,"BALUWA, Narha Balkawa",Male,MBBS
+27247,Dr. sumnima adhikary,"Sukedhara, Kathmandu",Female,MBBS
+27248,Dr. Anish Adhikari,"SALAKPUR, Mrigouliya",Male,MBBS
+27249,Dr. Pabitra K. C,"Pokhara, Pokhara",Female,BDS
+27250,Dr. Jeni Acharya,"Balewa, Amalachaur",Female,BDS
+27251,Dr. Amit Pandey,"Maharajgunj, Maharajgunj",Male,MBBS
+27252,Dr. Sharmila Lamichhane,"Bharatpur, Padampur",Female,MD
+27253,Dr. Raj Singh Dhurel,"Dhamboji, Nepalgung",Male,MBBS
+27254,Dr. Pujan Khadgi,"Etee Tole 19 Lalitpur, Lalitpur",Male,MBBS
+27255,Dr. Jitendra Yadav,"Janakpur, Janakpur",Male,MBBS
+27256,Dr. Smita Mandal,"Bhagwatpur, Bhagwatpur",Female,BDS
+27257,Dr. Nagendra Prasad Gupta,"Langadi 7, Langadi",Male,MBBS
+27258,Dr. Aman Yadav,"dhanusha, balha saghara",Male,MBBS
+27259,Dr. Prajwal Poudel,"Charali, Chandragadhi",Male,BDS
+27260,Dr. KAMLESH KUMAR YADAV,"Simaraha, Sakhuwanankar Katti",Male,MBBS
+27261,Dr. Poonam Rani Sah,"Kanchanpur, Kanchanpur",Female,MBBS
+27262,Dr. Bimash Babu Shrestha,"Bharatpur, Bharatpur",Male,MBBS
+27263,Dr. Rubi Kumari Sah,"Dhanusha, Janakpur",Female,MBBS
+27264,Dr. Preeti Thakur,"Manara, Manara",Female,MBBS
+27265,Dr. Arun Timilsina,"Gyaneshwor, Kathmandu",Male,MBBS
+27266,Dr. Raghav Ghimire,"Belghari, Belghari",Male,MBBS
+27267,Dr. anjan mandal,"Itari Prasahi, Itari Prasahi",Male,MBBS
+27268,Dr. Manash Raj Joshi,"Tahachal, Kathmandu",Male,MBBS
+27269,Dr. Archana yadav,"janakpur, giddha",Female,MBBS
+27270,Dr. Sonika Karki,"Palpa, Tansen",Female,MBBS
+27271,Dr. Ganesh Thapa,"KASKI, Pokhara",Male,MBBS
+27272,Dr. SHISHIR GIRI,"JAGATPUR, Jagatpur",Male,MBBS
+27273,Dr. Sanjeev Rawal,"Tansen, Tansen",Male,MBBS
+27274,Dr. Hemant Thapa,"Dang Ghorahi, Tribhuwan Nagar",Male,MBBS
+27275,Dr. Shambhu kharga,"Chikana, Chikana",Male,MBBS
+27276,Dr. Sunil Kumar Jha,"Gamhariya, Ekrahiya",Male,MBBS
+27277,Dr. BIJAYRAJ TIMALSINA,"Sumara, Gotikhel",Male,MBBS
+27278,Dr. Mohammod Imran Rain,"mahottari, Balawa",Male,MBBS
+27279,Dr. Manoj Kumar Patel,"BAHUARI, Bahuari",Male,MBBS
+27280,Dr. Saddam Hussain Khan,"Dumara, Dumara",Male,MBBS
+27281,Dr. Avijit Khadka,"Bayarban, morang, Bayarban",Male,MBBS
+27282,Dr. Arina Shah,"KATHMANDU, Kathmandu",Female,MBBS
+27283,Dr. Sujeet Singh,"Sudama, Sudama",Male,MBBS
+27284,Dr. Ashma Pathak,"Kharibot, Kathmandu",Female,MBBS
+27285,Dr. Anusha Deuja,"Chittapol, Chittapol",Female,MBBS
+27286,Dr. Aayushi Khanal,"Biratnagar, Biratnagar",Female,BDS
+27287,Dr. Sudarson Kumar Gurung,"LWANG GHALEL KASKI, Lwangghalel",Male,BDS
+27288,Dr. Mukund Dahal,"Pipra Simara, Pipra Simara",Male,BDS
+27289,Dr. salina maharjan,"Paknajole, Kathamandu",Female,BDS
+27290,Dr. Ritika Chhetri,"Bahundangi, Bahundangi",Female,BDS
+27291,Dr. Anish Pradhan,"Kathmandu, Kathmandu",Male,BDS
+27292,Dr. Radha Adhikari,"Rupandehi, Dudharaksha",Female,BDS
+27293,Dr. Sambridha Man Pradhan,"Kapurdhara, kathmandu",Male,BDS
+27294,Dr. supriya shrestha,"lalitpur, lalitpur",Female,BDS
+27295,Dr. Sabina Bhattarai,"Nawalparasi, Agyauli",Female,BDS
+27296,Dr. aaisha jha,"Tilathi, Tilathi",Female,BDS
+27297,Dr. ANUPA TIWARI,"Gaidakot, Gaindakot",Female,BDS
+27298,Dr. Diana Rai,"Shyamshila 6, bhojpur, Shyamshila",Female,BDS
+27299,Dr. rudra pratap shaha,"Chhapkaiya, Birganj",Male,BDS
+27300,Dr. Mumtaz Ahmad Khan,"Dumara, Dumara",Male,BDS
+27301,Dr. sanjeev yadav,"Rajdevi Tole, Rajbiraj",Male,BDS
+27302,Dr. Surakshya Amatya,"Dhapakhel, gairigau, Kathmandu",Female,BDS
+27303,Dr. aryan adhikari,"dhanusha, baniniya",Male,MBBS
+27304,Dr. sonam bharti,"dhanusha, dhanushadham",Female,MBBS
+27305,Dr. jagriti kadariya,"khimti, khimti",Female,MBBS
+27306,Dr. Avinash Kumar Yadav,"Sitapur, Murtiya",Male,MBBS
+27307,Dr. SUJAN PRASAD KADARIYA,"khimti, likhu",Male,MBBS
+27308,Dr. Jayanti Adhikari,"Parbat, Pipaltari",Female,MBBS
+27309,Dr. Kaushlendra Kumar Shah,"Ramdaiya Bhawari, Ramdaiya Bhawadi",Male,MBBS
+27310,Dr. Pragya Joshi,"Nepal, Dhangadhi",Female,MBBS
+27311,Dr. Sanjay Yadav,"Belhi, Janakpur",Male,MBBS
+27312,Dr. Ruby Yadav,"Lalapati, Saptari",Female,MBBS
+27313,Dr. Dipendra Kumar yadav,"Laxmipur, dhanushadham",Male,MBBS
+27314,Dr. SANJAYA ADHIKARI,"Chappargaudi, Gobardiha",Male,MBBS
+27315,Dr. Mihika Shah,"Bara, Bhatoda",Female,BDS
+27316,Dr. Tsering Sangmo Lama,"Prok, Prok",Female,BDS
+27317,Dr. Sarita Raut,"Rampura Malhaniya, Rampura Malhaniya",Female,BDS
+27318,Dr. Simphoni Shrestha,"Kathmandu, Kathmandu",Female,BDS
+27319,Dr. Aruna Shrestha,"Hatiya, Mashyam",Female,BDS
+27320,Dr. Bhawana Thapa,"Syangja, Chhangchhangdi",Female,BDS
+27321,Dr. Rupesh Kumar Mahato,"Sakhuwa Mahendranagar, Sakhuwa Mahendranagar",Male,BDS
+27322,Dr. Puja Adhikari,"Gauradaha, Gauradaha",Female,BDS
+27323,Dr. Kriti Dongol,"Kathmandu, Kathmandu",Female,BDS
+27324,Dr. Ajiv Shrestha,"Gaighat, Triyuga",Male,BDS
+27325,Dr. Suchita Khatiwada,"Ektin, Ekteen",Female,BDS
+27326,Dr. Rajeev Karna,"siraha, siraha",Male,BDS
+27327,Dr. Saru Maharjan,"Mheypi, Kathmandu",Female,BDS
+27328,Dr. Sabina Bhattarai,"Jadha Road, Tintolia, Biratnagar",Female,BDS
+27329,Dr. Abhishek Nayak,"Sabaila, Sabaila",Male,MBBS
+27330,Dr. Rohit Kumar Yadav,"Khutta pipradhi, Khutta pipradhi",Male,MBBS
+27331,Dr. Chandra Bahadur Thapa,"Kavre, Ugratara janagal",Male,MBBS
+27332,Dr. MISHA MAHASETH,"BHATAULIYA, Bhatauliya",Female,BDS
+27333,Dr. Ritesh Gupta,"Brahampuri, Brahampuri",Male,BDS
+27334,Dr. Bishal Limbu,"Itahari, Itahari",Male,BDS
+27335,Dr. Swikriti Rana,"Chhetrapati, Kathmandu",Female,BDS
+27336,Dr. Bindu Sen,"BANKE, Kohalpur",Female,BDS
+27337,Dr. Bandana Rana,"Boughagumha, Boughagumba",Female,BDS
+27338,Dr. Aarya Nhuchhe Pradhan,"Kalanki, Kathmandu",Female,BDS
+27339,Dr. Shristika Maharjan,"Pulchowk, Lalitpur",Female,BDS
+27340,Dr. Garima yadav,"Saptari, Raypur",Female,BDS
+27341,Dr. Mohammad Imran,"Gaur, Gaur",Male,MD (EQUIVALENT TO MBBS)
+27342,Dr. Bishal Subedi,"Chisapani, Kaskikot",Male,MBBS
+27343,Dr. rajat maharjan,"Hattigaunda, Khadka bhadrakali",Male,MBBS
+27344,Dr. RUDRA NARAYAN YADAV,"BAGADA, Bagada",Male,MBBS
+27345,Dr. RAS BIHAREE YADAV,"Mahadaiya Tapanpur, Ma. Tapanpur",Male,MBBS
+27346,Dr. Sabina Giri,"Balthali 13 ,kavre, Balthali",Female,MBBS
+27347,Dr. Ashok Adhikari,"Atradh, Ekarahiya",Male,MBBS
+27348,Dr. Shraddha Chudal,"Anamnagar, Kathmandu",Female,MBBS
+27349,Dr. shiva shrestha,"chunikhel, Chunikhel",Male,MBBS
+27350,Dr. Sanjaya Acharya,"Kahun, Kahun",Male,MBBS
+27351,Dr. Ranjan Yadav,"Patnuka, Patnuka",Male,MBBS
+27352,Dr. Rahul kumar jha,"Sakhuawa, Sakhuawa",Male,MBBS
+27353,Dr. saksham mandal,"siraha, gauripur",Male,MBBS
+27354,Dr. Pratima Mandal,"belhi, belhi chapena",Female,MBBS
+27355,Dr. Khusbu Sedhai,"Chitwan, Birendranagar",Female,MBBS
+27356,Dr. Rabina Maharjan,"Satungal, Satungal",Female,MBBS
+27357,Dr. Deepshikha Kumari Sah,"Ishworpur, Ishworpur",Female,MBBS
+27358,Dr. Rajani Chaudhary,"Matihani, Matihani",Female,MBBS
+27359,Dr. Arvind Kumar Singh,"Ganga Pipra, Ganga Pipra",Male,MBBS
+27360,Dr. Aarashma Shakya,"Mangalbazar, Lalitpur, Lalitpur",Female,BDS
+27361,Dr. Rajina Singh,"Tyagal, Lalitpur",Female,BDS
+27362,Dr. sneha gurung,"GITANAGAR, Gitanagar",Female,BDS
+27363,Dr. Manisha Shah,"Ramnagar, Mirchiya, Ramnagar Mirchiya",Female,BDS
+27364,Dr. Bishakha Pradhan,"Bargachhi, Biratnagar",Female,BDS
+27365,Dr. Abinas Dev,"Yadukuha, Yadukuha",Male,BDS
+27366,Dr. Aabha Pandey,"Dumkhana, Bara, Dumkhana",Female,BDS
+27367,Dr. Sangita Dahal,"Banepa, Ugratara Janagal",Female,BDS
+27368,Dr. Sonal Rayamajhi,"Bhairahawa, Siddharthanagar",Female,BDS
+27369,Dr. Prabha Gyawali,"Khadgakot3, Khadgakot",Female,BDS
+27370,Dr. Santosh Kumar Yadav,"Thera kachuri, Janakpur",Male,MBBS
+27371,Dr. nirmal shrestha,"damak, damak",Male,MBBS
+27372,Dr. Gaurav Jha,"Ghodghas, Ghodghas",Male,MBBS
+27373,Dr. Vikash Kumar Patel,"mahadevpatty, gaur",Male,BDS
+27374,Dr. Pradeep Kumar Gupta,"Phatuwa maheshpur, Phatuwa maheshpur",Male,MBBS
+27375,Dr. Prakriti Ghimire,"Bharatpur, Chitwan, Bharatpur",Female,BDS
+27376,Dr. Ruby Kandel,"Parijat Tole, Anandavan",Female,BDS
+27377,Dr. Shreeya Bade,"Banepa, Banepa",Female,BDS
+27378,Dr. Ashim Prajapati,"Dadhikot, Dadhikot",Male,MBBS
+27379,Dr. Pooja Subedy,"Charpane, Charpane",Female,MBBS
+27380,Dr. Manisha Gurung,"LAZIMPAT, Kathmandu",Female,MBBS
+27381,Dr. Chiran Basnet,"Dhapasi, Dhapasi",Male,MBBS
+27382,Dr. NITESH KUMAR JHA,"laxmipur, balara",Male,MBBS
+27383,Dr. Rashmi Shrestha,"Gongabu, Gongabu",Female,MBBS
+27384,Dr. SARITA PANDEY,"Manigram, Karahiya",Female,MBBS
+27385,Dr. Pujan Shrestha,"Narayanghat, Bharatpur",Male,MBBS
+27386,Dr. Navin Sagar Yadav,"Rautahat, Madanpur",Male,BDS
+27387,Dr. Ruksana Khan,"Tilottama path, krishnanagar",Female,MBBS
+27388,Dr. Melina Shrestha,"Bhanu tole, Biratnagar",Female,MBBS
+27389,Dr. Rosna Thapa,"Ramdhuni, Singiya",Female,MBBS
+27390,Dr. Pankaj Kumar Thadhiya yadav,"Bengashivpur, Bengashivpur",Male,MBBS
+27391,Dr. Chandnandan Yadav,"Naharniya, Nabarajpur",Male,BDS
+27392,Dr. Bhojraj Khanal,"Wangla, Wangla",Male,BDS
+27393,Dr. Suman Chhetri,"Sukhanagar, Butwal",Female,BDS
+27394,Dr. Priya Shrestha,"Dang, Ghorahi",Female,BDS
+27395,Dr. Shruti G. C.,"Baneshwor, Kathmandu",Female,BDS
+27396,Dr. Neelam Gurung,"Bharatpur, Sharadanagar",Female,BDS
+27397,Dr. Sheelly Singh,"Damhi, Damhi Madai",Female,MD
+27398,Dr. Farhana Parveen,"Mudali, Mudali",Female,MBBS
+27399,Dr. Richa Adhikari,"Hospital Chowk, Bhadrapur",Female,MBBS
+27400,Dr. Neha Kumari Shah,"Matiarwa, Matiarwa",Female,MBBS
+27401,Dr. Numa Kumari Kushwaha,"Belahiya, Banjariya",Female,MBBS
+27402,Dr. Ugnish Basnet,"Gorkha, Gorkha",Male,MBBS
+27403,Dr. Nitu Kumari Sah,"Janakpur, Giddha",Female,BDS
+27404,Dr. jyoti sharma dhungana,"BHARATPUR, Bharatpur",Female,BDS
+27405,Dr. Binita Gurung,"Shivanagar, Shivanagar",Female,BDS
+27406,Dr. usha thapa,"kafaldanda, Kyakmi",Female,BDS
+27407,Dr. Soni Adhikari,"Amritpath, Bharatpur",Female,BDS
+27408,Dr. Sunita Pun,"Bavani, Tikulighad",Female,BDS
+27409,Dr. kusum jha,"Matsari, Matsari",Female,BDS
+27410,Dr. md saddam husain,"Narsingh, Narsingh",Male,MBBS
+27411,Dr. Pooja Chhetri,"parroha, parroha",Female,MBBS
+27412,Dr. RAJU BIKRAM BASNET,"HOKSHE, WANA",Male,MBBS
+27413,Dr. Pooja Singh,"Itharuwa, Sitapur",Female,BDS
+27414,Dr. SUKRITI PANDIT,"nayabazar, kathmandu",Female,MBBS
+27415,Dr. Sumina G. C.,"Murgiya, Parroha",Female,MBBS
+27416,Dr. Reetu Sharma,"Dharan, Mudikuwa",Female,BDS
+27417,Dr. Pradeep Nagila,"Tanahun, Shyamgha",Male,MD
+27418,Dr. sanjit chaudhary,"Ramgopalpur, Ramgopalpur",Male,MBBS
+27419,Dr. Krishna Kumar Sah,"GAIDHA BHETPUR, Gaidha Bhetpur",Male,MBBS
+27420,Dr. Babin Koirala,"latikoili,08,surkhet,nepal, latikoili",Male,MBBS
+27421,Dr. Ghanashyam Pandey,"Pasang tole, Butwal",Male,MBBS
+27422,Dr. Kapil Adhikari,"Narayangarh, Amarapuri",Male,MBBS
+27423,Dr. Anisha Rimal,"Damauli, Vyas",Female,BDS
+27424,Dr. Shristi Bhandari,"Manigram, Anandaban",Female,BDS
+27425,Dr. Bijay Kumar Mandal,"Yadukuha, Yadukuha",Male,MBBS
+27426,Dr. DEEPIKA SHAH,"SAPTARI, khojpur",Female,MBBS
+27427,Dr. Rajeev Sah,"Malangwa, Kaudena",Male,BDS
+27428,Dr. KALYANI SAH,"Bhramarpura, Bhramarpura",Female,BDS
+27429,Dr. Sanjay Muni Bajracharya,"Gabahal, Lalitpur",Male,BDS
+27430,Dr. Rashmi Paudel,"Bijalpura, Bijalpura",Female,BDS
+27431,Dr. Binaya Paudel,"Radha Krishna tole, Bharatpur",Male,MBBS
+27432,Dr. Nabin Poudel,"Kalyanpur, Kalyanpur",Male,MBBS
+27433,Dr. Hamid Ali shaikh,"nepalgunj, Bankatti",Male,MBBS
+27434,Dr. FARHAN UDDIN MIYA,"Miyapatan, Pokhara",Male,MBBS
+27435,Dr. Ranjit Bhusal,"Sandhikharka, Sandhikharka",Male,MBBS
+27436,Dr. POOJA GURUNG,"Lausibot, Bhukatangle",Female,MBBS
+27437,Dr. Shasi Poudel,"Dhikurpokhari, Dhikurpokhari",Female,MBBS
+27438,Dr. Rupesh Jha,"Gobindpur, Chinnamasta",Male,MD
+27439,Dr. Prakash Chand,"Bhagawanpur, Shivagadhi",Male,MBBS
+27440,Dr. Arati Bartaula,"Makawanpur, Hetauda",Female,MBBS
+27441,Dr. Rohit Shrestha,"butwal, Butwal",Male,MBBS
+27442,Dr. Arfeen Tabassum,"Khap, Rampurkhap",Female,BDS
+27443,Dr. Laxmi Adhikari,"Anandavan, Anandavan",Female,BDS
+27444,Dr. Chhabilal Chhetri,"Bangephadke siranchaur, Bangephadke",Male,BDS
+27445,Dr. Sujit Kumar Sah,"Dhanusa, Pra. Ko Mahuwa",Male,MBBS
+27446,Dr. Poshan Sah,"Tarahi, Dakneshwari",Male,MBBS
+27447,Dr. Janak Lamichhane,"Harihar tole, Kalika",Male,MBBS
+27448,Dr. Prayash Panta,"Naurange, Bharatpur",Male,MBBS
+27449,Dr. Unique Bhattarai,"Biratnagar , Morang, Nepal, Biratnagar metropolitan",Male,MBBS
+27450,Dr. Pratistha Wagle,"Lakeside, Pokhara",Female,MBBS
+27451,Dr. Nigata K. C.,"Tikuri, Bijuwar",Female,MBBS
+27452,Dr. Praful Kumar Yadav,"Sinurjoda, Sinurjoda",Male,MBBS
+27453,Dr. PRASHANT MISHRA,"MALAHI, GARUDA",Male,MBBS
+27454,Dr. Pavitra Karki,"Jhalari, Jhalari",Female,MBBS
+27455,Dr. Yaman Bhatta,"Dhangadhi, kailali, Dhangadhi",Female,MBBS
+27456,Dr. Susmita Mishra,"Mahottari, Singyahi",Female,MBBS
+27457,Dr. Meena Bhurtel,"Nepal, Shankarnagar",Female,MBBS
+27458,Dr. Ashish Neupane,"Tandi, Ratnanagar Municipality",Male,MBBS
+27459,Dr. Yashoda Pokharel,"GOdawari, Godawari",Female,MBBS
+27460,Dr. Mukesh Kumar Shah,"banchauri, badiya banchauri",Male,MBBS
+27461,Dr. KRISTINA SHAKYA,"KULESHWOR, KATHMANDU METROPOLITIAN CITY",Female,MBBS
+27462,Dr. Abinash Kumar Rauniyar,"DUMARIYA, DUMARIYA PAROHA",Male,MBBS
+27463,Dr. Nawnit Gupta,"RAMNAGAR BHUTAHA, HARINAGAR",Male,MBBS
+27464,Dr. Alina Giri,"Surkhet, Chhinchu",Female,MBBS
+27465,Dr. Nisha Gurung,"Parbatipur, Bharatpur",Female,MBBS
+27466,Dr. Prashamsha Adhikari,"Kalanki, Kathmandu",Female,MBBS
+27467,Dr. Jiban Khanal,"Chappergaun, Motipur",Male,MBBS
+27468,Dr. Aabhushan Yadav,"Goth tole, Diman",Male,MBBS
+27469,Dr. Akhilesh Jha,"Hanumannagar Pra.dha. 08, Dhangadhimai",Male,MBBS
+27470,Dr. Saroj Pokharel,"Chumlingtar, Darechok",Male,MBBS
+27471,Dr. Manita Rimal,"Ratuwamai, Itahara",Female,MBBS
+27472,Dr. Ashok Awasthi,"Darchula, Mallikarjun",Male,MBBS
+27473,Dr. Aakriti Timsina,"Khandbari, Khandbari",Female,MBBS
+27474,Dr. Pratigya Paudel,"Nepal, Thumki",Female,MBBS
+27475,Dr. Dhan Bahadur Khatri,"Budhijhirmi, Municipality",Male,MBBS
+27476,Dr. Pramila Darlami,"Lindi, Sahalkot",Female,MBBS
+27477,Dr. Binash Bhatta,"Dumada, Amargadhi",Female,MBBS
+27478,Dr. Manish Kumar Shah,"Beldangi Road, Damak",Male,MBBS
+27479,Dr. Ojaswi Pokhrel,"Kichnash, Kichnash",Male,MBBS
+27480,Dr. Raman K. C.,"Bharatpur, Bharatpur",Male,MBBS
+27481,Dr. Melina Gautam,"Bharatpur, Bharatpur",Female,MBBS
+27482,Dr. Birendra Kumar Sah,"Janakpur, Janakpur",Male,MBBS
+27483,Dr. Prajwal Sapkota,"Dharmachowk ,lanku, Bharatpur",Male,MBBS
+27484,Dr. Amit Kumar Shah,"DHANUSHA, Basahiya",Male,MBBS
+27485,Dr. Sanjeev Kumar Chaudhary,"Dhodhana, Dhodhana",Male,MBBS
+27486,Dr. Rajpati Sah,"bandipur, badaharamal",Male,MBBS
+27487,Dr. Shreha Pokharel,"GOGRAHA CHOWK,KANYA MARGA, BIRATNAGAR",Female,MBBS
+27488,Dr. Ajit Raj Pandit,"Nepal, Barmajhiya",Male,MBBS
+27489,Dr. Ujjwal Singh Bohra,"Nepal, Byans",Male,MBBS
+27490,Dr. Babu Nandan Yadav,"Morang, Tankisinuwari",Male,MBBS
+27491,Dr. Randhir Prasad Shah,"Kajara Ramaul, Kajara Ramaul",Male,MBBS
+27492,Dr. Sumit Thakur,"Sirsiya, Gaur",Male,MBBS
+27493,Dr. Yuwraj Yadav,"Kamala, Kamala",Male,MBBS
+27494,Dr. Anupama Pokhrel,"Chitwan, Bharatpur",Female,MBBS
+27495,Dr. BEEAN KHATRI,"Gundu, Suryavinayak",Male,MBBS
+27496,Dr. suraj kishore roy,"chimadi, chimadi",Male,MBBS
+27497,Dr. Mosha Tamang,"Kanchanpur,Nepal, Punarwas Municipality",Male,MBBS
+27498,Dr. Roshan Sah,"Bhawanipur, Bhawanipur",Male,MBBS
+27499,Dr. Yogesh Thapa,"Khairenitar, Khairenitar",Male,MBBS
+27500,Dr. Pummy Karn,"Basahiya, Basahiya",Female,MBBS
+27501,Dr. Asmita Gyawali,"Laxminagar, Butwal",Female,MBBS
+27502,Dr. Sudarshan Pokhrel,"Bangain, Banganga",Male,MBBS
+27503,Dr. parmananda adhikari,"PADAMPUR, PADAMPUR",Male,MBBS
+27504,Dr. Dilip kumar Mandal,"Sitapur Pr.Ra, Sitapur Pr. Ra",Male,MBBS
+27505,Dr. VIVEKANAND YADAV,"Kabilasha, Shreepur",Male,MBBS
+27506,Dr. Sushil Poudel,"Dhital, Dhital",Male,MBBS
+27507,Dr. Garima Baral,"Arva bijaya, Arva bijaya",Female,MBBS
+27508,Dr. Saru Koirala,"Pokhara, Pokhara Lekhnath",Female,MBBS
+27509,Dr. Alisha Rai,"Acharya line, Dharan",Female,MBBS
+27510,Dr. Dron Karki,"Imiliya, buddhabhumi",Male,MBBS
+27511,Dr. Bipin Bista,"Bansbari, Kathmandu",Male,MBBS
+27512,Dr. Hem Shankar Chaudhary,"Barmajhiya, Barmajhiya",Male,MBBS
+27513,Dr. ABINASH JHA,"JANAKPUR, Duhabi",Male,MBBS
+27514,Dr. Shahrukh Hawari,"Birganj, Birganj",Male,MBBS
+27515,Dr. PRINCE KUMAR SAH,"Mirchaiya, Ramnagar Mirchaiya",Male,MBBS
+27516,Dr. Bajrang Lal Yadav,"Haspur, Baghachauda",Male,MBBS
+27517,Dr. Sujit Kumar Yadav,"pokhariya, kabilashi",Male,MBBS
+27518,Dr. Srijana Rai,"Wakarang, Basikhora",Female,MBBS
+27519,Dr. Bipin Yadav,"Babiya, Babiya",Male,MBBS
+27520,Dr. MUKESH SHAH,"Nocha, Nocha",Male,MBBS
+27521,Dr. Md Nausad Ali,"Manraja, Manraja",Male,MBBS
+27522,Dr. Shoaib Ahmed Quraishi,"Nepalgunj, Jaispur",Male,MBBS
+27523,Dr. Ranjana Rokaya,"Latikoili, Municipality",Female,MBBS
+27524,Dr. Rasish Subedi,"Manigram, Tilottoma",Male,MBBS
+27525,Dr. Abhishek Khadka,"Deurali, Dhurkot",Male,MBBS
+27526,Dr. Bishwash Pandey,"Kahule, Chatradev",Male,MBBS
+27527,Dr. Prem Oli,"Deudhakala, Basgadi",Male,MBBS
+27528,Dr. Bipin Neupane,"Butwal,Rupandehi, Butwal",Male,MBBS
+27529,Dr. Youvraj Sharma Bhandari,"Tapaha line, Tilottama",Male,MBBS
+27530,Dr. Bishnu Kharel,"Dogana, Suddhodhana",Male,MBBS
+27531,Dr. Elija Bajagain,"Kalika, Pokhara lekhnath metropolitan city",Female,BDS
+27532,Dr. Sanju Bhusal,"Butwal, Butwal",Female,BDS
+27533,Dr. SUVASH KUMAR MANDAL,"Katti, Itaharwakatti",Male,BDS
+27534,Dr. Sujan Timsina,"Lubhu, lalitpur, Mahalaxmi municipality",Male,BDS
+27535,Dr. Karishma Bhandari,"karahiya, karahiya",Female,BDS
+27536,Dr. Aashish Upreti,"Bhimsen Tole, Ghorahi",Male,BDS
+27537,Dr. Muna Thapa,"Gulmi, Thulolumpek",Female,BDS
+27538,Dr. Kripa Lamichhane,"Bhangal, Chapali Bhadrakali",Female,BDS
+27539,Dr. Sushmita Chhetri,"Shankarnagar, Tillotama",Female,BDS
+27540,Dr. Durga Poudel,"Jayanagar, Jayanagar",Female,BDS
+27541,Dr. SAJINA MAHARJAN,"Kirtipur, Kirtipur",Female,BDS
+27542,Dr. Dhiraj Barai,"Serahiya, Kapilvastu municipality",Male,BDS
+27543,Dr. Nabin Paudel,"Khadrauli, Dibyanagar",Male,BDS
+27544,Dr. Swoechha Shrestha,"Twapacha, Tokha",Female,BDS
+27545,Dr. Govinda Upreti,"Kanchanpur, Bheemdatt",Male,BDS
+27546,Dr. Saphal Adhikari,"Chitwan, Bharatpur",Male,BDS
+27547,Dr. Binaya Subedi,"Krishnapur, Bharatpur",Male,BDS
+27548,Dr. Biplov Paudel,"Ganeshtole, Ratnanagar",Male,BDS
+27549,Dr. Ashish Adhikari,"Rambag, Bharatpur",Male,BDS
+27550,Dr. Binu Magar,"Siruwari, Deurali",Female,BDS
+27551,Dr. Tanuja G. C.,"Kathmandu, Sitapaila",Female,BDS
+27552,Dr. Anish Karki,"Amardha, Amardah",Male,BDS
+27553,Dr. Nikita Piya,"Bandipur, Bandipur",Female,BDS
+27554,Dr. Sambhav Acharya,"Kuleshwor, Kathmandu",Male,BDS
+27555,Dr. Arun Basnet,"Badachaur, Khaira",Male,BDS
+27556,Dr. Shrinkhala Shrestha,"Sindhuli, Kamalamai",Female,BDS
+27557,Dr. Shankar Shrestha,"Bejhad, Rampur",Male,BDS
+27558,Dr. Rasna Shrestha,"Rupandehi,butwal, Butwal",Female,BDS
+27559,Dr. Suman Gupta,"Birgunj, Municipality",Female,BDS
+27560,Dr. Kishor Subedi,"Dharan, Dharan",Male,BDS
+27561,Dr. Bibha Sah,"Lahan, Lahan",Female,BDS
+27562,Dr. Rupa Chongbang Limbu,"Urlabari, Urlabari",Female,BDS
+27563,Dr. Deepika Shah,"Mirchaiya, Ramnagar Mirchaiya",Female,MBBS
+27564,Dr. Nishant Shrestha,"Dhading besi, Neelakantha",Male,MBBS
+27565,Dr. ANKIT SHARMA,"gaushala, gaushala",Male,MBBS
+27566,Dr. Subash panta,"Goptar, Tanglichok",Male,MBBS
+27567,Dr. Mithlesh Prasad Shah,"DHANGADHI 07, SAPTARI, Dhangadhi",Male,MBBS
+27568,Dr. Badri Sapkota,"Birendra Chowk, Gaindakot",Male,MBBS
+27569,Dr. Devendra Bist,"Anamnagar, Dhangadhi",Male,MBBS
+27570,Dr. Saurav Bhattarai,"Balkot, suryabinayak",Male,MBBS
+27571,Dr. Binita Adhikari,"Badalpur 4, Bardiya",Female,MBBS
+27572,Dr. Shruti Ojha,"Kathmandu, Ichangu Narayan",Female,MBBS
+27573,Dr. Punam Rai,"Pepsicola Townplanning, Kathmandu",Female,MBBS
+27574,Dr. Sushila Hamal,"Tinkune, Kathmandu metropolitan",Female,MBBS
+27575,Dr. Suman Kumar Kushwaha,"Paterwa, Paterwa",Male,MBBS
+27576,Dr. Nirajan Bohara,"Bansaha, Shuklaphanta",Male,MD
+27577,Dr. Siddhi Kumar Singh,"Nepal, DUMARIYA",Male,MD
+27578,Dr. Dilip Deuba,"Gulariya, Krishnapur",Male,MD
+27579,Dr. Himalay Prasad Yadav,"Aurahi, Aurahi Rural Municipality",Male,MD
+27580,Dr. Shubha Maharjan,"Thamel, K.M.C",Female,MD (EQUIVALENT TO MBBS)
+27581,Dr. Suman Adhikari,"Trishuli, Bidur",Male,MD
+27582,Dr. Sajal Khadka,"Danse, Khaniyapani",Male,MD
+27583,Dr. Shankar Shrestha,"Tolatung, Galyang",Male,MD
+27584,Dr. Bipin Aryal,"Barahatar, Gokarneshwor",Male,MD
+27585,Dr. Sandesh Prakash Parajuli,"Gajane, Waling",Male,MD
+27586,Dr. Roshani Lama,"TAMANG TOLE, SURYABINAYAK",Female,MBBS
+27587,Dr. Fool Babu Yadav,"SONUKHARA, MAHOTTARI",Male,MBBS
+27588,Dr. Subash Ram Shrestha,"Kathmandu, Kathmandu",Male,MBBS
+27589,Dr. Anurag Yadav,"MANGALPUR, DHANUSHA GOVINDAPUR",Male,MBBS
+27590,Dr. Asia Tamrakar,"Tangal Tole, Lalitpur",Female,MBBS
+27591,Dr. Suresh Tharu,"SUNSARI, MADHELI",Male,MBBS
+27592,Dr. Shekh Gul Mahamad,"tedhakatti, 01 bara, tedhakatti",Male,MBBS
+27593,Dr. Ravi Kumar Das,"Benga Shivpur, Benga Shivpur",Male,MBBS
+27594,Dr. Rahul Pandey,"Janakinagar, Janakpur",Male,MBBS
+27595,Dr. Aman Kumar Sah,"NIGAUL, NIGAUL",Male,MBBS
+27596,Dr. Rashmisha Maharjan,"BALKUMARI, LALITPUR",Female,MBBS
+27597,Dr. Sachin Shahi,"Dhangadhi, Dhangadhi",Male,MBBS
+27598,Dr. Minali Shah,"Pigauna, Pigauna",Female,MBBS
+27599,Dr. ajit kumar shah,"ramnagar mrchaiya, ramnagar mirchaiya",Male,MBBS
+27600,Dr. PUJA SINGH,"RADIYAHA, KRISHNAPUR",Female,MBBS
+27601,Dr. Santosh Kumar Mahato,"Lahan, Lahan",Male,MBBS
+27602,Dr. Sanjay Kumar Yadav,"Laukath, Laukath",Male,MBBS
+27603,Dr. Dipesh Kumar Singh,"pashupatinagar, bardibaas",Male,MBBS
+27604,Dr. Rajesh Ghimire,"khara, Gwalichour",Male,MBBS
+27605,Dr. Priyanka Yadav,"Jaleshwor, Ekdara",Female,MBBS
+27606,Dr. Sagar Regmi,"Gaurigunj, Bharatpur",Male,MBBS
+27607,Dr. Dipti Dhital,"kawasoti, Kawasoti",Female,MBBS
+27608,Dr. Kamlesh Raj,"Janakpur, Janakpur",Male,MBBS
+27609,Dr. Alisha Gautam,"Damak, Damak",Female,MBBS
+27610,Dr. Sanjeev Mangardaita,"chikana, chikana",Male,MBBS
+27611,Dr. Adarsha Regmi,"Doghariya, Bijauri",Male,MBBS
+27612,Dr. Vishal Buda,"KATHMANDU, Mahankal",Male,MBBS
+27613,Dr. Khurshed Ali Ansari,"Sisawa, Germi",Male,BDS
+27614,Dr. Saru Dheke,"BHAKTAPUR, MADHYAPUR THIMI",Female,BDS
+27615,Dr. Nishan Rajbhandari,"Chapagoun , lalitpur, Godawari",Male,BDS
+27616,Dr. Roshan Ghimire,"Biratnagar, Biratnagar",Male,BDS
+27617,Dr. Angel Shah,"Adarshnagar, Birganj",Female,BDS
+27618,Dr. Lawrence Maharjan,"Kirtipur, Kirtipur",Male,BDS
+27619,Dr. Ankita Rani Gupta,"Adarshnagar, Birganj",Female,BDS
+27620,Dr. Deepali Maharjan,"Birganj, Birganj",Female,BDS
+27621,Dr. Ateet Karki,"Kathmandu, Naikap Nayabhanjyang",Male,BDS
+27622,Dr. Pabita Dhungana,"Hetauda, Hetauda",Female,BDS
+27623,Dr. Priksha Khanal,"Janakpurdham, Janakpur nagarpalika",Female,BDS
+27624,Dr. AKASH NHEMAPHUKI,"KIWACHOK, GUNDU",Male,BDS
+27625,Dr. Manisha Chataut,"Majhagaun, Bhimdattanagar",Female,BDS
+27626,Dr. Roji Shrestha,"Kathmandu, Kathmandu",Female,MBBS
+27627,Dr. Sagar Lamsal,"Basandanda, Chinnebas",Male,BDS
+27628,Dr. Manita Lama (Tamang),"Bhaktapur, Katunje",Female,MBBS
+27629,Dr. Rajmani Yadav,"Dipahi, Dipahi",Male,MBBS
+27630,Dr. Pranaya Manandhar,"Charikot, Bhimeshwor",Male,MBBS
+27631,Dr. Nabin Khadka,"SURYAMANDALI, AALAPOT, KAGESHOWRI MANOHARA",Male,MD
+27632,Dr. Ramvidhya Chaudhary,"Jamuniya, Sakhuwa prasauni",Male,MD
+27633,Dr. Binod Rana Magar,"jaljale, Palungtar",Male,MD (EQUIVALENT TO MBBS)
+27634,Dr. Nirajan Khanal,"Gulmi dhurkot chautara, dhurkot",Male,MD
+27635,Dr. SAILESH KAPAIR,"Kanchanpur, Kanchanrup",Male,MD
+27636,Dr. Dikshya Lamichhane,"old baneshwor, Kathmandu",Female,MBBS
+27637,Dr. Ram Vijay Sah,"BAHEDA, KOLHUWA BAGEYA",Male,MBBS
+27638,Dr. Md Sarfaraz Alam,"B.LAXMINYA ,2,Mahottari, LAXMINYA",Male,MBBS
+27639,Dr. Juber Alam Ansari,"Sunsari, Ramnagar Bhutaha",Male,MBBS
+27640,Dr. Ramu Sapkota,"Barangja, Mangala Rural Municipality",Male,MD
+27641,Dr. Jeewan Shrestha,"Dhobighat, Lalitpur",Male,BDS
+27642,Dr. Srijana yadav,"Sonma, sonma",Female,MBBS
+27643,Dr. Aash Narayan Mahaseth,"Kurtha, Janakpur",Male,MBBS
+27644,Dr. Urvi Shrestha,"Kathmandu, K.M.C.",Female,MBBS
+27645,Dr. Avishek Raj Dhami,"Bharaul, Barahachhetra",Male,MBBS
+27646,Dr. Sandesh Neupane,"Parsa, Chainpur",Male,MBBS
+27647,Dr. Shubha Baniya,"Maharajgunj, Kathmandu",Female,MBBS
+27648,Dr. Faisal Khan,"Taulihawa, Taulihawa",Male,MBBS
+27649,Dr. Arun Kumar Verma,"Fultekra, Nepalgunj",Male,MBBS
+27650,Dr. Bikram Lamichhane,"Putalibazzar, Putalibazzar",Male,MBBS
+27651,Dr. Meena Yadav,"Siraha, Siraha",Female,MBBS
+27652,Dr. Santosh Kumar Yadav,"Pathargara, Kharukyahi",Male,MBBS
+27653,Dr. Priya Bajracharya,"Ravibhawan, Kathmandu",Female,MD
+27654,Dr. Nishika Singh,"Kathmandu, Nepal, Kathmandu",Female,MD
+27655,Dr. Sadikshya Shrestha,"Manbhawan jawalakhel, Lalitpur",Female,MD
+27656,Dr. Dharmendra Mandal,"Madargach, Jhapa",Male,MD
+27657,Dr. Rebina Shrestha,"DHANKUTA, DHANKUTA",Female,MBBS
+27658,Dr. Ram Shah,"phattepur, phattepur",Male,MBBS
+27659,Dr. Amrit Kumar Yadav,"Sabaila, Sabaila",Male,MBBS
+27660,Dr. Dikendra Sanjyal,"Kalikot, Nanikot",Male,MBBS
+27661,Dr. Saud Ahmad Ansari,"NEPALGUNJ, NEPALGUNJ",Male,MBBS
+27662,Dr. Sachin Jha,"inaruwa, inaruwa",Male,MBBS
+27663,Dr. Pratik Amatya,"Nyadhal, Lalitpur",Male,MBBS
+27664,Dr. Suman Khatri,"fattepur, fattepur",Male,MBBS
+27665,Dr. Rikeena Shrestha,"Lalitpur, Godavari",Female,MBBS
+27666,Dr. Bikram Shrestha,"Kuleshwor kathmandu, Kathmandu",Male,MBBS
+27667,Dr. Nitu Chaudhary,"Siwai, Sundarpur",Female,BDS
+27668,Dr. Yealena Shrestha,"Pokhara, Pokhara",Female,BDS
+27669,Dr. neha singh,"Mahottari, Sahodawa",Female,BDS
+27670,Dr. Kajol Shrestha,"Galyang, Jagatradevi",Female,BDS
+27671,Dr. Binay Chaudhary,"Karmahawa, Harnampur",Male,BDS
+27672,Dr. Madhu Chaudhary,"Simardahi, Simardahi",Female,BDS
+27673,Dr. BHUWAN CHAUHAN,"Pathivara Marga, SURUNGA",Male,BDS
+27674,Dr. Afzal Hussein Ansari,"PARASI, Germi",Male,BDS
+27675,Dr. Kajol Singh,"barmajhiya, Dhanusha",Female,BDS
+27676,Dr. AMARESH KUMAR YADAV,"ATRADH, Ekrahiya",Male,MBBS
+27677,Dr. Samjhana Khanal,"NawalParasi, Kusumkhola",Female,BDS
+27678,Dr. Ram Kumar Sah,"CHHAPARADI, HANUMANNAGAR PR DH",Male,MD
+27679,Dr. Sanjiv Kumar Yadav,"Benga, Bengashivpur",Male,MBBS
+27680,Dr. Pratima Joshi,"Baitadi, Sreekot",Female,BDS
+27681,Dr. Basanti Kumari Thapa,"Ramjanaki tol, Karahiya",Female,BDS
+27682,Dr. Bipin Yadav,"Chiyabari, Ayodhyanagar",Male,MBBS
+27683,Dr. Priyanka Sah,"Shreepur, Nakatajhijh",Female,MBBS
+27684,Dr. Ashish kumar chaurasiya,"Khapartata, Kalaiya",Male,MBBS
+27685,Dr. Anil Kumar Singh,"Kanijawa, Gaidahawa",Male,MBBS
+27686,Dr. Suman Yadav,"Mohanpur kamalpur, Mohanpur kamalpur",Male,MBBS
+27687,Dr. smriti parajuli,"Pokhara, Pokhara",Female,MBBS
+27688,Dr. Jitesh Yadav,"Khadagpur, Khadagpur",Male,MBBS
+27689,Dr. Sujan Rai,"Gaighat,Udayapur, Triyuga",Male,MBBS
+27690,Dr. Neha Kumari,"Pigauna, Jaleshwor",Female,MBBS
+27691,Dr. Roshan Sah,"Rampur, Pipra pra. Dha",Male,MBBS
+27692,Dr. Khushbu Thakur,"Chhinnamasta, Chhinmasta",Female,MBBS
+27693,Dr. Prasant Yadav,"Purbitole, Gaidha Bhetpur",Male,MBBS
+27694,Dr. Prashant Chaudhary,"Raypur, Raypur",Male,MBBS
+27695,Dr. Madhu Thakur,"Sonamai, Sonamai",Female,MBBS
+27696,Dr. Pragya Sapkota,"Gauriganj, Bharatpur",Female,BDS
+27697,Dr. Sweta Karki,"Balmandir Road, Hakimchwok, Bharatpur",Female,BDS
+27698,Dr. Ramesh Adhikari,"kaski, Kaskikot",Male,BDS
+27699,Dr. Rabina Gurung,"Karapu, Karapu",Female,BDS
+27700,Dr. Anup Karki,"Udayapur, Triyuga Municipality",Male,BDS
+27701,Dr. Aparna Mishra,"Kathahawa, Guthiparsauni",Female,BDS
+27702,Dr. Prawesh Gautam,"Ranibagiya, Sainamaina",Male,BDS
+27703,Dr. Deepa Neupane,"Manigram charnumber, Karahiya",Female,BDS
+27704,Dr. Richa Yadav,"Goithi, Goithi",Female,BDS
+27705,Dr. Aatish Pangeni,"Manglapur, Tilottama",Male,BDS
+27706,Dr. Sunil Mahaseth,"Janakpur dham, Municipality",Male,BDS
+27707,Dr. Apsara Panthi,"Hardineta, Hardineta",Female,BDS
+27708,Dr. Shraddha Sharma,"birauta, pokhara",Female,BDS
+27709,Dr. Subheksha Subedi,"Archalbot, Pokhara",Female,BDS
+27710,Dr. Saksham Chettri,"Soyang, Soyang",Male,MBBS
+27711,Dr. Bikram Budhathoki,"Ramechhap, Makadum",Male,MBBS
+27712,Dr. Anusha Sharma,"Silanas chowk, Gaindakot",Female,MBBS
+27713,Dr. Sneha Maskey,"Gorkha, Nepal",Female,MBBS
+27714,Dr. AASHRI SINGH,"NEPALGUNJ, Nepalgunj",Female,MBBS
+27715,Dr. Sajina Thapa,"Kalanki, Kathmandu",Female,MBBS
+27716,Dr. Sudhir Gautam,"Butwal, Sainamaina",Male,MBBS
+27717,Dr. Alisha Duwal,"Nagadesh, Madhyapur thimi",Female,MBBS
+27718,Dr. Jenisha Gurung,"Bhurungkhel, K.M.C",Female,BDS
+27719,Dr. AAYUSH RIMAL,"Pepsicola, Kathmandu",Male,MBBS
+27720,Dr. Madhu Swapana,"Hariwon, Hariwon",Female,MBBS
+27721,Dr. EKATA GIRI,"jugar,nerpa, triveni",Female,MBBS
+27722,Dr. Subash Chandra Bhurtyal,"pokhara, pokhara",Male,MBBS
+27723,Dr. Om Prakash Yadav,"Sisuwa, Duhabi",Male,MBBS
+27724,Dr. Abinash Kumar Sah,"Diman, Diman",Male,MBBS
+27725,Dr. Suman Mahato,"gauriganj, bharatpur",Female,MBBS
+27726,Dr. Manila Lama,"Sanistar, Gokarneswor",Female,MD
+27727,Dr. Devendra Bahadur Kathayat,"Bajhang, Jaya Prithvi Rithapata",Male,MD
+27728,Dr. Indra Kumar Chaudhary,"THUMUWA, TILAURAKOT",Male,MD (EQUIVALENT TO MBBS)
+27729,Dr. Prekshya Parajuli,"Kathmandu, Kathmandu",Female,MD
+27730,Dr. Shivanka Jha,"Matsari, Matsari",Female,MBBS
+27731,Dr. Asmita Paudel,"Kamere, Andhikhola",Female,MBBS
+27732,Dr. Dipendra Yadav,"JALESHWOR, Ratauli",Male,MBBS
+27733,Dr. Rasmita Shrestha,"Tokha, Kathmandu, Nepal, Tokha, Saraswati",Female,MD
+27734,Dr. Nitesh Bhattarai,"Sainbu Awas, Bhaisepati, Lalitpur",Male,MD (EQUIVALENT TO MBBS)
+27735,Dr. Deepa Laxmi Thapa,"rupakot, Rupakot",Female,MD
+27736,Dr. Ngima Yangjee Sherpa,"Khumjung, Khumbu Pasang Lhamu rural",Female,DDM
+27737,Dr. Sujata Bhattarai,"Banke, Nepalgunj khaskarkandau",Female,MD
+27738,Dr. Kamini Sharma,"mahendranagar, sakhuwa",Female,BDS
+27739,Dr. Manish Thapa,"Basatol, Harion",Male,MBBS
+27740,Dr. Rabin Bhurtel,"Kathmandu, Dhapasi",Male,MBBS
+27741,Dr. Subhas G. C.,"Tanahun, Keshavtar",Male,BDS
+27742,Dr. Bishwanath Pratap Singh,"Sarlahi, Chandranagar",Male,MBBS
+27743,Dr. Shivani Jaiswal,"Nepalgunj, Nepalgunj",Female,MBBS
+27744,Dr. Aakriti Shrestha,"Bhairahawa, Siddhartha",Female,BDS
+27745,Dr. Rajani Kaudal,"Gorkha, Paluntar",Female,BDS
+27746,Dr. Sworupa Wagle,"Aastha chowk, Bharatpur",Female,BDS
+27747,Dr. Drishti Shrestha,"Bharatpur, Bharatpur",Female,BDS
+27748,Dr. Prakriti Adhikari,"Bahunpokhara, Risti",Female,BDS
+27749,Dr. Richa Manandhar,"Bharatpur, Bharatpur",Female,BDS
+27750,Dr. Smita Silwal,"Nalang, VDC",Female,BDS
+27751,Dr. Bina Dhakal,"Swoyambhu, Kathmandu",Female,MBBS
+27752,Dr. Rashmi Subedi,"Bijuwar, Bijuwar VDC",Female,BDS
+27753,Dr. Gayatri Yadav,"BELHI, BELHI",Female,BDS
+27754,Dr. Prashamsa Khadka,"Godamchaur, Godamchaur",Female,BDS
+27755,Dr. Rohish Maharjan,"Kirtipur, Kathmandu",Male,BDS
+27756,Dr. Deepshikha Basnet,"Thasikhel, Municipality",Female,BDS
+27757,Dr. Sushma Katwal,"Kathmandu, Kathmandu",Female,BDS
+27758,Dr. Nisha Ghimire B. K,"Chormara, Madhyabindu",Female,BDS
+27759,Dr. Bimala Khatri,"Surkhet, Latikoili",Female,BDS
+27760,Dr. Debashree Bista,"Sanepa,Lalitpur,Nepal, Lalitpur",Female,MBBS
+27761,Dr. Sushmita Yadav,"Diman, Diman",Female,MBBS
+27762,Dr. Rahul Kurmi,"Kapilvastu, Shivraj",Male,MBBS
+27763,Dr. Ocean kumar pun,"Khalanga, Khalanga",Male,MBBS
+27764,Dr. Bhagwti Prasad Singh,"Sarepar, Babhangmma Katti",Male,MD
+27765,Dr. SUJAN POKHREL,"Syangja, Putalibazar",Male,MD
+27766,Dr. Ambika Mandal,"Dhanusha, Aurhi",Female,MD (EQUIVALENT TO MBBS)
+27767,Dr. Rohit Thapa,"chandol, Kathmandu Municipality",Male,MBBS
+27768,Dr. Jasmine Shrestha,"Arghakhanchi, Dibharna",Female,MBBS
+27769,Dr. Nashruva Jahan Mony,"Dharmasthali, Tarakeshwor",Female,MBBS
+27770,Dr. Richa Mandal,"Aurhi, Aurhi",Female,MBBS
+27771,Dr. DIGAMBAR PRASAD YADAV,"HARDIYA, HARDIYA",Male,MBBS
+27772,Dr. Shrawan Chaudhary,"Sisahaniya, Rapti Gaupalika",Male,MD
+27773,Dr. Samina Dongol,"Syuchatar, Kathmandu",Female,MBBS
+27774,Dr. Deepak Bahadur Bam,"Krishnagar, Gaurigaganga",Male,MD
+27775,Dr. Kshitiz Thakali,"Jomsom, Jomsom",Male,MD
+27776,Dr. Prasiddha Dangol,"NARADEVI, KATHMANDU, K.M.C., NARADEVI",Male,MBBS
+27777,Dr. Aakash Karki,"Surkhet, BIrendranagar",Male,MBBS
+27778,Dr. Sweta Sharma,"Dharan, Nepal, Dharan",Female,MBBS
+27779,Dr. Manoj Kumar Shah,"Taratal, Sanoshree",Male,MBBS
+27780,Dr. Shikchitta Malla,"kathmandu, kathmandu",Female,BDS
+27781,Dr. Bindu Thapa,"Basghari, Panauti",Female,BDS
+27782,Dr. Anupama Ghimire,"Jyotinagar, Bharatpur",Female,BDS
+27783,Dr. Prerana Aryal,"Hetauda, Hetauda",Female,BDS
+27784,Dr. Nickey Verma,"Inarabari, VDC Inarabari",Female,BDS
+27785,Dr. Hem Nandan Raut,"Rajbiraj, Malekpur",Male,MBBS
+27786,Dr. pampha sah,"janakpur, Nakatajhij",Female,MBBS
+27787,Dr. Suman Subedi,"Dhungepatan, Pokhara",Male,MBBS
+27788,Dr. Nirmal Thapa,"Sandu, Narayan municipality",Male,MBBS
+27789,Dr. Narendra Kumar Shah,"Bhutahi Paterwa, Dhanusha, Bhutahi Paterwa",Male,MBBS
+27790,Dr. Sanjeeb Babu Gharti,"Sundarbasti, Patihani",Male,MBBS
+27791,Dr. Mohammad Nasir Ahamed,"thali, jamuni madhepura",Male,MBBS
+27792,Dr. Ram Lakhan Yadav,"Maleth, Maleth",Male,MBBS
+27793,Dr. Elisha Hona,"Madhyapur thimi 7 , Nagadesh, Madhyapur thimi",Female,MBBS
+27794,Dr. URMILA PANDEY,"KANAKOT, NAUBISE",Female,MBBS
+27795,Dr. Shrijana Awal,"Bekhal, Mahalaxmisthan, Bhaktapur",Female,MBBS
+27796,Dr. Sushma Rajbahak,"Chapagaun, Chapagaun",Female,BDS
+27797,Dr. Sandeep Thapa,"Biran, Satashidham",Male,MBBS
+27798,Dr. Punam Thapa,"Kadaghari, Gothatar",Female,MBBS
+27799,Dr. Rupesh Kumar Suman,"Belapatti, Gidha",Male,MBBS
+27800,Dr. Suman Kamat,"Ramgunj Belgachhiya, Ramgunj Belgachhiya",Male,MBBS
+27801,Dr. Tanisha Dahal,"Hetauda, Municipality",Female,BDS
+27802,Dr. Asmita Sah,"Kanchanpur, Saptari, Kanchanpur",Female,BDS
+27803,Dr. Marisha Shrestha,"40B Veenas Residency, Tokha, Tokha",Female,MD
+27804,Dr. Kshitij Subedi,"Damak, Municipality",Male,MBBS
+27805,Dr. Mehboob Reza,"Bindhi, Bindhi",Male,MBBS
+27806,Dr. Bhaskar Mudbhari,"Sarlahi, Barahathawa",Male,MBBS
+27807,Dr. Sandeep Gupta,"Ranjitpur, Khadak Municipality",Male,MBBS
+27808,Dr. Ramgopal Tiwari,"MATEHIYA, MATEHIYA",Male,MBBS
+27809,Dr. Harish Khadka,"Attariya, Godawari muncipality",Male,MD
+27810,Dr. Nisha Mainali,"SUKE DHARA, MAHANKAL",Female,MBBS
+27811,Dr. Manauwar Hawari,"Link road, Birgunj",Male,MBBS
+27812,Dr. Santosh Thapa,"Banasthali, Mahadevsthan",Male,MBBS
+27813,Dr. Nisha karki,"Kharkhare, Damak",Female,MBBS
+27814,Dr. Nikita Thapa,"Biratnagar, Biratnagar",Female,BDS
+27815,Dr. Kirti Kumari Wasti,"Biratnagar, Biratnagar",Female,BDS
+27816,Dr. Shiwani Bhushan Kalwar,"Birgunj, Birjunj",Female,MBBS
+27817,Dr. Jay Prakash Yadav,"Gorgama, Itahari Bishnupur",Male,BDS
+27818,Dr. Santosh Prasad Bohara,"Kanchanpur, Daijee",Male,MBBS
+27819,Dr. Sanjay Yadav,"Singyouna, Bishariya",Male,MBBS
+27820,Dr. Aashish Regmi,"Sathighar bhagwati, Sathighar bhagwati",Male,MBBS
+27821,Dr. Ashok Kumar Mahato,"Lahan, Lahan",Male,MBBS
+27822,Dr. AFJAL HUSSAIN KHAN,"Khambhe, Lumbini adharsha",Male,MBBS
+27824,Dr. manoj kumar pandit,"Pipra, Ga.Maheshpur",Male,MBBS
+27824,Dr. manoj kumar pandit,"Pipra, Ga.Maheshpur",Male,MBBS
+27825,Dr. Vikalp Labh Karn,"janakpur, janakpur",Male,MBBS
+27826,Dr. Aashish Pokharel,"BIRATNAGAR, BIRATNAGAR",Male,BDS
+27827,Dr. Prajwal Karki,"Janapath Tole, Biratnagar",Male,MBBS
+27828,Dr. Ashma Shrestha,"Dharan, Dharan",Female,BDS
+27829,Dr. Ashish Jha,"Mouwaha, Mouwaha VDC",Male,MBBS
+27830,Dr. Punam Kharel,"SANOTHIMI, MADHYAPUR THIMI",Female,MBBS
+27831,Dr. Laxman Chapagain,"Chhapa, Bajung",Male,MBBS
+27832,Dr. Pawan Bhatta,"Teghari, Malakheti",Male,MBBS
+27833,Dr. Anushuya Baniya,"KIRTIPUR, KIRTIPUR",Female,MBBS
+27834,Dr. Krishna Lama,"Ranipauwa, Kakani",Male,MBBS
+27835,Dr. Kushum Devkota,"Kundule, Kamalaimai",Female,MBBS
+27836,Dr. Kriti Ranabhat,"Balkot, Balkot",Female,MBBS
+27837,Dr. Pinky Shah,"Sakhuwa, Shambhunath",Female,BDS
+27838,Dr. Bhuwan Khulal,"Fattepur, Fattepur",Male,MBBS
+27839,Dr. Kshitiz prasain,"Kamaldada, Hetauda",Male,BDS
+27840,Dr. Sandhya Subedi,"Amardeep Tol, Panchanagar",Female,BDS
+27841,Dr. Samikshya Ghimire,"Bairiya, Banganga",Female,BDS
+27842,Dr. Ranjana Khanal,"Narayanpur, Tripur",Female,BDS
+27843,Dr. Puran Bishowkarma,"Paundur, Dhikurpokhari",Male,BDS
+27844,Dr. Chadani Mahat,"Nayabato, lalitpur, Lalitpur",Female,MBBS
+27845,Dr. Sital Prasad Goit,"Lagama, Kamala",Male,MBBS
+27846,Dr. Bibek Baniya,"Dhalkewar, Mithila",Male,MBBS
+27847,Dr. Suman Saroj,"Bhatauliya, Bhatauliya",Female,BDS
+27848,Dr. Pratima Rai,"Dharan, Dharan",Female,BDS
+27849,Dr. Saurav Raut,"Bharatpur, Bharatpur",Male,MBBS
+27850,Dr. Rajiv Mahato,"SHREENAGAR, ISHWORPUR",Male,MBBS
+27851,Dr. Raaz Sharraf,"Malangwa, Malangwa",Male,MBBS
+27852,Dr. Anij Dumaru,"Kamalbiyanak, Bhaktapur",Male,BDS
+27853,Dr. Rabin Babu Thapaliya,"Chitwan narayangardh, Bharatpur",Male,BDS
+27854,Dr. Niroj Bogati,"Japhati, Bidur",Male,BDS
+27855,Dr. Sisha Adhikari,"Besishahar, Besishahar",Female,BDS
+27856,Dr. Anuja Ghimire,"Chainpurchowk, Khairahani Municipality",Female,BDS
+27857,Dr. Sabina Shrestha,"Tokha Saraswoti, Tokha Municipality",Female,BDS
+27858,Dr. Bishwanath Prasad Mandal,"Bhagwatpur, Bhagwatpur",Male,BDS
+27859,Dr. Aayushma Dhoju,"nadipur, pokhara",Female,BDS
+27860,Dr. Dhanu Maya Gurung,"Khamari,thalajung, Siranchok",Female,MBBS
+27861,Dr. Aasevi Aitwal,"Darchula, Byans",Female,MBBS
+27862,Dr. Barsha Mahat,"Mahat, Mahat",Female,BDS
+27863,Dr. Bishal Jung Rayamajhi,"Airigaun, Panauti",Male,MBBS
+27864,Dr. Kabita Mandal,"Wakil Tol, Janakpurdham",Female,BDS
+27865,Dr. rupak rauniyar,"gaighat, triyuga",Male,MBBS
+27866,Dr. Supriya Thapa,"Bhugdeu, Bethanchok",Female,MBBS
+27867,Dr. Sudeep Jamarkattel,"Damauli, Municipality",Male,MBBS
+27868,Dr. Rakesh Kumar Yadav,"Siraha, Bishnupur Rural Municipality",Male,MBBS
+27869,Dr. Intejar Ali,"Birgunj, Metropolitan city",Male,MBBS
+27870,Dr. Aditya Morbaita,"SIRAHA MADAR, MADAR",Male,MBBS
+27871,Dr. bishek dahal,"biratnagar, municipality",Male,BDS
+27872,Dr. CHANDANI KUMARI YADAV,"Siraha, Siraha",Female,BDS
+27873,Dr. Manju Kumari Sah,"Simraha singiyaun, Simraha singiyaun",Female,BDS
+27874,Dr. Sarita Kumari Yadav,"Sahasaula, Sahasaula",Female,BDS
+27875,Dr. Ashma G. C.,"banke, khaskarkandau",Female,BDS
+27876,Dr. Sushil Sharma Marasini,"Silanyas Chowk, Gaindakot",Male,MBBS
+27877,Dr. Aashutosh Ghimire,"Phalewas, Mudikuwa",Male,MBBS
+27878,Dr. Brijesh Shrestha,"Dharan, Dharan",Male,BDS
+27879,Dr. Reyn Pandey,"Kerwani 9 Rupandehi, Devdaha",Male,MBBS
+27880,Dr. Asmita Shrestha,"Gorkha, Gaikhur",Female,MBBS
+27881,Dr. Chandra Bikram Bista,"Lamki, lamki chuha",Male,MBBS
+27882,Dr. Prince Tiwari,"Damhimadai, VDC",Male,MBBS
+27883,Dr. Neelima Shrestha,"JAUBARI, VDC",Female,MBBS
+27884,Dr. Poonam Shrestha,"Bhandara, Bhandara",Female,BDS
+27885,Dr. Roma jaiswal,"Saramujawa, Saramujawa",Female,BDS
+27886,Dr. Bishal Chapagain,"Pragatinagar, Pragatinagar",Male,BDS
+27887,Dr. Rojeena Shrestha,"Dharan, Dharan",Female,BDS
+27888,Dr. Bhaskar shahi,"kailali, tikapur",Male,BDS
+27889,Dr. Rabina Karki,"Mahadevsthan, Mahadevsthan",Female,BDS
+27890,Dr. Himal Dahal,"chandranigahpur, santapur ma",Male,BDS
+27891,Dr. Palistha Shakya,"Inacho,Bhaktapur, Bhaktapur",Female,BDS
+27892,Dr. Alisha Shrestha,"Biratnagar, Biratnagar",Female,BDS
+27893,Dr. Sulekha Mishra,"Semari, kamahariya",Female,BDS
+27894,Dr. Vivek Lama,"Maharajgunj, Baluwatar",Male,MBBS
+27895,Dr. Santosh Kumar Dhungana,"santi tol, Kohalpur",Male,MBBS
+27896,Dr. Rojee Thapaliya,"Nawalpur, Netragunj",Female,MBBS
+27897,Dr. Hari Bohara,"Bohara besi, Gaunsahar",Male,MBBS
+27898,Dr. Kamlesh Kumar Yadav,"Siraha 02, Siraha",Male,MBBS
+27899,Dr. Hemant Khadka,"Chaukhabang, Musikot",Male,MBBS
+27900,Dr. Prajwal Adhikari,"Ghorahi, Dang, Ghorahi",Male,MBBS
+27901,Dr. Binu Gautam,"Dang, Hapur",Female,MBBS
+27902,Dr. Prabhat Kumar Gupta,"Barahathawa, Barahathawa",Male,MBBS
+27903,Dr. Siddhartha Dev Bhatta,"Ainthpur, Bheemdatt",Male,MBBS
+27904,Dr. Santosh Kumar Sah,"Pra.ko mahuwa, Janakpur",Male,MBBS
+27905,Dr. Gibson Shrestha,"Kuleshwor, Kathmandu",Male,MBBS
+27906,Dr. Gunawati Chaulagain,"Jumla, Lamra",Female,MBBS
+27907,Dr. Saurabh Raj Sharma,"Ka line, Tulsipur",Male,MBBS
+27908,Dr. Sandip Sharma,"Baunia, Dododhara",Male,MBBS
+27909,Dr. Bushra Khanam,"Kapilvastu, Bhilmi",Female,MBBS
+27910,Dr. Sankalpa Sigdel,"Bardiya, Dhodhari",Male,MBBS
+27911,Dr. Bishal Budha Magar,"Piparee, Kohalpur",Male,MBBS
+27912,Dr. Sandesh Paudel,"Ratmata, Baglung",Male,MBBS
+27913,Dr. Abhash Thapa,"Chhapiya, Dayanagar",Female,MBBS
+27914,Dr. SUBAS KHATRI,"Bethan, Bethan",Male,MBBS
+27915,Dr. Nayansha Karki,"Dharan, Dharan",Female,BDS
+27916,Dr. Dhanlal Dong Tamang,"Bhalwadi, Bethan",Male,MBBS
+27917,Dr. Nyima Phuti Sherpa,"Namche, Namche",Female,MBBS
+27918,Dr. Rameshwar Kumar Sah,"Matiarwa, Kalaiya",Male,MBBS
+27919,Dr. Anil Kumar Sah,"Harsar, Gopalpur",Male,MBBS
+27920,Dr. Raman Kumar Sah,"Haripurwa, Haripurwa",Male,MBBS
+27921,Dr. Aayusha Bhattachan,"Baglung, Bongadobhan",Female,MBBS
+27922,Dr. Bipul Thakur,"Ratauli, Pipara",Male,MBBS
+27923,Dr. Prabesh Luintel,"Raut Gaun, Katunje",Male,MBBS
+27924,Dr. DHARMENDRA KUMAR SAH,"RAMNAGAR MIRCHAIYA, RAMNAGAR MIRCHAIYA",Male,MBBS
+27925,Dr. Bikash Sitaula,"Kachhubari, Anarmani",Male,MBBS
+27926,Dr. Sadhana Sharma,"Dhangadhi, Dhangadhi",Female,MBBS
+27927,Dr. Abhin Sapkota,"Koteshwor, Kathmandu",Male,MBBS
+27928,Dr. ABIRAL DHAKAL,"Rayamajhi tole, Sorakhutte, KMC",Male,MBBS
+27929,Dr. Roshani Aryal,"Putlibazar, Putlibazar",Female,MBBS
+27930,Dr. Niva Shrestha,"Gangabu, Kathmandu",Female,MBBS
+27931,Dr. Bhawesh Kumar Yadav,"Raipur, Raipur",Male,MBBS
+27932,Dr. Barsha Gurung,"Dhuseni, Khalte",Female,MBBS
+27933,Dr. Chandan Kumar Shah,"Loharpatti, Mahottari, Loharpatti",Male,MBBS
+27934,Dr. Samrat Singh Khadka,"Bhainsepati, Lalitpur",Male,MBBS
+27935,Dr. Siddhanta K. C.,"OM COLONY, SUKEDHARA, BUDHANILKANTHA",Male,MBBS
+27936,Dr. Ayushma Acharya,"Kaushaltar, Madhyapur thimi",Female,MBBS
+27937,Dr. Keepa Manandhar,"Kathmandu, KMC",Female,MBBS
+27938,Dr. Muskan Bichha,"Pigauna 6 , Mahottari, Nepal, Pigauna",Female,MBBS
+27939,Dr. Pooja Sunar,"Chisapani, Baijanath",Female,MBBS
+27940,Dr. Damodar Poudel,"sachetan marg, K.M.C",Male,MBBS
+27941,Dr. Manjeel Adhikari karki,"Bardiya, Neulapur",Male,MBBS
+27942,Dr. Ichchha Baidhya,"Dang, Dhikpur",Female,MBBS
+27943,Dr. Arjun Khatri,"Dangbang, Kabhre",Male,MBBS
+27944,Dr. Abhishek Bhatta,"Bishalnagar, Dhangadhi",Male,MBBS
+27945,Dr. Rohit Mishra,"Janakpur, Janakpur Municipality",Male,MBBS
+27946,Dr. Kaushal Giri,"Dang deukhuri, Sonpur",Male,MBBS
+27947,Dr. Saroj Yadav,"Siddhartha tole, Nepalgunj",Male,MBBS
+27948,Dr. Astika Shrestha,"Bansbari, kathmandu, K.M.C",Female,MBBS
+27949,Dr. Sukriti Gyawali,"Gulariya, Gulariya",Female,MBBS
+27950,Dr. RASMITA DHAMALA,"Bhankharka, Sankosh",Female,MBBS
+27951,Dr. SUNNY YADAV,"NAYAKATOLA, HARIHARPUR",Male,MBBS
+27952,Dr. Supriya Niraula,"Salleri, Salyan",Female,MBBS
+27953,Dr. Bipin Sapkota,"Guyalghari, Thumakodanda",Male,MBBS
+27954,Dr. Roshan Acharya,"Maidanghopa, Maharanijhoda",Male,MBBS
+27955,Dr. Saurav Aryal,"Jaisidanda, Putalibazar municipality",Male,MBBS
+27956,Dr. Rabin Paneru,"Rangethanti, Setidovan",Male,MBBS
+27957,Dr. JASMINE GURUNG,"Nayabazar 8, Pokhara",Female,MBBS
+27958,Dr. Manish Timalsina,"Aauraha, Pipra Simara",Male,MBBS
+27959,Dr. Praju Karki,"Lalitpur, Lalitpur",Female,MBBS
+27960,Dr. aatish gurung,"dhikurpokhari, Dhikurpokhari",Male,MBBS
+27961,Dr. Rituraj Adhikari,"Batulethar, Lahachowk",Male,MBBS
+27962,Dr. Bishwa Nath Sharma,"Garjyagankot, Garjyagankot",Male,MBBS
+27963,Dr. Savyata Adhikari,"PaniPokhari, Kathmandu Metropolitan city",Female,MBBS
+27964,Dr. Madhu Sudan Bhattarai,"Jagata, sandhikharka",Male,MBBS
+27965,Dr. Rubi Rauniyar,"Sisaut, Ishworpur",Female,MBBS
+27966,Dr. sachit devkota,"lapsichhaur, mirkot",Male,MBBS
+27967,Dr. Sudha Kumari Sah,"Gonarpura, Gonarpura",Female,MBBS
+27968,Dr. Man Bahadur Bohara,"Dahabagar, Dahabagar",Male,MBBS
+27969,Dr. Anuj Timshina,"Khairenitar, Khairenitar",Male,MBBS
+27970,Dr. Kushal Sapkota,"Sundarbazar, Sundarbazar",Male,MBBS
+27971,Dr. Archana Kharel,"Nayabaneshwor, Kathmandu",Female,MBBS
+27972,Dr. Pritee Trivedee,"Mithuawa, Mithuawa",Female,MBBS
+27973,Dr. Nirusha Regmi,"Gyaneshwor, Kathmandu",Female,MBBS
+27974,Dr. Shubham Raj Gupta,"Janakpurdham, Janakpur",Male,MBBS
+27975,Dr. Nabaraj Shrestha,"Patle, Nalang",Male,MBBS
+27976,Dr. Aruna Luitel,"Dhulikhel, Dhulikhel",Female,MBBS
+27977,Dr. Prasanna Dhakal,"Bagdole, Lalitpur",Male,MBBS
+27978,Dr. Rubina Chaudhary,"Sisananiya, Sisananiya",Female,MBBS
+27979,Dr. Pramod Suman,"Chandrapatti, Vidhyanagar",Male,MBBS
+27980,Dr. Sunil Moktan,"Dudhpokhari, Tamchet dudhapokhari",Male,MBBS
+27981,Dr. Sunil Kumar Das,"Prasahi, Jamuni madhepura",Male,MBBS
+27982,Dr. Subham Kumar Rouniyar,"Duhabi, Duhabi",Male,MBBS
+27983,Dr. SATYA NARAYAN BHAGAT,"Lahan, Lahan",Male,MBBS
+27984,Dr. Binayak Bhatta,"Kanchanpur, krishnapur",Male,MBBS
+27985,Dr. Akash Rauniyar,"Kanchanpur Bazaar, Kanchanpur",Male,MBBS
+27986,Dr. Sudha Budhathoki,"Pakarbas, Pakarbas",Female,MBBS
+27987,Dr. Urusha Naaz,"Om shanti marg, Nepalgunj",Female,MBBS
+27988,Dr. SAJAN CHAUDHARY,"damhi, damhi, madai",Male,MBBS
+27989,Dr. Ashish Joshi,"Chatakpur, Dhangadhi",Male,MBBS
+27990,Dr. Shambhu Kumar Mahato,"Umaprempur,naushai, Umaprempur",Male,MBBS
+27991,Dr. Swesha Shrestha,"Pokhara bus park, narayanghad, Bharatpur",Female,MBBS
+27992,Dr. Shradha K C,Kathmandu,Female,MBBS
+27993,Dr. Shivali Rao,"Kathmandu, Kathmandu",Female,MBBS
+27994,Dr. Anisha Raut,"Gyaneshwor, Kathmandu, Kathmandu Metropolitan City",Female,MBBS
+27995,Dr. Vedhant Jaiswal,"Bhaisepati, sainbu",Male,MBBS
+27996,Dr. Aalok Jha,"Mahottari, Mahottari",Male,MBBS
+27997,Dr. Nobel Adhikari,"Machchhegaun, Machchhegaun",Male,MBBS
+27998,Dr. ASHISH GURAGAIN,"Dhaitar, Mahadevsthan",Male,MBBS
+27999,Dr. Shekhar Kumar Yadav,"Lahan, Lahan",Male,MBBS
+28000,Dr. Tulsi Kumar Mahato,"Brahampuri, Arnama",Male,MBBS
+28001,Dr. Prashant Maharjan,"Gulariya, Gulariya",Male,MBBS
+28002,Dr. Rakesh Sarraf,"Kalaiya, Kalaiya",Male,MBBS
+28003,Dr. Ganesh Kumar Giri,"Jhapa, Arjundhara",Male,MBBS
+28004,Dr. Niranjan K C,"Sokhel, Setidevi/Dakshinkali",Male,MBBS
+28005,Dr. Nipesh Aryal,"Gorkha, Gorkha",Male,MBBS
+28006,Dr. Nawaraj Chapagain,"kawasoti, kawasoti",Male,MBBS
+28007,Dr. Lokesh Acharya,"kundule, Baglung",Male,MBBS
+28008,Dr. MD Parbej Allam,"Lakhauri, Janakpur",Male,MBBS
+28009,Dr. Stuti Khanal,"Bahundangi, Bahundangi",Female,MBBS
+28010,Dr. Kiran Gupta,"Pokharapali, Ramgram",Male,MBBS
+28011,Dr. Abinash Sapkota,"Hatiya, Hatiya",Male,MBBS
+28012,Dr. Sumin Thapa,"Michhurlung, Majhkot",Male,MBBS
+28013,Dr. Niranjan Sah,"DA.JHITAKAIYA, DA.JHITAKAIYA",Male,MBBS
+28014,Dr. Anuj Raj Sharma,"Purano Sinamangal, K.M.C.",Male,MBBS
+28015,Dr. Bishal Shrestha,"Rupathali, Duwakot",Male,MBBS
+28016,Dr. Sabita Chand,"Sainpasela, Sainpasela",Female,MBBS
+28017,Dr. Joshana Shrestha,"Dolalghat, Dolalghat",Female,MBBS
+28018,Dr. Richa Sah,"HANUMANNAGAR, HANUMANNAGAR",Female,MBBS
+28019,Dr. AMAR RAUT,"Malahanma, Gobindapur",Male,MBBS
+28020,Dr. Srijana Aryal,"Arjai, Arjai",Female,MBBS
+28021,Dr. KRISHNA KHARAL,"Premnagar, Shankarnagar",Male,MBBS
+28022,Dr. Ram Kumar Thapa,"Sughare, Beltar",Male,MBBS
+28023,Santosh Lamichhane,"Pragatinagar, Nawalparasi",Male,MBBS
+28024,Dr. Sakar Pandey,"Subidhanagar, Kathmandu",Male,MBBS
+28025,Dr. Pawan Shrestha,"Arkhaule5 Khotang, Arkhaule",Male,MBBS
+28026,Dr. Bikranta Bikram Kharel,"Lakhanpur, Lakhanpur VDC",Male,MBBS
+28027,Dr. Suraj Khanal,"Jayamangala, Ratnanagar",Male,MBBS
+28028,Dr. Sudha Shah,"Bhatauliya, Bhatauliya",Female,MBBS
+28029,Dr. Surya Bhushan Yadav,"Bhawanipur, Kalaiya",Male,MBBS
+28030,Dr. Ashmita Shrestha,"K.M.C. 15, K.M.C.",Female,MBBS
+28031,Dr. Aashish Poudel,"Parakhopi, Haldibari",Male,MBBS
+28032,Dr. Ravina Bade Shrestha,"Dachutole, Banepa",Female,MBBS
+28033,Dr. Subi Rijal,"Madhyapur Thimi, Bhaktapur",Female,MBBS
+28034,Dr. Satenla Ruit,"Tripura path, Kathmandu",Female,MBBS
+28035,Dr. Uttam Bista,"DHADAKOT, JAGANNATH",Male,MBBS
+28036,Dr. Anita Shrestha,"Tindhara, Bhotsipa",Female,MBBS
+28037,Dr. Jeevan Raj Shrestha,"Kageshwari Manohara, Municipality",Male,MBBS
+28038,Dr. Rachana Subedi,"Chanaute, Khaula lankuri",Female,MBBS
+28039,Dr. Stuti Shrestha,"Kathmandu, K.M.C.",Female,MBBS
+28040,Dr. Amir Kafle,"Japhati, Oraste",Male,MBBS
+28041,Dr. Manoj Dhakal,"Dhakalthok, Panchamul",Male,MBBS
+28042,Dr. BISHAL SAH,"Mahottari, Loharpatti",Male,MBBS
+28043,Dr. Monika Thakur,"Gadahiya 2, Gadahiya",Female,MBBS
+28044,Dr. Sanu Gurung,"Jharlang, Jharlang",Female,MBBS
+28045,Dr. Meetu Maharjan,"Kathmandu, K.M.C",Female,MBBS
+28046,Dr. Manoj Bishwakarama,"Dailekh, Gauri VDC",Male,MBBS
+28047,Dr. LILA JOSHI,"GOVARAIYA, BHIMDATTANAGAR",Female,MBBS
+28048,Dr. Raja Babu Giri,"Chainpur, Bageshwari , titrauna",Male,MBBS
+28049,Dr. Rama Tamrakar,"Lalitpur, Lalitpur",Female,MBBS
+28050,Dr. ASHOK PRASAD SAH,"Gardaul, Bahuarwa,Bhatha",Male,MBBS
+28051,Dr. Amita Paudel,"Bhedikhalta, Jaidi",Female,MBBS
+28052,Dr. Aayusha Dhakal,"Swoyambhu, Kathmandu",Female,MBBS
+28053,Dr. Parash Adhikari,"Jutpani, Bhateni",Male,MBBS
+28054,Dr. Saswot Kumar Dhakal,"Koteshwor, Kathmandu metropolitan city",Male,MBBS
+28055,Dr. PRADEEP GHIMIRE,"PATAUTI, PANINI",Male,MBBS
+28056,Dr. Yukesh Karki,"Jhumka, Bhadgaunsinuwari",Male,MBBS
+28057,Dr. Ayush Karmacharya,"Subarna Marga, Kathmandu",Male,MBBS
+28058,Dr. Abhishek Shrestha,"Arthunge, Arthunge",Male,MBBS
+28059,Dr. Vineet Shah,"Bharampuri, Bhatauda",Male,MBBS
+28060,Dr. Ranjan Kadel,"Benighat, Benighat",Male,MBBS
+28061,Dr. UJWOL NEUPANE,"BALTHALI, PANAUTI",Male,MBBS
+28062,Dr. Kabita Pandey,"Birgha, Kaligandaki",Female,MBBS
+28063,Dr. SAROJ PAUDEL,"KUNCHEBARI, Arjunchaupari",Male,MBBS
+28064,Dr. Manoj Bhandari,"Baliya, Baliya",Male,MBBS
+28065,Dr. Ram Babu Yadav,"Lahan, Mahadewa Portaha",Male,MBBS
+28066,Dr. Puja Shrestha,"Borlang, Borlang",Female,BDS
+28067,Dr. NIMESH SHRESTHA,"Nasikasthan, Sanga",Male,BDS
+28068,Dr. LALAN MAHATO,"BABARGUNJ, BABARGUNJ",Male,BDS
+28069,Dr. Prabal Timilsina,"Kathmandu, Kathmandu",Male,MBBS
+28070,Dr. Bharat Kumar,"gaushala, gaushala",Male,MBBS
+28071,Dr. Sudhir Kumar Sah,"Miyatol, Basantpur",Male,MBBS
+28072,Dr. Bimal Kumar Bista,"Bhujela, Bhimdutta",Male,MBBS
+28073,Dr. Richa Paudyal,"Tolka, Lumle",Female,MBBS
+28074,Dr. Roshan Bhandari,"Tari, Bijuwar",Male,MBBS
+28075,Dr. Chandani Sainju,"New Baneshwor, Kathmandu",Female,MBBS
+28076,Dr. Bibek Dhital,"Sanu Siruwari, Chautara",Male,MBBS
+28077,Dr. Shijan Raj Shrestha,"Kathmandu, K.M.C",Male,MBBS
+28078,Dr. Sanjay Gautam,"Bankatti, Manpur",Male,MBBS
+28079,Dr. Subash Baral,"Tamghas, Resunga",Male,MBBS
+28080,Dr. Ashmita K. C.,"Bhandarthok, Salyan",Female,MBBS
+28081,Dr. SURAJ KESHARI,"paanabagh, kalaiya",Male,MBBS
+28082,Dr. Prabin Poudel,"Kharibot, Pang",Male,MBBS
+28083,Dr. Ankita Shrestha,"Salkha Tole, Bajrayogini",Female,MBBS
+28084,Dr. Bivash Yogi,"SITALPUR, URHARI",Male,MBBS
+28085,Dr. Roshan Singh,"Barahathawa, Barahathawa",Male,MBBS
+28086,Dr. Manish Neupane,"Banepa, Banepa",Male,MBBS
+28087,Dr. Rekha Yadav,"Bhadrapur, Bhadrapur",Female,BDS
+28088,Dr. Shambhu Bishokarma,"hadiya, udayapur, hadiya",Male,BDS
+28089,Dr. Priti Gupta,"Biratnagar, Biratnagar",Female,BDS
+28090,Dr. Aashiya Kattel,"Okhaldhunga, Phulbari",Female,MBBS
+28091,Dr. Divya Karmacharya,"Samakhushi, Tokha",Female,MBBS
+28092,Dr. Omhari Shrestha,"Duwakot, Besi, Changunarayan",Male,MBBS
+28093,Dr. Anjan Katel,"Sharadanagar, Sharadanagar",Male,MBBS
+28094,Dr. Supriya Paudel,"Piple, Hetauda",Female,MBBS
+28095,Dr. Anish joshi,"Tailung marg, Budhanilkantha",Male,MBBS
+28096,Dr. Pradumna Panday,"Belkot, Belkot",Male,MBBS
+28097,Dr. Diwash Rai,"Anamnagar, Kathmandu Metropolitan City",Male,BDS
+28098,Dr. SUDEEP REGMI,"ARCHALBOAT, DORDI",Male,MBBS
+28099,Dr. Reshma Shrestha,"K.M.C, Kathmandu",Female,MBBS
+28100,Dr. Nabita Bhattarai,"Phulabadiya, Inarwa",Female,MBBS
+28101,Dr. Vikash Sahani,"Rajwara, PipraRajwara",Male,MBBS
+28102,Dr. Sijuka Devkota,"Liglig, Amppipal",Female,MBBS
+28103,Dr. Rakshya Gnawali,"Kalikanagar, Butwal",Female,MBBS
+28104,Dr. Arzoo Shah,"Pataura, Pataura",Female,MBBS
+28105,Dr. Bipashna Timla,"Kathmandu, Kathmandu",Female,MBBS
+28106,Dr. Ritesh Dubey,"Siswakataiya, Siswakataiya",Male,MBBS
+28107,Dr. Tank Prasad Pant,"kanchanpur, Bhimduttanagar",Male,MBBS
+28108,Dr. Shisir Siwakoti,"Birtamod, Birtamod",Male,MBBS
+28109,Dr. Ananda Bhattarai,"Chitwan, Nepal",Male,MBBS
+28110,Dr. Rahul Shrestha,"Dhulikhel, Dhulikhel Municipality",Male,MBBS
+28111,Dr. Rupesh Kumar Yadav,"Bathanaha, Bathanaha",Male,MBBS
+28112,Dr. BIR BAHADUR BAL,"Rupse, Daman VDC",Male,MBBS
+28113,Dr. SHATRUDHAN RAJAK,"MITHILESHWAR MAUWAHI, MITHILABIHARI",Male,MBBS
+28114,Dr. Diwakar Singh Thapa,"Janakpur, Ganeshman charnath",Male,MBBS
+28115,Dr. Ashish Dahal,"Kathmandu, Kathmandu",Male,MBBS
+28116,Dr. Prabal Ranabhat,"Pokhara, Lekhnath",Male,MBBS
+28117,Dr. Sagarika Panday,"Kathmandu, Nepal",Female,MBBS
+28118,Dr. Prakash Kumar Sah,"Dhanusha, Janakpur",Male,MBBS
+28119,Dr. Angel Neupane,"Neupanethar, Putalibazaar",Male,MBBS
+28120,Dr. Bishwas B. K.,"gairigau, nareshwor",Male,MBBS
+28121,Dr. Divya Jyoti Sharma,"Budanilkantha, Chapali Bhadrakali",Female,MBBS
+28122,Dr. Suraj Shrestha,"Tanahun, Aanbookhaireni",Male,MBBS
+28123,Dr. Rakesh Kumar Sah,"Mahottari, Gaushala",Male,MBBS
+28124,Dr. Salu Mahato,"Minbhawan, KMC",Female,MBBS
+28125,Dr. Bidhan Thapa,"Devitar, Namjung",Male,MBBS
+28126,Dr. Dinesh Lamichhane,"Laushibot, Bangsing",Male,MBBS
+28127,Dr. Ayushma K. C.,"Nepal, Rautbesi",Female,MBBS
+28128,Dr. Surya Kumar Bantawa Rai,"Kattike, Temkemaiyung",Male,MBBS
+28129,Dr. Nawaraj shrestha,"shreenagar, gaurishankar",Male,MBBS
+28130,Dr. Naresh Padhaya,"Birshain, kotila",Male,MBBS
+28131,Dr. Bimal sharma,"RANIGANJ, MOTIPUR,RANIGANJ",Male,MBBS
+28132,Dr. SRIJANA NEUPANE,"Tallo Borang, Bhalayakharka",Female,MBBS
+28133,Dr. Deepti Poudel,"Kamal chowk, Bharatpur",Female,MBBS
+28134,Dr. Raj kumar Chaudhary,"Kailali, Tikapur",Male,MBBS
+28135,Dr. Aayush Khanal,"Nepal, Mechinagar",Male,MBBS
+28136,Dr. Sujata Lamichhane,"Chitwan, Bharatpur",Female,MBBS
+28137,Dr. Shreya Gautam,"Malepatan, Pokhara",Female,MBBS
+28138,Dr. Suresh Prasad Yadav,"Prasauni Bhatha, Hasawa",Male,MBBS
+28139,Dr. Bibesh Dahal,"tandi, ratnanagar",Male,MBBS
+28140,Dr. Sampada Tiwari,"Gunjanagar, Gunjanagar",Female,MBBS
+28141,Dr. Ankit Singh,"Vidyapatinagar, Gaur",Male,MBBS
+28142,Dr. Buddhi Kumari Budha magar,"Dang, Sisahaniya",Female,MBBS
+28143,Dr. Suresh shah,"Badahara, Itahari",Male,MBBS
+28144,Dr. Sudeep Choudhary,"Madhyanagar, Lamahi",Male,MBBS
+28145,Dr. Raju Shah,"Kolhuwa bageya, Kolhuwa bageya",Male,MBBS
+28146,Dr. Sawal Koirala,"Chuhade, Triyuga Municipality",Male,MBBS
+28147,Dr. Amrita Kumari Mahaseth,"Gonarpura, Gonarpura VDC",Female,MBBS
+28148,Dr. Manisha Upreti,"Kanchanpur, Bheemdatt",Female,MBBS
+28149,Dr. susmita neupane,"BIRATNAGAR, BIRATNAGAR",Female,BDS
+28150,Dr. Prawesh Koirala,"sasha, Nilkantha",Male,BDS
+28151,Dr. Yogesh Prasad Yadav,"Inarwari, Inarwari",Male,MBBS
+28152,Dr. Frena pulami magar,"lalitpur, lalitpur",Female,MBBS
+28153,Dr. Saurav Singh,"Banjaraha, Ishnath",Male,MBBS
+28154,Dr. Grishma Khadka,"Dhapakhel, Lalitpur",Female,MBBS
+28155,Dr. Anu Budhathoki,"Tankisinuwari, Tankisinuwari VDC",Female,MBBS
+28156,Dr. Pratikshya Bharati,"Jumla bharatiwada, Chandannath",Female,MBBS
+28157,Dr. Samikshya Pokharel,"Biratnagar, Biratnagar",Female,MBBS
+28158,Dr. Binaya Kamat,"Katahari, Katahari",Male,MBBS
+28159,Dr. Pujan Chaulagain,"Damak, Damak",Male,MBBS
+28160,Dr. Neha Karna,"Lagadigoth, Lagadigoth",Female,MBBS
+28161,Dr. Anisha Sah,"Malangawa, Malangawa",Female,MBBS
+28162,Dr. Anish Shrestha,"Beni, Beni",Male,MBBS
+28163,Dr. Bivek Kumar Yadav,"Sundarpur chuhadwa, Sundarpur chuhadwa",Male,MBBS
+28164,Dr. Ayurda Pradhan,"Shantichowk, Biratnagar",Female,MBBS
+28165,Dr. Sabin Shrestha,"Belbari, Belbari",Male,MBBS
+28166,Dr. Sandipa Sharma,"Kaiya, Narayansthan",Female,MBBS
+28167,Dr. Nisha Bhattarai,"Butwal, Butwal",Female,MBBS
+28168,Dr. RIBEK SUNAM PARIYAR,"PADAMPOKHARI, PATIHANI",Male,MBBS
+28169,Dr. Keshav Bohara,"Ghat bazar, Khalanga",Male,MBBS
+28170,Dr. Bikash karki,"Biratchowk, sundarharaincha",Male,MBBS
+28171,Dr. Piyoosh Tamang,"Itahari, Itahari",Male,MBBS
+28172,Dr. Utsab Kandel,"Bharatpur, Chitwan, Bharatpur",Male,MBBS
+28173,Dr. Shankar Dayal Sah,"Pra. Khe. Mahuwa, Pra. Khe. Mahuwa",Male,MBBS
+28174,Dr. Arnav Singh Parmar,"Dholahiti, Sunakothi",Male,MBBS
+28175,Dr. Bikash Adhikari,"Rajahar, Devchuli",Male,MBBS
+28176,Dr. ROSHAN JHA,"BASATPUR, BASATPUR",Male,MBBS
+28177,Dr. Umanga Baral,"Shantinagar, Pokhara",Male,MBBS
+28178,Dr. Birat Timilsina,"Adarshanagar, Rajhena",Male,MBBS
+28179,Dr. Mamata Bista,"Achham, Dhanku",Female,MBBS
+28180,Dr. Ashmita Poudel,"Kathmandu gyaneshwor shahid marg, KMC",Female,MBBS
+28181,Dr. Surakshya Baral,"Pardi Birauta, Pokhara",Female,MBBS
+28182,Dr. Biplav Adhikari,"Chitepani, Madigaupalika",Male,MBBS
+28183,Dr. Ankita Shah,"Mahottari, Gonarpura",Female,MBBS
+28184,Dr. Rukmina Adhikari,"Birauta, Pokhara Sub metropoliton 17,Kaski",Female,MBBS
+28185,Dr. Abhishek Chaudhary,"Janakpur, Janakpur municipality",Male,MBBS
+28186,Dr. Kushal Ghimire,"Dhungeadda, Tinthana",Male,MBBS
+28187,Dr. Roshna Thapa,"Ilam, Ilam",Female,MBBS
+28188,Dr. Bipin Raman Parajuli,"Mulpani, Baglung Municipality",Male,MBBS
+28189,Dr. Kosmita Karki,"Bhojpur, Bhojpur municipality",Female,MBBS
+28190,Dr. Pratik Niroula,"Bhatbhateni, Kathmandu",Male,MBBS
+28191,Dr. Anup Maharjan,"Thecho,lalitpur, Thecho",Male,MBBS
+28192,Dr. SAMRAKCHAN LAMSAL,"SIDDHARTHNAGAR, SIDDHARTHNAGAR",Male,MBBS
+28193,Dr. Binit Sharma Ghimire,"Lalitpur, Chapagaun",Male,MBBS
+28194,Dr. Aadarsh Bhadel,"Sahutole, Sejwaltakura",Male,MBBS
+28195,Dr. BIJAY KUMAR MAHATO,"Ramnagar, Gaushala",Male,MBBS
+28196,Dr. BIMANCHAL ADHIKARI,"Khaireni, Devdaha",Male,MBBS
+28197,Dr. Neha Siddique,"Dadha, Dadha",Female,MBBS
+28198,Dr. Bimal Parajuli,"Bhaluhi, Devdaha",Male,MBBS
+28199,Dr. Anushiya Kattel,"OKHALDHUNGA, PHULBHARI",Female,MBBS
+28200,Dr. Subash K. C.,"Gokuwa, Hattimuda",Male,MBBS
+28201,Dr. Pooja Gupta,"Wakil Gali, Malangwa",Female,MBBS
+28202,Dr. GYALJIN SHERPA,"thulung, dudhkoshi",Male,MBBS
+28203,Dr. Sandeep Khatri,"Gairigaun, Panauti",Male,MBBS
+28204,Dr. Ranjana Chimauriya,"Methinkot 2, Kavre, Methinkot",Female,MBBS
+28205,Dr. Kushal Shrestha,"Biratnagar, Biratnagar",Male,MBBS
+28206,Dr. Sujan Adhikari,"Bhaktipur, Bhaktipur",Male,MBBS
+28207,Dr. Anshu Gupta,"Barainiya, Bisrampur",Female,MBBS
+28208,Dr. Rakshya Pangeni,"Waling jausipadhera, Waling",Female,MBBS
+28209,Dr. Ranjay Mahaseth,"Chikana 01 Siraha, Chikana",Male,MBBS
+28210,Dr. Aashish Adhikari,"Dadakonak, Lekhnath",Male,MBBS
+28211,Dr. Anupa Sharma,"Kushmisera, Kushmisera",Female,MBBS
+28212,Dr. Bikash Panthi,"Nayabazar, Resunga",Male,MBBS
+28213,Dr. Sushil Paudyal,"Nayera, Hardinata",Male,MBBS
+28214,Dr. Suyesh Poudel,"Balmandir Road, Bharatpur",Male,MBBS
+28215,Dr. GAYATRI PAUDEL,"SHERA, PAKUWA",Female,MBBS
+28216,Dr. Binit Kumar Mandal,"Bhardah, Bhardah",Male,MBBS
+28217,Dr. DILIP SAPKOTA,"KAWASOTI, KAWASOTI",Male,MBBS
+28218,Dr. Rishi Raj Sharma,"Materiya, Motipur",Male,MBBS
+28219,Dr. Nebula Devkota,"B gaun, Bageshwori",Female,MBBS
+28220,Dr. Prakash Kharel,"Nayagaun, butwal",Male,MBBS
+28221,Dr. Amrendra Kumar Chaudhary,"Janakpur, Bindhi",Male,MBBS
+28222,Dr. Paribesh Gyawali,"Bank Colony, Bhairahawa, Siddharthnagar",Male,MBBS
+28223,Dr. Niraj Subedi,"Kolpata, Thulipokhari",Male,MBBS
+28224,Dr. Ranjan Regmi,"Bishalchowk, Bhozad, Bharatpur",Male,MBBS
+28225,Dr. Reshma Shrestha,"Kathmandu, Kathmandu metropolitan city",Female,MBBS
+28226,Dr. Prakriti Acharya,"Chitwan, Bharatpur",Female,MBBS
+28227,Dr. Aakriti Rijal,"Sauraha, Ratnanagar",Female,MBBS
+28228,Dr. Mamata Lamichhane,"Bhedabari, Daraun",Female,MBBS
+28229,Dr. Rukma Raj Kafle,"Chapauli, Jalakanya",Male,MBBS
+28230,Dr. Sunita Kunwar,"Gongabu,Kathmandu, Gongabu",Female,BDS
+28231,Dr. Laxmi Parajuli,"Pokhara, Pokhara",Female,BDS
+28232,Dr. Rabina Sakha,"Bhaktapur, Bhaktapur",Female,BDS
+28233,Dr. Pragya Tulsi,"Bhaktapur, Bhaktapur",Female,BDS
+28234,Dr. Usha Tamang,"Chankhu, Gaurishankhar",Female,BDS
+28235,Dr. Kritisha Acharya,"saimarga, dharan",Female,BDS
+28236,Dr. Swastika Mahat,"chaukot, Dhulikhel",Female,BDS
+28237,Dr. Swikriti Makaju Shrestha,"Dhulikhel, Dhulikhel",Female,BDS
+28238,Dr. SUMIN RAI,"Gola Muksar, Jamdaha",Male,BDS
+28239,Dr. Rashila Manandhar,"Bhaktapur, Bhaktapur",Female,BDS
+28240,Dr. Sapna Singh,"Birtamode, Anarmani",Female,BDS
+28241,Dr. Kirti Devkota,"Palungtar, Gaikhur",Female,BDS
+28242,Dr. Gyanendra Thakur,"Bhramarpura, Loharpatti",Male,MBBS
+28243,Dr. sanjay kirketta,"biratnagar, Tanamuna",Male,MBBS
+28244,Dr. Jenny Shrestha,"Chapali, Bhadrakali 7, Kathmandu, Nepal, Chapali, Bhadrakali",Female,MBBS
+28245,Dr. Subesh Yadav,"Baniniya, Baniniya",Male,MBBS
+28246,Dr. Suraj Adhikari,"Rupakot, Rupakot",Male,MBBS
+28247,Dr. Savranta K C,"Lalitpur, Lalitpur",Male,MBBS
+28248,Dr. Sandesh Timila,"Birauta, Pokhara Lekhnath",Male,MBBS
+28249,Dr. Dikshya Karki,"Dhulikhel, Dhulikhel",Female,MBBS
+28250,Dr. sachin kumar chaudhary,"Chanahi, Malhaniya",Male,MBBS
+28251,Dr. Anwit Raj Pandey,"Dillibazar, Kathmandu",Male,MBBS
+28252,Dr. Ajay Kumar Yadav,"Rajbiraj, maleth",Male,MBBS
+28253,Dr. Keshika Kshatree,"Dhungkharka, Bethanchowk",Female,MBBS
+28254,Dr. Siddhartha Kumar Shrestha,"Bhaisepati, Lalitpur",Male,MBBS
+28255,Dr. Ajay Kurmi,"NEPAL, BAGAHI",Male,MBBS
+28256,Dr. Rakesh Poudel,"Falkapur, Sonpur",Male,MBBS
+28257,Dr. KABITA K. C.,"Rupandehi, Kha. Bangai",Female,MBBS
+28258,Dr. Pujan Bataju,"Bagaletole, Pokhara Metropolitan City",Male,MBBS
+28259,Dr. AASHUTOSH SAH,"RANJITPUR, KHOJPUR",Male,MBBS
+28260,Dr. Roshan Acharya,"Talla sarangi, Amalachaur",Male,MBBS
+28261,Dr. Sandhya Thapa,"Chidipani 7, palpa, Chidipani",Female,MBBS
+28262,Dr. Sindhu Gyawali,"Gatina, Bandikot",Female,MBBS
+28263,Dr. Pravash Karna,"Jhumka, Bhadgau Sinuwari",Male,MBBS
+28264,Dr. Bhupendra Prasad Yadav,"Malhaniya, Phulkahi",Male,MBBS
+28265,Dr. Sudip Yadav,"PAKRI, PAKRI",Male,MBBS
+28266,Dr. Prajwal Raj Bista,"Biratnagar 11, Biratnagar",Male,MBBS
+28267,Dr. Komal Paudyal,"panitanki, Biratnagar",Female,MBBS
+28268,Dr. Ghanish Kumar Sah,"Dumraha, Dumraha",Male,MBBS
+28269,Dr. Sonam Panday,"Janakpur nagarpalika, Janakpur nagrpalika",Female,MBBS
+28270,Dr. Mukesh Shah,"kalyanpur jabdi, kalyanpur jabdi",Male,MBBS
+28271,Dr. Nikhil Panjiyar,"Dhanusha, Nepal",Male,MBBS
+28272,Dr. Manish Sah,"Balkawa, Aasopur",Male,MBBS
+28273,Dr. Sanjeev Adhikari,"Bageswori, Bageswori",Male,MBBS
+28274,Dr. SUSHANT BHARDWAJ,"Bagiya, Kolhuwa Bagiya",Male,MBBS
+28275,Dr. Kusum Maharjan,"Kathmandu, Kathmandu Municipality",Female,MBBS
+28276,Dr. Sinet Pokharel,"Mahendrachowk, Inaruwa",Male,MBBS
+28277,Dr. Diki Sherpa,"Kathmandu, Kathmandu metropolitan city",Female,MBBS
+28278,Dr. Madhav Poudel,"Deudakala, Deudakala",Male,MBBS
+28279,Dr. Anand Shah,"dhanusa, sabaila",Male,MBBS
+28280,Dr. Sabita Kumari Shah,"Mahabir chowk, Janakpurdham",Female,MBBS
+28281,Dr. Sushila Katuwal,"Sota, Narayan Municipality",Female,MBBS
+28282,Dr. Surya Prakash Soni,"Bhadrapur Bazaar, Bhadrapur",Male,MBBS
+28283,Dr. Amit kumar shah,"brahampuri 02 sarlahi, brahampuri ruralmuncipality",Male,MBBS
+28284,Dr. RISHIKESH CHAUDHARY,"BANAULA 07, SAPTARI, BANAULA",Male,MBBS
+28285,Dr. Abhilekh kumar singh,"gokul tole, peepal chowk, Biratnagar",Male,MBBS
+28286,Dr. Sachin Kumar Yadav,"Raypur, Raypur",Male,MBBS
+28287,Dr. uday singh,"Saraswoti tole, Lahan",Male,MBBS
+28288,Dr. Birendra Kumar Shah,"Badiya Banchauri, Badiya Banchauri",Male,MBBS
+28289,Dr. Sudiksha Thapa,"Subidhanagar,Tinkune, K.M.C",Female,MBBS
+28290,Dr. Dakshina Koirala,"Kathmandu, Kapan",Female,MBBS
+28291,Dr. Preetika Yadav,"Majhaura, Siraha",Female,MBBS
+28292,Dr. RAJU JAYSHWAL,"PADARIYA 01, SARLAHI, PADARIYA",Male,MBBS
+28293,Dr. Monika Singh,"tintoliya, biratnagar",Female,MBBS
+28294,Dr. Smita Khulal,"Sundar tol, Belbari",Female,MBBS
+28295,Dr. Samyojana Gurung,"Kathmandu, Manamaiju",Female,MBBS
+28296,Dr. Anima Mathema,"Sallaghari, Katunje",Female,MBBS
+28297,Dr. Premlata Yadav,"Bode Barsain, Bode Barsain",Female,MBBS
+28298,Dr. Sudhir Shrestha,"Sankhamul, Kathmandu",Male,MBBS
+28299,Dr. Rupika Bastola,"Sisuwa bazar, Lekhnath",Female,MBBS
+28300,Dr. Sushmita Khanal,"Kanchanbari, Biratnagar",Female,MBBS
+28301,Dr. Sunaina Kumari Yadav,"Bishnupur, Bishnupur VDC",Female,MBBS
+28302,Dr. Narayan Pun Magar,"Madichaur, Jankot vdc",Male,MBBS
+28303,Dr. Anush Thapa,"Arubot, Godawori",Male,MBBS
+28304,Dr. Raslina Shrestha,"Kirtipur, Kirtipur",Female,MBBS
+28305,Dr. Richa Niraula,"Kathmandu, K.M.C",Female,MBBS
+28306,Dr. AVISHEK KUNWAR,"LAXMIBAZAR, GORKHA",Male,MBBS
+28307,Dr. Richa Shah,"Janakpurdham, Janakpur",Female,MBBS
+28308,Dr. Muna Gautam,"Lakshminiya, Shiswani Jahada",Female,MBBS
+28309,Dr. Himal Pandey,"Lankoo, Bharatpur",Male,MBBS
+28310,Dr. Ishwor Balami,"Raniban, Ichamgunarayan",Male,MBBS
+28311,Dr. Shreeya Shrestha,"Dhulikhel, Dhulikhel",Female,MBBS
+28312,Dr. Sadikshya Bhandari,"Kapan, Budhanilkantha",Female,MBBS
+28313,Dr. Pratigya Karki,"Gothatar, Gothatar",Female,MBBS
+28314,Dr. Subash Karki,"Santapur, Santapur",Male,MBBS
+28315,Dr. Dipendra Bhusal,"Banjhakateri, Banjhakateri",Male,MBBS
+28316,Dr. Shreejana Pandey,"Bastu, Dhurkhot",Female,MBBS
+28317,Dr. RAVI GUPTA,"Sarlahi, Dumariya",Male,MBBS
+28318,Dr. Apekchhya Basnet,"Kathmandu, Kathmandu",Female,MBBS
+28319,Dr. NEETU SHRESTHA,"NAYA THIMI, MADHYAPUR THIMI",Female,MBBS
+28320,Dr. Susmita Shrestha,"baglung, baglung",Female,MBBS
+28321,Dr. Ingima Shrestha,"Kathmandu, K.M.C.",Female,MBBS
+28322,Dr. Rishika Karki,"CHABAIL, KATHMANDU METROPOLITIAN CITY",Female,MBBS
+28323,Dr. Sabina Rayamajhi,"Barahathawa, Sarlahi, Barahathawa",Female,MBBS
+28324,Dr. Nabina Shrestha,"Sindhuli, Kamalamai",Female,MBBS
+28325,Dr. Subhechhya Shrestha,"Bhaktapur, Bhaktapur",Female,MBBS
+28326,Dr. Shishir Shahi,"Chorela, Ganyapdhura",Male,MBBS
+28327,Dr. Anisha Joshi,"Bhawan Gaira, Diktel Rupakot Majhuwagadhi Municipality",Female,MBBS
+28328,Dr. Ira K. C.,"Syuchatar, Nagarjun",Female,MBBS
+28329,Dr. Khusbu Thapa,"Gyaneshwor,Kathmandu, Kathmandu",Female,MBBS
+28330,Dr. KUNDAN SINGH,"Gamhariya, Purainiya",Male,MBBS
+28331,Dr. Ajay Sah,"Prastoka, Prasauni",Male,MBBS
+28332,Dr. Sushil Pandit,"Gagan gauda, Pokhara",Male,MBBS
+28333,Dr. Rumi K C,"Tarahara, Hansposha",Female,MBBS
+28334,Dr. Mahesh Kumar Shrestha,"Malekhu, Rorang",Male,MBBS
+28335,Dr. Pratima Poudel Sharma,"Rammandir line, Butwal",Female,MBBS
+28336,Dr. PRIYANKA BISHT,"KATHMANDU, MAHADEVSTHAN",Female,MBBS
+28337,Dr. Richa Gautam,"Kathmandu, Nepal, Nagarjun",Female,MBBS
+28338,Dr. Anisha Chhetri,"Syangja, Bichari Chautara",Female,MBBS
+28339,Dr. Dhiraj Prasad Shah,"Badaharwa, Durgabhagwati gaupalika",Male,MBBS
+28340,Dr. Prakriti Bhandari,"Thumpaki, Ghodagaun VDC",Female,MBBS
+28341,Dr. Shitashma Bohara,"New Baneshwor, Kathmandu",Female,MBBS
+28342,Dr. Jonsan Bishwakarma,"Ghorlikharka, Pakhribas",Male,MBBS
+28343,Dr. Sandhya Maharjan,"Kilagal, KMC",Female,MBBS
+28344,Dr. Abhaya Mahto,"Thadhi, Thadhi Jhijha",Male,MBBS
+28345,Dr. Shristy Dutraj,"kalanki, kathmandu, Kathmandu Metropolitan city",Female,MBBS
+28346,Dr. Sushil Adhikari,"Bharatpur Chitwan, Bharatpur",Male,MBBS
+28347,Dr. Apekshya Nanda,"Bulingtar, Bulingtar",Female,BDS
+28348,Dr. Sagar Pokharel,"Shantinagar tole, Bhimeshwar",Male,BDS
+28349,Dr. Alisha Agrawal,"Narayangarh, Bharatpur",Female,BDS
+28350,Dr. APPU YADAV,"Pacchiyari tole, Tarapatti sirsiya",Male,BDS
+28351,Dr. Sushmita Kakshyapati,"Bagdula, Dharmawati",Female,BDS
+28352,Dr. Ganesh Dhungana,"mangalsen, mangalsen municipality",Male,BDS
+28353,Dr. Archana Devkota,"Achham, Binayak",Female,BDS
+28354,Dr. Priyanka Dhakal,"Jagatpur, Jagatpur",Female,BDS
+28355,Dr. Narayan Oli,"Pamka, Vdc",Male,BDS
+28356,Dr. Pradeep Lamichhane,"Rupakot, Municipality",Male,BDS
+28357,Dr. Annu Chaudhary,"Ganga pipra, Ganga pipra",Female,BDS
+28358,Dr. Surakshya Giri,"Pokhara, Pokhara",Female,BDS
+28359,Dr. Kanchanmala Gautam,"Parbat, Ramja Deurali",Female,BDS
+28360,Dr. Niroj Bhattarai,"Gothgaon, Sundar Haraicha",Male,BDS
+28361,Dr. Upama Karki,"Lalitpur, Godamchaur",Female,BDS
+28362,Dr. Anita Bhatta,"Baitadi, Shree Kedar",Female,BDS
+28363,Dr. Rachana Karki,"boudha, kathmandu",Female,BDS
+28364,Dr. Pratima Adhikari,"Dharapani, Ramechhap, Khimti",Female,BDS
+28365,Dr. Bikram Karki Chhetri,"Dhunge Deurali, Darbar Gaupalika",Male,BDS
+28366,Dr. Milan Rai,"Basteem, Pauwadungma",Male,BDS
+28367,Dr. Sabita Sigdel,"Gokarna, Gokarneshwor",Female,BDS
+28368,Dr. Riti Gupta,"Hetauda, Hetauda",Female,BDS
+28369,Dr. Anuja Gautam,"Itahari, Itahari",Female,BDS
+28370,Dr. Shreya Subedi,"Imadol, Mahalaxmi",Female,BDS
+28371,Dr. Nikita Rajbhandari,"Bargachi, Biratnagar",Female,BDS
+28372,Dr. Rukshana Khanal,"arubote, khandbari",Female,BDS
+28373,Dr. Rojina Deoju,"Dhulikhel, Dhulikhel",Female,BDS
+28374,Dr. Siddhant Thapa,"lele, Lalitpur",Male,BDS
+28375,Dr. Barsha Hada,"Bhaktapur, Bhaktapur",Female,BDS
+28376,Dr. Samjhana K. C.,"Chaukot, Panauti",Female,BDS
+28377,Dr. Grishma Ghimire,"Bhiman, Kamalamai municipality",Female,BDS
+28378,Dr. Ishori Pyatha,"Tahanani, Madhyapur thimi municipality",Female,BDS
+28379,Dr. SHROTA SHAKYA,"KATHMANDU, KATHMANDU",Female,BDS
+28380,Dr. Pramila Khanal,"Shankarnagar, Tilottama",Female,BDS
+28381,Dr. Shreya Kayastha,"Nasamana, Bhaktapur",Female,BDS
+28382,Dr. Prafulla Shrestha,"Tahanani, Madhyapur Thimi",Female,BDS
+28383,Dr. Susma Gurung,"Itahari, Itahari",Female,BDS
+28384,Dr. DIPTI SHRESTHA,"ITAHARI, ITAHARI",Female,BDS
+28385,Dr. KRIPA SEDHAIN,"KATHMANDU, KATHMANDU",Female,BDS
+28386,Dr. Mamta Shah,"Barsain, Negada",Female,BDS
+28387,Dr. Saranga Ghimire,"MANAMAIJU, TARKESHWAR",Female,BDS
+28388,Dr. Nirajan Bhandari,"Dhikurpokhari, Annapurna Rural municipality",Male,BDS
+28389,Dr. Sabina Thapa,"Sangla, Tarkeshwor",Female,BDS
+28390,Dr. Pramisha Karki,"putalibazaar, pauwai gaunde",Female,BDS
+28391,Dr. Sampada Shrestha,"Kathmandu, Kathmandu",Female,BDS
+28392,Dr. Amrita Dhakal,"Dhapasi, Tokha",Female,BDS
+28393,Dr. Rachana Reshami,"Budhathum, Fulkharka",Female,BDS
+28394,Dr. Puskar Neupane,"Bhurigaun, Thakurbaba",Male,BDS
+28395,Dr. Ankit Jaiswal,"Sabaila, Sabaila",Male,BDS
+28396,Dr. Sanjeev Bhandari,"Bharatpur, Bharatpur metropolitan city",Male,BDS
+28397,Dr. Kisit Nepal,"Shanti tole, Birtamode",Female,BDS
+28398,Dr. Janaki Rana,"Hoshrangdi, Hoshrangdi",Female,BDS
+28399,Dr. Sumi K C,"Duwakot, Changunarayan",Female,BDS
+28400,Dr. Deepa Bhandari,"Kotihawa, Madhwaliya",Female,BDS
+28401,Dr. SALINA SHRESTHA,"SHANKAR CHOWK, JALESHWOR MUNICIPALITY",Female,BDS
+28402,Dr. Ashwini Rajbhandari,"Kathmandu, K.M.C",Female,BDS
+28403,Dr. Sunaina Manandhar,"Kathmandu, Kathmandu",Female,BDS
+28404,Dr. Subikshya Bogati,"Lalitpur, Imadol",Female,BDS
+28405,Dr. Arpana Yadav,"Kachuri thera, Kachuri thera",Female,BDS
+28406,Dr. Binita Gautam,"Dhorphedri, Dhorphedri",Female,BDS
+28407,Dr. Sangeeta Karki,"Gaindakot, Gaindakot municipality",Female,BDS
+28408,Dr. Sabin Koirala,"Dhanthok,dumja, Kusheshwor Dumja",Male,BDS
+28409,Dr. Neelam Adhikari,"Kawajit, Mirlung",Female,BDS
+28410,Dr. Aastha Kafle,"Syangja, Banethok Deurali",Female,MBBS
+28411,Dr. Sudhansu Pradhan,"swayambhu, kathmandu metropolitan city",Male,MBBS
+28412,Dr. Ashu Sharma,"Kathmandu, Kathmandu",Female,MBBS
+28413,Dr. Bimal Yadav,"Asanpur, Asanpur",Male,MBBS
+28414,Dr. Dewasish Singh Swar,"Tikapur, Tikapur",Male,MBBS
+28415,Dr. Aamod Subedi,"Syangja, Phedikhola",Male,MBBS
+28416,Dr. Bikash Pyakurel,"Ek no. Pul, Bidur",Male,MBBS
+28417,Dr. PRADIP ADHIKARI,"Tarkeshwor, Tarkeshwor",Male,MBBS
+28418,Dr. Shailesh Khanal,"Chainpur, Chainpur",Male,MBBS
+28419,Dr. SUDIKSHYA BHANDARI,"MAKWANPUR, HETAUDA",Female,MBBS
+28420,Dr. Prabha Bashyal,"Palpa, Madanpokhara",Female,MBBS
+28421,Dr. Shambhu Banstola,"Pokhara, Pokhara",Male,MBBS
+28422,Dr. Samiksha Acharya,"Ratnanagar, Ratananagar",Female,MBBS
+28423,Dr. Sanim Laudari,"Gongabu, Kathmandu, K.M.C.",Male,MBBS
+28424,Dr. Krishna Yadav,"Siraha, Siraha",Male,MBBS
+28425,Dr. samjhana nepali,"Banepa, Banepa municipality",Female,MBBS
+28426,Dr. GYANU POUDYAL,"Taplejung, Dhungesanghu",Male,MBBS
+28427,Dr. Abhishek Pandey,"Town, Bharatpur",Male,MBBS
+28428,Dr. Prabin Gautam,"Ramja Deurali, Modi Gaupalika",Male,MBBS
+28429,Dr. Bishal Acharya,"Jhapa, Bhadrapur, Bhadrapur",Male,MBBS
+28430,Dr. Manisha Chapagain,"Gothatar, Kageshwori Manohara",Female,MBBS
+28431,Dr. Tejaswi Adhikari,"Kumaripati, Lalitpur",Female,MBBS
+28432,Dr. Kreepa Adhikari,"Kuleshwor, Kathmandu, Kathmandu",Female,MBBS
+28433,Dr. Emima Chhetri,"Simpani, Simpani",Female,MBBS
+28434,Dr. Mamata Awasthi,"Baitadi, Ganjari",Female,MBBS
+28435,Dr. REKHA CHAULAGAIN,"GOTHPANI, GOTHPANI",Female,MBBS
+28436,Dr. yek raj gurung,"bungathali, chokati",Male,MBBS
+28437,Dr. Priyanka Shah,"Biratnagar, Biratnagar",Female,MBBS
+28438,Dr. Swastika Shrestha,"Bode, Madhyapur Thimi",Female,MBBS
+28439,Dr. Suyasha Rajbhandari,"Dorpu bazar, Salleri",Female,MBBS
+28440,Dr. Shreya Shrestha,"Chuchepati, Kathmandu",Female,MBBS
+28441,Dr. Dibesh Prajapati,"Suryamadi, Bhaktapur municipality",Male,MBBS
+28442,Dr. Sweta Silwal,"Townplanning, Gothatar",Female,MBBS
+28443,Dr. IEAN RAI,"Balkot, Bhaktapur",Male,MBBS
+28444,Dr. Sweta Tamang,"Boudha, Kathmandu",Female,MBBS
+28445,Dr. Mandeep Thapa,"Mulpani, Kageshwori manohara",Male,MBBS
+28446,Dr. Abhinandan Tiwari,"Lekhnath, Lekhnath",Male,MBBS
+28447,Dr. GARIMA SUBEDI,"SANIMADAU, MANTHALI",Female,MBBS
+28448,Dr. Shailesh Panthee,"Gairakharka, Bhanbhane",Male,MBBS
+28449,Dr. SAGAR POUDEL,"PHURKESALLA, CHHISTI",Male,MBBS
+28450,Dr. Sanjaya Thapa,"Prabesh Marga, Banepa",Male,MBBS
+28451,Dr. Badal Maharjan,"Dhapakhel, Dhapakhel",Male,MBBS
+28452,Dr. Sujata Thapa,"Lagan Tole, K.MC",Female,MBBS
+28453,Dr. Ojaswee Lawati,"Changathali, Tikathali",Female,MBBS
+28454,Dr. Prashanti Prasai,"Siphal,ktm, Kathmandu",Female,MBBS
+28455,Dr. Jessica Maharjan,"Thecho, Lalitpur",Female,MBBS
+28456,Dr. Anjela Baidya,"Gabahal, Lalitpur",Female,MBBS
+28457,Dr. Anjan Jung Thapa,"Namjung, Shahid Lakhan rural municipality",Male,MBBS
+28458,Dr. Shreya Lakshami Shah,"Pipra, Sahodawa",Female,MBBS
+28459,Dr. SAMARPAN TIMILSINA,"Dharmasthali, Tarakeshwor",Male,MBBS
+28460,Dr. Pragya Kayastha,"Bholakha Tol, Banepa",Female,MBBS
+28461,Dr. SUMI PIYA,"SAMAKHUSHI, KMC",Female,MBBS
+28462,Dr. Rabin Poudel,"Lamahi Dang, Lamahi",Male,MBBS
+28463,Dr. Pasang Sherpa,"Golfutar, Budhanilkantha",Male,MBBS
+28464,Dr. Luna Shahi,"Buspark, Tamti",Female,MBBS
+28465,Dr. Sheshna Shrestha,"Wokutole, Banepa",Female,MBBS
+28466,Dr. pragya shrestha,"samakhusi, kathmandu, kathmandu",Female,MBBS
+28467,Dr. SRIJANA MAHARJAN,"SATUNGAL, CHANDRAGIRI",Female,MBBS
+28468,Dr. Ramila Bhasink,"Bode, Madhyapur Thimi",Female,MBBS
+28469,Dr. Uttam Chaulagain,"Jorpati, Jorpati",Male,MBBS
+28470,Dr. Bibek Raj Dahal,"Chyangring, Madi rambeni",Male,MBBS
+28471,Dr. Nikhil Ranjan Das,"Janakpurdham, Janakpur submetro",Male,MBBS
+28472,Dr. Shovana Ghimire,"Dirghayu Tole, Shantinagar, Kathmandu",Female,MBBS
+28473,Dr. Biplov Adhikari,"Rata Mata, Lunkhu Deurali",Male,MBBS
+28474,Dr. Ujjwal Ghimire,"Shangrila Tole, Tokha Municipality",Male,MBBS
+28475,Dr. Pragya Bhandari,"Marsyangdi, Marsyangdi",Female,MBBS
+28476,Dr. Bhuvrit Raj Dhakal,"Malangawa, Malangawa",Male,MBBS
+28477,Dr. Shradha Dhakal,"Battisputali, Kathmandu Metropolitan City",Female,MBBS
+28478,Dr. Shristi Chauhan,"Tulsi, Tulsi",Female,MBBS
+28479,Dr. Irusha Rani Adhikari,"Makaising, Gandaki",Female,MBBS
+28480,Dr. Rejal Bahadur Thapa,"kamerotaar, madhyapur thimi",Male,MBBS
+28481,Dr. BABITA MAJHI,"Lakhantari, Lakhantari",Female,MBBS
+28482,Dr. Karma Sherpa,"Taplejung, lelep",Male,MBBS
+28483,Dr. Aayush Yadav,"Nepal, Dhangadi VDC",Male,MBBS
+28484,Dr. Samrat Malla,"Bauniya, Bauniya",Male,MBBS
+28485,Dr. Prasansa Basnet,"Illam, Sakhejung",Female,MBBS
+28486,Dr. Kabi Raj Bastola,"Bhagaichatol, Itahari",Male,MBBS
+28487,Dr. Manoj Mandal,"Kanchanpur, Kanchanpur",Male,MBBS
+28488,Dr. Sangita Thapa,"Ramche, Barhabise",Female,MBBS
+28489,Dr. Sadiksha Subedi,"Unique tole, Budhanilkantha municipality",Female,MBBS
+28490,Dr. Subash Dahal,"Ichot, Gothatar",Male,MBBS
+28491,Dr. Aseem Bhattarai,"Nayabazar, Urlabari",Male,MBBS
+28492,Dr. Shila Kandel,"Ganganagar, Gaindakot",Female,BDS
+28493,Dr. Prince Pant,"Kshetrapur, Bharatpur",Male,BDS
+28494,Dr. Pratikshya Panthee,"Palpa, Chidipani",Female,BDS
+28495,Dr. SWETA JAISWAL,"sakhuwa, sakukha,mahendranagar",Female,BDS
+28496,Dr. Sashanka Pandey,"Bidur, Bidur",Male,BDS
+28497,Dr. Sweta Somani,"Biratnagar, Biratnagar",Female,BDS
+28498,Dr. Saroj Maharjan,"Satungal, Satungal",Male,BDS
+28499,Dr. Rojina Shrestha,"Jorpati, Gokarneshwor",Female,BDS
+28500,Dr. Rubisha Upreti,"Kolati, Bhumlu",Female,BDS
+28501,Dr. Subash Chandra Khand Thapa,"Syangja, Malyangkot",Male,BDS
+28502,Dr. Sanskriti Pradhan,"Khairahani, Khairahani",Female,BDS
+28503,Dr. Yunisha Shrestha,"Dhulikhel, Dhulikhel",Female,BDS
+28504,Dr. Pranisha Bhandari,"Gokarna, Gokarneshwor",Female,BDS
+28505,Dr. Hemna Khanal,"Chabahil, Kathmandu",Female,BDS
+28506,Dr. Kanchan Tamang,"Jorpati, Gokarneshwor",Female,BDS
+28507,Dr. Vivek Maharjan,"newroad, kathmandu metropolitan city",Male,BDS
+28508,Dr. Pratiksha Poudel,"Pakaudi, Patihani",Female,BDS
+28509,Dr. Aakriti Baniya,"Furkechaur, Harnamadi",Female,BDS
+28510,Dr. Kabita Dhakal,"Pokhara, Pokhara",Female,BDS
+28511,Dr. Supath K. C.,"Nepal, Dhangadhi",Male,BDS
+28512,Dr. Pawan Kumar Rauniyar,"Mahuwan, Sakhuwaparsauni",Male,BDS
+28513,Dr. Pooja Gurung,"Gorkha, Shreenathkot",Female,BDS
+28514,Dr. Kriti Rai,"Gaighat, Triyuga",Female,BDS
+28515,Dr. Roji Shrestha,"Damauli, Vyas Municipality",Female,BDS
+28516,Dr. Sadhana Budhathoki,"Dang Ghorahi, Manpur",Female,BDS
+28517,Dr. Rakshya Shah,"Bhangal, Budhanilkantha",Female,BDS
+28518,Dr. Shrawana Shrestha,"Kathmandu, Kathmandu",Female,BDS
+28519,Dr. Pawan Acharya,"Kathmandu, Tinthana",Male,MBBS
+28520,Dr. Aagya Regmi,"Palpa, Tansen N.P",Female,BDS
+28521,Dr. Pratiksha Bhagat,"Barahachhetra, Barahachhetra",Female,MBBS
+28522,Dr. Nakul Tamang,"Jimbaal tole, Rautbesi",Male,MBBS
+28523,Dr. Bishal Kumar Jha,"Janakpur, Tulsiyahi Nikas",Male,MBBS
+28524,Dr. Santosh Poudel,"Pokhara, Lamachour",Male,MBBS
+28525,Dr. Rajan Kumar Gupta,"Jeetpur 3, Bara, Nepal, Jeetpur",Male,MBBS
+28526,Dr. Namrata Rai,"Dharan, Dharan",Female,MBBS
+28527,Dr. Sweta Dahal,"Harion, Harion",Female,MBBS
+28528,Dr. Laxman Kumar Bhagat,"Sathghumti chowk,Biratnagar, Biratnagar",Male,MBBS
+28529,Dr. Anushuya Gosain,"Taulachhen, Bhaktapur municipality",Female,MBBS
+28530,Dr. Ayushi Das,"Rajdevi Road, Rajbiraj",Female,MBBS
+28531,Dr. Shamim Akhtar Ansari,"Pheta, Pheta",Male,MBBS
+28532,Dr. Saurav Chaturvedi,"Sirsiya khalwatola, Sirsiya khalwatola",Male,MBBS
+28533,Dr. Bristi Acharya,"Samakhushi, Kathmandu",Female,BDS
+28534,Dr. Sachin Kumar Kapar,"Bhathihan, Sbaila",Male,MD
+28535,Dr. Kajal Basnet,"Kadaghari, Gothatar",Female,MBBS
+28536,Dr. Kriti Bhandari,"Chabahil, Kathmandu",Female,MBBS
+28537,Dr. Chandra Prakash Chaudhary,"Bahedwa, Triyuga",Male,MBBS
+28538,Dr. Biplop Bohara,"Chauraha, Dhangadhi Sub metropolitan City",Male,MBBS
+28539,Dr. Sirez Paudel,"Balkot, Balkot",Male,MBBS
+28540,Dr. Neha Yadav,"Diman, Diman",Female,MBBS
+28541,Dr. Pramesh Khatri,"kathmandu, Chandragiri",Male,MBBS
+28542,Dr. Niliyam Prasai,"Siphal 7, Kathmandu metroplolitian city",Female,MBBS
+28543,Dr. Ingita Chand,"Charnarayan marg, Maligaun, Kathmandu",Female,MBBS
+28544,Dr. Tanbir Ikram,"Gorkhali Tole, Rajbiraj",Male,MBBS
+28545,Dr. Arthur Gyawali,"Limgha, Satyawati",Male,MBBS
+28546,Dr. Pratik Joshi,"Bengadawar, Bengadawar",Male,MBBS
+28547,Dr. Nabodit Raut,"kumarigal, kathmandu, kathmandu municipality",Male,MBBS
+28548,Dr. Sagar Shrestha,"Sindhuli, Sirthauli V.D.C.",Male,MBBS
+28549,Dr. Shreyash Parajuli,"Kathmandu, Kathmandu",Male,MBBS
+28550,Dr. Prakriti Baral,"Battishputali, K.M.C",Female,MBBS
+28551,Dr. Manjay Maharjan,"Pilachhen, Lalitpur",Male,MBBS
+28552,Dr. Dilasha Manandhar,"Thapathali, Kathmandu",Female,MBBS
+28553,Dr. Jenish Shrestha,"Sanga, Banepa",Male,MBBS
+28554,Dr. Anish Dutta Pandey,"Gairidhara tangal, kathmandu",Male,MBBS
+28555,Dr. Prajwal Ranabhat,"Bhanu, Bhanu",Male,MBBS
+28556,Dr. Priya Pandey,"Baluwatar, Kathmandu",Female,MBBS
+28557,Dr. Sanjay Kakshyapati,"Bagdula, Dharmawati",Male,MBBS
+28558,Dr. Priyanka Sah,"Janakpurdham, Dhanauji kataiya",Female,MBBS
+28559,Dr. Sandesh Dhakal,"Gorkha, Palumtar",Male,MBBS
+28560,Dr. Milan Paudel,"Baglung, Baglung",Male,MBBS
+28561,Dr. Shristi Gautam,"Rampur, Rampur",Female,MBBS
+28562,Dr. Sanjeela Gurung,"Naya gaun, Pokhara",Female,MBBS
+28563,Dr. Prakriti Gyawali,"Kathmandu, Kirtipur",Female,MBBS
+28564,Dr. Enish Shrestha,"kathmandu, Dakshinkali",Male,MBBS
+28565,Dr. Samiksha Pandey,"Sainamaina, Parroha",Female,MBBS
+28566,Dr. Dipesh Mishra,"Old Baneshwor, Kathmandu",Male,MBBS
+28567,Dr. Bibek Birat Khanal,"Khanadaha, Malarani",Male,MBBS
+28568,Dr. Bishnu Bishwakarma,"Hardi, Bogadi VDC",Male,MBBS
+28569,Dr. Samichhya Khanal,"Betahi, Sou. Farsatikar",Female,MBBS
+28570,Dr. Sheela Tamang,"Budhanilkantha, Bishnu Budhanilkantha",Female,BDS
+28571,Dr. Niranjan Bhatt,"Baitadi, Dasharathachanda",Male,MBBS
+28572,Dr. Shreema Basnet,"Biratnagar, Biratnagar",Female,MBBS
+28573,Dr. Sara Manandhar,"Newroad, Kathmandu",Female,MBBS
+28574,Dr. Sunil Sanjel,"Kotaltole, Dakshinkali",Male,MBBS
+28575,Dr. Anmol Shrestha,"Tindobato,Karuna marga, Banepa",Male,MBBS
+28576,Dr. Puja Yadav,"Sonama, Sonama",Female,MBBS
+28577,Dr. Leepy Paudel,"Gyadi, Katuwachaupari",Female,MBBS
+28578,Dr. Sandesh Pokhrel,"Kusunti, Lalitpur",Male,MBBS
+28579,Dr. Bishowjyoti sujan sapkota,"Lanku,Bharatpur, Bharatpur metropolitan city",Male,BDS
+28580,Dr. Roushan Pratap Singh Yadav,"Pachaharwa, Pachaharwa",Male,MBBS
+28581,Dr. Bhanu Shrestha,"Massangali, Kel tole, Kathmandu metropolitan city",Male,MBBS
+28582,Dr. Sujita Chhetri,"Phaudi, Oraste",Female,BDS
+28583,Dr. Bibhusa Pradhan,"Gyaneshwor, Kathmandu municipality",Female,BDS
+28584,Dr. Sristi Napit,"Bhimsentole, Pokhara, Pokhara Municipality",Female,BDS
+28585,Dr. Tshering Lama,"tojing, garma",Male,BDS
+28586,Dr. John Rai,"Dharan, Dharan",Male,BDS
+28587,Dr. Sushma Khanal,"Tulsipur , Dang, Tulsipur",Female,BDS
+28588,Dr. Rupa Pant,"Kavrepalanchok, Saramthali",Female,BDS
+28589,Dr. Ashmita Basnet,"Itahari, Sunsari",Female,BDS
+28590,Dr. Sunita Adhikari,"Nawalparasi, Tamsariya",Female,BDS
+28591,Dr. Supriya Karki,"Morang, Biratnagar",Female,BDS
+28592,Dr. Deep Shrestha,"Kathmandu, Kirtipur",Male,BDS
+28593,Dr. Nirmala Pokharel,"RAMNAGAR, RAMNAGAR",Female,BDS
+28594,Dr. kabin muktan,"Makwanpur, Manahari",Male,BDS
+28595,Dr. Rajanee Gupta,"Bus park chowk, Hajariya",Female,BDS
+28596,Dr. Harshit Gurung,"Gahate, Mijuredanda VDC",Male,BDS
+28597,Dr. Rebika Pandey,"Chitwan, Bharatpur",Female,BDS
+28598,Dr. Rebecca Malla,"Kathmandu, Kathmandu Metropolitan City",Female,BDS
+28599,Dr. Bhawana Kumari Mallick,"Bhadrapur, Bhadrapur",Female,MBBS
+28600,Dr. Puja Pantha,"Baletaksar, Ruru",Female,MBBS
+28601,Dr. Suprava Acharya,"Arghakhanchi, Sandhikharka",Female,MBBS
+28602,Dr. Kabita Khadka,"Kubukasthali, Ramechhap, Kubukasthali",Female,MBBS
+28603,Dr. Akashbabu Pantha,"Darsingbash, Baletaksar",Male,MBBS
+28604,Dr. RISHAV SUBEDI,"MANIGRAM, ANANDABAN",Male,MBBS
+28605,Dr. Sakar Dhakal,"Gopigunj, Jamuniya",Male,MBBS
+28606,Dr. DINU RAUT,"Kathmandu, K.M.C",Female,MBBS
+28607,Dr. Rubal Ranabhat,"Bijaypur, Pokhara lekhnath",Male,MBBS
+28608,Dr. NISCHAL BHATTARAI,"LAKHANPUR 01,JHAPA, LAKHANPUR",Male,MBBS
+28609,Dr. Prasoon Sharma,"Sunsari, Itahari",Male,MBBS
+28610,Dr. Suvash Khadka,"Bajhang, Kotdewal",Male,BDS
+28611,Dr. Aanchal Ghimire,"Pokharia, Biratnagar Submetropolitan city",Female,BDS
+28612,Dr. Ichchha shah,"pathara, baragadhi",Female,BDS
+28613,Dr. Jagriti Belbase Chhetri,"Buddhanagar, K.M.C",Female,BDS
+28614,Dr. Pragya Thapa,"Kathmandu, Dhapasi",Female,BDS
+28615,Dr. Saujanya Pant,"Dharampani, Hardineta",Male,BDS
+28616,Dr. Parshuram Thakur,"Siraha, Siraha",Male,BDS
+28617,Dr. Bidisha Rasaily,"Sharanamati, Sharanamati",Female,BDS
+28618,Dr. Pranab Nepal Fi,"Dhulabari, Mechinagar",Male,MBBS
+28619,Dr. KSHITIZ GAUTAM,"RATODANDA, LAMAHI, CHAILAHI",Male,MBBS
+28620,Dr. Sijan Giri,"hugdisir, hugdisir",Female,MBBS
+28621,Dr. Bipin Adhikari,"Machhegau, Kirtipur",Male,MBBS
+28622,Dr. JASMITA BALAMPAKI,"JANAKPUR, YAGYABHUMI",Female,MBBS
+28623,Dr. Niranjan Chalise,"Rupandhei, Siddharthnagar",Male,MBBS
+28624,Dr. Sudan Puri,"Narikot, Narikot",Male,MBBS
+28625,Dr. Jun Bajracharya,"Tansen, Tansen",Male,MBBS
+28626,Dr. Bhagwati Poudel,"Palpa, Ringnerah",Female,MBBS
+28627,Dr. prachi goenka,"janakpur, janakpur",Female,MBBS
+28628,Dr. Agya Timsina,"Biratnagar, Biratnagar",Female,BDS
+28629,Dr. Kripa Gurung,"Lekhnath, Lekhnath",Female,BDS
+28630,Dr. Sampada Gautam,"Kathmandu, Gongabu",Female,BDS
+28631,Dr. Vedansh Shrestha,"Kathmandu, K.M.C",Male,BDS
+28632,Dr. Asma Kafle,"Biratnagar, Biratnagar",Female,BDS
+28633,Dr. Shivani Koirala,"Dhanusha, Janakpur Municipality",Female,BDS
+28634,Dr. Sampada Gaire,"Nawalparasi, Rupauliya",Female,MBBS
+28635,Dr. Kamrul Hoda Mansuri,"Chhapkaiya, Birganj",Male,MBBS
+28636,Dr. Bhubaneshor Bhusal,"dang, Tulsipur municypality",Male,BDS
+28637,Dr. Shreeja Pradhan,"Balaju, K.M.C",Female,BDS
+28638,Dr. Prakriti Basukala,"Dekocha, Bhaktapur",Female,BDS
+28639,Dr. Prakriti Kafle,"Aarmadi, Walling",Female,BDS
+28640,Dr. Smriti Shrestha,"Nasmana, Bhaktapur",Female,BDS
+28641,Dr. Pabitra Thapa Magar,"Gorkha, Phinam",Female,BDS
+28642,Dr. BIRAJ PANTHI,"Tokha, Tokha",Male,MBBS
+28643,Dr. Prashrit Thapa,"Butwal, Butwal",Male,MBBS
+28644,Dr. MD. Abdul Rahaman,"Siraha, Siraha",Male,MBBS
+28645,Dr. akriti panthi,"PALPA, TANSEN",Female,MBBS
+28646,Dr. Pratyasha Kayastha,"Lalitpur, Chapagaun",Female,MBBS
+28647,Dr. Aayush Uprety,"Mansapur, Ghailadubba",Male,MBBS
+28648,Dr. Mamta Sah,"Jaleshwar, Jaleshwar",Female,BDS
+28649,Dr. Simran Ranjitkar,"Bhaktapur, Bhaktapur",Female,BDS
+28650,Dr. Pawan Sigdel,"Arva, Pokhara",Male,BDS
+28651,Dr. Tripurari Shukla,"Sisaut 03, Ramnagar",Male,BDS
+28652,Dr. Anju Shah,"Rautahat, Rajdevi",Female,BDS
+28653,Dr. Rimsha Bhattarai,"Chandragadi, Bhadrapur",Female,BDS
+28654,Dr. Supradepti Bhandari,"Geetanagar, Geetanagar",Female,BDS
+28655,Dr. Salina Poudel,"Bharatpur, Bharatpur municipality",Female,BDS
+28656,Dr. Janak Gurung,"KUDULE, Ra.Mo.Kot",Male,MBBS
+28657,Dr. Raj Kishor Chauhan,"Birgunj, Ganapur",Male,MBBS
+28658,Dr. Avinash Kumar Mishra,"Basopatti, Nainhi",Male,MBBS
+28659,Dr. Amrita Karki,"Panauti, Panauti",Female,BDS

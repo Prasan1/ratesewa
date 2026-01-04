@@ -20,41 +20,27 @@ def main():
     print("=" * 70)
     print()
 
-    # Check if CSV files exist
-    clinicone_csv = '/home/ppaudyal/Documents/scraper/clinicone_doctors_clean.csv'
-    nmc_csv = '/home/ppaudyal/Documents/scraper/nmc_doctors.csv'
+    # Check if CSV files exist (they're in the same directory as this script)
+    clinicone_csv = 'clinicone_doctors_clean.csv'
+    nmc_csv = 'nmc_doctors.csv'
 
-    # Alternative paths for production
-    alt_clinicone = 'clinicone_doctors_clean.csv'
-    alt_nmc = 'nmc_doctors.csv'
-
-    clinicone_exists = os.path.exists(clinicone_csv) or os.path.exists(alt_clinicone)
-    nmc_exists = os.path.exists(nmc_csv) or os.path.exists(alt_nmc)
+    clinicone_exists = os.path.exists(clinicone_csv)
+    nmc_exists = os.path.exists(nmc_csv)
 
     if not clinicone_exists or not nmc_exists:
         print("⚠️  CSV files not found!")
         print()
-        print("You need to upload these files to your production server:")
+        print("ERROR: The CSV files should be in the git repository.")
+        print("Please run: git pull")
+        print()
+        print("The files should appear automatically after pulling:")
         print(f"  1. clinicone_doctors_clean.csv (24 doctors)")
         print(f"  2. nmc_doctors.csv (3,089 doctors)")
-        print()
-        print("Steps:")
-        print("  1. Download from local machine:")
-        print("     - /home/ppaudyal/Documents/scraper/clinicone_doctors_clean.csv")
-        print("     - /home/ppaudyal/Documents/scraper/nmc_doctors.csv")
-        print()
-        print("  2. Upload to DigitalOcean server (same directory as this script)")
-        print()
-        print("  3. Run this script again: python3 migrate_add_3000_doctors.py")
         print()
         sys.exit(1)
 
     print("✅ CSV files found!")
     print()
-
-    # Determine correct file paths
-    clinicone_file = clinicone_csv if os.path.exists(clinicone_csv) else alt_clinicone
-    nmc_file = nmc_csv if os.path.exists(nmc_csv) else alt_nmc
 
     # Import Clinic One doctors
     print("Step 1: Importing Clinic One doctors...")
@@ -75,9 +61,9 @@ def main():
         clinicone_imported = 0
         clinicone_skipped = 0
 
-        print(f"Reading Clinic One data from: {clinicone_file}")
+        print(f"Reading Clinic One data from: {clinicone_csv}")
 
-        with open(clinicone_file, 'r', encoding='utf-8') as f:
+        with open(clinicone_csv, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
                 name = row['name'].strip()
@@ -149,9 +135,9 @@ def main():
         cities_created = 0
         batch_nmc_numbers = set()
 
-        print(f"Reading NMC data from: {nmc_file}")
+        print(f"Reading NMC data from: {nmc_csv}")
 
-        with open(nmc_file, 'r', encoding='utf-8') as f:
+        with open(nmc_csv, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
 
             for i, row in enumerate(reader, 1):
