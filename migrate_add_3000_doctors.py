@@ -80,16 +80,29 @@ def main():
                         clinicone_skipped += 1
                         continue
 
-                # Get or create city
+                # Get or create city (truncate if needed)
                 city_name = row['city'].strip() if row['city'].strip() else 'Kathmandu'
+                city_name = city_name[:100]  # Truncate to database limit
+
                 city = City.query.filter(City.name.ilike(city_name)).first()
                 if not city:
                     city = City(name=city_name)
                     db.session.add(city)
                     db.session.flush()
 
-                # Get or create specialty
+                # Get or create specialty (clean and truncate if needed)
                 spec_name = row['specialty'].strip() if row['specialty'].strip() else 'General Physician'
+
+                # Clean messy specialty names (remove qualification/schedule text)
+                if 'Qualification' in spec_name or 'OPD Schedule' in spec_name:
+                    # Extract just the specialty part (text before "Qualification")
+                    spec_name = spec_name.split('Qualification')[0].strip()
+                    if not spec_name:
+                        spec_name = 'General Physician'
+
+                # Truncate to 100 characters (database limit)
+                spec_name = spec_name[:100]
+
                 specialty = Specialty.query.filter(Specialty.name.ilike(spec_name)).first()
                 if not specialty:
                     specialty = Specialty(name=spec_name)
@@ -167,6 +180,9 @@ def main():
                 if not city_name:
                     nmc_invalid += 1
                     continue
+
+                # Truncate city name to database limit
+                city_name = city_name[:100]
 
                 # Check if exists
                 if Doctor.query.filter_by(nmc_number=nmc_number).first():
