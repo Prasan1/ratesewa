@@ -303,10 +303,13 @@ $(document).ready(function() {
     });
 });
 
-    function loadDoctors() {
+    let currentPage = 1;
+
+    function loadDoctors(page = 1) {
         const cityId = $('#citySelect').val();
         const specialtyId = $('#specialtySelect').val();
         const nameSearch = $('#nameSearch').val();
+        currentPage = page;
 
         $('#doctorList').html('<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>');
 
@@ -316,10 +319,11 @@ $(document).ready(function() {
             data: {
                 city_id: cityId,
                 specialty_id: specialtyId,
-                name: nameSearch
+                name: nameSearch,
+                page: page
             },
-            success: function(doctors) {
-                displayDoctors(doctors);
+            success: function(response) {
+                displayDoctors(response);
             },
             error: function() {
                 $('#doctorList').html('<div class="col-12"><div class="alert alert-danger">Error loading doctors.</div></div>');
@@ -327,7 +331,10 @@ $(document).ready(function() {
         });
     }
 
-    function displayDoctors(doctors) {
+    function displayDoctors(response) {
+        const doctors = response.doctors || response; // Handle both old and new format
+        const pagination = response.pagination;
+
         if (doctors.length === 0) {
             $('#doctorList').html('<div class="col-12"><div class="alert alert-info">No doctors found.</div></div>');
             return;
@@ -385,6 +392,62 @@ $(document).ready(function() {
     });
 
     $('#doctorList').html(html);
+
+    // Add pagination if available
+    if (pagination && pagination.total_pages > 1) {
+        let paginationHtml = '<div class="col-12"><nav aria-label="Doctor results pagination"><ul class="pagination justify-content-center mt-4">';
+
+        // Previous button
+        if (pagination.has_prev) {
+            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(${pagination.page - 1}); return false;">Previous</a></li>`;
+        } else {
+            paginationHtml += '<li class="page-item disabled"><span class="page-link">Previous</span></li>';
+        }
+
+        // Page numbers (show max 5 pages at a time)
+        let startPage = Math.max(1, pagination.page - 2);
+        let endPage = Math.min(pagination.total_pages, pagination.page + 2);
+
+        if (startPage > 1) {
+            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(1); return false;">1</a></li>`;
+            if (startPage > 2) {
+                paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            if (i === pagination.page) {
+                paginationHtml += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+            } else {
+                paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(${i}); return false;">${i}</a></li>`;
+            }
+        }
+
+        if (endPage < pagination.total_pages) {
+            if (endPage < pagination.total_pages - 1) {
+                paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(${pagination.total_pages}); return false;">${pagination.total_pages}</a></li>`;
+        }
+
+        // Next button
+        if (pagination.has_next) {
+            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="loadDoctors(${pagination.page + 1}); return false;">Next</a></li>`;
+        } else {
+            paginationHtml += '<li class="page-item disabled"><span class="page-link">Next</span></li>';
+        }
+
+        paginationHtml += '</ul></nav>';
+        paginationHtml += `<p class="text-center text-muted small">Showing page ${pagination.page} of ${pagination.total_pages} (${pagination.total_doctors} doctors total)</p>`;
+        paginationHtml += '</div>';
+
+        $('#doctorList').append(paginationHtml);
+
+        // Scroll to top of results
+        $('html, body').animate({
+            scrollTop: $("#doctorList").offset().top - 100
+        }, 500);
+    }
     }
 
     function generateStarRatingHtml(rating, ratingCount) {

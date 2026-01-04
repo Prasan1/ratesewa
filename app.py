@@ -1543,12 +1543,17 @@ def get_doctors():
             )
         )
 
+    # Get total count BEFORE pagination for pagination UI
+    total_doctors = query.count()
+    total_pages = (total_doctors + per_page - 1) // per_page  # Ceiling division
+
     # Order by database fields first (faster than Python sorting)
     # Featured doctors first, then by name
     query = query.order_by(Doctor.is_featured.desc(), Doctor.name)
 
-    # Paginate results
-    doctors = query.limit(per_page).all()
+    # Paginate results using offset and limit
+    offset = (page - 1) * per_page
+    doctors = query.offset(offset).limit(per_page).all()
 
     # Sort doctors:
     # 1. Featured first
@@ -1604,7 +1609,17 @@ def get_doctors():
             'rating_count': d.rating_count
         })
 
-    return jsonify(doctors_list)
+    return jsonify({
+        'doctors': doctors_list,
+        'pagination': {
+            'page': page,
+            'per_page': per_page,
+            'total_doctors': total_doctors,
+            'total_pages': total_pages,
+            'has_next': page < total_pages,
+            'has_prev': page > 1
+        }
+    })
 
 @app.route('/admin/doctors')
 @admin_required
