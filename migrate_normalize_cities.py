@@ -93,6 +93,58 @@ CITY_NORMALIZATIONS = {
     "birtamode": "Birtamod",
     "birtamod municipality": "Birtamod",
     "anarmani": "Birtamod",  # Anarmani is in Birtamod
+
+    # More Pokhara area variations
+    "madanpokhara": "Pokhara",
+    "thoolapokhara": "Pokhara",
+    "pokharathok": "Pokhara",
+    "boughapokharathok": "Pokhara",
+
+    # More Janakpur variations
+    "janakpur n.p": "Janakpur",
+    "janakpur n. p.": "Janakpur",
+    "janakpur nagrpalika": "Janakpur",
+    "janakpur submetro": "Janakpur",
+
+    # More Butwal variations
+    "butwal na.pa": "Butwal",
+
+    # More Nepalgunj variations
+    "nepalgunj_11": "Nepalgunj",
+    "nepalgunj n.p.": "Nepalgunj",
+    "nepalgunj khaskarkandau": "Nepalgunj",
+
+    # More Dhangadhi variations
+    "dhangadhimai": "Dhangadhi",
+
+    # More Itahari variations
+    "itahari bishnupur": "Itahari",
+
+    # Kathmandu neighborhoods (smaller ones, keep major suburbs separate)
+    "baluwatar": "Kathmandu",
+    "maharajgunj": "Kathmandu",
+    "sinamangal": "Kathmandu",
+    "gongabu": "Kathmandu",
+    "jorpati": "Kathmandu",
+    "budhanilkantha": "Kathmandu",
+    "kapan": "Kathmandu",
+    "dakshinkali": "Kathmandu",
+
+    # Lalitpur neighborhoods
+    "imadol": "Lalitpur",
+    "lubhu": "Lalitpur",
+    "godawari": "Lalitpur",
+    "chapagaun": "Lalitpur",
+
+    # Bhaktapur neighborhoods
+    "changunarayan": "Bhaktapur",
+    "suryabinayak": "Bhaktapur",
+
+    # Common misspellings and duplicates
+    "aanboo khaireni": "Aanbookhaireni",
+    "anbookhaireni": "Aanbookhaireni",
+    "amardah": "Amardaha",
+    "arjun chaupari": "Arjunchaupari",
 }
 
 def normalize_city_name(name):
