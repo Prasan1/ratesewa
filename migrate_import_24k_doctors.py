@@ -11,7 +11,7 @@ This migration:
 """
 
 from app import app, db
-from models import Doctor, City, Specialty
+from models import Doctor, City, Specialty, Article
 import csv
 import sys
 from slugify import slugify
@@ -46,11 +46,18 @@ def clean_duplicate_specializations():
         if not duplicate or not primary:
             continue
 
+        # Update doctors
         doctor_count = Doctor.query.filter_by(specialty_id=duplicate_id).count()
         if doctor_count > 0:
             Doctor.query.filter_by(specialty_id=duplicate_id).update({'specialty_id': primary_id})
             print(f"  ✓ Merged '{duplicate.name}' -> '{primary.name}' ({doctor_count} doctors)")
             merged_count += 1
+
+        # Update articles that reference this specialty
+        article_count = Article.query.filter_by(related_specialty_id=duplicate_id).count()
+        if article_count > 0:
+            Article.query.filter_by(related_specialty_id=duplicate_id).update({'related_specialty_id': primary_id})
+            print(f"  ✓ Updated {article_count} articles referencing '{duplicate.name}'")
 
         db.session.delete(duplicate)
 
