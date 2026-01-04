@@ -11,7 +11,7 @@ This migration:
 """
 
 from app import app, db
-from models import Doctor, City, Specialty, Article
+from models import Doctor, City, Specialty, Article, VerificationRequest, Advertisement
 import csv
 import sys
 from slugify import slugify
@@ -46,18 +46,32 @@ def clean_duplicate_specializations():
         if not duplicate or not primary:
             continue
 
-        # Update doctors
+        # Update all tables that reference this specialty
+
+        # 1. Update doctors
         doctor_count = Doctor.query.filter_by(specialty_id=duplicate_id).count()
         if doctor_count > 0:
             Doctor.query.filter_by(specialty_id=duplicate_id).update({'specialty_id': primary_id})
             print(f"  ✓ Merged '{duplicate.name}' -> '{primary.name}' ({doctor_count} doctors)")
             merged_count += 1
 
-        # Update articles that reference this specialty
+        # 2. Update articles
         article_count = Article.query.filter_by(related_specialty_id=duplicate_id).count()
         if article_count > 0:
             Article.query.filter_by(related_specialty_id=duplicate_id).update({'related_specialty_id': primary_id})
-            print(f"  ✓ Updated {article_count} articles referencing '{duplicate.name}'")
+            print(f"  ✓ Updated {article_count} articles")
+
+        # 3. Update verification requests
+        verification_count = VerificationRequest.query.filter_by(proposed_specialty_id=duplicate_id).count()
+        if verification_count > 0:
+            VerificationRequest.query.filter_by(proposed_specialty_id=duplicate_id).update({'proposed_specialty_id': primary_id})
+            print(f"  ✓ Updated {verification_count} verification requests")
+
+        # 4. Update advertisements
+        ad_count = Advertisement.query.filter_by(target_specialty_id=duplicate_id).count()
+        if ad_count > 0:
+            Advertisement.query.filter_by(target_specialty_id=duplicate_id).update({'target_specialty_id': primary_id})
+            print(f"  ✓ Updated {ad_count} advertisements")
 
         db.session.delete(duplicate)
 
