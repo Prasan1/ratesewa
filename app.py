@@ -1653,6 +1653,10 @@ def admin_doctor_new():
     clinics = Clinic.query.order_by(Clinic.name.asc()).all()
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
+        nmc_number = request.form.get('nmc_number', '').strip()
+        phone_number = request.form.get('phone_number', '').strip()
+        workplace = request.form.get('workplace', '').strip()
+        practice_address = request.form.get('practice_address', '').strip()
         city_id = request.form.get('city_id')
         specialty_id = request.form.get('specialty_id')
         clinic_id = request.form.get('clinic_id') or None
@@ -1668,12 +1672,23 @@ def admin_doctor_new():
             flash('Name, city, and specialty are required.', 'danger')
             return render_template('admin_doctor_form.html', doctor=None, cities=cities, specialties=specialties, clinics=clinics)
 
+        # Check if NMC number already exists
+        if nmc_number:
+            existing = Doctor.query.filter_by(nmc_number=nmc_number).first()
+            if existing:
+                flash(f'NMC number {nmc_number} is already registered to {existing.name}.', 'danger')
+                return render_template('admin_doctor_form.html', doctor=None, cities=cities, specialties=specialties, clinics=clinics)
+
         experience = int(experience_raw) if experience_raw.isdigit() else None
         slug = generate_unique_slug(name)
 
         doctor = Doctor(
             name=name,
             slug=slug,
+            nmc_number=nmc_number or None,
+            phone_number=phone_number or None,
+            workplace=workplace or None,
+            practice_address=practice_address or None,
             city_id=int(city_id),
             specialty_id=int(specialty_id),
             clinic_id=int(clinic_id) if clinic_id else None,
@@ -1719,6 +1734,10 @@ def admin_doctor_edit(doctor_id):
 
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
+        nmc_number = request.form.get('nmc_number', '').strip()
+        phone_number = request.form.get('phone_number', '').strip()
+        workplace = request.form.get('workplace', '').strip()
+        practice_address = request.form.get('practice_address', '').strip()
         city_id = request.form.get('city_id')
         specialty_id = request.form.get('specialty_id')
         clinic_id = request.form.get('clinic_id') or None
@@ -1734,10 +1753,21 @@ def admin_doctor_edit(doctor_id):
             flash('Name, city, and specialty are required.', 'danger')
             return render_template('admin_doctor_form.html', doctor=doctor, cities=cities, specialties=specialties, clinics=clinics)
 
+        # Check if NMC number already exists (if changing it)
+        if nmc_number and nmc_number != doctor.nmc_number:
+            existing = Doctor.query.filter_by(nmc_number=nmc_number).first()
+            if existing and existing.id != doctor.id:
+                flash(f'NMC number {nmc_number} is already registered to {existing.name}.', 'danger')
+                return render_template('admin_doctor_form.html', doctor=doctor, cities=cities, specialties=specialties, clinics=clinics)
+
         if name != doctor.name:
             doctor.slug = generate_unique_slug(name, doctor_id=doctor.id)
 
         doctor.name = name
+        doctor.nmc_number = nmc_number or None
+        doctor.phone_number = phone_number or None
+        doctor.workplace = workplace or None
+        doctor.practice_address = practice_address or None
         doctor.city_id = int(city_id)
         doctor.specialty_id = int(specialty_id)
         doctor.clinic_id = int(clinic_id) if clinic_id else None

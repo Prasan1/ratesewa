@@ -16,11 +16,22 @@
         <form method="post" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="row g-3">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label for="name" class="form-label">Full name</label>
                     <input type="text" class="form-control" id="name" name="name" value="{{ doctor.name if doctor else '' }}" required>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
+                    <label for="nmc_number" class="form-label">
+                        NMC Number
+                        <small class="text-muted">(Nepal Medical Council)</small>
+                    </label>
+                    <input type="text" class="form-control" id="nmc_number" name="nmc_number" value="{{ doctor.nmc_number if doctor else '' }}" placeholder="e.g., 8325">
+                </div>
+                <div class="col-md-4">
+                    <label for="phone_number" class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" id="phone_number" name="phone_number" value="{{ doctor.phone_number if doctor else '' }}" placeholder="e.g., 01-5400400">
+                </div>
+                <div class="col-md-4">
                     <label for="city_id" class="form-label">City</label>
                     <select class="form-select" id="city_id" name="city_id" required>
                         <option value="" disabled {% if not doctor %}selected{% endif %}>Select city</option>
@@ -29,7 +40,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <label for="specialty_id" class="form-label">Specialty</label>
                     <select class="form-select" id="specialty_id" name="specialty_id" required>
                         <option value="" disabled {% if not doctor %}selected{% endif %}>Select specialty</option>
@@ -38,26 +49,40 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label for="clinic_id" class="form-label">Clinic (optional)</label>
+                <div class="col-md-4">
+                    <label for="experience" class="form-label">Years of experience</label>
+                    <input type="number" class="form-control" id="experience" name="experience" min="0" value="{{ doctor.experience if doctor and doctor.experience is not none else '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label for="workplace" class="form-label">
+                        Workplace/Hospital/Clinic
+                        <small class="text-muted">(Where they currently work)</small>
+                    </label>
+                    <input type="text" class="form-control" id="workplace" name="workplace" value="{{ doctor.workplace if doctor else '' }}" placeholder="e.g., Clinic One, Nepal Mediciti">
+                </div>
+                <div class="col-md-6">
+                    <label for="practice_address" class="form-label">Practice Address</label>
+                    <input type="text" class="form-control" id="practice_address" name="practice_address" value="{{ doctor.practice_address if doctor else '' }}" placeholder="e.g., Lalitpur-12, Ring Road">
+                </div>
+                <div class="col-md-6">
+                    <label for="education" class="form-label">Education/Qualifications</label>
+                    <input type="text" class="form-control" id="education" name="education" value="{{ doctor.education if doctor else '' }}" placeholder="e.g., MBBS, MD">
+                </div>
+                <div class="col-md-6">
+                    <label for="college" class="form-label">College/University</label>
+                    <input type="text" class="form-control" id="college" name="college" value="{{ doctor.college if doctor else '' }}" placeholder="e.g., Kathmandu Medical College">
+                </div>
+                <div class="col-md-4">
+                    <label for="clinic_id" class="form-label">
+                        Link to Clinic Profile
+                        <small class="text-muted">(Optional)</small>
+                    </label>
                     <select class="form-select" id="clinic_id" name="clinic_id">
-                        <option value="" {% if not doctor or not doctor.clinic_id %}selected{% endif %}>No clinic</option>
+                        <option value="" {% if not doctor or not doctor.clinic_id %}selected{% endif %}>No clinic link</option>
                         {% for clinic in clinics %}
                         <option value="{{ clinic.id }}" {% if doctor and doctor.clinic_id == clinic.id %}selected{% endif %}>{{ clinic.name }}</option>
                         {% endfor %}
                     </select>
-                </div>
-                <div class="col-md-3">
-                    <label for="experience" class="form-label">Years of experience</label>
-                    <input type="number" class="form-control" id="experience" name="experience" min="0" value="{{ doctor.experience if doctor and doctor.experience is not none else '' }}">
-                </div>
-                <div class="col-md-9">
-                    <label for="education" class="form-label">Education</label>
-                    <input type="text" class="form-control" id="education" name="education" value="{{ doctor.education if doctor else '' }}">
-                </div>
-                <div class="col-md-9">
-                    <label for="college" class="form-label">College</label>
-                    <input type="text" class="form-control" id="college" name="college" value="{{ doctor.college if doctor else '' }}">
                 </div>
                 <div class="col-12">
                     <label for="profile_photo" class="form-label">
