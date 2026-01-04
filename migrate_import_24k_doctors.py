@@ -115,7 +115,6 @@ def import_doctors():
                 db.session.add(general_physician)
                 db.session.flush()
 
-            batch = []
             batch_size = 500
 
             for row in reader:
@@ -183,19 +182,16 @@ def import_doctors():
                     description=f"Registered doctor with Nepal Medical Council. {degree or 'Medical professional'} practicing in {city_name}."
                 )
 
-                batch.append(doctor)
+                db.session.add(doctor)  # Use regular add instead of bulk
                 stats['created'] += 1
 
                 # Commit in batches
-                if len(batch) >= batch_size:
-                    db.session.bulk_save_objects(batch)
+                if stats['created'] % batch_size == 0:
                     db.session.commit()
                     print(f"  ✓ Committed batch. Total created: {stats['created']:,}")
-                    batch = []
 
             # Commit remaining
-            if batch:
-                db.session.bulk_save_objects(batch)
+            if stats['created'] % batch_size != 0:
                 db.session.commit()
 
             print("\n" + "="*60)
