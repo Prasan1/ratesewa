@@ -11,12 +11,42 @@ from models import db, City, Specialty, Clinic, Doctor, User, Rating, Appointmen
 from config import Config
 import ad_manager
 import upload_utils
-import text_utils
 import r2_storage
 import stripe
 import subscription_config
 import promo_config
 import resend
+
+# Import text_utils with fallback
+try:
+    import text_utils
+except ImportError:
+    # Fallback if text_utils not available
+    class text_utils:
+        @staticmethod
+        def normalize_name(name):
+            """Fallback name normalization"""
+            if not name:
+                return name
+            name = name.strip()
+            if not name:
+                return name
+
+            # Handle Dr. prefix
+            prefix = ""
+            name_part = name
+
+            if name.lower().startswith("dr. "):
+                prefix = "Dr. "
+                name_part = name[4:]
+            elif name.lower().startswith("dr "):
+                prefix = "Dr. "
+                name_part = name[3:]
+
+            # Convert to title case
+            name_part = name_part.title()
+
+            return prefix + name_part
 
 # Load environment variables
 load_dotenv()
