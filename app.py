@@ -1953,6 +1953,22 @@ def admin_doctor_new():
         is_active = bool(request.form.get('is_active'))
         is_verified = bool(request.form.get('is_verified'))
 
+        # Convert string "None" to empty string (form may submit "None" as text)
+        if nmc_number.lower() == 'none':
+            nmc_number = ''
+        if phone_number.lower() == 'none':
+            phone_number = ''
+        if workplace.lower() == 'none':
+            workplace = ''
+        if practice_address.lower() == 'none':
+            practice_address = ''
+        if education.lower() == 'none':
+            education = ''
+        if college.lower() == 'none':
+            college = ''
+        if description.lower() == 'none':
+            description = ''
+
         if not name or not city_id or not specialty_id:
             flash('Name, city, and specialty are required.', 'danger')
             return render_template('admin_doctor_form.html', doctor=None, cities=cities, specialties=specialties, clinics=clinics)
@@ -2034,6 +2050,22 @@ def admin_doctor_edit(doctor_id):
         is_featured = bool(request.form.get('is_featured'))
         is_active = bool(request.form.get('is_active'))
         is_verified = bool(request.form.get('is_verified'))
+
+        # Convert string "None" to empty string (form may submit "None" as text)
+        if nmc_number.lower() == 'none':
+            nmc_number = ''
+        if phone_number.lower() == 'none':
+            phone_number = ''
+        if workplace.lower() == 'none':
+            workplace = ''
+        if practice_address.lower() == 'none':
+            practice_address = ''
+        if education.lower() == 'none':
+            education = ''
+        if college.lower() == 'none':
+            college = ''
+        if description.lower() == 'none':
+            description = ''
 
         if not name or not city_id or not specialty_id:
             flash('Name, city, and specialty are required.', 'danger')
