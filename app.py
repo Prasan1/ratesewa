@@ -11,6 +11,7 @@ from models import db, City, Specialty, Clinic, Doctor, User, Rating, Appointmen
 from config import Config
 import ad_manager
 import upload_utils
+import text_utils
 import r2_storage
 import stripe
 import subscription_config
@@ -1257,7 +1258,7 @@ def doctor_self_register_submit():
 
     try:
         # Get form data - all fields are mandatory
-        name = request.form.get('name', '').strip()
+        name = text_utils.normalize_name(request.form.get('name', '').strip())
         specialty_id = request.form.get('specialty_id')
         city_id = request.form.get('city_id')
         education = request.form.get('education', '').strip()
@@ -1894,7 +1895,7 @@ def admin_doctor_new():
     specialties = Specialty.query.order_by(Specialty.name.asc()).all()
     clinics = Clinic.query.order_by(Clinic.name.asc()).all()
     if request.method == 'POST':
-        name = request.form.get('name', '').strip()
+        name = text_utils.normalize_name(request.form.get('name', '').strip())
         nmc_number = request.form.get('nmc_number', '').strip()
         phone_number = request.form.get('phone_number', '').strip()
         workplace = request.form.get('workplace', '').strip()
@@ -1975,7 +1976,7 @@ def admin_doctor_edit(doctor_id):
     clinics = Clinic.query.order_by(Clinic.name.asc()).all()
 
     if request.method == 'POST':
-        name = request.form.get('name', '').strip()
+        name = text_utils.normalize_name(request.form.get('name', '').strip())
         nmc_number = request.form.get('nmc_number', '').strip()
         phone_number = request.form.get('phone_number', '').strip()
         workplace = request.form.get('workplace', '').strip()
