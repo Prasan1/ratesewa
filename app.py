@@ -1837,17 +1837,19 @@ def get_doctors():
 
     # Sort doctors:
     # 1. Featured first
-    # 2. Has NMC number (verified doctors)
-    # 3. Claimed/verified profiles (has phone or is_verified)
-    # 4. Then by avg_rating
-    # 5. Then by name
+    # 2. RankSewa verified (is_verified)
+    # 3. Has NMC number
+    # 4. Has phone (claimed profile)
+    # 5. Then by avg_rating
+    # 6. Then by name
     def sort_key(d):
         has_nmc = bool(d.nmc_number)
-        is_claimed = bool(d.phone_number) or d.is_verified
+        has_phone = bool(d.phone_number)
         return (
             -d.is_featured,      # Featured first (1 → -1, 0 → 0)
-            not has_nmc,         # Has NMC number first (True → False, False → True)
-            not is_claimed,      # Claimed profiles first (True → False, False → True)
+            not d.is_verified,   # RankSewa verified first (True → False, False → True)
+            not has_nmc,         # Has NMC number second (True → False, False → True)
+            not has_phone,       # Has phone third (claimed profiles)
             -d.avg_rating,       # Higher rating first
             d.name               # Alphabetical
         )
