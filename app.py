@@ -930,7 +930,8 @@ def article_detail(slug):
     if article.related_specialty_id:
         related_doctors = Doctor.query.filter_by(
             specialty_id=article.related_specialty_id,
-            is_active=True
+            is_active=True,
+            is_verified=True  # Only show verified doctors in article recommendations
         ).order_by(Doctor.is_featured.desc())\
          .limit(4).all()
 

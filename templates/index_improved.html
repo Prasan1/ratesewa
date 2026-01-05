@@ -313,7 +313,7 @@ $(document).ready(function() {
 
             html += `
                 <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card doctor-card h-100 ${doctor.is_featured ? 'featured' : ''}">
+                    <div class="card doctor-card h-100 ${doctor.is_featured ? 'featured' : ''} ${doctor.is_verified ? 'verified' : ''}">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
                                 <div class="doctor-avatar me-3">

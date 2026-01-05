@@ -207,6 +207,15 @@ a:hover {
     z-index: 10;
 }
 
+/* Verified doctors - subtle green border */
+.doctor-card.verified {
+    border-left: 2px solid rgba(60, 122, 98, 0.3);
+}
+
+.doctor-card.verified:hover {
+    border-left-color: rgba(60, 122, 98, 0.5);
+}
+
 /* Make doctor cards equal height in their row */
 .doctor-card {
     display: flex;
