@@ -5,10 +5,11 @@ DEBUG ISSUE:
    - Click-to-call on mobile (tel: link)
    - Displays number on desktop
 
-2. Clinic link field - Need clarification:
-   - Field EXISTS in admin_doctor_form.html (line 76-86)
-   - It's a dropdown select showing all clinics
-   - Is it not visible? Or should it be a text input instead of dropdown? 
+2. ✅ RESOLVED: Added External Clinic URL field
+   - New text input field in admin form
+   - Can paste full URLs like: https://clinicone.com.np/product/dr-name/
+   - Clinic dropdown kept for future use (when clinics are added to DB)
+   - External URL provides workaround for now 
 
 
 
