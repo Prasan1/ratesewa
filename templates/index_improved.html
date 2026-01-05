@@ -2,6 +2,44 @@
 
 {% block title %}Find Trusted Doctors in Nepal Based on Real Patient Experience{% endblock %}
 
+{% block head %}
+<!-- Organization Schema for Nepal Local SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MedicalWebPage",
+  "name": "RankSewa - Find Trusted Doctors in Nepal",
+  "description": "Discover and review the best doctors and healthcare providers in Nepal based on real patient experiences",
+  "url": "{{ request.url }}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "RankSewa",
+    "url": "https://ranksewa.com",
+    "logo": "{{ request.url_root }}static/img/logo.png",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "NP",
+      "addressLocality": "Nepal"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "areaServed": "NP"
+    }
+  },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [{
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ request.url }}"
+    }]
+  }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- Promotional Banner -->
 {% include 'partials/promo_banner.html' %}
