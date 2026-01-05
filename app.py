@@ -15,9 +15,13 @@ import r2_storage
 import stripe
 import subscription_config
 import promo_config
+import resend
 
 # Load environment variables
 load_dotenv()
+
+# Configure Resend for email notifications
+resend.api_key = os.getenv('RESEND_API_KEY', 're_2RuGAUcZ_ExtETyfnMvHEg4ua3r1ckvUq')
 
 # --- App Configuration ---
 app = Flask(__name__)
@@ -345,6 +349,166 @@ def is_admin_email(email):
     if not email:
         return False
     return email.strip().lower() in admin_email_set()
+
+def send_verification_approved_email(to_email, doctor_name):
+    """
+    Send email notification when doctor verification is approved
+
+    Args:
+        to_email: Doctor's email address
+        doctor_name: Full name of the doctor (e.g., "Dr. Bilakshan Mishra")
+
+    Returns:
+        True if email sent successfully, False otherwise
+    """
+    try:
+        # Extract last name for personalization
+        last_name = doctor_name.split()[-1].replace('Dr.', '').strip()
+
+        subject = "Your RankSewa Profile Has Been Verified"
+
+        html_body = f"""
+        <div style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #111;">
+            <p>Dear Dr. {last_name},</p>
+
+            <p>
+                Greetings from <strong>RankSewa</strong>.
+            </p>
+
+            <p>
+                We are pleased to inform you that your doctor profile on
+                <strong>RankSewa</strong> has been <strong>successfully verified</strong>
+                after reviewing the documents you submitted.
+            </p>
+
+            <p>
+                Thank you for taking the time to complete the verification process.
+                As we build RankSewa to help patients in Nepal find trusted healthcare
+                professionals, verified doctors like you play a vital role in
+                maintaining transparency and trust.
+            </p>
+
+            <p>
+                We would also like to sincerely thank you for your contribution to
+                the healthcare community. Medical professionals like you are essential
+                to the well-being of our society, and your work makes a meaningful
+                difference every day.
+            </p>
+
+            <p>
+                RankSewa is still in its early stages, and your decision to verify your
+                profile means a great deal to us. We truly appreciate your trust
+                and support.
+            </p>
+
+            <p>
+                If you ever wish to update your profile or share feedback on how we can
+                improve the platform for doctors and patients, please feel free to
+                reply to this email.
+            </p>
+
+            <p style="margin-top: 32px;">
+                With sincere appreciation,<br>
+                <strong>Paul Paudyal</strong><br>
+                Founder, RankSewa<br>
+                <a href="https://ranksewa.com">https://ranksewa.com</a>
+            </p>
+        </div>
+        """
+
+        params = {
+            "from": "RankSewa Onboarding <onboarding@ranksewa.com>",
+            "to": [to_email],
+            "subject": subject,
+            "html": html_body
+        }
+
+        email_response = resend.Emails.send(params)
+        print(f"✅ Verification approved email sent to {to_email}")
+        return True
+
+    except Exception as e:
+        print(f"❌ Failed to send verification email to {to_email}: {e}")
+        return False
+
+def send_verification_rejected_email(to_email, doctor_name, admin_notes=None):
+    """
+    Send email notification when doctor verification is rejected
+
+    Args:
+        to_email: Doctor's email address
+        doctor_name: Full name of the doctor
+        admin_notes: Optional notes from admin about rejection
+
+    Returns:
+        True if email sent successfully, False otherwise
+    """
+    try:
+        last_name = doctor_name.split()[-1].replace('Dr.', '').strip()
+
+        subject = "Update on Your RankSewa Verification Request"
+
+        rejection_reason = ""
+        if admin_notes:
+            rejection_reason = f"""
+            <p>
+                <strong>Admin Notes:</strong><br>
+                {admin_notes}
+            </p>
+            """
+
+        html_body = f"""
+        <div style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #111;">
+            <p>Dear Dr. {last_name},</p>
+
+            <p>
+                Thank you for submitting your verification request on <strong>RankSewa</strong>.
+            </p>
+
+            <p>
+                After reviewing your submission, we were unable to approve your verification
+                request at this time.
+            </p>
+
+            {rejection_reason}
+
+            <p>
+                You are welcome to submit a new verification request with updated information
+                or documentation. Please ensure:
+            </p>
+            <ul>
+                <li>Your NMC registration number is valid and matches NMC records</li>
+                <li>All uploaded documents are clear and readable</li>
+                <li>Your information matches your official NMC registration</li>
+            </ul>
+
+            <p>
+                If you have any questions or need clarification, please reply to this email
+                and we'll be happy to help.
+            </p>
+
+            <p style="margin-top: 32px;">
+                Best regards,<br>
+                <strong>RankSewa Team</strong><br>
+                <a href="https://ranksewa.com">https://ranksewa.com</a>
+            </p>
+        </div>
+        """
+
+        params = {
+            "from": "RankSewa Onboarding <onboarding@ranksewa.com>",
+            "to": [to_email],
+            "subject": subject,
+            "html": html_body
+        }
+
+        email_response = resend.Emails.send(params)
+        print(f"✅ Verification rejected email sent to {to_email}")
+        return True
+
+    except Exception as e:
+        print(f"❌ Failed to send rejection email to {to_email}: {e}")
+        return False
 
 def generate_unique_slug(name, doctor_id=None):
     base_slug = generate_slug(name)
@@ -2954,6 +3118,9 @@ def admin_verification_detail(request_id):
 
                     db.session.commit()
 
+                    # Send verification approved email
+                    send_verification_approved_email(user.email, new_doctor.name)
+
                     flash(f'New doctor profile created and verified! {new_doctor.name} is now live and linked to {user.name}.', 'success')
                     return redirect(url_for('admin_verification_requests'))
 
@@ -2976,6 +3143,9 @@ def admin_verification_detail(request_id):
 
                     db.session.commit()
 
+                    # Send verification approved email
+                    send_verification_approved_email(user.email, doctor.name)
+
                     flash(f'Verification approved! {doctor.name} is now verified and linked to {user.name}.', 'success')
                     return redirect(url_for('admin_verification_requests'))
 
@@ -2996,6 +3166,11 @@ def admin_verification_detail(request_id):
                     verification_request.reviewed_at = datetime.utcnow()
 
                     db.session.commit()
+
+                    # Send verification rejected email
+                    user = verification_request.user
+                    doctor_name = verification_request.proposed_name if verification_request.is_new_doctor else verification_request.doctor.name
+                    send_verification_rejected_email(user.email, doctor_name, admin_notes)
 
                     flash(f'Verification request rejected.', 'info')
                     return redirect(url_for('admin_verification_requests'))
