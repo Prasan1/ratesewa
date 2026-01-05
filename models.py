@@ -74,6 +74,7 @@ class Doctor(db.Model):
     nmc_number = db.Column(db.String(50), unique=True, nullable=True)  # Nepal Medical Council registration
     phone_number = db.Column(db.String(20), nullable=True)
     practice_address = db.Column(db.Text, nullable=True)
+    external_clinic_url = db.Column(db.Text, nullable=True)  # External clinic profile URL (e.g., ClinicOne)
 
     # Analytics
     profile_views = db.Column(db.Integer, default=0)

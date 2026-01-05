@@ -75,7 +75,7 @@
                 <div class="col-md-4">
                     <label for="clinic_id" class="form-label">
                         Link to Clinic Profile
-                        <small class="text-muted">(Optional)</small>
+                        <small class="text-muted">(Optional - Internal)</small>
                     </label>
                     <select class="form-select" id="clinic_id" name="clinic_id">
                         <option value="" {% if not doctor or not doctor.clinic_id %}selected{% endif %}>No clinic link</option>
@@ -83,6 +83,16 @@
                         <option value="{{ clinic.id }}" {% if doctor and doctor.clinic_id == clinic.id %}selected{% endif %}>{{ clinic.name }}</option>
                         {% endfor %}
                     </select>
+                </div>
+                <div class="col-md-8">
+                    <label for="external_clinic_url" class="form-label">
+                        External Clinic Profile URL
+                        <small class="text-muted">(Optional - e.g., ClinicOne, Nepal Mediciti website)</small>
+                    </label>
+                    <input type="url" class="form-control" id="external_clinic_url" name="external_clinic_url"
+                           value="{{ doctor.external_clinic_url if doctor else '' }}"
+                           placeholder="e.g., https://clinicone.com.np/product/dr-name/">
+                    <small class="form-text text-muted">If doctor has a profile on external clinic website, paste the full URL here</small>
                 </div>
                 <div class="col-12">
                     <label for="profile_photo" class="form-label">

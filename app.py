@@ -1942,6 +1942,7 @@ def admin_doctor_new():
         phone_number = request.form.get('phone_number', '').strip()
         workplace = request.form.get('workplace', '').strip()
         practice_address = request.form.get('practice_address', '').strip()
+        external_clinic_url = request.form.get('external_clinic_url', '').strip()
         city_id = request.form.get('city_id')
         specialty_id = request.form.get('specialty_id')
         clinic_id = request.form.get('clinic_id') or None
@@ -1962,6 +1963,8 @@ def admin_doctor_new():
             workplace = ''
         if practice_address.lower() == 'none':
             practice_address = ''
+        if external_clinic_url.lower() == 'none':
+            external_clinic_url = ''
         if education.lower() == 'none':
             education = ''
         if college.lower() == 'none':
@@ -1991,6 +1994,7 @@ def admin_doctor_new():
             phone_number=phone_number or None,
             workplace=workplace or None,
             practice_address=practice_address or None,
+            external_clinic_url=external_clinic_url or None,
             city_id=int(city_id),
             specialty_id=int(specialty_id),
             clinic_id=int(clinic_id) if clinic_id else None,
@@ -2040,6 +2044,7 @@ def admin_doctor_edit(doctor_id):
         phone_number = request.form.get('phone_number', '').strip()
         workplace = request.form.get('workplace', '').strip()
         practice_address = request.form.get('practice_address', '').strip()
+        external_clinic_url = request.form.get('external_clinic_url', '').strip()
         city_id = request.form.get('city_id')
         specialty_id = request.form.get('specialty_id')
         clinic_id = request.form.get('clinic_id') or None
@@ -2060,6 +2065,8 @@ def admin_doctor_edit(doctor_id):
             workplace = ''
         if practice_address.lower() == 'none':
             practice_address = ''
+        if external_clinic_url.lower() == 'none':
+            external_clinic_url = ''
         if education.lower() == 'none':
             education = ''
         if college.lower() == 'none':
@@ -2087,6 +2094,7 @@ def admin_doctor_edit(doctor_id):
         doctor.phone_number = phone_number or None
         doctor.workplace = workplace or None
         doctor.practice_address = practice_address or None
+        doctor.external_clinic_url = external_clinic_url or None
         doctor.city_id = int(city_id)
         doctor.specialty_id = int(specialty_id)
         doctor.clinic_id = int(clinic_id) if clinic_id else None
