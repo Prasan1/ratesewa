@@ -510,6 +510,73 @@ def send_verification_rejected_email(to_email, doctor_name, admin_notes=None):
         print(f"❌ Failed to send rejection email to {to_email}: {e}")
         return False
 
+def send_admin_verification_notification(verification_request, doctor_name, user_email):
+    """
+    Send email notification to admin when new verification request is submitted
+
+    Args:
+        verification_request: VerificationRequest object
+        doctor_name: Name of the doctor/profile being verified
+        user_email: Email of the user submitting request
+
+    Returns:
+        True if email sent successfully, False otherwise
+    """
+    try:
+        # Get admin email from environment variable
+        admin_email = os.getenv('ADMIN_EMAIL', 'paul.paudyal@gmail.com')
+
+        request_type = "New Doctor Registration" if verification_request.is_new_doctor else "Profile Claim"
+
+        subject = f"New Verification Request: {doctor_name}"
+
+        html_body = f"""
+        <div style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #111;">
+            <h2 style="color: #2563eb;">🔔 New Verification Request</h2>
+
+            <p><strong>Type:</strong> {request_type}</p>
+            <p><strong>Doctor Name:</strong> {doctor_name}</p>
+            <p><strong>User Email:</strong> {user_email}</p>
+            <p><strong>NMC Number:</strong> {verification_request.nmc_number or 'Not provided'}</p>
+            <p><strong>Submitted:</strong> {verification_request.created_at.strftime('%B %d, %Y at %I:%M %p') if verification_request.created_at else 'Just now'}</p>
+
+            <div style="margin: 30px 0; padding: 20px; background-color: #f3f4f6; border-left: 4px solid #2563eb;">
+                <p style="margin: 0;"><strong>Action Required:</strong></p>
+                <p style="margin: 10px 0 0 0;">Review and approve/reject this verification request in your admin panel.</p>
+            </div>
+
+            <p>
+                <a href="https://ranksewa.com/admin/verification-requests/{verification_request.id}"
+                   style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                    Review Request →
+                </a>
+            </p>
+
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+
+            <p style="color: #6b7280; font-size: 14px;">
+                This is an automated notification from RankSewa.<br>
+                <a href="https://ranksewa.com/admin/verification-requests" style="color: #2563eb;">View all pending requests</a>
+            </p>
+        </div>
+        """
+
+        params = {
+            "from": "RankSewa Admin <onboarding@ranksewa.com>",
+            "to": [admin_email],
+            "subject": subject,
+            "html": html_body,
+            "reply_to": user_email
+        }
+
+        email_response = resend.Emails.send(params)
+        print(f"✅ Admin notification sent to {admin_email} for {doctor_name}")
+        return True
+
+    except Exception as e:
+        print(f"❌ Failed to send admin notification: {e}")
+        return False
+
 def generate_unique_slug(name, doctor_id=None):
     base_slug = generate_slug(name)
     slug = base_slug
@@ -1125,6 +1192,10 @@ def claim_profile_submit(doctor_id):
         db.session.add(verification_request)
         db.session.commit()
 
+        # Send admin notification
+        user = User.query.get(session['user_id'])
+        send_admin_verification_notification(verification_request, doctor.name, user.email)
+
         return redirect(url_for('verification_submitted'))
 
     except ValueError as e:
@@ -1344,6 +1415,10 @@ def doctor_self_register_submit():
 
         db.session.add(verification_request)
         db.session.commit()
+
+        # Send admin notification
+        user = User.query.get(user_id)
+        send_admin_verification_notification(verification_request, name, user.email)
 
         return redirect(url_for('verification_submitted'))
 
