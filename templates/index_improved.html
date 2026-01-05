@@ -321,8 +321,8 @@ $(document).ready(function() {
                 specialty_id: specialtyId,
                 name: nameSearch
             },
-            success: function(doctors) {
-                displayDoctors(doctors);
+            success: function(response) {
+                displayDoctors(response.doctors);
             },
             error: function() {
                 $('#doctorList').html('<div class="col-12"><div class="alert alert-danger">Error loading doctors.</div></div>');
