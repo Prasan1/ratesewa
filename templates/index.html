@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Find Trusted Doctors in Nepal Based on Real Patient Experience{% endblock %}
+{% block title %}Find Doctors in Nepal Based on Patient Experiences{% endblock %}
 
 {% block content %}
 <!-- Promotional Banner -->
@@ -11,10 +11,10 @@
     <div class="col-12">
         <div class="text-center py-5 hero-surface">
             <h1 class="display-5 fw-bold mb-3 text-brand">
-                Find Trusted Doctors in Nepal Based on Real Patient Experience
+                Find Doctors in Nepal Based on Patient Experiences
             </h1>
             <p class="lead text-muted mb-4">
-                Helping patients make safer healthcare choices.
+                Helping patients make more informed healthcare choices.
             </p>
             <div class="d-flex justify-content-center gap-3 flex-wrap">
                 <a href="#searchSection" class="btn btn-primary btn-lg">
@@ -48,13 +48,20 @@
                     </div>
                     <div class="col-md-3">
                         <h3 class="fw-bold mb-1 text-accent">{{ verified_doctors }}+</h3>
-                        <p class="text-muted mb-0">Verified Doctors</p>
+                        <p class="text-muted mb-0">RankSewa Verified Profiles</p>
                     </div>
                 </div>
                 <div class="text-center mt-3">
                     <p class="text-muted small mb-0">
                         <i class="fas fa-map-marker-alt me-1"></i>
                         Kathmandu | Lalitpur | Pokhara | Biratnagar | Birtamod
+                    </p>
+                </div>
+
+                <!-- Transparency disclaimer -->
+                <div class="text-center mt-2">
+                    <p class="text-muted small mb-0">
+                        Doctor information is compiled from public sources and self-submitted data. Verification badges indicate profiles reviewed by RankSewa.
                     </p>
                 </div>
             </div>
@@ -111,7 +118,7 @@
                                     <small class="fw-semibold text-brand">Launch Offer - Until April 25, 2026</small>
                                 </div>
                                 <h4 class="mb-2 text-dark">Are You a Doctor? Claim Your Profile</h4>
-                                <p class="mb-3 text-muted">Build patient trust with verified badge, respond to feedback, and stand out in search.</p>
+                                <p class="mb-3 text-muted">Build patient trust with a RankSewa Verified badge, respond to feedback, and stand out in search.</p>
                                 <!-- IMPROVED: Better bullet points -->
                                 <div class="row g-2 mb-3">
                                     <div class="col-md-4">
@@ -398,10 +405,11 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <div class="doctor-details">
-                                ${doctor.nmc_number ? `<p class="card-text small mb-1"><strong>NMC#:</strong> ${doctor.nmc_number}</p>` : ''}
+                                ${doctor.is_verified && doctor.nmc_number ? `<p class="card-text small mb-1"><strong>NMC#:</strong> ${doctor.nmc_number}</p>` : ''}
                                 ${doctor.experience && doctor.experience > 0 ? `<p class="card-text small mb-1"><strong>Experience:</strong> ${doctor.experience} years</p>` : ''}
                                 ${doctor.education ? `<p class="card-text small mb-1"><strong>Education:</strong> ${doctor.education}</p>` : ''}
-                                ${doctor.workplace ? `<p class="card-text small mb-2"><strong>Works At:</strong> ${doctor.workplace}</p>` : ''}
+                                ${doctor.college ? `<p class="card-text small mb-1"><strong>College:</strong> ${doctor.college}</p>` : ''}
+                                ${doctor.workplace ? `<p class="card-text small mb-1"><strong>Works At:</strong> ${doctor.workplace}</p>` : ''}
                                 <div class="d-flex align-items-center mb-2">
                                     <div class="rating me-2">
                                         ${starHtml}
