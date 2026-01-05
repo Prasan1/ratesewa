@@ -1807,13 +1807,16 @@ def get_doctors():
 
     # Sort doctors:
     # 1. Featured first
-    # 2. Claimed/verified profiles (has phone or is_verified)
-    # 3. Then by avg_rating
-    # 4. Then by name
+    # 2. Has NMC number (verified doctors)
+    # 3. Claimed/verified profiles (has phone or is_verified)
+    # 4. Then by avg_rating
+    # 5. Then by name
     def sort_key(d):
+        has_nmc = bool(d.nmc_number)
         is_claimed = bool(d.phone_number) or d.is_verified
         return (
             -d.is_featured,      # Featured first (1 → -1, 0 → 0)
+            not has_nmc,         # Has NMC number first (True → False, False → True)
             not is_claimed,      # Claimed profiles first (True → False, False → True)
             -d.avg_rating,       # Higher rating first
             d.name               # Alphabetical
@@ -1925,7 +1928,8 @@ def admin_doctor_new():
             return render_template('admin_doctor_form.html', doctor=None, cities=cities, specialties=specialties, clinics=clinics)
 
         # Check if NMC number already exists
-        if nmc_number:
+        # Skip validation if NMC number is empty or "None" string
+        if nmc_number and nmc_number.lower() != 'none':
             existing = Doctor.query.filter_by(nmc_number=nmc_number).first()
             if existing:
                 flash(f'NMC number {nmc_number} is already registered to {existing.name}.', 'danger')
@@ -2006,7 +2010,8 @@ def admin_doctor_edit(doctor_id):
             return render_template('admin_doctor_form.html', doctor=doctor, cities=cities, specialties=specialties, clinics=clinics)
 
         # Check if NMC number already exists (if changing it)
-        if nmc_number and nmc_number != doctor.nmc_number:
+        # Skip validation if NMC number is empty or "None" string
+        if nmc_number and nmc_number.lower() != 'none' and nmc_number != doctor.nmc_number:
             existing = Doctor.query.filter_by(nmc_number=nmc_number).first()
             if existing and existing.id != doctor.id:
                 flash(f'NMC number {nmc_number} is already registered to {existing.name}.', 'danger')
