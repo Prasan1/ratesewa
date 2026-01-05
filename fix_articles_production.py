@@ -39,7 +39,7 @@ with app.app_context():
             target_specialty_id = 15  # Cardiology
         elif 'mental health' in title_lower or 'mental' in title_lower:
             target_specialty_id = 22  # Psychiatry
-        elif 'women' in title_lower or 'gynecology' in title_lower:
+        elif 'women' in title_lower or 'gynecology' in title_lower or 'pregnancy' in title_lower or 'prenatal' in title_lower or 'maternal' in title_lower:
             target_specialty_id = 43  # Obstetrics & Gynecology
         elif 'diabetes' in title_lower or 'nutrition' in title_lower:
             target_specialty_id = 13  # General Physician (assuming ID 13 exists)
