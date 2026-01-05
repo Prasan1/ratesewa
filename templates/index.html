@@ -363,6 +363,8 @@ $(document).ready(function() {
         });
     }
 
+    const isAdmin = {{ 'true' if session.get('is_admin') else 'false' }};
+
     function displayDoctors(response) {
         const doctors = response.doctors || response; // Handle both old and new format
         const pagination = response.pagination;
@@ -380,6 +382,9 @@ $(document).ready(function() {
             const starHtml = generateStarRatingHtml(doctor.avg_rating, ratingCount);
             const verifiedBadge = doctor.is_verified ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>' : '';
             const clinicLine = doctor.clinic_name ? `<p class="card-text text-muted small mb-0"><i class="fas fa-hospital me-1"></i><a href="/clinic/${doctor.clinic_slug}" class="text-muted text-decoration-none">${doctor.clinic_name}</a></p>` : '';
+            const adminEditButton = isAdmin
+                ? `<a href="/admin/doctors/${doctor.id}/edit" class="btn btn-outline-secondary btn-sm ms-2">Edit</a>`
+                : '';
 
             // IMPROVED: Better "no reviews" messaging
             const ratingText = hasRatings
@@ -418,7 +423,10 @@ $(document).ready(function() {
                                 </div>
                                 <p class="card-text small text-muted">${doctor.description}</p>
                             </div>
-                            <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                            <div class="d-flex align-items-center">
+                                <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                                ${adminEditButton}
+                            </div>
                         </div>
                     </div>
             </div>

@@ -86,13 +86,13 @@
                 </div>
                 <div class="col-md-8">
                     <label for="external_clinic_url" class="form-label">
-                        External Clinic Profile URL
-                        <small class="text-muted">(Optional - e.g., ClinicOne, Nepal Mediciti website)</small>
+                        External Clinic Profile URL (optional)
+                        <small class="text-muted">(e.g., ClinicOne, Nepal Mediciti website)</small>
                     </label>
-                    <input type="url" class="form-control" id="external_clinic_url" name="external_clinic_url"
-                           value="{{ doctor.external_clinic_url if doctor else '' }}"
+                    <input type="text" class="form-control" id="external_clinic_url" name="external_clinic_url" inputmode="url"
+                           value="{{ doctor.external_clinic_url if doctor and doctor.external_clinic_url and doctor.external_clinic_url|lower != 'none' else '' }}"
                            placeholder="e.g., https://clinicone.com.np/product/dr-name/">
-                    <small class="form-text text-muted">If doctor has a profile on external clinic website, paste the full URL here</small>
+                    <small class="form-text text-muted">Paste the full URL if available.</small>
                 </div>
                 <div class="col-12">
                     <label for="profile_photo" class="form-label">
@@ -136,6 +136,7 @@
                     <div class="form-check me-4">
                         <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" {% if doctor and doctor.is_featured %}checked{% endif %}>
                         <label class="form-check-label" for="is_featured">Featured</label>
+                        <div class="form-text">Only verified doctors should be featured.</div>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {% if doctor %}{% if doctor.is_active %}checked{% endif %}{% else %}checked{% endif %}>

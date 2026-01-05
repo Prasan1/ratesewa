@@ -75,6 +75,11 @@
                     <span class="badge bg-success">RankSewa Verified</span>
                 </div>
                 {% endif %}
+                {% if session.get('is_admin') %}
+                <a href="{{ url_for('admin_doctor_edit', doctor_id=doctor.id) }}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                    <i class="fas fa-edit me-2"></i>Edit Doctor
+                </a>
+                {% endif %}
                 <p class="card-text text-muted">{{ doctor.specialty.name }}</p>
                 <p class="card-text"><i class="fas fa-map-marker-alt me-2"></i>{{ doctor.city.name }}</p>
                 {% if doctor.clinic %}

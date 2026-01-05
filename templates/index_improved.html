@@ -330,6 +330,8 @@ $(document).ready(function() {
         });
     }
 
+    const isAdmin = {{ 'true' if session.get('is_admin') else 'false' }};
+
     function displayDoctors(doctors) {
         if (doctors.length === 0) {
             $('#doctorList').html('<div class="col-12"><div class="alert alert-info">No doctors found.</div></div>');
@@ -343,6 +345,9 @@ $(document).ready(function() {
             const avgRating = hasRatings ? parseFloat(doctor.avg_rating).toFixed(1) : '';
             const starHtml = generateStarRatingHtml(doctor.avg_rating, ratingCount);
             const verifiedBadge = doctor.is_verified ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>' : '';
+            const adminEditButton = isAdmin
+                ? `<a href="/admin/doctors/${doctor.id}/edit" class="btn btn-outline-secondary btn-sm ms-2">Edit</a>`
+                : '';
 
             // IMPROVED: Better "no reviews" messaging
             const ratingText = hasRatings
@@ -380,7 +385,10 @@ $(document).ready(function() {
                                 </div>
                                 ${doctor.description ? `<p class="card-text small text-muted">${doctor.description}</p>` : ''}
                             </div>
-                            <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                            <div class="d-flex align-items-center">
+                                <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                                ${adminEditButton}
+                            </div>
                         </div>
                     </div>
             </div>

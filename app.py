@@ -1800,13 +1800,36 @@ def get_doctors():
     page = request.args.get('page', 1, type=int)
     per_page = 50  # Limit results per page
 
-    # Build query with filters and eager loading to prevent N+1 queries
-    from sqlalchemy.orm import joinedload
-    query = Doctor.query.options(
-        joinedload(Doctor.city),
-        joinedload(Doctor.specialty),
-        joinedload(Doctor.ratings)  # Eager load ratings to prevent N+1
-    ).filter_by(is_active=True)  # Show all active doctors (NMC city = practice location)
+    # Build query with rating aggregates and eager loading to prevent N+1 queries
+    from sqlalchemy import func, case, and_
+    from sqlalchemy.orm import selectinload
+
+    avg_rating = func.coalesce(func.avg(Rating.rating), 0).label('avg_rating')
+    rating_count = func.count(Rating.id).label('rating_count')
+    sort_rank = case(
+        (and_(Doctor.is_featured.is_(True), Doctor.is_verified.is_(True)), 0),
+        (Doctor.is_verified.is_(True), 1),
+        (rating_count > 0, 2),
+        else_=3
+    ).label('sort_rank')
+
+    rating_stats = db.session.query(
+        Doctor.id.label('doctor_id'),
+        avg_rating,
+        rating_count,
+        sort_rank
+    ).outerjoin(Rating).group_by(Doctor.id).subquery()
+
+    query = db.session.query(
+        Doctor,
+        rating_stats.c.avg_rating,
+        rating_stats.c.rating_count,
+        rating_stats.c.sort_rank
+    ).join(rating_stats, Doctor.id == rating_stats.c.doctor_id).options(
+        selectinload(Doctor.city),
+        selectinload(Doctor.specialty),
+        selectinload(Doctor.clinic)
+    ).filter(Doctor.is_active.is_(True))  # Show all active doctors (NMC city = practice location)
 
     if city_id:
         query = query.filter(Doctor.city_id == int(city_id))
@@ -1827,31 +1850,21 @@ def get_doctors():
     total_doctors = query.count()
     total_pages = (total_doctors + per_page - 1) // per_page  # Ceiling division
 
-    # Order by database fields first (faster than Python sorting)
-    # Featured doctors first, then by name
-    query = query.order_by(Doctor.is_featured.desc(), Doctor.name)
+    # Order by priority:
+    # 1) Featured + verified, 2) Verified, 3) Highest rated, 4) Others
+    query = query.order_by(
+        rating_stats.c.sort_rank.asc(),
+        rating_stats.c.avg_rating.desc(),
+        Doctor.name.asc()
+    )
 
     # Paginate results using offset and limit
     offset = (page - 1) * per_page
     doctors = query.offset(offset).limit(per_page).all()
 
-    # Sort doctors:
-    # 1. Featured first (all featured doctors, verified or not)
-    # 2. Verified (RankSewa verified, not featured)
-    # 3. Everyone else (by rating, then name)
-    def sort_key(d):
-        return (
-            -d.is_featured,      # Featured first (1 → -1, 0 → 0)
-            not d.is_verified,   # Then verified (True → False, False → True)
-            -d.avg_rating,       # Higher rating first
-            d.name               # Alphabetical
-        )
-
-    doctors_sorted = sorted(doctors, key=sort_key)
-
     # Serialize to JSON
     doctors_list = []
-    for d in doctors_sorted:
+    for d, avg_rating_value, rating_count_value, _sort_rank in doctors:
         # Generate proper photo URL
         photo_url = None
         if d.photo_url:
@@ -1885,8 +1898,8 @@ def get_doctors():
             'photo_url': photo_url,
             'is_featured': d.is_featured,
             'is_verified': d.is_verified,
-            'avg_rating': d.avg_rating,
-            'rating_count': d.rating_count
+            'avg_rating': float(avg_rating_value or 0),
+            'rating_count': int(rating_count_value or 0)
         })
 
     return jsonify({
