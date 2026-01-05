@@ -1836,20 +1836,13 @@ def get_doctors():
     doctors = query.offset(offset).limit(per_page).all()
 
     # Sort doctors:
-    # 1. Featured first
-    # 2. RankSewa verified (is_verified)
-    # 3. Has NMC number
-    # 4. Has phone (claimed profile)
-    # 5. Then by avg_rating
-    # 6. Then by name
+    # 1. Featured first (all featured doctors, verified or not)
+    # 2. Verified (RankSewa verified, not featured)
+    # 3. Everyone else (by rating, then name)
     def sort_key(d):
-        has_nmc = bool(d.nmc_number)
-        has_phone = bool(d.phone_number)
         return (
             -d.is_featured,      # Featured first (1 → -1, 0 → 0)
-            not d.is_verified,   # RankSewa verified first (True → False, False → True)
-            not has_nmc,         # Has NMC number second (True → False, False → True)
-            not has_phone,       # Has phone third (claimed profiles)
+            not d.is_verified,   # Then verified (True → False, False → True)
             -d.avg_rating,       # Higher rating first
             d.name               # Alphabetical
         )
