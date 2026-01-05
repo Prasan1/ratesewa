@@ -1,7 +1,42 @@
-# Major: When you are logged in as a doctor, you can open your profile in public view and rate yourself.
+DEBUG ISSUE:
+=============
+1. Clinic link doesn't have input field while editing doctor. 
+2. The information doesn't show up in doctor profile, There should be a phone number visibility when entered and place a green btn to hide the phone number
+   which when clicked should call automatically in phone or display phone number in desktop if this is doable. Most of the number will be from clinic. 
 
-1. The webpage is not that fast maybe this is because of the massive data that we have but we will have 20k + doctor profile what will we do?
-2. There are several duplicate specialization listed. such as ENT and ENT specialized are the same ENT. No need to keep two category. 
-3. We need to be extra careful now. There have been 7 new users in the platform 2 of them were doctors and they haven't created profile yet and their 
-   profile is not in the system yet. So I don't know if that created this friction or maybe they will come back. 
-4. We have to be very careful on making chnages now . Few people are gainig interest. 
+
+
+  
+  FUTURE IMPLEMENTATION:
+  ==========================
+  
+  High‑priority improvements
+
+  - Remove hardcoded secrets and production‑unsafe defaults: SECRET_KEY fallback and a real default Resend key are in app.py; move all secrets to env and fail fast if missing; set
+    SESSION_COOKIE_SECURE=True in prod and gate debug by env instead of app.run(debug=True) in app.py.
+  - Eliminate state‑changing GET endpoints to avoid CSRF risk: /admin/appointment/<id>/confirm, /admin/appointment/<id>/cancel, and /admin/toggle_featured/<id> should be POST+CSRF and
+    ideally require explicit confirmation in the UI (app.py).
+  - Remove exposed credentials in docs: admin password in README.md should not be in the repo (even for MVP); point to env/seed instructions instead.
+
+  Security & privacy
+
+  - Add rate limiting for login, review, flag, appointment, and contact endpoints (app.py) to deter brute force and abuse (Flask‑Limiter or similar).
+  - Strengthen password policy and add account recovery/email verification (current minimum is 6 chars in app.py and templates).
+  - Restrict debug endpoints and admin tooling behind an explicit config flag so they can’t be accidentally exposed in production (app.py routes like /admin/debug/*).
+
+  Data integrity & scalability
+
+  - Add DB‑level constraints for reviews to prevent duplicates (unique on (doctor_id, user_id) in models.py), not just app‑level checks.
+  - Add indexes for frequent filters/joins: doctors.city_id, doctors.specialty_id, ratings.doctor_id, ratings.user_id (models.py) to keep search and profile pages fast as data grows.
+  - Reduce N+1 queries and Python‑side aggregation for ratings/analytics (app.py); use SQL aggregates or eager loading where lists are iterated.
+
+  Maintainability
+
+  - Split app.py into blueprints (auth, admin, doctors, reviews, billing) and move business logic into service modules. The file is 3.8k+ lines and mixes concerns, which makes regressions
+    more likely.
+  - Centralize config by environment (Dev/Prod/Test) in config.py and avoid per‑route configuration in app.py.
+
+  Product/ops
+
+  - Add structured logging instead of print() for R2 and upload paths (r2_storage.py, upload_utils.py) so production logs are searchable.
+  - Expand automated tests beyond test_admin_users.py: auth, review flow, and admin actions are the highest‑value targets.
