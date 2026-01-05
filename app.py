@@ -929,12 +929,21 @@ def article_detail(slug):
     # Get related doctors if article has a related specialty
     related_doctors = []
     if article.related_specialty_id:
+        # Try to get verified doctors first
         related_doctors = Doctor.query.filter_by(
             specialty_id=article.related_specialty_id,
             is_active=True,
-            is_verified=True  # Only show verified doctors in article recommendations
+            is_verified=True
         ).order_by(Doctor.is_featured.desc())\
          .limit(4).all()
+
+        # If no verified doctors found, fall back to all active doctors
+        if not related_doctors:
+            related_doctors = Doctor.query.filter_by(
+                specialty_id=article.related_specialty_id,
+                is_active=True
+            ).order_by(Doctor.is_featured.desc(), Doctor.is_verified.desc())\
+             .limit(4).all()
 
     return render_template('article_detail.html',
                          article=article,
