@@ -1,8 +1,14 @@
 DEBUG ISSUE:
 =============
-1. Clinic link doesn't have input field while editing doctor. 
-2. The information doesn't show up in doctor profile, There should be a phone number visibility when entered and place a green btn to hide the phone number
-   which when clicked should call automatically in phone or display phone number in desktop if this is doable. Most of the number will be from clinic. 
+1. ✅ RESOLVED: Phone number now shows with green "Show Phone Number" button
+   - Click to reveal number
+   - Click-to-call on mobile (tel: link)
+   - Displays number on desktop
+
+2. Clinic link field - Need clarification:
+   - Field EXISTS in admin_doctor_form.html (line 76-86)
+   - It's a dropdown select showing all clinics
+   - Is it not visible? Or should it be a text input instead of dropdown? 
 
 
 
