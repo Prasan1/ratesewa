@@ -1055,8 +1055,14 @@ def claim_profile():
 
     if search_query:
         # Find doctors without a linked user account
+        # Search by both name AND NMC number for better accuracy
         unclaimed_doctors = Doctor.query.outerjoin(User, User.doctor_id == Doctor.id)\
-            .filter(Doctor.name.ilike(f'%{search_query}%'))\
+            .filter(
+                db.or_(
+                    Doctor.name.ilike(f'%{search_query}%'),
+                    Doctor.nmc_number.ilike(f'%{search_query}%')
+                )
+            )\
             .filter(User.id.is_(None))\
             .filter(Doctor.is_active == True)\
             .all()
