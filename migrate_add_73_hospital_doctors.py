@@ -211,21 +211,17 @@ def get_city_for_hospital(hospital_name):
     return city
 
 
-def check_if_exists(name, nmc_number):
-    """Check if doctor already exists in database."""
+def check_if_exists(name, nmc_number, nmc_cache, name_cache):
+    """Check if doctor already exists in database using pre-built caches."""
     # Check by NMC number first (most reliable)
     if nmc_number and nmc_number.strip():
-        existing = Doctor.query.filter_by(nmc_number=nmc_number.strip()).first()
-        if existing:
-            return True, existing
+        if nmc_number.strip() in nmc_cache:
+            return True, nmc_cache[nmc_number.strip()]
 
     # Check by normalized name
     normalized = normalize_name(name)
-    if normalized:
-        all_doctors = Doctor.query.all()
-        for doc in all_doctors:
-            if normalize_name(doc.name) == normalized:
-                return True, doc
+    if normalized and normalized in name_cache:
+        return True, name_cache[normalized]
 
     return False, None
 
@@ -251,6 +247,22 @@ def main():
         print(f"Current doctors in database: {current_count}")
         print()
 
+        # Build cache of existing doctors ONCE (efficient for large databases)
+        print("Building cache of existing doctors...")
+        nmc_cache = {}
+        name_cache = {}
+
+        all_doctors = Doctor.query.all()
+        for doc in all_doctors:
+            if doc.nmc_number:
+                nmc_cache[doc.nmc_number] = doc
+            normalized = normalize_name(doc.name)
+            if normalized:
+                name_cache[normalized] = doc
+
+        print(f"Cache built: {len(nmc_cache)} doctors with NMC, {len(name_cache)} total doctors")
+        print()
+
         # Process each doctor
         added = []
         skipped = []
@@ -262,8 +274,8 @@ def main():
             education = row['education'].strip() if row['education'] else ''
             hospital = row['hospital'].strip()
 
-            # Check if exists
-            exists, existing_doc = check_if_exists(name, nmc)
+            # Check if exists using cache
+            exists, existing_doc = check_if_exists(name, nmc, nmc_cache, name_cache)
 
             if exists:
                 skipped.append(name)
