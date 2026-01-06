@@ -16,6 +16,8 @@ import stripe
 import subscription_config
 import promo_config
 import resend
+from PIL import Image
+import secrets
 
 # Import text_utils with fallback
 try:
@@ -686,6 +688,71 @@ def doctor_avatar_filter(doctor):
     if doctor.photo_url:
         return doctor.photo_url
     return get_doctor_avatar_url(doctor.name, doctor.id)
+
+
+def optimize_and_save_article_image(image_file):
+    """
+    Optimize uploaded article image and save to static/img/articles/
+
+    - Resizes to optimal social sharing size (1200x630px for OG tags)
+    - Compresses for web (reduces file size 60-80%)
+    - Converts to JPEG for consistency
+    - Generates unique filename
+
+    Returns: relative path like 'img/articles/abc123.jpg' or None if error
+    """
+    try:
+        # Generate unique filename
+        random_hex = secrets.token_hex(8)
+        filename = f"{random_hex}.jpg"
+        filepath = os.path.join('static', 'img', 'articles', filename)
+
+        # Open and optimize image
+        img = Image.open(image_file)
+
+        # Convert to RGB if necessary (handles PNG with transparency, etc.)
+        if img.mode != 'RGB':
+            # Create white background for images with transparency
+            rgb_img = Image.new('RGB', img.size, (255, 255, 255))
+            if img.mode == 'RGBA' or 'transparency' in img.info:
+                # Paste with alpha channel as mask
+                rgb_img.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+            else:
+                rgb_img.paste(img)
+            img = rgb_img
+
+        # Resize to optimal social sharing size (1200x630px for OG tags)
+        # This is the perfect size for Facebook/Twitter/LinkedIn sharing
+        target_width = 1200
+        target_height = 630
+
+        # Calculate aspect ratio
+        aspect = img.width / img.height
+        target_aspect = target_width / target_height
+
+        if aspect > target_aspect:
+            # Image is wider - crop width
+            new_width = int(img.height * target_aspect)
+            left = (img.width - new_width) // 2
+            img = img.crop((left, 0, left + new_width, img.height))
+        else:
+            # Image is taller - crop height
+            new_height = int(img.width / target_aspect)
+            top = (img.height - new_height) // 2
+            img = img.crop((0, top, img.width, top + new_height))
+
+        # Resize to target dimensions
+        img = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
+
+        # Save with high quality JPEG compression (85 = good balance of quality/size)
+        img.save(filepath, 'JPEG', quality=85, optimize=True)
+
+        # Return relative path for database (without 'static/' prefix)
+        return f"img/articles/{filename}"
+
+    except Exception as e:
+        print(f"Error optimizing image: {e}")
+        return None
 
 
 # --- Authentication Routes ---
@@ -2478,7 +2545,6 @@ def admin_article_new():
         category_id = request.form.get('category_id')
         summary = request.form.get('summary', '').strip()
         content = request.form.get('content', '').strip()
-        featured_image = request.form.get('featured_image', '').strip()
         meta_description = request.form.get('meta_description', '').strip()
         meta_keywords = request.form.get('meta_keywords', '').strip()
         related_specialty_id = request.form.get('related_specialty_id') or None
@@ -2490,6 +2556,16 @@ def admin_article_new():
             categories = ArticleCategory.query.order_by(ArticleCategory.display_order).all()
             specialties = Specialty.query.order_by(Specialty.name).all()
             return render_template('admin_article_form.html', article=None, categories=categories, specialties=specialties)
+
+        # Handle image upload
+        featured_image = None
+        if 'featured_image' in request.files:
+            image_file = request.files['featured_image']
+            if image_file and image_file.filename:
+                # Optimize and save image
+                featured_image = optimize_and_save_article_image(image_file)
+                if not featured_image:
+                    flash('Error processing image. Please try again or use a different image.', 'warning')
 
         # Generate slug from title
         import re
@@ -2507,7 +2583,7 @@ def admin_article_new():
             category_id=category_id,
             summary=summary or None,
             content=content,
-            featured_image=featured_image or None,
+            featured_image=featured_image,
             meta_description=meta_description or None,
             meta_keywords=meta_keywords or None,
             related_specialty_id=related_specialty_id,
@@ -2535,7 +2611,6 @@ def admin_article_edit(article_id):
         category_id = request.form.get('category_id')
         summary = request.form.get('summary', '').strip()
         content = request.form.get('content', '').strip()
-        featured_image = request.form.get('featured_image', '').strip()
         meta_description = request.form.get('meta_description', '').strip()
         meta_keywords = request.form.get('meta_keywords', '').strip()
         related_specialty_id = request.form.get('related_specialty_id') or None
@@ -2549,11 +2624,29 @@ def admin_article_edit(article_id):
             specialties = Specialty.query.order_by(Specialty.name).all()
             return render_template('admin_article_form.html', article=article, categories=categories, specialties=specialties)
 
+        # Handle image upload (keep existing image if no new one uploaded)
+        if 'featured_image' in request.files:
+            image_file = request.files['featured_image']
+            if image_file and image_file.filename:
+                # Optimize and save new image
+                new_image_path = optimize_and_save_article_image(image_file)
+                if new_image_path:
+                    # Delete old image file if it exists
+                    if article.featured_image:
+                        old_image_path = os.path.join('static', article.featured_image)
+                        if os.path.exists(old_image_path):
+                            try:
+                                os.remove(old_image_path)
+                            except:
+                                pass  # Ignore errors if file doesn't exist
+                    article.featured_image = new_image_path
+                else:
+                    flash('Error processing new image. Keeping existing image.', 'warning')
+
         article.title = title
         article.category_id = category_id
         article.summary = summary or None
         article.content = content
-        article.featured_image = featured_image or None
         article.meta_description = meta_description or None
         article.meta_keywords = meta_keywords or None
         article.related_specialty_id = related_specialty_id

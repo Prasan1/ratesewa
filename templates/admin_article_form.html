@@ -11,7 +11,7 @@
                 {% if article %}Edit Article{% else %}Create New Article{% endif %}
             </h2>
 
-            <form method="POST" class="needs-validation" novalidate>
+            <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                 <div class="mb-3">
                     <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="title" name="title"
@@ -60,10 +60,22 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="featured_image" class="form-label">Featured Image URL</label>
-                    <input type="url" class="form-control" id="featured_image" name="featured_image"
-                           value="{{ article.featured_image if article else '' }}"
-                           placeholder="https://example.com/image.jpg">
+                    <label for="featured_image" class="form-label">Featured Image</label>
+                    {% if article and article.featured_image %}
+                    <div class="mb-2">
+                        <img src="{{ url_for('static', filename=article.featured_image) }}"
+                             alt="Current featured image"
+                             class="img-thumbnail"
+                             style="max-height: 200px;">
+                        <p class="small text-muted mt-1">Current image: {{ article.featured_image }}</p>
+                    </div>
+                    {% endif %}
+                    <input type="file" class="form-control" id="featured_image" name="featured_image"
+                           accept="image/jpeg,image/png,image/jpg,image/webp">
+                    <small class="text-muted">
+                        Upload JPG, PNG, or WebP. Image will be automatically optimized (resized to 1200x630px, compressed for web).
+                        {% if article %}Leave blank to keep current image.{% endif %}
+                    </small>
                 </div>
 
                 <div class="mb-3">
