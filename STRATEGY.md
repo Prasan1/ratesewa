@@ -229,12 +229,63 @@ Two-sided marketplaces are especially hard because you need BOTH sides engaged.
 
 ---
 
-## Questions to Explore
+## Strategic Decision: English-Only Platform
 
-### Language Barrier
-- Is English limiting reach in Nepal market?
-- Should we create Nepali version?
-- Bilingual content strategy?
+### Why English-Only Is Better (Not a Limitation)
+
+**Decision: Stay English-only for foreseeable future (12-24 months minimum)**
+
+#### 1. Content Moderation Advantage
+- **English:** Automated profanity filters exist (10 lines of code)
+- **Nepali:** No good libraries, manual moderation needed, regional slang impossible to filter
+- **Result:** English saves 50% of operational time
+
+#### 2. Natural Quality Filter
+- English acts as barrier to low-quality reviews
+- Filters out: emotional rants, trolls, personal vendettas, spam
+- Lets through: thoughtful users, constructive criticism, detailed experiences
+- **This is a feature, not a bug**
+
+#### 3. Legal Protection (Critical in Nepal)
+- Defamation lawsuits are real risk
+- English reviews more professional = less likely to be defamatory
+- Easier to moderate before legal issues arise
+- Shows platform targets educated, responsible users
+
+#### 4. Precedent: Works Globally
+- TripAdvisor, Yelp, Google Reviews mostly English even in non-English countries
+- Practo (India doctor reviews) = English interface, millions of users
+- Urban educated market perfectly comfortable with English
+
+#### 5. Target Market Alignment
+- Urban Nepal (Kathmandu, Pokhara, Biratnagar) = 60-70% English literacy
+- Digital-first patients = English-comfortable
+- Professional medical discussions happen in English anyway
+- Not trying to serve everyone, just digitally-engaged patients
+
+#### 6. Operational Simplicity
+- One language = faster development
+- All features built once
+- Content moderation manageable
+- SEO strategy simpler
+- Can always add Nepali later if data demands it
+
+### The "Elitism" Objection (And Why It's Wrong)
+- **Objection:** "English excludes poor/rural patients"
+- **Reality:** Those patients don't write online reviews (low digital literacy)
+- **Truth:** They use word-of-mouth (asking family/friends)
+- **Your market:** Digitally-engaged urban patients (that's okay!)
+- **Precedent:** Uber doesn't serve people without smartphones - that's fine
+
+### When to Reconsider Nepali
+**Only add Nepali if ALL these conditions are met:**
+1. Traffic plateaus at 10,000+ monthly visitors (hit growth ceiling)
+2. User surveys show >50% want Nepali option
+3. You have budget for professional translator + moderator
+4. You've built automated Nepali profanity detection
+5. Legal framework for user-generated content is clear
+
+**Until then: English-only is a strategic advantage, not a limitation**
 
 ### Technical Debt
 - Clean up repo (remove debug files)
