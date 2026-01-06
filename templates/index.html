@@ -367,7 +367,7 @@ $(document).ready(function() {
 
     // Generate professional avatar URL for doctors without photos
     function getDoctorAvatar(doctorName, doctorId) {
-        const cleanedName = (doctorName || '').replace(/^\s*dr\.?\s+/i, '').trim() || doctorName;
+        const cleanedName = (doctorName || '').replace(/^\s*(dr|mr|mrs|ms|prof|professor)\.?\s+/i, '').trim() || doctorName;
         const colors = ['0D8ABC', '2a9d8f', 'e76f51', 'f4a261', '264653', '9b59b6', '3498db', '16a085'];
         const color = colors[doctorId % colors.length];
         const seed = encodeURIComponent(cleanedName);
