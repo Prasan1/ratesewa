@@ -11,7 +11,7 @@ def migrate():
         print("Increasing article title length to 200 characters...")
 
         # Check which database we're using
-        db_type = db.session.bind.dialect.name
+        db_type = db.engine.dialect.name
         print(f"Detected database: {db_type}")
 
         try:
