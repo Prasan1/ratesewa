@@ -22,6 +22,9 @@ instance/
 *.log
 import_log.txt
 import_complete_log.txt
+debug*.txt
+debug*.py
+test_*.py
 
 # IDE
 .vscode/
