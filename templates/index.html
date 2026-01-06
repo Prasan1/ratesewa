@@ -1,112 +1,158 @@
 {% extends "base.html" %}
 
-{% block title %}Find Doctors in Nepal Based on Patient Experiences{% endblock %}
+{% block title %}Find Doctors in Nepal Based on Patient Reviews{% endblock %}
 
 {% block content %}
 <!-- Promotional Banner -->
 {% include 'partials/promo_banner.html' %}
 
-<!-- Hero Section - NEW -->
-<div class="row mb-4">
+<!-- Hero + Search -->
+<div class="row mb-4 homepage-hero">
     <div class="col-12">
-        <div class="text-center py-5 hero-surface">
-            <h1 class="display-5 fw-bold mb-3 text-brand">
-                Find Doctors in Nepal Based on Patient Experiences
-            </h1>
-            <p class="lead text-muted mb-4">
-                Helping patients make more informed healthcare choices.
-            </p>
-            <div class="d-flex justify-content-center gap-3 flex-wrap">
-                <a href="#searchSection" class="btn btn-primary btn-lg">
-                    <i class="fas fa-search me-2"></i>Search Doctors
-                </a>
-                <a href="#whyReviewsMatter" class="btn btn-outline-primary btn-lg">
-                    <i class="fas fa-star me-2"></i>Write a Review
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Social Proof Section - NEW -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body py-4">
-                <div class="row text-center g-4">
-                    <div class="col-md-3">
-                        <h3 class="fw-bold mb-1 text-brand">{{ total_doctors }}+</h3>
-                        <p class="text-muted mb-0">Doctors Listed</p>
-                    </div>
-                    <div class="col-md-3">
-                        <h3 class="fw-bold mb-1 text-accent">{{ total_cities }}+</h3>
-                        <p class="text-muted mb-0">Cities Covered</p>
-                    </div>
-                    <div class="col-md-3">
-                        <h3 class="fw-bold mb-1 text-brand">{{ total_reviews }}+</h3>
-                        <p class="text-muted mb-0">Patient Reviews</p>
-                    </div>
-                    <div class="col-md-3">
-                        <h3 class="fw-bold mb-1 text-accent">{{ verified_doctors }}+</h3>
-                        <p class="text-muted mb-0">RankSewa Verified Profiles</p>
-                    </div>
-                </div>
-                <div class="text-center mt-3">
-                    <p class="text-muted small mb-0">
-                        <i class="fas fa-map-marker-alt me-1"></i>
-                        Kathmandu | Lalitpur | Pokhara | Biratnagar | Birtamod
+        <div class="hero-card">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-6">
+                    <span class="eyebrow">Nepal’s doctor directory powered by patient experiences</span>
+                    <h1 class="display-5 fw-bold mb-3 text-brand">
+                        Find Doctors in Nepal Based on Patient Reviews
+                    </h1>
+                    <p class="lead text-muted mb-4">
+                        Search by city and specialty, read real experiences, and choose with confidence. Doctors can claim profiles and add verified details.
                     </p>
-                </div>
 
-                <!-- Transparency disclaimer -->
-                <div class="text-center mt-2">
-                    <p class="text-muted small mb-0">
-                        Doctor information is compiled from public sources and self-submitted data. Verification badges indicate profiles reviewed by RankSewa.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{# Featured Clinics - Hidden for MVP, can enable later
-{% if featured_clinics %}
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h3 class="mb-0">Featured Clinics</h3>
-                    <a href="{{ url_for('clinics') }}" class="btn btn-sm btn-outline-primary">View all clinics</a>
-                </div>
-                <div class="row g-3">
-                    {% for clinic in featured_clinics %}
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body">
-                                <h5 class="mb-1">{{ clinic.name }}</h5>
-                                <p class="text-muted small mb-2">
-                                    <i class="fas fa-map-marker-alt me-1"></i>{{ clinic.city.name }}
-                                </p>
-                                {% if clinic.description %}
-                                <p class="text-muted small mb-3">{{ clinic.description }}</p>
-                                {% endif %}
-                                <a href="{{ url_for('clinic_profile', slug=clinic.slug) }}" class="btn btn-outline-primary btn-sm">View clinic</a>
-                            </div>
+                    <div class="trust-strip mb-4">
+                        <div class="trust-item">
+                            <i class="fas fa-shield-alt me-2 text-brand"></i>NMC number checked (when available)
+                        </div>
+                        <div class="trust-item">
+                            <i class="fas fa-star me-2 text-brand"></i>Real patient reviews
+                        </div>
+                        <div class="trust-item">
+                            <i class="fas fa-map-marker-alt me-2 text-brand"></i>Nationwide coverage
                         </div>
                     </div>
-                    {% endfor %}
+
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="#searchSection" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-2"></i>Search Doctors
+                        </a>
+                        <a href="#whyReviewsMatter" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-pen me-2"></i>Rate a Doctor
+                        </a>
+                    </div>
+
+                    <p class="text-muted small mt-3 mb-0">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Reviews should be respectful and based on personal experience.
+                    </p>
                 </div>
+
+                <div class="col-lg-6">
+                    <div class="search-container search-card" id="searchSection">
+                        <h3 class="text-center">
+                            <i class="fas fa-search me-2"></i>Search Doctors in Nepal
+                        </h3>
+                        <p class="text-center text-muted mb-3">Search by name, city, or specialty</p>
+                        <p class="text-center text-muted small mb-4">
+                            Tip: Try city + specialty first (fastest), then narrow by name.
+                        </p>
+
+                        <form id="filterForm">
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label for="nameSearch" class="form-label">
+                                        <i class="fas fa-user-md me-2"></i>Doctor or clinic name
+                                    </label>
+                                    <input type="text" id="nameSearch" class="form-control" placeholder="e.g., Dr. S. K. Aryal / Drishti Eye Care" autocomplete="off">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="citySelect" class="form-label">
+                                        <i class="fas fa-map-marker-alt me-2"></i>Select city
+                                    </label>
+                                    <select id="citySelect" class="form-select">
+                                        <option value="">All Cities</option>
+                                        {% for city in cities %}
+                                        <option value="{{ city.id }}">{{ city.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="specialtySelect" class="form-label">
+                                        <i class="fas fa-stethoscope me-2"></i>Select specialty
+                                    </label>
+                                    <select id="specialtySelect" class="form-select">
+                                        <option value="">All Specialties</option>
+                                        {% for specialty in specialties %}
+                                        <option value="{{ specialty.id }}">{{ specialty.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 text-center">
+                                    <button type="button" id="filterBtn" class="btn btn-primary btn-lg w-100">
+                                        <i class="fas fa-search me-2"></i>Search Doctors
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-2">
+                                <small class="text-muted">
+                                    Results update automatically when you change filters.
+                                </small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div><!-- /row -->
+        </div><!-- /hero-card -->
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="stats-strip">
+            <div class="row text-center g-3">
+                <div class="col-6 col-md-3">
+                    <h3 class="fw-bold mb-1 text-brand">{{ total_doctors }}+</h3>
+                    <p class="text-muted mb-0">Doctors listed</p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <h3 class="fw-bold mb-1 text-accent">{{ total_cities }}+</h3>
+                    <p class="text-muted mb-0">Cities covered</p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <h3 class="fw-bold mb-1 text-brand">{{ total_reviews }}+</h3>
+                    <p class="text-muted mb-0">Patient reviews</p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <h3 class="fw-bold mb-1 text-accent">{{ verified_doctors }}+</h3>
+                    <p class="text-muted mb-0">Verified profiles</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <p class="text-muted small mb-0">
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    Kathmandu | Lalitpur | Pokhara | Biratnagar | Birtamod
+                </p>
+            </div>
+
+            <div class="text-center mt-2">
+                <p class="text-muted small mb-0">
+                    Doctor info is compiled from public sources and self-submitted updates.
+                    <strong>Verified</strong> badges mean the profile was reviewed by RankSewa (not an endorsement).
+                </p>
             </div>
         </div>
     </div>
 </div>
-{% endif %}
-#}
 
 <div class="row">
     <div class="col-12">
-        <!-- Doctor Claim Profile CTA - IMPROVED COPY -->
+        <!-- Doctor Claim Profile CTA -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card border-0 shadow-sm overflow-hidden cta-surface">
@@ -118,29 +164,34 @@
                                     <small class="fw-semibold text-brand">Launch Offer - Until April 25, 2026</small>
                                 </div>
                                 <h4 class="mb-2 text-dark">Are You a Doctor? Claim Your Profile</h4>
-                                <p class="mb-3 text-muted">Build patient trust with a RankSewa Verified badge, respond to feedback, and stand out in search.</p>
-                                <!-- IMPROVED: Better bullet points -->
+                                <p class="mb-3 text-muted">
+                                    Add accurate details, get a RankSewa Verified badge after review, and respond to patient feedback.
+                                </p>
                                 <div class="row g-2 mb-3">
                                     <div class="col-md-4">
                                         <div class="d-flex align-items-start gap-2">
                                             <i class="fas fa-check-circle text-success mt-1"></i>
-                                            <span class="small">Builds your professional reputation</span>
+                                            <span class="small">Show verified details</span>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="d-flex align-items-start gap-2">
                                             <i class="fas fa-check-circle text-success mt-1"></i>
-                                            <span class="small">Helps patients choose you</span>
+                                            <span class="small">Build patient trust</span>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="d-flex align-items-start gap-2">
                                             <i class="fas fa-check-circle text-success mt-1"></i>
-                                            <span class="small">Increases trust & visibility</span>
+                                            <span class="small">Improve visibility in search</span>
                                         </div>
                                     </div>
                                 </div>
+                                <p class="text-muted small mb-0">
+                                    Verification review: typically 2–3 business days (may vary).
+                                </p>
                             </div>
+
                             <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
                                 <div class="d-grid gap-2">
                                     <a href="{{ url_for('claim_profile') }}" class="btn btn-primary btn-lg">
@@ -151,16 +202,16 @@
                                     </a>
                                 </div>
                                 <div class="mt-3 small text-success fw-semibold">
-                                    <i class="fas fa-gift me-1"></i>100% Free • Review in 2-3 business days
+                                    <i class="fas fa-gift me-1"></i>100% Free during launch
                                 </div>
                             </div>
-                        </div>
+                        </div><!-- /row -->
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- How RankSewa Helps - NEW -->
+        <!-- How RankSewa Helps -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
@@ -173,16 +224,10 @@
                                         <i class="fas fa-users fa-3x text-brand"></i>
                                     </div>
                                     <h5 class="mb-3">For Patients</h5>
-                                    <ul class="list-unstyled text-start" style="max-width: 300px; margin: 0 auto;">
-                                        <li class="mb-2">
-                                            <i class="fas fa-check text-success me-2"></i>Read honest reviews
-                                        </li>
-                                        <li class="mb-2">
-                                            <i class="fas fa-check text-success me-2"></i>Find right doctor faster
-                                        </li>
-                                        <li class="mb-2">
-                                            <i class="fas fa-check text-success me-2"></i>Make informed decisions
-                                        </li>
+                                    <ul class="list-unstyled text-start" style="max-width: 340px; margin: 0 auto;">
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Read real patient experiences</li>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Compare doctors by city & specialty</li>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Choose with more confidence</li>
                                     </ul>
                                 </div>
                             </div>
@@ -192,90 +237,72 @@
                                         <i class="fas fa-user-md fa-3x text-accent"></i>
                                     </div>
                                     <h5 class="mb-3">For Doctors</h5>
-                                    <ul class="list-unstyled text-start" style="max-width: 300px; margin: 0 auto;">
-                                        <li class="mb-2">
-                                            <i class="fas fa-check text-success me-2"></i>Earn patient trust
-                                        </li>
-                                        <li class="mb-2">
-                                            <i class="fas fa-check text-success me-2"></i>Show experience clearly
-                                        </li>
-                                        <li class="mb-2">
-                                            <i class="fas fa-check text-success me-2"></i>Manage professional reputation
-                                        </li>
+                                    <ul class="list-unstyled text-start" style="max-width: 340px; margin: 0 auto;">
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Claim profile & correct info</li>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Show experience, workplace, services</li>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Respond to feedback professionally</li>
                                     </ul>
                                 </div>
                             </div>
-                        </div>
+                        </div><!-- /row -->
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Why Reviews Matter - NEW -->
+        <!-- Why Reviews Matter -->
         <div class="row mb-4" id="whyReviewsMatter">
             <div class="col-12">
                 <div class="card border-0 shadow-sm highlight-surface">
                     <div class="card-body p-4 text-center">
                         <h3 class="mb-3">Why Reviews Matter</h3>
-                        <p class="lead text-muted" style="max-width: 800px; margin: 0 auto;">
-                            Choosing a doctor is a big decision. RankSewa helps patients learn from real experiences
-                            so good doctors get recognition and patients feel safer.
+                        <p class="lead text-muted" style="max-width: 860px; margin: 0 auto;">
+                            Choosing a doctor is a big decision. RankSewa helps people learn from real experiences so
+                            good care gets recognized and patients feel safer.
+                        </p>
+
+                        <div class="row g-3 mt-4" style="max-width: 920px; margin: 0 auto;">
+                            <div class="col-md-4">
+                                <div class="p-3 bg-white border rounded-3 h-100">
+                                    <div class="fw-bold mb-1"><i class="fas fa-search me-2 text-brand"></i>1) Search</div>
+                                    <div class="text-muted small">Find the doctor by name, city, or specialty.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-white border rounded-3 h-100">
+                                    <div class="fw-bold mb-1"><i class="fas fa-id-card me-2 text-brand"></i>2) Open profile</div>
+                                    <div class="text-muted small">View details, clinic, and existing reviews.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-white border rounded-3 h-100">
+                                    <div class="fw-bold mb-1"><i class="fas fa-pen me-2 text-brand"></i>3) Share experience</div>
+                                    <div class="text-muted small">Leave a respectful review to help others.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <a href="#searchSection" class="btn btn-primary btn-lg">
+                                <i class="fas fa-search me-2"></i>Search & Review
+                            </a>
+                        </div>
+
+                        <p class="text-muted small mt-3 mb-0">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            RankSewa does not provide medical advice. For emergencies, contact local services immediately.
                         </p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Search Section -->
-        <div class="search-container" id="searchSection">
-            <h3 class="text-center">
-                <i class="fas fa-search me-2"></i>Find the Best Doctors in Nepal
-            </h3>
-            <p class="text-center text-muted mb-4">Search by city and specialty to find the right doctor for you</p>
-            <form id="filterForm">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label for="nameSearch" class="form-label">
-                            <i class="fas fa-user-md me-2"></i>Search by Doctor or Clinic
-                        </label>
-                        <input type="text" id="nameSearch" class="form-control" placeholder="Enter doctor or clinic name...">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="citySelect" class="form-label">
-                            <i class="fas fa-map-marker-alt me-2"></i>Select City
-                        </label>
-                        <select id="citySelect" class="form-select">
-                            <option value="">All Cities</option>
-                            {% for city in cities %}
-                            <option value="{{ city.id }}">{{ city.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="specialtySelect" class="form-label">
-                            <i class="fas fa-stethoscope me-2"></i>Select Specialty
-                        </label>
-                        <select id="specialtySelect" class="form-select">
-                            <option value="">All Specialties</option>
-                            {% for specialty in specialties %}
-                            <option value="{{ specialty.id }}">{{ specialty.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-12 text-center">
-                        <button type="button" id="filterBtn" class="btn btn-primary btn-lg">
-                            <i class="fas fa-search me-2"></i>Search Doctors
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
+        <!-- Results -->
         <div class="row">
             <div class="col-12">
-                <h2 class="mb-3">Doctor List</h2>
+                <h2 class="mb-2">Doctor List</h2>
+                <p class="text-muted mb-3 small">Verified profiles appear first to help patients choose with confidence.</p>
+
                 <div id="doctorList" class="row">
                     <div class="col-12 text-center py-5">
                         <p class="mt-2">Please use the search filters to find doctors</p>
@@ -283,8 +310,9 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
+
+    </div><!-- /col -->
+</div><!-- /row -->
 {% endblock %}
 
 {% block scripts %}
@@ -320,7 +348,7 @@ $(document).ready(function() {
 
     // Use Select2 change event instead of regular change
     $('#citySelect, #specialtySelect').on('select2:select select2:clear', function() {
-        loadDoctors(1, true); // User changed filter - scroll to results
+        loadDoctors(1, false); // User changed filter - keep focus in input
     });
 
     // Search as user types (with debounce)
@@ -328,116 +356,140 @@ $(document).ready(function() {
     $('#nameSearch').on('input', function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(function() {
-            loadDoctors(1, true); // User searched by name - scroll to results
-        }, 500); // Wait 500ms after user stops typing
+            loadDoctors(1, false); // User searched by name - keep focus in input
+        }, 500);
     });
 });
 
-    let currentPage = 1;
-    let shouldScroll = false; // Track if we should scroll after loading doctors
+let currentPage = 1;
+let shouldScroll = false; // Track if we should scroll after loading doctors
 
-    function loadDoctors(page = 1, scroll = false) {
-        const cityId = $('#citySelect').val();
-        const specialtyId = $('#specialtySelect').val();
-        const nameSearch = $('#nameSearch').val();
-        currentPage = page;
-        shouldScroll = scroll; // Remember if we should scroll
+function loadDoctors(page = 1, scroll = false) {
+    const cityId = $('#citySelect').val();
+    const specialtyId = $('#specialtySelect').val();
+    const nameSearch = $('#nameSearch').val();
+    currentPage = page;
+    shouldScroll = scroll;
 
-        $('#doctorList').html('<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>');
+    $('#doctorList').html('<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status" aria-label="Loading"></div></div>');
 
-        $.ajax({
-            url: '/doctors',
-            type: 'GET',
-            data: {
-                city_id: cityId,
-                specialty_id: specialtyId,
-                name: nameSearch,
-                page: page
-            },
-            success: function(response) {
-                displayDoctors(response);
-            },
-            error: function() {
-                $('#doctorList').html('<div class="col-12"><div class="alert alert-danger">Error loading doctors.</div></div>');
-            }
-        });
-    }
-
-    const isAdmin = {{ 'true' if session.get('is_admin') else 'false' }};
-
-    // Generate professional avatar URL for doctors without photos
-    function getDoctorAvatar(doctorName, doctorId) {
-        const cleanedName = (doctorName || '').replace(/^\s*(dr|mr|mrs|ms|prof|professor)\.?\s+/i, '').trim() || doctorName;
-        const colors = ['0D8ABC', '2a9d8f', 'e76f51', 'f4a261', '264653', '9b59b6', '3498db', '16a085'];
-        const color = colors[doctorId % colors.length];
-        const seed = encodeURIComponent(cleanedName);
-        return `https://api.dicebear.com/7.x/initials/svg?seed=${seed}&backgroundColor=${color}`;
-    }
-
-    function displayDoctors(response) {
-        const doctors = response.doctors || response; // Handle both old and new format
-        const pagination = response.pagination;
-
-        if (doctors.length === 0) {
-            $('#doctorList').html('<div class="col-12"><div class="alert alert-info">No doctors found.</div></div>');
-            return;
+    $.ajax({
+        url: '/doctors',
+        type: 'GET',
+        data: {
+            city_id: cityId,
+            specialty_id: specialtyId,
+            name: nameSearch,
+            page: page
+        },
+        success: function(response) {
+            displayDoctors(response);
+        },
+        error: function() {
+            $('#doctorList').html('<div class="col-12"><div class="alert alert-danger">Error loading doctors.</div></div>');
         }
+    });
+}
 
-        let html = '';
-        doctors.forEach(doctor => {
-            const ratingCount = doctor.rating_count || 0;
-            const hasRatings = ratingCount > 0;
-            const avgRating = hasRatings ? parseFloat(doctor.avg_rating).toFixed(1) : '';
-            const starHtml = generateStarRatingHtml(doctor.avg_rating, ratingCount);
-            const verifiedBadge = doctor.is_verified ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>' : '';
-            const clinicLine = doctor.clinic_name ? `<p class="card-text text-muted small mb-0"><i class="fas fa-hospital me-1"></i><a href="/clinic/${doctor.clinic_slug}" class="text-muted text-decoration-none">${doctor.clinic_name}</a></p>` : '';
-            const adminEditButton = isAdmin
-                ? `<a href="/admin/doctors/${doctor.id}/edit" class="btn btn-outline-secondary btn-sm ms-2">Edit</a>`
-                : '';
+const isAdmin = {{ 'true' if session.get('is_admin') else 'false' }};
 
-            // IMPROVED: Better "no reviews" messaging
-            const ratingText = hasRatings
-                ? `${avgRating} (${ratingCount} reviews)`
-                : '⭐ No reviews yet — <a href="/doctor/' + doctor.slug + '" class="text-primary">Be the first to review</a>';
+// Generate professional avatar URL for doctors without photos
+function getDoctorAvatar(doctorName, doctorId) {
+        let cleanedName = doctorName || '';
+        const titleRegex = /^\s*(dr|mr|mrs|ms|prof|professor|asst|assistant|assoc|associate)\.?\s+/i;
+        while (titleRegex.test(cleanedName)) {
+            cleanedName = cleanedName.replace(titleRegex, '');
+        }
+        cleanedName = cleanedName.trim() || doctorName;
+    const colors = ['0D8ABC', '2a9d8f', 'e76f51', 'f4a261', '264653', '9b59b6', '3498db', '16a085'];
+    const color = colors[doctorId % colors.length];
+    const seed = encodeURIComponent(cleanedName);
+    return `https://api.dicebear.com/7.x/initials/svg?seed=${seed}&backgroundColor=${color}`;
+}
 
-            html += `
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card doctor-card h-100 ${doctor.is_featured ? 'featured' : ''} ${doctor.is_verified ? 'verified' : ''}">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="doctor-avatar me-3">
-                                    <img src="${doctor.photo_url || getDoctorAvatar(doctor.name, doctor.id)}" class="rounded-circle" alt="${doctor.name}" width="80" height="80" loading="lazy" onerror="this.src=getDoctorAvatar('${doctor.name}', ${doctor.id})">
-                                </div>
-                                <div class="doctor-info flex-grow-1">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <h5 class="card-title mb-1">${doctor.name}</h5>
-                                        ${verifiedBadge}
-                                    </div>
-                                    <p class="card-text text-muted mb-1">${doctor.specialty_name}</p>
-                                    <p class="card-text text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>${doctor.city_name}</p>
-                                    ${clinicLine}
-                                </div>
+function displayDoctors(response) {
+    const doctors = response.doctors || response; // Handle both old and new format
+    const pagination = response.pagination;
+
+    if (!doctors || doctors.length === 0) {
+        $('#doctorList').html('<div class="col-12"><div class="alert alert-info">No doctors found.</div></div>');
+        return;
+    }
+
+    let html = '';
+    doctors.forEach(doctor => {
+        const ratingCount = doctor.rating_count || 0;
+        const hasRatings = ratingCount > 0;
+        const avgRating = hasRatings ? parseFloat(doctor.avg_rating).toFixed(1) : '';
+        const starHtml = generateStarRatingHtml(doctor.avg_rating, ratingCount);
+        const verifiedBadge = doctor.is_verified
+            ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>'
+            : '';
+        const clinicLine = doctor.clinic_name
+            ? `<p class="card-text text-muted small mb-0"><i class="fas fa-hospital me-1"></i><a href="/clinic/${doctor.clinic_slug}" class="text-muted text-decoration-none">${doctor.clinic_name}</a></p>`
+            : '';
+        const adminEditButton = isAdmin
+            ? `<a href="/admin/doctors/${doctor.id}/edit" class="btn btn-outline-secondary btn-sm ms-2">Edit</a>`
+            : '';
+
+        const ratingText = hasRatings
+            ? `${avgRating} (${ratingCount} reviews)`
+            : `⭐ No reviews yet — <a href="/doctor/${doctor.slug}" class="text-primary">Be the first to review</a>`;
+
+        const imgSrc = doctor.photo_url || getDoctorAvatar(doctor.name, doctor.id);
+
+        html += `
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card doctor-card h-100 ${doctor.is_featured ? 'featured' : ''} ${doctor.is_verified ? 'verified' : ''}">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="doctor-avatar me-3">
+                                <img
+                                    src="${imgSrc}"
+                                    data-name="${String(doctor.name || '')}"
+                                    data-id="${doctor.id}"
+                                    class="rounded-circle"
+                                    alt="${doctor.name}"
+                                    width="80"
+                                    height="80"
+                                    loading="lazy"
+                                    onerror="this.onerror=null; this.src=getDoctorAvatar(this.dataset.name, parseInt(this.dataset.id || '0', 10));"
+                                >
                             </div>
-                            <div class="doctor-details">
-                                ${doctor.is_verified && doctor.nmc_number ? `<p class="card-text small mb-1"><strong>NMC#:</strong> ${doctor.nmc_number}</p>` : ''}
-                                ${doctor.experience && doctor.experience > 0 ? `<p class="card-text small mb-1"><strong>Experience:</strong> ${doctor.experience} years</p>` : ''}
-                                ${doctor.education ? `<p class="card-text small mb-1"><strong>Education:</strong> ${doctor.education}</p>` : ''}
-                                ${doctor.college ? `<p class="card-text small mb-1"><strong>College:</strong> ${doctor.college}</p>` : ''}
-                                ${doctor.workplace ? `<p class="card-text small mb-1"><strong>Works At:</strong> ${doctor.workplace}</p>` : ''}
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="rating me-2">
-                                        ${starHtml}
-                                    </div>
-                                    <span class="text-muted small">${ratingText}</span>
+                            <div class="doctor-info flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h5 class="card-title mb-1">${doctor.name}</h5>
+                                    ${verifiedBadge}
                                 </div>
-                                <p class="card-text small text-muted">${doctor.description}</p>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Profile</a>
-                                ${adminEditButton}
+                                <p class="card-text text-muted mb-1">${doctor.specialty_name}</p>
+                                <p class="card-text text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>${doctor.city_name}</p>
+                                ${clinicLine}
                             </div>
                         </div>
+
+                        <div class="doctor-details">
+                            ${doctor.is_verified && doctor.nmc_number ? `<p class="card-text small mb-1"><strong>NMC#:</strong> ${doctor.nmc_number}</p>` : ''}
+                            ${doctor.experience && doctor.experience > 0 ? `<p class="card-text small mb-1"><strong>Experience:</strong> ${doctor.experience} years</p>` : ''}
+                            ${doctor.education ? `<p class="card-text small mb-1"><strong>Education:</strong> ${doctor.education}</p>` : ''}
+                            ${doctor.college ? `<p class="card-text small mb-1"><strong>College:</strong> ${doctor.college}</p>` : ''}
+                            ${doctor.workplace ? `<p class="card-text small mb-1"><strong>Works At:</strong> ${doctor.workplace}</p>` : ''}
+
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="rating me-2">
+                                    ${starHtml}
+                                </div>
+                                <span class="text-muted small">${ratingText}</span>
+                            </div>
+
+                            <p class="card-text small text-muted">${doctor.description}</p>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                            ${adminEditButton}
+                        </div>
                     </div>
+                </div>
             </div>
         `;
     });
@@ -501,32 +553,32 @@ $(document).ready(function() {
             }, 500);
         }
     }
+}
+
+function generateStarRatingHtml(rating, ratingCount) {
+    if (!ratingCount) {
+        return '';
     }
 
-    function generateStarRatingHtml(rating, ratingCount) {
-        if (!ratingCount) {
-            return '';  // Return empty, let the text show improved message
-        }
+    let html = '';
+    const numericRating = parseFloat(rating);
+    const fullStars = Math.floor(numericRating);
+    const hasHalfStar = (numericRating - fullStars) >= 0.5;
 
-        let html = '';
-        const numericRating = parseFloat(rating);
-        const fullStars = Math.floor(numericRating);
-        const hasHalfStar = (numericRating - fullStars) >= 0.5;
-
-        for (let i = 0; i < fullStars; i++) {
-            html += '<i class="fas fa-star text-warning"></i>';
-        }
-
-        if (hasHalfStar) {
-            html += '<i class="fas fa-star-half-alt text-warning"></i>';
-        }
-
-        const emptyStars = 5 - Math.ceil(numericRating);
-        for (let i = 0; i < emptyStars; i++) {
-            html += '<i class="far fa-star text-warning"></i>';
-        }
-
-        return html;
+    for (let i = 0; i < fullStars; i++) {
+        html += '<i class="fas fa-star text-warning"></i>';
     }
+
+    if (hasHalfStar) {
+        html += '<i class="fas fa-star-half-alt text-warning"></i>';
+    }
+
+    const emptyStars = 5 - Math.ceil(numericRating);
+    for (let i = 0; i < emptyStars; i++) {
+        html += '<i class="far fa-star text-warning"></i>';
+    }
+
+    return html;
+}
 </script>
 {% endblock %}

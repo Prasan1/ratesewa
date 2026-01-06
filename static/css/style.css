@@ -1,33 +1,33 @@
 :root {
     --ink: #1f2a30;
     --muted: #5b6770;
-    --brand: #2f6f6d;
-    --brand-dark: #245756;
-    --brand-soft: #e2ece7;
-    --brand-contrast: #f5faf8;
+    --brand: #048288;
+    --brand-dark: #045c61;
+    --brand-soft: #e9f6f7;
+    --brand-contrast: #f4fafb;
     --accent-gold: #c9b46a;
     --accent-gold-dark: #a69048;
     --accent-gold-soft: #f3ebd1;
-    --accent: #2f6f6d;
-    --accent-dark: #245756;
-    --accent-soft: #dfe9e4;
+    --accent: #048288;
+    --accent-dark: #045c61;
+    --accent-soft: #d7e7ea;
     --surface: #ffffff;
-    --surface-alt: #f6f7f4;
-    --border: #e3e7e8;
+    --surface-alt: #f4fafb;
+    --border: #d7e7ea;
     --shadow-sm: 0 8px 24px rgba(17, 29, 35, 0.08);
     --shadow-md: 0 14px 30px rgba(17, 29, 35, 0.12);
-    --hero-grad-start: #f4f8f6;
-    --hero-grad-end: #e6f0ed;
-    --cta-grad-start: #eef6f2;
-    --cta-grad-end: #e8f1f6;
-    --footer-grad-start: #f4f7f5;
-    --footer-grad-end: #e6efec;
-    --promo-grad-start: #2f6f6d;
-    --promo-grad-end: #3c7a62;
-    --dash-1-start: #2f6f6d;
-    --dash-1-end: #245756;
-    --dash-2-start: #3c7a62;
-    --dash-2-end: #2f5f4c;
+    --hero-grad-start: #f4fafb;
+    --hero-grad-end: #e9f6f7;
+    --cta-grad-start: #eef8f9;
+    --cta-grad-end: #e6f2f4;
+    --footer-grad-start: #f4fafb;
+    --footer-grad-end: #e6f2f4;
+    --promo-grad-start: #048288;
+    --promo-grad-end: #0c949b;
+    --dash-1-start: #048288;
+    --dash-1-end: #045c61;
+    --dash-2-start: #0c949b;
+    --dash-2-end: #046e73;
     --dash-3-start: #c9b46a;
     --dash-3-end: #a69048;
     --dash-4-start: #5b6770;
@@ -74,6 +74,59 @@ a:hover {
 .hero-surface {
     background: linear-gradient(135deg, var(--hero-grad-start) 0%, var(--hero-grad-end) 100%);
     border-radius: 16px;
+}
+
+.homepage-hero {
+    margin-top: 12px;
+}
+
+.hero-card {
+    background: linear-gradient(135deg, var(--hero-grad-start) 0%, #f8fbfa 100%);
+    border-radius: 24px;
+    padding: 36px;
+    border: 1px solid rgba(227, 231, 232, 0.7);
+    box-shadow: var(--shadow-md);
+}
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+}
+
+.trust-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.trust-item {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    color: var(--ink);
+    box-shadow: 0 6px 12px rgba(17, 29, 35, 0.06);
+}
+
+.search-card {
+    margin-bottom: 0;
+    border-radius: 20px;
+    box-shadow: 0 12px 24px rgba(17, 29, 35, 0.12);
+}
+
+.stats-strip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
 }
 
 .cta-surface {
@@ -678,6 +731,21 @@ footer {
 @media (max-width: 768px) {
     .search-container {
         padding: 22px;
+    }
+
+    .hero-card {
+        padding: 24px;
+        border-radius: 18px;
+    }
+
+    .trust-strip {
+        justify-content: center;
+    }
+
+    .trust-item {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
     }
 
     .doctor-card {

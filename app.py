@@ -663,7 +663,9 @@ def get_doctor_avatar_url(doctor_name, doctor_id):
 
     # Normalize to avoid "Dr" being used as the first initial
     cleaned_name = doctor_name or ''
-    cleaned_name = re.sub(r'^\s*(dr|mr|mrs|ms|prof|professor)\.?\s+', '', cleaned_name, flags=re.IGNORECASE)
+    title_pattern = r'^\s*(dr|mr|mrs|ms|prof|professor|asst|assistant|assoc|associate)\.?\s+'
+    while re.match(title_pattern, cleaned_name, flags=re.IGNORECASE):
+        cleaned_name = re.sub(title_pattern, '', cleaned_name, flags=re.IGNORECASE)
     cleaned_name = re.sub(r'\s+', ' ', cleaned_name).strip()
     seed_name = cleaned_name or doctor_name
 
