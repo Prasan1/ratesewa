@@ -1,24 +1,49 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- Background circle with Nepal-inspired gradient -->
+  <!-- Modern medical gradient background -->
   <defs>
-    <linearGradient id="nepalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#DC143C;stop-opacity:1" />
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D8ABC;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#003893;stop-opacity:1" />
     </linearGradient>
+
+    <!-- Shadow for depth -->
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+    </filter>
   </defs>
 
-  <!-- Background circle -->
-  <circle cx="50" cy="50" r="48" fill="url(#nepalGradient)" stroke="#fff" stroke-width="2"/>
+  <!-- Main background circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#bgGradient)"/>
 
-  <!-- Temple-inspired roof shape (pagoda style) -->
-  <path d="M 50 20 L 30 35 L 35 35 L 35 50 L 65 50 L 65 35 L 70 35 Z"
-        fill="#fff" opacity="0.9"/>
+  <!-- White stethoscope icon (simplified for small sizes) -->
+  <g filter="url(#shadow)">
+    <!-- Ear pieces -->
+    <circle cx="35" cy="30" r="4" fill="white"/>
+    <circle cx="65" cy="30" r="4" fill="white"/>
 
-  <!-- Medical cross in the center -->
-  <rect x="45" y="40" width="10" height="25" fill="#DC143C" rx="1"/>
-  <rect x="38" y="47" width="24" height="10" fill="#DC143C" rx="1"/>
+    <!-- Tubes -->
+    <path d="M 35 34 Q 35 45 40 50"
+          stroke="white"
+          stroke-width="3.5"
+          fill="none"
+          stroke-linecap="round"/>
+    <path d="M 65 34 Q 65 45 60 50"
+          stroke="white"
+          stroke-width="3.5"
+          fill="none"
+          stroke-linecap="round"/>
 
-  <!-- Star for rating (top right) -->
-  <polygon points="80,25 82,31 88,31 83,35 85,41 80,37 75,41 77,35 72,31 78,31"
-           fill="#FFD700" stroke="#fff" stroke-width="0.5"/>
+    <!-- Chest piece -->
+    <circle cx="50" cy="60" r="12" fill="white"/>
+    <circle cx="50" cy="60" r="8" fill="#003893"/>
+    <circle cx="50" cy="60" r="5" fill="white"/>
+  </g>
+
+  <!-- Rating star (top right corner - RankSewa's key feature) -->
+  <g transform="translate(70, 20)">
+    <polygon points="0,-8 2,-2 8,-2 3,2 5,8 0,4 -5,8 -3,2 -8,-2 -2,-2"
+             fill="#FFD700"
+             stroke="white"
+             stroke-width="1"/>
+  </g>
 </svg>
