@@ -403,6 +403,73 @@
                             <i class="fas fa-handshake me-1"></i>Help others by being civil and constructive in your feedback
                         </small>
                     </div>
+
+                    <!-- Visit Experience Details -->
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">
+                                <i class="fas fa-clock me-2"></i>Visit Details (Optional but helpful!)
+                            </h6>
+                            <small class="text-muted d-block mb-3">
+                                Help other patients plan their visit by sharing timing and wait information
+                            </small>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="visit_time" class="form-label small fw-semibold">When did you visit?</label>
+                                    <select class="form-select form-select-sm" id="visit_time" name="visit_time">
+                                        <option value="">Select time...</option>
+                                        <option value="Morning">Morning (6 AM - 12 PM)</option>
+                                        <option value="Afternoon">Afternoon (12 PM - 5 PM)</option>
+                                        <option value="Evening">Evening (5 PM - 9 PM)</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-semibold">Did you have an appointment?</label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="had_appointment" id="appointment_yes" value="yes">
+                                            <label class="form-check-label small" for="appointment_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="had_appointment" id="appointment_no" value="no" checked>
+                                            <label class="form-check-label small" for="appointment_no">No (Walk-in)</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="wait_time_minutes" class="form-label small fw-semibold">
+                                        How long did you wait?
+                                        <i class="fas fa-info-circle text-muted" title="Total waiting time including delays"></i>
+                                    </label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" class="form-control" id="wait_time_minutes" name="wait_time_minutes"
+                                               min="0" max="600" placeholder="0">
+                                        <span class="input-group-text">minutes</span>
+                                    </div>
+                                    <small class="text-muted">Leave blank if you don't remember</small>
+                                </div>
+
+                                <div class="col-md-6 mb-0" id="doctor_on_time_container" style="display: none;">
+                                    <label class="form-label small fw-semibold">Was doctor on time for your appointment?</label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="doctor_on_time" id="on_time_yes" value="yes">
+                                            <label class="form-check-label small" for="on_time_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="doctor_on_time" id="on_time_no" value="no">
+                                            <label class="form-check-label small" for="on_time_no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -540,6 +607,24 @@ document.addEventListener('DOMContentLoaded', function() {
             // The 'action' attribute on the form tag will handle the request.
         });
     }
+
+    // Toggle "Was doctor on time?" field based on appointment status
+    const appointmentYes = document.getElementById('appointment_yes');
+    const appointmentNo = document.getElementById('appointment_no');
+    const doctorOnTimeContainer = document.getElementById('doctor_on_time_container');
+
+    function toggleDoctorOnTimeField() {
+        if (appointmentYes.checked) {
+            doctorOnTimeContainer.style.display = 'block';
+        } else {
+            doctorOnTimeContainer.style.display = 'none';
+            // Clear the doctor_on_time selection when hidden
+            document.getElementsByName('doctor_on_time').forEach(radio => radio.checked = false);
+        }
+    }
+
+    appointmentYes.addEventListener('change', toggleDoctorOnTimeField);
+    appointmentNo.addEventListener('change', toggleDoctorOnTimeField);
 
     // Handle flag review button clicks
     const flagButtons = document.querySelectorAll('.flag-review-btn');

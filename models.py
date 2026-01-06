@@ -223,6 +223,12 @@ class Rating(db.Model):
     comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Visit experience details (new fields for better patient insights)
+    visit_time = db.Column(db.String(20), nullable=True)  # Morning/Afternoon/Evening
+    had_appointment = db.Column(db.Boolean, default=False)  # Did they have an appointment?
+    wait_time_minutes = db.Column(db.Integer, nullable=True)  # How long they waited
+    doctor_on_time = db.Column(db.Boolean, nullable=True)  # Was doctor on time? (for appointments)
+
     # Relationships
     doctor_response = db.relationship('DoctorResponse', backref='rating', uselist=False, lazy=True)
     helpful_votes = db.relationship('ReviewHelpful', backref='rating', lazy=True)

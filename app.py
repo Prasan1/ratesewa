@@ -2977,6 +2977,12 @@ def rate_doctor():
     comment = request.form.get('comment')
     user_id = session['user_id']
 
+    # New visit experience fields
+    visit_time = request.form.get('visit_time')  # Morning/Afternoon/Evening
+    had_appointment = request.form.get('had_appointment') == 'yes'  # yes/no -> boolean
+    wait_time_minutes = request.form.get('wait_time_minutes')  # integer
+    doctor_on_time = request.form.get('doctor_on_time')  # yes/no/null
+
     if not doctor_id or not rating_value:
         flash('Please provide a rating.', 'danger')
         return redirect(url_for('index'))
@@ -3013,12 +3019,16 @@ def rate_doctor():
     # Check if this is the first review for this doctor
     is_first_review = Rating.query.filter_by(doctor_id=doctor_id).count() == 0
 
-    # Create new rating
+    # Create new rating with visit experience details
     new_rating = Rating(
         doctor_id=doctor_id,
         user_id=user_id,
         rating=rating_value,
-        comment=comment
+        comment=comment,
+        visit_time=visit_time,
+        had_appointment=had_appointment,
+        wait_time_minutes=int(wait_time_minutes) if wait_time_minutes else None,
+        doctor_on_time=True if doctor_on_time == 'yes' else (False if doctor_on_time == 'no' else None)
     )
     db.session.add(new_rating)
     db.session.flush()  # Flush to get the rating ID
