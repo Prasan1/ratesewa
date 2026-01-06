@@ -3109,6 +3109,15 @@ def rate_doctor():
         doctor = Doctor.query.get(doctor_id)
         return redirect(url_for('doctor_profile', slug=doctor.slug))
 
+    # Content moderation check (only if comment provided)
+    if comment and comment.strip():
+        from content_moderation import moderate_review
+        moderation = moderate_review('', comment)
+        if not moderation['approved']:
+            flash(moderation['message'], 'warning')
+            doctor = Doctor.query.get(doctor_id)
+            return redirect(url_for('doctor_profile', slug=doctor.slug))
+
     # Check if this is the first review for this doctor
     is_first_review = Rating.query.filter_by(doctor_id=doctor_id).count() == 0
 
