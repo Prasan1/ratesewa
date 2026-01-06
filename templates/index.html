@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Find Doctors in Nepal Based on Patient Reviews{% endblock %}
+{% block title %}RankSewa - Find Doctors in Nepal Based on Patient Reviews and Ratings{% endblock %}
+
+{% block meta_description %}Find and compare 28,000+ doctors in Nepal based on real patient reviews. Search by specialty and city in Kathmandu, Pokhara, Biratnagar, and across Nepal. Check NMC credentials, read verified patient experiences, and discover trusted healthcare providers near you.{% endblock %}
+
+{% block meta_keywords %}find doctors in Nepal, doctor reviews Nepal, NMC verified doctors, doctors in Kathmandu, doctors in Pokhara, Nepal healthcare directory, patient reviews, medical professionals Nepal, specialist doctors Nepal, doctor ratings Nepal, RankSewa{% endblock %}
+
+{% block og_title %}RankSewa - Find Trusted Doctors in Nepal | Patient Reviews & Ratings{% endblock %}
+{% block og_description %}Discover and compare doctors in Nepal based on real patient experiences. Search 28,000+ doctors by specialty and city. Read verified reviews, check NMC numbers, and find trusted healthcare providers near you.{% endblock %}
+
+{% block twitter_title %}RankSewa - Find Doctors in Nepal | Patient Reviews{% endblock %}
+{% block twitter_description %}Search 28,000+ doctors in Nepal by specialty and city. Read real patient reviews, check credentials, and find trusted healthcare providers.{% endblock %}
 
 {% block content %}
 <!-- Promotional Banner -->
@@ -145,6 +155,78 @@
                     Doctor info is compiled from public sources and self-submitted updates.
                     <strong>Verified</strong> badges mean the profile was reviewed by RankSewa (not an endorsement).
                 </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- What is RankSewa Section (for SEO and clarity) -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto text-center">
+                        <h2 class="h3 fw-bold mb-3 text-brand">What is RankSewa?</h2>
+                        <p class="lead text-muted mb-4">
+                            RankSewa is Nepal's comprehensive healthcare directory platform that helps patients find and review doctors based on real patient experiences.
+                        </p>
+                        <div class="row g-3 text-start">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-search text-brand fs-5"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h5 class="fw-semibold mb-2">Search by City & Specialty</h5>
+                                        <p class="text-muted small mb-0">Find doctors across Nepal's major cities including Kathmandu, Pokhara, Biratnagar, and more. Filter by medical specialty to find the right healthcare provider for your needs.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-star text-brand fs-5"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h5 class="fw-semibold mb-2">Real Patient Reviews</h5>
+                                        <p class="text-muted small mb-0">Read authentic patient experiences and ratings to make informed healthcare decisions. Share your own experience to help others in the community.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-shield-alt text-brand fs-5"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h5 class="fw-semibold mb-2">Verified Credentials</h5>
+                                        <p class="text-muted small mb-0">Check Nepal Medical Council (NMC) registration numbers and verified doctor profiles. RankSewa reviews doctor-submitted information for accuracy.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-user-md text-brand fs-5"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h5 class="fw-semibold mb-2">For Healthcare Providers</h5>
+                                        <p class="text-muted small mb-0">Doctors can claim their profiles for free, update their information, respond to reviews, and build trust with potential patients across Nepal.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -579,6 +661,87 @@ function generateStarRatingHtml(rating, ratingCount) {
     }
 
     return html;
+}
+</script>
+
+<!-- Structured Data (JSON-LD) for SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{ request.url_root }}#organization",
+      "name": "RankSewa",
+      "url": "{{ request.url_root }}",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "{{ request.url_root }}static/img/logo.png",
+        "width": 512,
+        "height": 512
+      },
+      "description": "Nepal's premier healthcare directory platform helping patients find and review doctors based on real experiences. Compare doctors by specialty, city, and patient ratings.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "NP",
+        "addressRegion": "Bagmati",
+        "addressLocality": "Kathmandu"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Nepal"
+      },
+      "sameAs": [
+        "https://www.facebook.com/ranksewa",
+        "https://twitter.com/ranksewa",
+        "https://www.linkedin.com/company/ranksewa",
+        "https://www.instagram.com/ranksewa"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "{{ request.url_root }}#website",
+      "url": "{{ request.url_root }}",
+      "name": "RankSewa - Find Doctors in Nepal",
+      "description": "Find and review doctors in Nepal based on patient experiences. Search by specialty, city, and read verified patient reviews.",
+      "publisher": {
+        "@id": "{{ request.url_root }}#organization"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "{{ request.url_root }}search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      },
+      "inLanguage": "en-US"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "{{ request.url }}#webpage",
+      "url": "{{ request.url }}",
+      "name": "RankSewa - Find Doctors in Nepal Based on Patient Reviews",
+      "isPartOf": {
+        "@id": "{{ request.url_root }}#website"
+      },
+      "about": {
+        "@id": "{{ request.url_root }}#organization"
+      },
+      "description": "Discover and compare 28,000+ doctors in Nepal. Search by specialty and city, read real patient reviews, check NMC credentials, and find trusted healthcare providers.",
+      "inLanguage": "en-US"
+    },
+    {
+      "@type": "MedicalOrganization",
+      "name": "RankSewa Healthcare Directory",
+      "url": "{{ request.url_root }}",
+      "description": "Comprehensive healthcare directory for Nepal featuring {{ total_doctors }}+ doctors across {{ total_cities }}+ cities with {{ total_reviews }}+ patient reviews",
+      "medicalSpecialty": [
+        "Cardiology", "Dermatology", "Pediatrics", "Orthopedics", "Gynecology",
+        "Neurology", "Ophthalmology", "ENT", "General Medicine", "Dentistry"
+      ]
+    }
+  ]
 }
 </script>
 {% endblock %}

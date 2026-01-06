@@ -13,6 +13,15 @@
 
     <title>{% block title %}RankSewa - Discover Healthcare Providers Based on Patient Experiences{% endblock %}</title>
 
+    <!-- Canonical URL (important for SEO) -->
+    <link rel="canonical" href="{% block canonical_url %}{{ request.url }}{% endblock %}">
+
+    <!-- Meta Description (important for SEO) -->
+    <meta name="description" content="{% block meta_description %}Discover and review the best doctors and healthcare providers in Nepal. Read patient experiences, check credentials, and find trusted medical professionals near you.{% endblock %}">
+
+    <!-- Keywords for SEO -->
+    <meta name="keywords" content="{% block meta_keywords %}doctors in Nepal, healthcare providers Nepal, find doctor Nepal, doctor reviews Nepal, NMC verified doctors, medical professionals Nepal, Kathmandu doctors, Nepal medical directory{% endblock %}">
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:url" content="{{ request.url }}">
