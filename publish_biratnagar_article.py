@@ -40,22 +40,38 @@ def publish_article():
         article = Article(
             title='Prescription Fraud Alert: Biratnagar Pharmacy Caught Manipulating Dosages - What Patients Must Know',
             slug='biratnagar-pharmacy-fraud-prescription-safety',
-            summary='A pharmacy at Nobel Medical College in Biratnagar was caught altering prescriptions, changing medication dosages that could endanger lives. Learn how to protect yourself and verify your prescriptions.',
+            summary='A pharmacy in Biratnagar was caught changing prescriptions—turning "1 tablet" into "15" or "18" to defraud patients. GM Dipesh Rai confirms Nobel Medical College is moving to digital prescriptions. Learn how to protect yourself.',
             content='''<h2>Prescription Manipulation Scandal Rocks Biratnagar: What Patients Need to Know</h2>
 
-<p class="lead">A pharmacy at Nobel Medical College in Biratnagar has been caught deliberately altering doctor prescriptions, changing medication dosages that could have endangered patient lives. The pharmacist responsible has fled the area after the fraud was discovered.</p>
+<p class="lead">A pharmacy operating near Nobel Medical College in Biratnagar has been caught deliberately altering doctor prescriptions—changing "1 tablet" to "15" or "18" tablets—to defraud vulnerable patients purchasing expensive surgical medications on credit. The fraud was discovered when an educated patient's relative compared the original prescription with the pharmacy's photocopy. The pharmacist has fled after being confronted.</p>
 
 <h3>What Happened?</h3>
 
-<p>In a shocking breach of medical ethics and patient trust, a pharmacy operating at Nobel Medical College in Biratnagar was discovered systematically manipulating doctor-written prescriptions. The fraudulent practice involved altering dosage numbers on prescriptions:</p>
+<p>In a shocking breach of medical ethics and patient trust, a pharmacy operating outside Nobel Medical College in Biratnagar was discovered systematically manipulating doctor-written prescriptions. The fraud came to light when an educated patient's relative, suspicious about their bill, compared the original doctor's prescription with the pharmacy's photocopy and found deliberate alterations.</p>
+
+<p><strong>Specific cases uncovered:</strong></p>
 
 <ul>
-    <li>Changing "8" tablets to "18" tablets</li>
-    <li>Altering "7" doses to "9" doses</li>
-    <li>Potentially other undiscovered modifications</li>
+    <li><strong>Recumid:</strong> Doctor prescribed "1" tablet (Rs. 640), pharmacy altered it to "15" tablets by adding a "5"</li>
+    <li><strong>Destimid:</strong> Doctor prescribed "1" tablet (Rs. 1,208 per unit), pharmacy changed it to "18" tablets by adding an "8"</li>
+    <li>Multiple other manipulations suspected across many patients</li>
 </ul>
 
-<p>When confronted by patients and medical staff who noticed the discrepancies, the pharmacist closed the pharmacy and fled Biratnagar, leaving behind questions about how long this practice had been ongoing and how many patients were affected.</p>
+<h4>How They Got Away With It—Until Now</h4>
+
+<p>The pharmacy specifically targeted vulnerable patients who needed credit (उधारो) for expensive surgical medications. Knowing these patients had no immediate cash and were in urgent medical situations, the pharmacist would:</p>
+
+<ol>
+    <li>Take the doctor's handwritten prescription</li>
+    <li>Photocopy it for "record-keeping"</li>
+    <li>Manually add digits to increase quantities (1 → 18, 1 → 15, etc.)</li>
+    <li>Bill patients the inflated amounts</li>
+    <li>Keep photocopies as false documentation</li>
+</ol>
+
+<p>Most patients in rushed, stressful medical situations never thought to count tablets or verify their bills against the original prescription. The fraud was only discovered when one vigilant family member insisted on comparing documents.</p>
+
+<p>When confronted with evidence, the pharmacy owner immediately shut down operations and fled Biratnagar. The pharmacy has not been seen since, and their whereabouts remain unknown.</p>
 
 <h3>Why This Is Extremely Dangerous</h3>
 
@@ -71,7 +87,13 @@ def publish_article():
 
 <h3>A Growing Problem in Nepal's Healthcare System</h3>
 
-<p>While this incident occurred in Biratnagar, it highlights broader concerns about healthcare transparency and accountability in Nepal. Patients place enormous trust in medical professionals—doctors, pharmacists, and healthcare institutions. When that trust is violated, it affects the entire healthcare ecosystem.</p>
+<p>While this incident occurred in Biratnagar, it highlights broader concerns about healthcare transparency and accountability in Nepal. What makes this case particularly disturbing is how it specifically exploited vulnerable patients:</p>
+
+<p><strong>The exploitation of medical emergencies:</strong> The pharmacy primarily targeted patients who needed expensive surgical medications on credit. These families, already under enormous stress and lacking immediate cash, were in no position to carefully scrutinize bills or count tablets. The pharmacist weaponized their desperation.</p>
+
+<p><strong>The education gap:</strong> As GM Dipesh Rai noted, the fraud was only caught because this particular patient's relative was educated and suspicious. How many less-educated families were defrauded and never knew? How many patients simply trusted the system and paid inflated bills without question?</p>
+
+<p>Patients place enormous trust in medical professionals—doctors, pharmacists, and healthcare institutions. When that trust is violated through deliberate fraud targeting the vulnerable, it affects the entire healthcare ecosystem.</p>
 
 <p>This case also raises questions about oversight mechanisms at private medical colleges and hospitals. How did this practice go undetected? Were there warning signs that were ignored? What systems need to be in place to prevent similar incidents?</p>
 
@@ -113,11 +135,32 @@ def publish_article():
     <li>Report any unusual side effects to your doctor immediately</li>
 </ul>
 
+<h3>Nobel Medical College's Response</h3>
+
+<p>General Manager Dipesh Rai acknowledged that the hospital administration was shocked by the incident. In a statement, he explained that the fraud was only discovered because the patient's relative was educated enough to be suspicious and had the courage to verify the prescription details.</p>
+
+<p><strong>Immediate actions taken by Nobel Medical College:</strong></p>
+
+<ul>
+    <li><strong>Digital prescription system:</strong> The hospital is immediately moving away from handwritten prescriptions to a computer-based digital system to prevent such manipulation</li>
+    <li><strong>Pharmacy meetings:</strong> Hospital held urgent meetings with all outside pharmacies operating near the facility (notably, the fraudulent pharmacy owner did not attend)</li>
+    <li><strong>Patient advisory:</strong> Hospital now urges all patients to:
+        <ul>
+            <li>Verify that purchased medicines match the doctor's original prescription</li>
+            <li>Count medications before leaving the pharmacy</li>
+            <li>Keep the original prescription safe for final reconciliation</li>
+            <li>Purchase from any pharmacy they trust, not just nearby ones</li>
+        </ul>
+    </li>
+</ul>
+
+<p>GM Rai noted that most patients in rushed, stressful situations don't have the presence of mind to count tablets or verify documents—exactly what the fraudulent pharmacist was counting on.</p>
+
 <h3>What Should Happen Next?</h3>
 
 <p>The Biratnagar incident demands immediate action from multiple parties:</p>
 
-<p><strong>For Medical Institutions:</strong> Nobel Medical College must conduct a thorough internal investigation, compensate affected patients, and implement stronger pharmacy oversight systems. Their response to this crisis will define their credibility going forward.</p>
+<p><strong>For Medical Institutions:</strong> Nobel Medical College has already begun implementing safeguards, but other hospitals across Nepal should take note and proactively move to digital prescription systems before similar incidents occur at their facilities.</p>
 
 <p><strong>For Regulatory Bodies:</strong> The Nepal Medical Council and Nepal Pharmacy Council need to investigate not just this incident but whether similar practices exist elsewhere. Strengthening inspection protocols and implementing random audits could prevent future cases.</p>
 
@@ -137,15 +180,26 @@ def publish_article():
 
 <h3>Moving Forward</h3>
 
-<p>If you or someone you know may have been affected by the Biratnagar pharmacy fraud, take these steps:</p>
+<p><strong>If you purchased medications from pharmacies near Nobel Medical College in Biratnagar (especially on credit), particularly Recumid or Destimid, you may have been affected.</strong></p>
+
+<p>Take these steps immediately:</p>
 
 <ol>
-    <li><strong>Review past prescriptions and pharmacy bills</strong> from this location for any discrepancies</li>
-    <li><strong>Contact your prescribing doctor</strong> if you notice you have extra medication or ran out too quickly</li>
-    <li><strong>Report the incident</strong> to the Nepal Pharmacy Council (www.nepalpharmacycouncil.org.np)</li>
-    <li><strong>Get a medication review</strong> from your doctor to ensure you're taking correct dosages going forward</li>
-    <li><strong>Share your experience</strong> to warn other patients and help authorities understand the scope of the problem</li>
+    <li><strong>Compare your original prescription with pharmacy bills:</strong> Look for added digits (1 changed to 18, 1 changed to 15, etc.). Check specifically for Recumid and Destimid but also other expensive surgical medications</li>
+    <li><strong>Count remaining medications:</strong> If you were prescribed 1 tablet but billed for 15-18, you should have extras. If you don't, you may have been defrauded</li>
+    <li><strong>Contact your prescribing doctor</strong> to verify the original prescription quantities if you no longer have the original prescription</li>
+    <li><strong>Report to authorities:</strong> File complaints with:
+        <ul>
+            <li>Nepal Pharmacy Council (www.nepalpharmacycouncil.org.np)</li>
+            <li>Local police (this is criminal fraud)</li>
+            <li>Nobel Medical College administration (they are cooperating with affected patients)</li>
+        </ul>
+    </li>
+    <li><strong>Get a medication review</strong> from your doctor if you took the wrong dosages</li>
+    <li><strong>Share your experience</strong> to help other victims come forward and assist authorities in understanding the full scope</li>
 </ol>
+
+<p><strong>For future protection:</strong> Never purchase medications on credit from pharmacies you don't fully trust. If credit is necessary, insist on keeping the original prescription and take a photo before handing it over.</p>
 
 <h3>Your Voice Matters</h3>
 
