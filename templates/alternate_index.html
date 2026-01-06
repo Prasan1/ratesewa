@@ -408,6 +408,15 @@ $(document).ready(function() {
         });
     }
 
+    // Generate professional avatar URL for doctors without photos
+    function getDoctorAvatar(doctorName, doctorId) {
+        const cleanedName = (doctorName || '').replace(/^\s*dr\.?\s+/i, '').trim() || doctorName;
+        const colors = ['0D8ABC', '2a9d8f', 'e76f51', 'f4a261', '264653', '9b59b6', '3498db', '16a085'];
+        const color = colors[doctorId % colors.length];
+        const seed = encodeURIComponent(cleanedName);
+        return `https://api.dicebear.com/7.x/initials/svg?seed=${seed}&backgroundColor=${color}`;
+    }
+
     function displayDoctors(response) {
         const doctors = response.doctors || response; // Handle both old and new format
         const pagination = response.pagination;
@@ -437,7 +446,7 @@ $(document).ready(function() {
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
                                 <div class="doctor-avatar me-3">
-                                    <img src="${doctor.photo_url || 'https://picsum.photos/seed/doctor' + doctor.id + '/80/80.jpg'}" class="rounded-circle" alt="${doctor.name}" width="80" height="80" loading="lazy" onerror="this.src='https://picsum.photos/seed/doctor${doctor.id}/80/80.jpg'">
+                                    <img src="${doctor.photo_url || 'getDoctorAvatar(doctor.name, doctor.id)'}" class="rounded-circle" alt="${doctor.name}" width="80" height="80" loading="lazy" onerror="this.src='getDoctorAvatar('${doctor.name}', ${doctor.id})'">
                                 </div>
                                 <div class="doctor-info flex-grow-1">
                                     <div class="d-flex align-items-center justify-content-between">

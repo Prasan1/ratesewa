@@ -631,6 +631,61 @@ def generate_unique_clinic_slug(name, clinic_id=None):
         slug = f"{base_slug}-{counter}"
         counter += 1
 
+
+def get_doctor_avatar_url(doctor_name, doctor_id):
+    """
+    Generate professional avatar URL for doctors without photos.
+    Uses DiceBear Avatars API to create unique, professional initials-based avatars.
+
+    Args:
+        doctor_name: Full name of the doctor (e.g., "Dr. Ramesh Sharma")
+        doctor_id: Unique doctor ID for color consistency
+
+    Returns:
+        URL to professional avatar image
+    """
+    from urllib.parse import quote
+
+    # Color palette - professional medical colors
+    colors = [
+        '0D8ABC',  # Medical blue
+        '2a9d8f',  # Teal
+        'e76f51',  # Coral
+        'f4a261',  # Sandy brown
+        '264653',  # Dark blue-green
+        '9b59b6',  # Purple
+        '3498db',  # Sky blue
+        '16a085',  # Green sea
+    ]
+
+    # Select color based on doctor ID for consistency
+    color = colors[doctor_id % len(colors)]
+
+    # Normalize to avoid "Dr" being used as the first initial
+    cleaned_name = doctor_name or ''
+    cleaned_name = re.sub(r'^\s*dr\.?\s+', '', cleaned_name, flags=re.IGNORECASE)
+    cleaned_name = re.sub(r'\s+', ' ', cleaned_name).strip()
+    seed_name = cleaned_name or doctor_name
+
+    # URL encode the doctor name for seed
+    seed = quote(seed_name)
+
+    # Generate DiceBear initials avatar URL
+    return f"https://api.dicebear.com/7.x/initials/svg?seed={seed}&backgroundColor={color}"
+
+
+# Register as Jinja template filter
+@app.template_filter('doctor_avatar')
+def doctor_avatar_filter(doctor):
+    """
+    Jinja template filter to get doctor avatar URL.
+    Usage in templates: {{ doctor|doctor_avatar }}
+    """
+    if doctor.photo_url:
+        return doctor.photo_url
+    return get_doctor_avatar_url(doctor.name, doctor.id)
+
+
 # --- Authentication Routes ---
 @app.route('/register', methods=['GET', 'POST'])
 def register():

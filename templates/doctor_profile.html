@@ -62,9 +62,9 @@
                      class="rounded-circle mb-3"
                      alt="{{ doctor.name }}"
                      style="width: 200px; height: 200px; object-fit: cover;"
-                     onerror="this.src='https://picsum.photos/seed/doctor{{ doctor.id }}/200/200.jpg'">
+                     onerror="this.src='{{ doctor|doctor_avatar }}'">
                 {% else %}
-                <img src="https://picsum.photos/seed/doctor{{ doctor.id }}/200/200.jpg"
+                <img src="{{ doctor|doctor_avatar }}"
                      class="rounded-circle mb-3"
                      alt="{{ doctor.name }}"
                      style="width: 200px; height: 200px; object-fit: cover;">
