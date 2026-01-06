@@ -58,6 +58,16 @@
     <!-- Theme Color (for mobile browsers) -->
     <meta name="theme-color" content="#0D8ABC">
 
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z1EHM5PJW6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-Z1EHM5PJW6');
+    </script>
+
     <!-- Local Bootstrap CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
     <!-- Google Fonts (keeping CDN for fonts as they're frequently updated) -->
