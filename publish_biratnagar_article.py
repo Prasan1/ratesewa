@@ -157,7 +157,7 @@ def publish_article():
     <strong>Have you visited Nobel Medical College or other hospitals in Biratnagar?</strong> Share your experience to help other patients make informed healthcare decisions. Your review could prevent someone else from encountering similar problems.
 </div>''',
             category_id=category.id,
-            meta_description='Biratnagar pharmacy fraud exposed: Learn how to protect yourself from prescription manipulation, verify medication dosages, and ensure healthcare safety in Nepal.',
+            meta_description='Pharmacy at Nobel Medical College caught altering prescriptions. Learn how to verify your medications and protect yourself from dosage fraud in Nepal.',
             meta_keywords='pharmacy fraud Nepal, prescription safety, Biratnagar healthcare, Nobel Medical College, medication dosage, prescription manipulation, patient safety Nepal, pharmacy oversight',
             is_published=True,
             is_featured=True,
