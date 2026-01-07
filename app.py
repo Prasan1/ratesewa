@@ -2114,6 +2114,30 @@ def admin_doctor_new():
             flash('Name, city, and specialty are required.', 'danger')
             return render_template('admin_doctor_form.html', doctor=None, cities=cities, specialties=specialties, clinics=clinics)
 
+        # Validate field lengths (prevent database errors)
+        validation_errors = []
+        if len(name) > 200:
+            validation_errors.append('Doctor name must be less than 200 characters')
+        if nmc_number and len(nmc_number) > 50:
+            validation_errors.append('NMC number must be less than 50 characters')
+        if phone_number and len(phone_number) > 20:
+            validation_errors.append('Phone number must be less than 20 characters (use only one number)')
+        if workplace and len(workplace) > 200:
+            validation_errors.append('Workplace must be less than 200 characters')
+        if practice_address and len(practice_address) > 500:
+            validation_errors.append('Practice address must be less than 500 characters')
+        if external_clinic_url and len(external_clinic_url) > 500:
+            validation_errors.append('External clinic URL must be less than 500 characters')
+        if education and len(education) > 200:
+            validation_errors.append('Education must be less than 200 characters')
+        if college and len(college) > 200:
+            validation_errors.append('College must be less than 200 characters')
+
+        if validation_errors:
+            for error in validation_errors:
+                flash(error, 'danger')
+            return render_template('admin_doctor_form.html', doctor=None, cities=cities, specialties=specialties, clinics=clinics)
+
         # Check if NMC number already exists
         # Skip validation if NMC number is empty or "None" string
         if nmc_number and nmc_number.lower() != 'none':
@@ -2145,26 +2169,38 @@ def admin_doctor_new():
             is_active=is_active,
             is_verified=is_verified
         )
-        db.session.add(doctor)
-        db.session.flush()  # Get doctor ID before photo upload
+        try:
+            db.session.add(doctor)
+            db.session.flush()  # Get doctor ID before photo upload
 
-        # Handle photo upload
-        if 'profile_photo' in request.files:
-            photo_file = request.files['profile_photo']
-            if photo_file and photo_file.filename:
-                try:
-                    photo_path = upload_utils.save_profile_photo(
-                        photo_file,
-                        app.config['UPLOAD_FOLDER'],
-                        doctor.id
-                    )
-                    doctor.photo_url = photo_path
-                except ValueError as e:
-                    flash(f'Error uploading photo: {str(e)}', 'warning')
+            # Handle photo upload
+            if 'profile_photo' in request.files:
+                photo_file = request.files['profile_photo']
+                if photo_file and photo_file.filename:
+                    try:
+                        photo_path = upload_utils.save_profile_photo(
+                            photo_file,
+                            app.config['UPLOAD_FOLDER'],
+                            doctor.id
+                        )
+                        doctor.photo_url = photo_path
+                    except ValueError as e:
+                        flash(f'Error uploading photo: {str(e)}', 'warning')
 
-        db.session.commit()
-        flash('Doctor added successfully.', 'success')
-        return redirect(url_for('admin_doctors'))
+            db.session.commit()
+            flash('Doctor added successfully.', 'success')
+            return redirect(url_for('admin_doctors'))
+
+        except Exception as e:
+            db.session.rollback()
+            error_msg = str(e)
+            if 'too long' in error_msg.lower() or 'value too long' in error_msg.lower():
+                flash('One or more fields are too long. Please shorten your input.', 'danger')
+            elif 'duplicate' in error_msg.lower() or 'unique' in error_msg.lower():
+                flash('This doctor may already exist in the database.', 'danger')
+            else:
+                flash(f'Error adding doctor: {error_msg}', 'danger')
+            return render_template('admin_doctor_form.html', doctor=None, cities=cities, specialties=specialties, clinics=clinics)
 
     return render_template('admin_doctor_form.html', doctor=None, cities=cities, specialties=specialties, clinics=clinics)
 
@@ -2216,6 +2252,30 @@ def admin_doctor_edit(doctor_id):
             flash('Name, city, and specialty are required.', 'danger')
             return render_template('admin_doctor_form.html', doctor=doctor, cities=cities, specialties=specialties, clinics=clinics)
 
+        # Validate field lengths (prevent database errors)
+        validation_errors = []
+        if len(name) > 200:
+            validation_errors.append('Doctor name must be less than 200 characters')
+        if nmc_number and len(nmc_number) > 50:
+            validation_errors.append('NMC number must be less than 50 characters')
+        if phone_number and len(phone_number) > 20:
+            validation_errors.append('Phone number must be less than 20 characters (use only one number)')
+        if workplace and len(workplace) > 200:
+            validation_errors.append('Workplace must be less than 200 characters')
+        if practice_address and len(practice_address) > 500:
+            validation_errors.append('Practice address must be less than 500 characters')
+        if external_clinic_url and len(external_clinic_url) > 500:
+            validation_errors.append('External clinic URL must be less than 500 characters')
+        if education and len(education) > 200:
+            validation_errors.append('Education must be less than 200 characters')
+        if college and len(college) > 200:
+            validation_errors.append('College must be less than 200 characters')
+
+        if validation_errors:
+            for error in validation_errors:
+                flash(error, 'danger')
+            return render_template('admin_doctor_form.html', doctor=doctor, cities=cities, specialties=specialties, clinics=clinics)
+
         # Check if NMC number already exists (if changing it)
         # Skip validation if NMC number is empty or "None" string
         if nmc_number and nmc_number.lower() != 'none' and nmc_number != doctor.nmc_number:
@@ -2244,32 +2304,44 @@ def admin_doctor_edit(doctor_id):
         doctor.is_active = is_active
         doctor.is_verified = is_verified
 
-        # Handle profile photo removal
-        if 'remove_photo' in request.form and doctor.photo_url:
-            upload_utils.delete_profile_photo(app.config['UPLOAD_FOLDER'], doctor.photo_url)
-            doctor.photo_url = None
+        try:
+            # Handle profile photo removal
+            if 'remove_photo' in request.form and doctor.photo_url:
+                upload_utils.delete_profile_photo(app.config['UPLOAD_FOLDER'], doctor.photo_url)
+                doctor.photo_url = None
 
-        # Handle photo upload
-        if 'profile_photo' in request.files:
-            photo_file = request.files['profile_photo']
-            if photo_file and photo_file.filename:
-                try:
-                    # Delete old photo if exists
-                    if doctor.photo_url:
-                        upload_utils.delete_profile_photo(app.config['UPLOAD_FOLDER'], doctor.photo_url)
+            # Handle photo upload
+            if 'profile_photo' in request.files:
+                photo_file = request.files['profile_photo']
+                if photo_file and photo_file.filename:
+                    try:
+                        # Delete old photo if exists
+                        if doctor.photo_url:
+                            upload_utils.delete_profile_photo(app.config['UPLOAD_FOLDER'], doctor.photo_url)
 
-                    photo_path = upload_utils.save_profile_photo(
-                        photo_file,
-                        app.config['UPLOAD_FOLDER'],
-                        doctor.id
-                    )
-                    doctor.photo_url = photo_path
-                except ValueError as e:
-                    flash(f'Error uploading photo: {str(e)}', 'warning')
+                        photo_path = upload_utils.save_profile_photo(
+                            photo_file,
+                            app.config['UPLOAD_FOLDER'],
+                            doctor.id
+                        )
+                        doctor.photo_url = photo_path
+                    except ValueError as e:
+                        flash(f'Error uploading photo: {str(e)}', 'warning')
 
-        db.session.commit()
-        flash('Doctor updated successfully.', 'success')
-        return redirect(url_for('admin_doctors'))
+            db.session.commit()
+            flash('Doctor updated successfully.', 'success')
+            return redirect(url_for('admin_doctors'))
+
+        except Exception as e:
+            db.session.rollback()
+            error_msg = str(e)
+            if 'too long' in error_msg.lower() or 'value too long' in error_msg.lower():
+                flash('One or more fields are too long. Please shorten your input.', 'danger')
+            elif 'duplicate' in error_msg.lower() or 'unique' in error_msg.lower():
+                flash('This doctor may already exist in the database.', 'danger')
+            else:
+                flash(f'Error updating doctor: {error_msg}', 'danger')
+            return render_template('admin_doctor_form.html', doctor=doctor, cities=cities, specialties=specialties, clinics=clinics)
 
     return render_template('admin_doctor_form.html', doctor=doctor, cities=cities, specialties=specialties, clinics=clinics)
 
