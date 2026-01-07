@@ -287,6 +287,32 @@ Two-sided marketplaces are especially hard because you need BOTH sides engaged.
 
 **Until then: English-only is a strategic advantage, not a limitation**
 
+### Doctor Verification Strategy
+
+**Current Approach (Jan 2026):**
+- **Keep ID submission requirement** for all claims
+- Manually review all claims (2-3 business days)
+- Better to err on side of caution at MVP stage
+
+**Why:**
+- Legal protection (have ID on file if dispute)
+- Prevents impersonation fraud
+- Low claim volume (can handle manual review)
+- Peace of mind while building traffic
+
+**Optional Improvements to Consider:**
+- SMS verification (add extra layer, ~$0.01 per claim)
+- Email domain checking (auto-flag personal emails)
+- Risk scoring (prioritize review queue)
+
+**When to Revisit:**
+- Getting 20+ claims per week (review bottleneck)
+- Doctors complaining about friction
+- Processed 100+ claims with zero fraud
+- Competitors have easier process
+
+**Decision:** Keep strict verification until traffic/claims justify loosening it.
+
 ### Technical Debt
 - Clean up repo (remove debug files)
 - Don't commit conversation logs
