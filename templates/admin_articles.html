@@ -65,6 +65,7 @@
                                   action="{{ url_for('admin_article_delete', article_id=article.id) }}"
                                   class="d-inline"
                                   onsubmit="return confirm('Delete this article?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
                                     <i class="fas fa-trash"></i>
                                 </button>
