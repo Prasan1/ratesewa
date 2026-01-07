@@ -2786,6 +2786,82 @@ def admin_article_delete(article_id):
     flash('Article deleted successfully.', 'success')
     return redirect(url_for('admin_articles'))
 
+@app.route('/admin/email-composer')
+@admin_required
+def admin_email_composer():
+    """Email composer for sending emails to doctors"""
+    # Get all verified doctors with user emails
+    verified_doctors = Doctor.query.filter_by(is_verified=True)\
+        .join(User, Doctor.user_id == User.id, isouter=True)\
+        .order_by(Doctor.name).all()
+
+    return render_template('admin_email_composer.html',
+                         verified_doctors=verified_doctors)
+
+@app.route('/admin/send-email', methods=['POST'])
+@admin_required
+def admin_send_email():
+    """Send email to doctor(s)"""
+    doctor_id = request.form.get('doctor_id')
+    recipient_email = request.form.get('recipient_email', '').strip()
+    subject = request.form.get('subject', '').strip()
+    body = request.form.get('body', '').strip()
+
+    # Validate inputs
+    if not subject or not body:
+        flash('Subject and body are required', 'danger')
+        return redirect(url_for('admin_email_composer'))
+
+    # Determine recipient
+    to_email = None
+    doctor_name = None
+
+    if doctor_id:
+        # Selected from dropdown
+        doctor = Doctor.query.get(doctor_id)
+        if doctor and doctor.user:
+            to_email = doctor.user.email
+            doctor_name = doctor.name
+        else:
+            flash('Selected doctor does not have an email address', 'danger')
+            return redirect(url_for('admin_email_composer'))
+    elif recipient_email:
+        # Manual email entry
+        to_email = recipient_email
+        doctor_name = recipient_email.split('@')[0]  # Use email prefix as fallback
+    else:
+        flash('Please select a doctor or enter an email address', 'danger')
+        return redirect(url_for('admin_email_composer'))
+
+    # Send email using Resend
+    try:
+        # Wrap body in professional HTML template
+        html_body = f"""
+        <div style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #111;">
+            {body}
+        </div>
+        """
+
+        params = {
+            "from": "RankSewa Support <support@ranksewa.com>",
+            "to": [to_email],
+            "subject": subject,
+            "html": html_body,
+            "reply_to": "support@ranksewa.com"
+        }
+
+        response = resend.Emails.send(params)
+
+        flash(f'✅ Email sent successfully to {to_email}!', 'success')
+        print(f"[EMAIL] Sent to {to_email}: {subject}")
+
+    except Exception as e:
+        flash(f'❌ Failed to send email: {str(e)}', 'danger')
+        print(f"[EMAIL ERROR] Failed to send to {to_email}: {e}")
+        return redirect(url_for('admin_email_composer'))
+
+    return redirect(url_for('admin_email_composer'))
+
 @app.route('/admin/users')
 @admin_required
 def admin_users():

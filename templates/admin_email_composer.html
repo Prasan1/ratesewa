@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Email Composer - Admin{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-envelope me-2"></i>
+                    Email Composer
+                </h2>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('admin_send_email') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                        <!-- Email Template Selector -->
+                        <div class="alert alert-info mb-4">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    <strong>Quick Start:</strong> Select a template to pre-fill the email
+                                </div>
+                                <select class="form-select form-select-sm" id="templateSelector" style="width: auto;">
+                                    <option value="">Choose template...</option>
+                                    <option value="profile_fixed">Profile Issue Fixed</option>
+                                    <option value="welcome">Welcome to RankSewa</option>
+                                    <option value="profile_enhance">Profile Enhancement Suggestion</option>
+                                    <option value="verification_reminder">Verification Reminder</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Recipient Section -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-user me-2"></i><strong>Recipient</strong> <span class="text-danger">*</span>
+                            </label>
+
+                            <!-- Option 1: Select from verified doctors -->
+                            <div class="mb-3">
+                                <label for="doctor_id" class="form-label small text-muted">Select a verified doctor:</label>
+                                <select class="form-select" id="doctor_id" name="doctor_id">
+                                    <option value="">-- Select Doctor --</option>
+                                    {% for doctor in verified_doctors %}
+                                    <option value="{{ doctor.id }}" data-email="{{ doctor.user.email if doctor.user else '' }}">
+                                        {{ doctor.name }} ({{ doctor.specialty.name }})
+                                        {% if doctor.user %}
+                                        - {{ doctor.user.email }}
+                                        {% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- OR Option 2: Enter email manually -->
+                            <div class="text-center my-2">
+                                <small class="text-muted">OR</small>
+                            </div>
+
+                            <div>
+                                <label for="recipient_email" class="form-label small text-muted">Enter email address:</label>
+                                <input type="email"
+                                       class="form-control"
+                                       id="recipient_email"
+                                       name="recipient_email"
+                                       placeholder="doctor@example.com">
+                                <small class="form-text text-muted">
+                                    Enter email manually if doctor is not in the list above
+                                </small>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Subject -->
+                        <div class="mb-4">
+                            <label for="subject" class="form-label">
+                                <strong>Subject</strong> <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="subject"
+                                   name="subject"
+                                   placeholder="Your RankSewa Profile Has Been Updated"
+                                   required>
+                        </div>
+
+                        <!-- Email Body -->
+                        <div class="mb-4">
+                            <label for="body" class="form-label">
+                                <strong>Email Body</strong> <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control"
+                                      id="body"
+                                      name="body"
+                                      rows="15"
+                                      placeholder="Enter your email content here (HTML supported)"
+                                      required></textarea>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                You can use HTML formatting. Basic tags: &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;p&gt;, &lt;a href=""&gt;, &lt;br&gt;
+                            </small>
+                        </div>
+
+                        <!-- Preview Button -->
+                        <div class="mb-4">
+                            <button type="button" class="btn btn-outline-info" id="previewBtn">
+                                <i class="fas fa-eye me-2"></i>Preview Email
+                            </button>
+                        </div>
+
+                        <!-- Preview Area -->
+                        <div id="previewArea" class="alert alert-light border d-none mb-4">
+                            <h6 class="mb-3">Email Preview:</h6>
+                            <div class="p-3 bg-white border rounded">
+                                <div class="mb-2"><strong>To:</strong> <span id="previewRecipient"></span></div>
+                                <div class="mb-2"><strong>Subject:</strong> <span id="previewSubject"></span></div>
+                                <hr>
+                                <div id="previewBody" style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6;"></div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Send Email
+                            </button>
+                            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-lg">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Email Templates
+const templates = {
+    'profile_fixed': {
+        subject: 'Your RankSewa Profile Has Been Updated',
+        body: `<p><strong>Namaste Dr. [Name],</strong></p>
+
+<p>Thank you for reaching out and for bringing those details to our attention.</p>
+
+<p>We're happy to let you know that the issues with your profile have been resolved:</p>
+
+<ul>
+    <li>Your profile information has been corrected</li>
+    <li>All details are now accurate and up to date</li>
+</ul>
+
+<p>Your profile is now live on RankSewa ✅</p>
+
+<p>If you need any further assistance, feel free to reply to this email—we're always happy to help.</p>
+
+<p style="margin-top: 32px;">
+    <strong>Warm regards,</strong><br>
+    RankSewa Support Team<br>
+    <a href="mailto:support@ranksewa.com">support@ranksewa.com</a><br>
+    <a href="https://ranksewa.com">https://ranksewa.com</a>
+</p>`
+    },
+    'welcome': {
+        subject: 'Welcome to RankSewa - Your Profile is Live!',
+        body: `<p><strong>Namaste Dr. [Name],</strong></p>
+
+<p>Welcome to RankSewa! We're excited to have you on board.</p>
+
+<p>Your verified profile is now live and patients can find you when searching for healthcare providers in Nepal.</p>
+
+<h3>What's Next?</h3>
+
+<ul>
+    <li><strong>Enhance your profile:</strong> Add a professional description about your experience and services</li>
+    <li><strong>Share your profile:</strong> Let your patients know they can find and review you on RankSewa</li>
+    <li><strong>Monitor your analytics:</strong> Track profile views and patient engagement</li>
+</ul>
+
+<p>
+    <a href="https://ranksewa.com/doctor/dashboard" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px;">
+        Visit Your Dashboard →
+    </a>
+</p>
+
+<p>If you have any questions, we're here to help!</p>
+
+<p style="margin-top: 32px;">
+    <strong>Warm regards,</strong><br>
+    RankSewa Support Team<br>
+    <a href="mailto:support@ranksewa.com">support@ranksewa.com</a>
+</p>`
+    },
+    'profile_enhance': {
+        subject: 'Enhance Your RankSewa Profile',
+        body: `<p><strong>Namaste Dr. [Name],</strong></p>
+
+<p>We hope your experience with RankSewa has been great so far!</p>
+
+<p>We noticed your profile could be enhanced with a few additional details that help patients choose the right doctor for their needs:</p>
+
+<ul>
+    <li><strong>Professional description:</strong> Share your experience, specializations, and approach to patient care</li>
+    <li><strong>Profile photo:</strong> Add a professional photo to build trust with patients</li>
+    <li><strong>Services offered:</strong> List specific treatments or procedures you provide</li>
+</ul>
+
+<p>Enhanced profiles typically receive 3-4x more patient inquiries!</p>
+
+<p>
+    <a href="https://ranksewa.com/doctor/dashboard" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px;">
+        Update Profile →
+    </a>
+</p>
+
+<p>Need help? Reply to this email and we'll assist you.</p>
+
+<p style="margin-top: 32px;">
+    <strong>Warm regards,</strong><br>
+    RankSewa Support Team
+</p>`
+    },
+    'verification_reminder': {
+        subject: 'Complete Your RankSewa Profile Verification',
+        body: `<p><strong>Namaste Dr. [Name],</strong></p>
+
+<p>We noticed you started the verification process for your RankSewa profile but haven't completed it yet.</p>
+
+<p><strong>Why verify your profile?</strong></p>
+
+<ul>
+    <li>Patients trust verified doctors 5x more</li>
+    <li>Get a "Verified" badge on your profile</li>
+    <li>Access to doctor dashboard and analytics</li>
+    <li>Respond to patient reviews</li>
+</ul>
+
+<p>Verification takes just 5 minutes and requires:</p>
+<ul>
+    <li>Valid NMC registration number</li>
+    <li>Government-issued ID</li>
+    <li>Phone number and email</li>
+</ul>
+
+<p>
+    <a href="https://ranksewa.com/claim-profile" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px;">
+        Complete Verification →
+    </a>
+</p>
+
+<p>Questions? Reply to this email anytime.</p>
+
+<p style="margin-top: 32px;">
+    <strong>Warm regards,</strong><br>
+    RankSewa Support Team
+</p>`
+    }
+};
+
+// Template selector
+document.getElementById('templateSelector').addEventListener('change', function() {
+    const templateKey = this.value;
+    if (templateKey && templates[templateKey]) {
+        const template = templates[templateKey];
+        document.getElementById('subject').value = template.subject;
+        document.getElementById('body').value = template.body;
+    }
+});
+
+// Doctor selector - auto-fill email
+document.getElementById('doctor_id').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const email = selectedOption.getAttribute('data-email');
+    if (email) {
+        document.getElementById('recipient_email').value = email;
+        document.getElementById('recipient_email').disabled = true;
+    } else {
+        document.getElementById('recipient_email').disabled = false;
+    }
+});
+
+// Preview button
+document.getElementById('previewBtn').addEventListener('click', function() {
+    const doctorSelect = document.getElementById('doctor_id');
+    const recipientEmail = document.getElementById('recipient_email').value;
+    const subject = document.getElementById('subject').value;
+    const body = document.getElementById('body').value;
+
+    // Get recipient
+    let recipient = recipientEmail;
+    if (doctorSelect.value) {
+        recipient = doctorSelect.options[doctorSelect.selectedIndex].text;
+    }
+
+    // Show preview
+    document.getElementById('previewRecipient').textContent = recipient || '[No recipient selected]';
+    document.getElementById('previewSubject').textContent = subject || '[No subject]';
+    document.getElementById('previewBody').innerHTML = body || '<em>No content</em>';
+
+    document.getElementById('previewArea').classList.remove('d-none');
+
+    // Scroll to preview
+    document.getElementById('previewArea').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const doctorId = document.getElementById('doctor_id').value;
+    const recipientEmail = document.getElementById('recipient_email').value;
+
+    if (!doctorId && !recipientEmail) {
+        e.preventDefault();
+        alert('Please select a doctor or enter an email address');
+        return false;
+    }
+
+    if (!confirm('Send this email now?')) {
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
+{% endblock %}
