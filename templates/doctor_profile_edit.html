@@ -59,7 +59,8 @@
                                 <!-- Current Photo Preview -->
                                 <div>
                                     {% if doctor.photo_url %}
-                                    <img src="{{ url_for('serve_photo', filename=doctor.photo_url) }}"
+                                    {% set photo_path = doctor.photo_url.replace('photos/', '') %}
+                                    <img src="{{ url_for('serve_photo', filename=photo_path) }}"
                                          alt="{{ doctor.name }}"
                                          class="rounded-circle"
                                          style="width: 100px; height: 100px; object-fit: cover;"

@@ -15,7 +15,7 @@
   "@type": "Physician",
   "name": "{{ doctor.name }}",
   {% if doctor.photo_url %}
-  "image": "{{ url_for('serve_photo', filename=doctor.photo_url, _external=True) }}",
+  "image": "{{ url_for('serve_photo', filename=doctor.photo_url.replace('photos/', ''), _external=True) }}",
   {% endif %}
   "address": {
     "@type": "PostalAddress",
@@ -46,11 +46,11 @@
 {% block og_type %}profile{% endblock %}
 {% block og_title %}{{ doctor.name }} - {{ doctor.specialty.name }} in {{ doctor.city.name }}{% endblock %}
 {% block og_description %}{{ doctor.specialty.name }} with {{ doctor.experience }} years experience in {{ doctor.city.name }}, Nepal.{% if doctor.avg_rating > 0 %} Rated {{ "%.1f"|format(doctor.avg_rating) }}/5 by {{ doctor.rating_count }} patients.{% endif %}{% endblock %}
-{% block og_image %}{{ url_for('serve_photo', filename=doctor.photo_url, _external=True) if doctor.photo_url else request.url_root + 'static/img/logo.png' }}{% endblock %}
+{% block og_image %}{{ url_for('serve_photo', filename=doctor.photo_url.replace('photos/', ''), _external=True) if doctor.photo_url else request.url_root + 'static/img/logo.png' }}{% endblock %}
 
 {% block twitter_title %}{{ doctor.name }} - {{ doctor.specialty.name }} in {{ doctor.city.name }}{% endblock %}
 {% block twitter_description %}{{ doctor.specialty.name }} with {{ doctor.experience }} years experience in {{ doctor.city.name }}, Nepal{% endblock %}
-{% block twitter_image %}{{ url_for('serve_photo', filename=doctor.photo_url, _external=True) if doctor.photo_url else request.url_root + 'static/img/logo.png' }}{% endblock %}
+{% block twitter_image %}{{ url_for('serve_photo', filename=doctor.photo_url.replace('photos/', ''), _external=True) if doctor.photo_url else request.url_root + 'static/img/logo.png' }}{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -58,7 +58,8 @@
         <div class="card shadow-sm doctor-profile-sidebar">
             <div class="card-body text-center">
                 {% if doctor.photo_url %}
-                <img src="{{ url_for('serve_photo', filename=doctor.photo_url) }}"
+                {% set photo_path = doctor.photo_url.replace('photos/', '') %}
+                <img src="{{ url_for('serve_photo', filename=photo_path) }}"
                      class="rounded-circle mb-3"
                      alt="{{ doctor.name }}"
                      style="width: 200px; height: 200px; object-fit: cover;"

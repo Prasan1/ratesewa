@@ -13,7 +13,8 @@
                 </h4>
                 <div class="d-flex align-items-center">
                     {% if doctor.photo_url %}
-                    <img src="{{ url_for('serve_photo', filename=doctor.photo_url) }}" alt="{{ doctor.name }}" class="rounded-circle me-3" width="80" height="80" onerror="this.src='{{ doctor|doctor_avatar }}'">
+                    {% set photo_path = doctor.photo_url.replace('photos/', '') %}
+                    <img src="{{ url_for('serve_photo', filename=photo_path) }}" alt="{{ doctor.name }}" class="rounded-circle me-3" width="80" height="80" onerror="this.src='{{ doctor|doctor_avatar }}'">
                     {% else %}
                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 80px; height: 80px;">
                         <i class="fas fa-user-md fa-2x"></i>

@@ -133,7 +133,8 @@
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2">
                                         {% if doctor.photo_url %}
-                                        <img src="{{ url_for('serve_photo', filename=doctor.photo_url) }}"
+                                        {% set photo_path = doctor.photo_url.replace('photos/', '') %}
+                                        <img src="{{ url_for('serve_photo', filename=photo_path) }}"
                                              class="rounded-circle me-3"
                                              width="60"
                                              height="60"
