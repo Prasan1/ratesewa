@@ -441,6 +441,23 @@ $(document).ready(function() {
             loadDoctors(1, false); // User searched by name - keep focus in input
         }, 500);
     });
+
+    // Prevent form submission when pressing Enter
+    $('#filterForm').on('submit', function(e) {
+        e.preventDefault(); // Stop form from submitting
+        loadDoctors(1, true); // Trigger search and scroll to results
+        return false;
+    });
+
+    // Also handle Enter key specifically in name search field
+    $('#nameSearch').on('keypress', function(e) {
+        if (e.which === 13) { // Enter key
+            e.preventDefault();
+            clearTimeout(searchTimeout); // Cancel debounce timer
+            loadDoctors(1, true); // Immediate search and scroll
+            return false;
+        }
+    });
 });
 
 let currentPage = 1;
