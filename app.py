@@ -436,15 +436,16 @@ def send_verification_approved_email(to_email, doctor_name):
 
             <p>
                 If you ever wish to update your profile or share feedback on how we can
-                improve the platform for doctors and patients, please feel free to
-                reply to this email.
+                improve the platform for doctors and patients, please contact us at
+                <a href="mailto:support@ranksewa.com">support@ranksewa.com</a>.
             </p>
 
             <p style="margin-top: 32px;">
                 With sincere appreciation,<br>
                 <strong>Paul Paudyal</strong><br>
                 Founder, RankSewa<br>
-                <a href="https://ranksewa.com">https://ranksewa.com</a>
+                <a href="https://ranksewa.com">https://ranksewa.com</a><br>
+                <span style="color: #6b7280; font-size: 14px;">Support: <a href="mailto:support@ranksewa.com">support@ranksewa.com</a></span>
             </p>
         </div>
         """
@@ -516,14 +517,15 @@ def send_verification_rejected_email(to_email, doctor_name, admin_notes=None):
             </ul>
 
             <p>
-                If you have any questions or need clarification, please reply to this email
-                and we'll be happy to help.
+                If you have any questions or need clarification, please contact us at
+                <a href="mailto:support@ranksewa.com">support@ranksewa.com</a> and we'll be happy to help.
             </p>
 
             <p style="margin-top: 32px;">
                 Best regards,<br>
                 <strong>RankSewa Team</strong><br>
-                <a href="https://ranksewa.com">https://ranksewa.com</a>
+                <a href="https://ranksewa.com">https://ranksewa.com</a><br>
+                <span style="color: #6b7280; font-size: 14px;">Support: <a href="mailto:support@ranksewa.com">support@ranksewa.com</a></span>
             </p>
         </div>
         """
@@ -3656,7 +3658,7 @@ def serve_verification_document(request_id, doc_type):
 @app.route('/uploads/photos/<path:filename>')
 def serve_photo(filename):
     """Serve profile photos from R2 or local storage (publicly accessible)"""
-    from flask import send_from_directory, send_file
+    from flask import send_from_directory, send_file, make_response
     import os
     from io import BytesIO
 
@@ -3673,11 +3675,15 @@ def serve_photo(filename):
             r2_path = f"photos/{filename}"
             photo_data = get_verification_document(r2_path)
             if photo_data:
-                return send_file(
+                response = make_response(send_file(
                     BytesIO(photo_data),
                     mimetype='image/jpeg',
                     as_attachment=False
-                )
+                ))
+                # Add cache headers - cache for 7 days (photos rarely change)
+                response.headers['Cache-Control'] = 'public, max-age=604800, immutable'
+                response.headers['Expires'] = '7 days'
+                return response
         except Exception as e:
             print(f"[R2] Error fetching photo from R2: {e}")
 
@@ -3689,7 +3695,11 @@ def serve_photo(filename):
     local_path = os.path.join(photos_folder, filename)
 
     if os.path.exists(local_path):
-        return send_from_directory(photos_folder, filename)
+        response = make_response(send_from_directory(photos_folder, filename))
+        # Add cache headers - cache for 7 days
+        response.headers['Cache-Control'] = 'public, max-age=604800, immutable'
+        response.headers['Expires'] = '7 days'
+        return response
 
     # Photo not found anywhere
     abort(404)

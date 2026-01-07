@@ -49,8 +49,10 @@
                             <div class="col-md-12 mb-3">
                                 <label for="name" class="form-label"><strong>Full Name</strong> <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="name" name="name"
-                                       placeholder="Dr. Your Full Name" required maxlength="200">
-                                <small class="form-text text-muted">Enter your full name with prefix (Dr.)</small>
+                                       placeholder="Sabin Paudel" required maxlength="200">
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>Enter your full name <strong>without</strong> "Dr." prefix - your profile will display as "Dr. [Your Name]" automatically
+                                </small>
                             </div>
                         </div>
 
@@ -63,6 +65,9 @@
                                     <option value="{{ specialty.id }}">{{ specialty.name }}</option>
                                     {% endfor %}
                                 </select>
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-search me-1"></i>Start typing to search specialties
+                                </small>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -268,6 +273,47 @@ document.addEventListener('DOMContentLoaded', function() {
         const submitBtn = form.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+    });
+
+    // Make specialty dropdown searchable
+    const specialtySelect = document.getElementById('specialty_id');
+    const originalOptions = Array.from(specialtySelect.options).slice(1); // Skip first "Select" option
+
+    // Add search input above select
+    const searchWrapper = document.createElement('div');
+    searchWrapper.className = 'mb-2';
+    searchWrapper.innerHTML = `
+        <input type="text"
+               class="form-control form-control-sm"
+               placeholder="🔍 Type to filter specialties..."
+               id="specialty_search"
+               autocomplete="off">
+    `;
+    specialtySelect.parentElement.insertBefore(searchWrapper, specialtySelect);
+
+    const searchInput = document.getElementById('specialty_search');
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+
+        // Remove all options except the first one
+        while (specialtySelect.options.length > 1) {
+            specialtySelect.remove(1);
+        }
+
+        // Re-add matching options
+        originalOptions.forEach(option => {
+            if (option.text.toLowerCase().includes(searchTerm)) {
+                specialtySelect.add(option.cloneNode(true));
+            }
+        });
+
+        // Show count
+        const count = specialtySelect.options.length - 1;
+        if (searchTerm && count === 0) {
+            searchInput.style.borderColor = '#dc3545';
+        } else {
+            searchInput.style.borderColor = '';
+        }
     });
 });
 </script>

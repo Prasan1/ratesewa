@@ -132,12 +132,22 @@
                             <div class="card h-100 shadow-sm">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2">
-                                        <img src="{{ doctor.photo_url or 'https://picsum.photos/seed/doctor' + doctor.id|string + '/60/60' }}"
+                                        {% if doctor.photo_url %}
+                                        <img src="{{ url_for('serve_photo', filename=doctor.photo_url) }}"
+                                             class="rounded-circle me-3"
+                                             width="60"
+                                             height="60"
+                                             loading="lazy"
+                                             alt="{{ doctor.name }}"
+                                             onerror="this.src='{{ doctor|doctor_avatar }}'">
+                                        {% else %}
+                                        <img src="{{ doctor|doctor_avatar }}"
                                              class="rounded-circle me-3"
                                              width="60"
                                              height="60"
                                              loading="lazy"
                                              alt="{{ doctor.name }}">
+                                        {% endif %}
                                         <div>
                                             <h6 class="mb-0">{{ doctor.name }}</h6>
                                             <small class="text-muted">{{ doctor.specialty.name }}</small>

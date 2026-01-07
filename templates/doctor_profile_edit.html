@@ -59,11 +59,12 @@
                                 <!-- Current Photo Preview -->
                                 <div>
                                     {% if doctor.photo_url %}
-                                    <img src="{{ url_for('serve_photo', filename=doctor.photo_url.split('/')[-1]) }}"
+                                    <img src="{{ url_for('serve_photo', filename=doctor.photo_url) }}"
                                          alt="{{ doctor.name }}"
                                          class="rounded-circle"
                                          style="width: 100px; height: 100px; object-fit: cover;"
-                                         id="photoPreview">
+                                         id="photoPreview"
+                                         onerror="this.src='{{ doctor|doctor_avatar }}'">
                                     {% else %}
                                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
                                          style="width: 100px; height: 100px;"
