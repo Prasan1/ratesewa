@@ -2739,6 +2739,43 @@ def admin_article_edit(article_id):
     specialties = Specialty.query.order_by(Specialty.name).all()
     return render_template('admin_article_form.html', article=article, categories=categories, specialties=specialties)
 
+@app.route('/admin/articles/<int:article_id>/clean-debug', methods=['GET'])
+@admin_required
+def admin_article_clean_debug(article_id):
+    """Remove debug text from article content (one-time cleanup)"""
+    import re
+    article = Article.query.get_or_404(article_id)
+
+    original_content = article.content
+    updated_content = original_content
+
+    # Remove debug text patterns
+    debug_patterns = [
+        r'Related Specialty:.*?production database\)',
+        r'Related Specialty:.*?Dentist',
+        r'Category: Oral Health',
+        r'Recommended doctor specialty:.*?\)',
+        r'based on your production database',
+        r'\(ID \d+ based on your production database\)'
+    ]
+
+    for pattern in debug_patterns:
+        updated_content = re.sub(pattern, '', updated_content, flags=re.DOTALL | re.IGNORECASE)
+
+    # Clean up extra whitespace
+    updated_content = re.sub(r'\n\n\n+', '\n\n', updated_content)
+    updated_content = updated_content.strip()
+
+    if original_content != updated_content:
+        article.content = updated_content
+        db.session.commit()
+        chars_removed = len(original_content) - len(updated_content)
+        flash(f'✅ Debug text removed successfully! ({chars_removed} characters cleaned)', 'success')
+    else:
+        flash('ℹ️ No debug text found to remove', 'info')
+
+    return redirect(url_for('admin_article_edit', article_id=article_id))
+
 @app.route('/admin/articles/<int:article_id>/delete', methods=['POST'])
 @admin_required
 def admin_article_delete(article_id):
