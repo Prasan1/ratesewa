@@ -50,10 +50,10 @@
                                 <select class="form-select" id="doctor_id" name="doctor_id">
                                     <option value="">-- Select Doctor --</option>
                                     {% for doctor in verified_doctors %}
-                                    <option value="{{ doctor.id }}" data-email="{{ doctor.user.email if doctor.user else '' }}">
+                                    <option value="{{ doctor.id }}" data-email="{{ doctor.user_account.email if doctor.user_account else '' }}">
                                         {{ doctor.name }} ({{ doctor.specialty.name }})
-                                        {% if doctor.user %}
-                                        - {{ doctor.user.email }}
+                                        {% if doctor.user_account %}
+                                        - {{ doctor.user_account.email }}
                                         {% endif %}
                                     </option>
                                     {% endfor %}

@@ -2790,9 +2790,8 @@ def admin_article_delete(article_id):
 @admin_required
 def admin_email_composer():
     """Email composer for sending emails to doctors"""
-    # Get all verified doctors with user emails
+    # Get all verified doctors (user_account backref will load user if exists)
     verified_doctors = Doctor.query.filter_by(is_verified=True)\
-        .join(User, Doctor.user_id == User.id, isouter=True)\
         .order_by(Doctor.name).all()
 
     return render_template('admin_email_composer.html',
@@ -2819,8 +2818,8 @@ def admin_send_email():
     if doctor_id:
         # Selected from dropdown
         doctor = Doctor.query.get(doctor_id)
-        if doctor and doctor.user:
-            to_email = doctor.user.email
+        if doctor and doctor.user_account:
+            to_email = doctor.user_account.email
             doctor_name = doctor.name
         else:
             flash('Selected doctor does not have an email address', 'danger')
