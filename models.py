@@ -130,7 +130,7 @@ class User(db.Model):
     ratings = db.relationship('Rating', backref='user', lazy=True)
     appointments = db.relationship('Appointment', backref='user', lazy=True)
     contact_messages = db.relationship('ContactMessage', backref='user', lazy=True)
-    doctor_profile = db.relationship('Doctor', foreign_keys=[doctor_id], backref='user_account', uselist=False)
+    doctor_profile = db.relationship('Doctor', foreign_keys=[doctor_id], backref=db.backref('user_account', uselist=False), uselist=False)
     verification_requests = db.relationship('VerificationRequest', foreign_keys='VerificationRequest.user_id', backref='user', lazy=True)
     badges = db.relationship('UserBadge', backref='user', lazy=True)
     helpful_votes = db.relationship('ReviewHelpful', backref='user', lazy=True)
