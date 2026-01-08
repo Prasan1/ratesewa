@@ -113,7 +113,7 @@
                         {% endif %}
                     </div>
                     <div>
-                        <h1 class="mb-2" style="font-weight: 600;">Dr. {{ doctor.name }}</h1>
+                        <h1 class="mb-2" style="font-weight: 600;">{{ doctor.name|doctor_title }}</h1>
                         <p class="mb-2" style="font-size: 1.2rem; opacity: 0.9;">
                             <i class="fas fa-stethoscope me-2"></i>{{ doctor.specialty.name }}
                         </p>
@@ -412,6 +412,87 @@
                             <i class="fas fa-trash-alt me-2"></i>Delete Account
                         </a>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Working Hours Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm" style="border-radius: 16px; border: none;">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--dash-3-start) 0%, var(--dash-3-end) 100%); border-radius: 16px 16px 0 0; border: none;">
+                    <h5 class="mb-0 text-white">
+                        <i class="far fa-clock me-2"></i>Working Hours
+                        {% if tier_features is defined and not tier_features.can_show_hours %}
+                        <span class="badge bg-warning text-dark float-end">Premium</span>
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    {% if tier_features is defined and tier_features.can_show_hours %}
+                    <!-- Premium/Featured: Show editable form -->
+                    <p class="text-muted mb-4">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Set your working hours to help patients know when you're available for appointments.
+                    </p>
+
+                    <form method="POST" action="{{ url_for('doctor_update_working_hours') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                        <div class="row">
+                            {% set days_order = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
+                            {% set days_display = {'monday': 'Monday', 'tuesday': 'Tuesday', 'wednesday': 'Wednesday', 'thursday': 'Thursday', 'friday': 'Friday', 'saturday': 'Saturday', 'sunday': 'Sunday'} %}
+                            {% set working_hours_data = {} %}
+                            {% if doctor.working_hours %}
+                                {% set working_hours_data = doctor.working_hours|from_json %}
+                            {% endif %}
+
+                            {% for day in days_order %}
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ day }}" class="form-label fw-bold">{{ days_display[day] }}</label>
+                                <input type="text" class="form-control" id="{{ day }}" name="{{ day }}"
+                                       value="{{ working_hours_data[day] if working_hours_data and day in working_hours_data else '' }}"
+                                       placeholder="e.g., 9:00 AM - 5:00 PM or Closed">
+                                <small class="text-muted">Leave blank or write "Closed" if not available</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Tips:</strong> Use formats like "9:00 AM - 5:00 PM", "10:00-17:00", or "By appointment only"
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Working Hours
+                            </button>
+                        </div>
+                    </form>
+
+                    {% else %}
+                    <!-- Free tier: Show upgrade prompt -->
+                    <div class="text-center py-5">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                            <i class="fas fa-lock fa-3x text-white"></i>
+                        </div>
+                        <h5 class="mb-3">Working Hours - Premium Feature</h5>
+                        <p class="text-muted mb-4">
+                            Upgrade to Premium to add your working hours and help patients know when you're available for appointments.
+                        </p>
+                        <div class="mb-4">
+                            <div class="d-inline-block text-start">
+                                <p class="mb-2"><i class="fas fa-check text-success me-2"></i>Show appointment availability</p>
+                                <p class="mb-2"><i class="fas fa-check text-success me-2"></i>Help patients plan their visits</p>
+                                <p class="mb-2"><i class="fas fa-check text-success me-2"></i>Increase booking confidence</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('subscription_pricing') }}" class="btn btn-warning btn-lg">
+                            <i class="fas fa-crown me-2"></i>Upgrade to Premium
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

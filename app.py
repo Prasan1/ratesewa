@@ -750,6 +750,26 @@ def from_json_filter(json_string):
         return {}
 
 
+@app.template_filter('doctor_title')
+def doctor_title_filter(name):
+    """
+    Jinja template filter to add 'Dr.' prefix if not already present.
+    Handles edge cases like professors (Prof. Dr. ...).
+    Usage in templates: {{ doctor.name|doctor_title }}
+    """
+    if not name:
+        return ''
+
+    name = name.strip()
+
+    # If name already starts with Dr. or Prof., don't add anything
+    if name.startswith('Dr.') or name.startswith('Prof.'):
+        return name
+
+    # Otherwise, add Dr. prefix
+    return f'Dr. {name}'
+
+
 def optimize_and_save_article_image(image_file):
     """
     Optimize uploaded article image and save to static/img/articles/
@@ -4028,6 +4048,49 @@ def doctor_profile_edit():
             flash(f'Error updating profile: {str(e)}', 'danger')
 
     return render_template('doctor_profile_edit.html', doctor=doctor, user=user)
+
+
+@app.route('/doctor/working-hours/update', methods=['POST'])
+@doctor_required
+def doctor_update_working_hours():
+    """Update doctor's working hours (Premium/Featured only)"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    # Check if doctor has access to working hours feature
+    tier = doctor.subscription_tier or 'free'
+    tier_features = subscription_config.TIER_FEATURES.get(tier, subscription_config.TIER_FEATURES['free'])
+
+    if not tier_features['can_show_hours']:
+        flash('Working hours feature is available with Premium subscription.', 'warning')
+        return redirect(url_for('subscription_pricing'))
+
+    try:
+        # Collect working hours from form
+        days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        working_hours = {}
+
+        for day in days:
+            hours = request.form.get(day, '').strip()
+            if hours:  # Only save non-empty values
+                working_hours[day] = hours
+
+        # Save as JSON string
+        if working_hours:
+            doctor.working_hours = json.dumps(working_hours)
+            flash('Working hours updated successfully!', 'success')
+        else:
+            # If all fields are empty, clear working hours
+            doctor.working_hours = None
+            flash('Working hours cleared.', 'info')
+
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating working hours: {str(e)}', 'danger')
+
+    return redirect(url_for('doctor_dashboard'))
 
 
 @app.route('/doctor/reviews')
