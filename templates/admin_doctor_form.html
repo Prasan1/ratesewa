@@ -64,6 +64,25 @@
                     <label for="practice_address" class="form-label">Practice Address</label>
                     <input type="text" class="form-control" id="practice_address" name="practice_address" value="{{ doctor.practice_address if doctor else '' }}" placeholder="e.g., Lalitpur-12, Ring Road">
                 </div>
+
+                <!-- Geolocation for "Near Me" Feature -->
+                <div class="col-md-3">
+                    <label for="latitude" class="form-label">
+                        Latitude <small class="text-muted">(Optional)</small>
+                    </label>
+                    <input type="number" step="0.0001" class="form-control" id="latitude" name="latitude" value="{{ doctor.latitude if doctor and doctor.latitude else '' }}" placeholder="27.7172">
+                    <small class="form-text text-muted">For "near me" search</small>
+                </div>
+                <div class="col-md-3">
+                    <label for="longitude" class="form-label">
+                        Longitude <small class="text-muted">(Optional)</small>
+                    </label>
+                    <input type="number" step="0.0001" class="form-control" id="longitude" name="longitude" value="{{ doctor.longitude if doctor and doctor.longitude else '' }}" placeholder="85.3240">
+                    <small class="form-text text-muted">
+                        <a href="https://www.google.com/maps" target="_blank" rel="noopener">Find on Google Maps</a>
+                    </small>
+                </div>
+
                 <div class="col-md-6">
                     <label for="education" class="form-label">Education/Qualifications</label>
                     <input type="text" class="form-control" id="education" name="education" value="{{ doctor.education if doctor else '' }}" placeholder="e.g., MBBS, MD">

@@ -76,6 +76,10 @@ class Doctor(db.Model):
     practice_address = db.Column(db.Text, nullable=True)
     external_clinic_url = db.Column(db.Text, nullable=True)  # External clinic profile URL (e.g., ClinicOne)
 
+    # Geolocation for "near me" feature
+    latitude = db.Column(db.Float, nullable=True)  # Clinic latitude
+    longitude = db.Column(db.Float, nullable=True)  # Clinic longitude
+
     # Analytics
     profile_views = db.Column(db.Integer, default=0)
 

@@ -3,6 +3,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy import or_
 import re
 import os
+import math
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
@@ -369,6 +370,41 @@ def generate_slug(name):
     name = re.sub(r'[^\w\s-]', '', name).strip()
     slug = re.sub(r'[-\s]+', '-', name)
     return slug
+
+# --- Geolocation Helper Functions ---
+def calculate_distance(lat1, lon1, lat2, lon2):
+    """
+    Calculate the distance between two coordinates using the Haversine formula.
+
+    Args:
+        lat1: Latitude of first point (decimal degrees)
+        lon1: Longitude of first point (decimal degrees)
+        lat2: Latitude of second point (decimal degrees)
+        lon2: Longitude of second point (decimal degrees)
+
+    Returns:
+        Distance in kilometers (float), rounded to 1 decimal place
+    """
+    # Earth's radius in kilometers
+    R = 6371
+
+    # Convert latitude and longitude from degrees to radians
+    lat1_rad = math.radians(lat1)
+    lat2_rad = math.radians(lat2)
+    delta_lat = math.radians(lat2 - lat1)
+    delta_lon = math.radians(lon2 - lon1)
+
+    # Haversine formula
+    a = math.sin(delta_lat/2)**2 + \
+        math.cos(lat1_rad) * math.cos(lat2_rad) * \
+        math.sin(delta_lon/2)**2
+
+    c = 2 * math.asin(math.sqrt(a))
+
+    # Calculate distance
+    distance = R * c
+
+    return round(distance, 1)
 
 def admin_email_set():
     configured = app.config.get('ADMIN_EMAILS', set())
@@ -1932,6 +1968,11 @@ def get_doctors():
     page = request.args.get('page', 1, type=int)
     per_page = 50  # Limit results per page
 
+    # Get user location for "near me" feature
+    user_lat = request.args.get('lat', type=float)
+    user_lng = request.args.get('lng', type=float)
+    sort_by = request.args.get('sort', 'relevance')  # 'relevance' or 'distance'
+
     # Build query with rating aggregates and eager loading to prevent N+1 queries
     from sqlalchemy import func, case, and_
     from sqlalchemy.orm import selectinload
@@ -1994,9 +2035,33 @@ def get_doctors():
     offset = (page - 1) * per_page
     doctors = query.offset(offset).limit(per_page).all()
 
+    # Calculate distances if user location provided
+    doctors_with_distance = []
+    if user_lat and user_lng and sort_by == 'distance':
+        for d, avg_rating_value, rating_count_value, _sort_rank in doctors:
+            # Safe check - only calculate distance if columns exist
+            try:
+                if hasattr(d, 'latitude') and hasattr(d, 'longitude') and d.latitude and d.longitude:
+                    distance = calculate_distance(user_lat, user_lng, d.latitude, d.longitude)
+                else:
+                    distance = 9999  # Very far for doctors without coordinates
+            except AttributeError:
+                # Columns don't exist yet (migration not run)
+                distance = 9999
+            doctors_with_distance.append((d, avg_rating_value, rating_count_value, _sort_rank, distance))
+
+        # Sort by distance
+        doctors_with_distance.sort(key=lambda x: x[4])
+        doctors = doctors_with_distance
+    else:
+        # No distance sorting - add None as distance
+        doctors_with_distance = [(d, avg_rating_value, rating_count_value, _sort_rank, None)
+                                  for d, avg_rating_value, rating_count_value, _sort_rank in doctors]
+        doctors = doctors_with_distance
+
     # Serialize to JSON
     doctors_list = []
-    for d, avg_rating_value, rating_count_value, _sort_rank in doctors:
+    for d, avg_rating_value, rating_count_value, _sort_rank, distance in doctors:
         # Generate proper photo URL
         photo_url = None
         if d.photo_url:
@@ -2011,7 +2076,7 @@ def get_doctors():
 
             photo_url = url_for('serve_photo', filename=photo_path, _external=False)
 
-        doctors_list.append({
+        doctor_data = {
             'id': d.id,
             'name': d.name,
             'slug': d.slug,
@@ -2032,7 +2097,13 @@ def get_doctors():
             'is_verified': d.is_verified,
             'avg_rating': float(avg_rating_value or 0),
             'rating_count': int(rating_count_value or 0)
-        })
+        }
+
+        # Add distance if calculated
+        if distance is not None and distance < 9999:
+            doctor_data['distance_km'] = distance
+
+        doctors_list.append(doctor_data)
 
     return jsonify({
         'doctors': doctors_list,
@@ -2083,6 +2154,13 @@ def admin_doctor_new():
         workplace = request.form.get('workplace', '').strip()
         practice_address = request.form.get('practice_address', '').strip()
         external_clinic_url = request.form.get('external_clinic_url', '').strip()
+
+        # Geolocation coordinates for "near me" feature
+        latitude_str = request.form.get('latitude', '').strip()
+        longitude_str = request.form.get('longitude', '').strip()
+        latitude = float(latitude_str) if latitude_str else None
+        longitude = float(longitude_str) if longitude_str else None
+
         city_id = request.form.get('city_id')
         specialty_id = request.form.get('specialty_id')
         clinic_id = request.form.get('clinic_id') or None
@@ -2221,6 +2299,13 @@ def admin_doctor_edit(doctor_id):
         workplace = request.form.get('workplace', '').strip()
         practice_address = request.form.get('practice_address', '').strip()
         external_clinic_url = request.form.get('external_clinic_url', '').strip()
+
+        # Geolocation coordinates for "near me" feature
+        latitude_str = request.form.get('latitude', '').strip()
+        longitude_str = request.form.get('longitude', '').strip()
+        latitude = float(latitude_str) if latitude_str else None
+        longitude = float(longitude_str) if longitude_str else None
+
         city_id = request.form.get('city_id')
         specialty_id = request.form.get('specialty_id')
         clinic_id = request.form.get('clinic_id') or None
@@ -2295,6 +2380,13 @@ def admin_doctor_edit(doctor_id):
         doctor.workplace = workplace or None
         doctor.practice_address = practice_address or None
         doctor.external_clinic_url = external_clinic_url or None
+
+        # Set coordinates only if columns exist (safe for migration)
+        if hasattr(doctor, 'latitude'):
+            doctor.latitude = latitude
+        if hasattr(doctor, 'longitude'):
+            doctor.longitude = longitude
+
         doctor.city_id = int(city_id)
         doctor.specialty_id = int(specialty_id)
         doctor.clinic_id = int(clinic_id) if clinic_id else None
