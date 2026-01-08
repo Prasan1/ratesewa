@@ -71,11 +71,25 @@
                      style="width: 200px; height: 200px; object-fit: cover;">
                 {% endif %}
                 <h3 class="card-title">{{ doctor.name }}</h3>
-                {% if doctor.is_verified %}
+
+                <!-- Tier Badges -->
                 <div class="mb-2">
-                    <span class="badge bg-success">RankSewa Verified</span>
+                    {% if doctor.is_verified %}
+                    <span class="badge bg-success me-1">
+                        <i class="fas fa-check-circle me-1"></i>Verified
+                    </span>
+                    {% endif %}
+
+                    {% if doctor.subscription_tier == 'featured' %}
+                    <span class="badge bg-gradient text-white me-1" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-size: 0.85rem; padding: 0.4rem 0.7rem;">
+                        <i class="fas fa-star me-1"></i>Featured
+                    </span>
+                    {% elif doctor.subscription_tier == 'premium' %}
+                    <span class="badge bg-info text-white me-1" style="font-size: 0.8rem;">
+                        <i class="fas fa-crown me-1"></i>Premium
+                    </span>
+                    {% endif %}
                 </div>
-                {% endif %}
                 {% if session.get('is_admin') %}
                 <a href="{{ url_for('admin_doctor_edit', doctor_id=doctor.id) }}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
                     <i class="fas fa-edit me-2"></i>Edit Doctor
@@ -92,14 +106,24 @@
 
                 <!-- Phone Number with Click-to-Reveal -->
                 {% if doctor.phone_number %}
-                <div class="mb-3">
-                    <button class="btn btn-success btn-sm w-100" id="showPhoneBtn" onclick="revealPhone()">
-                        <i class="fas fa-phone me-2"></i>Show Phone Number
-                    </button>
-                    <a href="tel:{{ doctor.phone_number }}" class="btn btn-success btn-sm w-100 d-none" id="phoneNumberLink">
-                        <i class="fas fa-phone me-2"></i>{{ doctor.phone_number }}
-                    </a>
-                </div>
+                    {% if tier_features is defined and tier_features.can_show_contact %}
+                    <div class="mb-3">
+                        <button class="btn btn-success btn-sm w-100" id="showPhoneBtn" onclick="revealPhone()">
+                            <i class="fas fa-phone me-2"></i>Show Phone Number
+                        </button>
+                        <a href="tel:{{ doctor.phone_number }}" class="btn btn-success btn-sm w-100 d-none" id="phoneNumberLink">
+                            <i class="fas fa-phone me-2"></i>{{ doctor.phone_number }}
+                        </a>
+                    </div>
+                    {% else %}
+                    <!-- Upgrade prompt for free tier -->
+                    <div class="mb-3">
+                        <div class="alert alert-info small mb-0">
+                            <i class="fas fa-lock me-2"></i>
+                            <strong>Contact info</strong> available with <a href="{{ url_for('subscription_pricing') }}" class="alert-link">Premium</a>
+                        </div>
+                    </div>
+                    {% endif %}
                 {% endif %}
 
                 <div class="mb-3">
@@ -205,6 +229,22 @@
         {# {% from 'partials/ad_display.html' import render_ad %}
         {{ render_ad(banner_ad, 'mb-4') }} #}
 
+        <!-- Featured Doctor Banner -->
+        {% if doctor.subscription_tier == 'featured' %}
+        <div class="alert alert-dismissible fade show mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;" role="alert">
+            <div class="d-flex align-items-center">
+                <div class="me-3" style="font-size: 2rem;">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h5 class="mb-1" style="color: white;"><i class="fas fa-star me-2"></i>Featured Doctor</h5>
+                    <p class="mb-0 small">This doctor has a Featured Premium profile with verified credentials and priority visibility.</p>
+                </div>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <h4 class="card-title mb-3">About</h4>
@@ -246,6 +286,55 @@
                     </div>
                     {% endif %}
                 </div>
+
+                {% if doctor.working_hours is defined and doctor.working_hours %}
+                {% set working_hours_data = doctor.working_hours|from_json %}
+                {% if working_hours_data %}
+                    {% if tier_features is defined and tier_features.can_show_hours %}
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="mb-3">
+                                <i class="far fa-clock me-2"></i>Working Hours
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody>
+                                        {% set days_order = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
+                                        {% set days_display = {'monday': 'Monday', 'tuesday': 'Tuesday', 'wednesday': 'Wednesday', 'thursday': 'Thursday', 'friday': 'Friday', 'saturday': 'Saturday', 'sunday': 'Sunday'} %}
+                                        {% for day in days_order %}
+                                            {% if day in working_hours_data %}
+                                            <tr>
+                                                <td class="fw-bold" style="width: 30%;">{{ days_display[day] }}</td>
+                                                <td>{{ working_hours_data[day] }}</td>
+                                            </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Hours may vary. Please call ahead to confirm availability.
+                            </p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="mb-3">
+                                <i class="far fa-clock me-2"></i>Working Hours
+                            </h5>
+                            <div class="alert alert-info small">
+                                <i class="fas fa-lock me-2"></i>
+                                <strong>Appointment hours</strong> available with <a href="{{ url_for('subscription_pricing') }}" class="alert-link">Premium</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                {% endif %}
             </div>
         </div>
 

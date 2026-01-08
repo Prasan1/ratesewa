@@ -281,6 +281,7 @@
         </div>
 
         <div class="col-lg-3 col-md-6 mb-3">
+            {% if tier_features is defined and tier_features.can_view_analytics %}
             <a href="{{ url_for('doctor_analytics') }}" class="text-decoration-none">
                 <div class="action-card card shadow-sm h-100">
                     <div class="card-body text-center p-4">
@@ -292,6 +293,19 @@
                     </div>
                 </div>
             </a>
+            {% else %}
+            <a href="{{ url_for('subscription_pricing') }}" class="text-decoration-none">
+                <div class="action-card card shadow-sm h-100 border-warning">
+                    <div class="card-body text-center p-4">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fas fa-lock fa-2x text-white"></i>
+                        </div>
+                        <h6 class="mb-2">Analytics <span class="badge bg-warning text-dark">Premium</span></h6>
+                        <small class="text-muted">Upgrade to unlock insights</small>
+                    </div>
+                </div>
+            </a>
+            {% endif %}
         </div>
 
         <div class="col-lg-3 col-md-6 mb-3">

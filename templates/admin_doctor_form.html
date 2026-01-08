@@ -153,6 +153,47 @@
                     <label for="description" class="form-label">Profile description</label>
                     <textarea class="form-control" id="description" name="description" rows="4">{{ doctor.description if doctor else '' }}</textarea>
                 </div>
+
+                <!-- Working Hours Section -->
+                <div class="col-12">
+                    <hr class="my-4">
+                    <h5 class="mb-3">Working Hours <small class="text-muted">(Optional - for appointment scheduling)</small></h5>
+                    <p class="text-muted small mb-3">Leave blank for days the doctor is not available. Use 24-hour format (e.g., 09:00-17:00)</p>
+                </div>
+
+                {% set working_hours_data = {} %}
+                {% if doctor and doctor.working_hours %}
+                    {% set working_hours_data = doctor.working_hours|from_json %}
+                {% endif %}
+
+                <div class="col-md-6">
+                    <label for="monday" class="form-label">Monday</label>
+                    <input type="text" class="form-control" id="monday" name="monday" value="{{ working_hours_data.monday if working_hours_data.monday else '' }}" placeholder="e.g., 09:00-17:00">
+                </div>
+                <div class="col-md-6">
+                    <label for="tuesday" class="form-label">Tuesday</label>
+                    <input type="text" class="form-control" id="tuesday" name="tuesday" value="{{ working_hours_data.tuesday if working_hours_data.tuesday else '' }}" placeholder="e.g., 09:00-17:00">
+                </div>
+                <div class="col-md-6">
+                    <label for="wednesday" class="form-label">Wednesday</label>
+                    <input type="text" class="form-control" id="wednesday" name="wednesday" value="{{ working_hours_data.wednesday if working_hours_data.wednesday else '' }}" placeholder="e.g., 09:00-17:00">
+                </div>
+                <div class="col-md-6">
+                    <label for="thursday" class="form-label">Thursday</label>
+                    <input type="text" class="form-control" id="thursday" name="thursday" value="{{ working_hours_data.thursday if working_hours_data.thursday else '' }}" placeholder="e.g., 09:00-17:00">
+                </div>
+                <div class="col-md-6">
+                    <label for="friday" class="form-label">Friday</label>
+                    <input type="text" class="form-control" id="friday" name="friday" value="{{ working_hours_data.friday if working_hours_data.friday else '' }}" placeholder="e.g., 09:00-17:00">
+                </div>
+                <div class="col-md-6">
+                    <label for="saturday" class="form-label">Saturday</label>
+                    <input type="text" class="form-control" id="saturday" name="saturday" value="{{ working_hours_data.saturday if working_hours_data.saturday else '' }}" placeholder="e.g., 09:00-13:00">
+                </div>
+                <div class="col-md-6">
+                    <label for="sunday" class="form-label">Sunday</label>
+                    <input type="text" class="form-control" id="sunday" name="sunday" value="{{ working_hours_data.sunday if working_hours_data.sunday else '' }}" placeholder="Closed or 10:00-14:00">
+                </div>
             </div>
             <div class="mt-4 d-flex gap-2">
                 <button type="submit" class="btn btn-primary">{% if doctor %}Save changes{% else %}Add doctor{% endif %}</button>

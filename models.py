@@ -75,6 +75,7 @@ class Doctor(db.Model):
     phone_number = db.Column(db.String(20), nullable=True)
     practice_address = db.Column(db.Text, nullable=True)
     external_clinic_url = db.Column(db.Text, nullable=True)  # External clinic profile URL (e.g., ClinicOne)
+    working_hours = db.Column(db.Text, nullable=True)  # JSON string: {"monday": "9:00-17:00", "tuesday": "9:00-17:00", ...}
 
     # Analytics
     profile_views = db.Column(db.Integer, default=0)

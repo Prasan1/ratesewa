@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, make_response
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, make_response, abort
 from sqlalchemy.orm import joinedload
 from sqlalchemy import or_
 import re
 import os
+import json
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
@@ -54,12 +55,25 @@ except ImportError:
 load_dotenv()
 
 # Configure Resend for email notifications
-resend.api_key = os.getenv('RESEND_API_KEY', 're_2RuGAUcZ_ExtETyfnMvHEg4ua3r1ckvUq')
+resend_key = os.getenv('RESEND_API_KEY')
+if not resend_key:
+    print("WARNING: RESEND_API_KEY not set. Email functionality will not work.")
+    resend_key = None  # Will fail gracefully when trying to send emails
+resend.api_key = resend_key
 
 # --- App Configuration ---
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+
+# SECRET_KEY is required - fail fast if not set in production
+secret_key = os.environ.get('SECRET_KEY')
+if not secret_key:
+    if os.environ.get('FLASK_ENV') == 'production' or os.environ.get('DATABASE_URL'):
+        raise ValueError("SECRET_KEY environment variable must be set in production!")
+    # Development fallback only
+    secret_key = 'dev-secret-key-INSECURE-FOR-DEVELOPMENT-ONLY'
+    print("WARNING: Using insecure development SECRET_KEY. DO NOT use in production!")
+app.config['SECRET_KEY'] = secret_key
 db_url = os.environ.get('DATABASE_URL') or 'sqlite:///doctors.db'
 if db_url.startswith('postgres://'):
     db_url = db_url.replace('postgres://', 'postgresql://', 1)
@@ -67,7 +81,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Security configurations
-app.config['SESSION_COOKIE_SECURE'] = False  # Set to True when using HTTPS
+# SESSION_COOKIE_SECURE: True in production (HTTPS), False in development
+is_production = os.environ.get('FLASK_ENV') == 'production' or os.environ.get('DATABASE_URL') is not None
+app.config['SESSION_COOKIE_SECURE'] = is_production
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
@@ -180,9 +196,37 @@ def clinic_manager_required(f):
             return redirect(url_for('login'))
         if user.role != 'clinic_manager':
             flash('Clinic manager access required.', 'warning')
-            return redirect(url_for('clinic_manager_dashboard'))
+            # Fixed: Redirect to index instead of clinic_manager_dashboard to avoid infinite loop
+            return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated_function
+
+
+def is_safe_url(target):
+    """
+    Validate that a redirect URL is safe (prevents open redirects).
+    Only allows relative URLs or URLs to the same host.
+    """
+    if not target:
+        return False
+
+    from urllib.parse import urlparse, urljoin
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+
+    # Must be same scheme (http/https) and same netloc (domain)
+    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+
+
+def get_safe_redirect(param_name='next', fallback='index'):
+    """
+    Get a safe redirect URL from request parameters.
+    Returns the validated URL or a fallback route.
+    """
+    target = request.values.get(param_name)
+    if target and is_safe_url(target):
+        return target
+    return url_for(fallback)
 
 
 def build_doctor_analytics_context(doctor):
@@ -692,6 +736,20 @@ def doctor_avatar_filter(doctor):
     return get_doctor_avatar_url(doctor.name, doctor.id)
 
 
+@app.template_filter('from_json')
+def from_json_filter(json_string):
+    """
+    Jinja template filter to parse JSON string.
+    Usage in templates: {{ doctor.working_hours|from_json }}
+    """
+    if not json_string:
+        return {}
+    try:
+        return json.loads(json_string)
+    except (json.JSONDecodeError, TypeError):
+        return {}
+
+
 def optimize_and_save_article_image(image_file):
     """
     Optimize uploaded article image and save to static/img/articles/
@@ -831,8 +889,8 @@ def login():
             session['role'] = user.role
             flash(f'Welcome back, {user.name}!', 'success')
 
-            next_page = request.values.get('next')
-            return redirect(next_page or url_for('index'))
+            # Fixed: Use safe redirect to prevent open redirect vulnerability
+            return redirect(get_safe_redirect('next', 'index'))
         else:
             flash('Invalid email or password.', 'danger')
 
@@ -843,8 +901,9 @@ def facebook_login():
     if not facebook.client_id or not facebook.client_secret:
         flash('Facebook login is not configured. Please contact the site admin.', 'warning')
         return redirect(url_for('login'))
+    # Fixed: Validate redirect URL before storing in session
     next_page = request.args.get('next')
-    if next_page:
+    if next_page and is_safe_url(next_page):
         session['oauth_next'] = next_page
     redirect_uri = url_for('facebook_callback', _external=True)
     return facebook.authorize_redirect(redirect_uri)
@@ -898,16 +957,20 @@ def facebook_callback():
     session['role'] = user.role
     flash(f'Welcome, {user.name}!', 'success')
 
+    # Fixed: Validate stored redirect URL before using it
     next_page = session.pop('oauth_next', None)
-    return redirect(next_page or url_for('index'))
+    if next_page and is_safe_url(next_page):
+        return redirect(next_page)
+    return redirect(url_for('index'))
 
 @app.route('/login/google')
 def google_login():
     if not google.client_id or not google.client_secret:
         flash('Google login is not configured. Please contact the site admin.', 'warning')
         return redirect(url_for('login'))
+    # Fixed: Validate redirect URL before storing in session
     next_page = request.args.get('next')
-    if next_page:
+    if next_page and is_safe_url(next_page):
         session['oauth_next'] = next_page
     redirect_uri = url_for('google_authorized', _external=True)
     return google.authorize_redirect(redirect_uri)
@@ -967,8 +1030,11 @@ def google_authorized():
     session['role'] = user.role
     flash(f'Welcome, {user.name}!', 'success')
 
+    # Fixed: Validate stored redirect URL before using it
     next_page = session.pop('oauth_next', None)
-    return redirect(next_page or url_for('index'))
+    if next_page and is_safe_url(next_page):
+        return redirect(next_page)
+    return redirect(url_for('index'))
 
 @app.route('/logout')
 def logout():
@@ -2094,6 +2160,17 @@ def admin_doctor_new():
         is_active = bool(request.form.get('is_active'))
         is_verified = bool(request.form.get('is_verified'))
 
+        # Collect working hours from form
+        working_hours_dict = {}
+        days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        for day in days:
+            hours = request.form.get(day, '').strip()
+            if hours:  # Only include days with hours specified
+                working_hours_dict[day] = hours
+
+        # Convert to JSON string (or None if no hours specified)
+        working_hours_json = json.dumps(working_hours_dict) if working_hours_dict else None
+
         # Convert string "None" to empty string (form may submit "None" as text)
         if nmc_number.lower() == 'none':
             nmc_number = ''
@@ -2167,6 +2244,7 @@ def admin_doctor_new():
             college=college or None,
             description=description or None,
             photo_url=None,  # Will be set after photo upload
+            working_hours=working_hours_json,
             is_featured=is_featured,
             is_active=is_active,
             is_verified=is_verified
@@ -2231,6 +2309,17 @@ def admin_doctor_edit(doctor_id):
         is_featured = bool(request.form.get('is_featured'))
         is_active = bool(request.form.get('is_active'))
         is_verified = bool(request.form.get('is_verified'))
+
+        # Collect working hours from form
+        working_hours_dict = {}
+        days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        for day in days:
+            hours = request.form.get(day, '').strip()
+            if hours:  # Only include days with hours specified
+                working_hours_dict[day] = hours
+
+        # Convert to JSON string (or None if no hours specified)
+        working_hours_json = json.dumps(working_hours_dict) if working_hours_dict else None
 
         # Convert string "None" to empty string (form may submit "None" as text)
         if nmc_number.lower() == 'none':
@@ -2302,6 +2391,7 @@ def admin_doctor_edit(doctor_id):
         doctor.education = education or None
         doctor.college = college or None
         doctor.description = description or None
+        doctor.working_hours = working_hours_json
         doctor.is_featured = is_featured
         doctor.is_active = is_active
         doctor.is_verified = is_verified
@@ -3246,7 +3336,17 @@ def doctor_profile(slug):
     inline_ad = ad_manager.get_ad_for_position('profile_inline',
                                                 specialty_id=doctor.specialty_id)
 
-    return render_template('doctor_profile.html', doctor=doctor, ratings=ratings, avg_rating=avg_rating, banner_ad=banner_ad, inline_ad=inline_ad)
+    # Get tier features for access control
+    import subscription_config
+    tier_features = subscription_config.TIER_FEATURES.get(doctor.subscription_tier, subscription_config.TIER_FEATURES['free'])
+
+    return render_template('doctor_profile.html',
+                          doctor=doctor,
+                          ratings=ratings,
+                          avg_rating=avg_rating,
+                          banner_ad=banner_ad,
+                          inline_ad=inline_ad,
+                          tier_features=tier_features)
 
 @app.route('/rate_doctor', methods=['POST'])
 @login_required
@@ -3839,6 +3939,10 @@ def doctor_dashboard():
         user_id=user.id
     ).order_by(VerificationRequest.created_at.desc()).first()
 
+    # Get tier features for access control
+    import subscription_config
+    tier_features = subscription_config.TIER_FEATURES.get(doctor.subscription_tier, subscription_config.TIER_FEATURES['free'])
+
     return render_template('doctor_dashboard.html',
                          doctor=doctor,
                          user=user,
@@ -3846,7 +3950,8 @@ def doctor_dashboard():
                          avg_rating=avg_rating,
                          response_count=response_count,
                          response_rate=response_rate,
-                         verification_request=verification_request)
+                         verification_request=verification_request,
+                         tier_features=tier_features)
 
 
 @app.route('/doctor/profile/edit', methods=['GET', 'POST'])
@@ -4003,6 +4108,12 @@ def doctor_analytics():
     """View profile analytics"""
     user = User.query.get(session['user_id'])
     doctor = user.doctor_profile
+
+    # Check if doctor has access to analytics (Premium+)
+    import subscription_config
+    if not subscription_config.can_access_feature(doctor.subscription_tier, 'can_view_analytics'):
+        flash('Analytics dashboard is available with Premium subscription. Upgrade to unlock detailed insights!', 'info')
+        return redirect(url_for('subscription_pricing'))
 
     analytics_context = build_doctor_analytics_context(doctor)
 
@@ -4446,4 +4557,9 @@ def test_r2_upload():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Fixed: Only enable debug mode if explicitly set, never in production
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    if is_production and debug_mode:
+        print("ERROR: Debug mode cannot be enabled in production!")
+        debug_mode = False
+    app.run(debug=debug_mode)

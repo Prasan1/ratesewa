@@ -53,7 +53,6 @@ SUBSCRIPTION_TIERS = {
             'Top of search results',
             '3x priority in listings',
             'Sponsored placement',
-            'Unlimited photos',
             'Premium support (24h response)'
         ],
         'highlight': 'Best Value'
@@ -142,7 +141,7 @@ TIER_FEATURES = {
         'can_show_hours': True,
         'is_featured': True,
         'search_boost_multiplier': 3.0,
-        'max_photos': 999  # Unlimited
+        'max_photos': 5  # Same as Premium
     }
 }
 
