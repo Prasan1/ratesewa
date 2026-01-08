@@ -5,10 +5,9 @@
 {% block head %}
 <!-- SEO Meta Tags -->
 <meta name="description" content="{{ doctor.name|doctor_title }}, {{ doctor.specialty.name }} in {{ doctor.city.name }}, Nepal. {{ doctor.experience }} years experience.{% if doctor.education %} {{ doctor.education }}.{% endif %}{% if doctor.avg_rating > 0 %} Rated {{ "%.1f"|format(doctor.avg_rating) }}/5 by {{ doctor.rating_count }} patients.{% endif %}{% if doctor.workplace %} Practices at {{ doctor.workplace }}.{% endif %}">
-
 <meta name="keywords" content="{{ doctor.name }}, {{ doctor.specialty.name }}, {{ doctor.city.name }}, Nepal doctor, {{ doctor.specialty.name }} {{ doctor.city.name }}, best {{ doctor.specialty.name }} Nepal{% if doctor.workplace %}, {{ doctor.workplace }}{% endif %}">
 
-<!-- Schema.org Markup for Google Rich Results -->
+<!-- Schema.org Markup -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -41,427 +40,579 @@
   "description": "{{ doctor.specialty.name }} with {{ doctor.experience }} years of experience{% if doctor.workplace %}, practicing at {{ doctor.workplace }}{% endif %}"
 }
 </script>
+
+<style>
+  :root{
+    --surface:#fff;
+    --surface-2:#f7fafc;
+    --text:#0f172a;
+    --muted:#64748b;
+    --border:rgba(15,23,42,.08);
+    --shadow:0 10px 30px rgba(2,6,23,.08);
+    --shadow2:0 14px 40px rgba(2,6,23,.14);
+    --r-xl:24px; --r-lg:18px; --r-md:14px;
+  }
+
+  .profile-bg{
+    background:
+      radial-gradient(900px 360px at 15% -10%, rgba(13,138,188,.12), transparent 60%),
+      radial-gradient(900px 360px at 90% 0%, rgba(123,44,191,.10), transparent 55%),
+      linear-gradient(180deg,#fff 0%,#fbfdff 30%,#fff 100%);
+    border-radius: var(--r-xl);
+    padding: 24px;
+    margin: 20px 0;
+  }
+  @media (max-width: 768px){
+    .profile-bg{
+      padding: 16px;
+      margin: 12px 0;
+      border-radius: 16px;
+    }
+  }
+
+  .hero{
+    border-radius: var(--r-xl);
+    padding: 1.75rem;
+    background: linear-gradient(135deg, rgba(13,138,188,.14) 0%, rgba(123,44,191,.10) 100%);
+    border: 1px solid rgba(13,138,188,.18);
+    box-shadow: 0 1px 0 rgba(15,23,42,.02);
+  }
+  @media (max-width: 768px){
+    .hero{ padding: 1.25rem; }
+  }
+
+  .pill{
+    display:inline-flex; align-items:center; gap:8px;
+    border-radius:999px; padding:.35rem .7rem;
+    border:1px solid var(--border);
+    background: rgba(255,255,255,.75);
+    color: var(--text);
+    font-size: .86rem;
+    white-space: nowrap;
+  }
+
+  .card-clean{
+    border:1px solid var(--border);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    box-shadow: 0 1px 0 rgba(15,23,42,.02);
+  }
+  .card-clean:hover{ box-shadow: var(--shadow); }
+  .card-clean .card-body{
+    padding: 1.5rem;
+  }
+  @media (max-width: 768px){
+    .card-clean .card-body{
+      padding: 1.25rem;
+    }
+  }
+
+  .sticky-side{ position: sticky; top: 18px; }
+
+  .avatar{
+    width: 120px; height: 120px; object-fit: cover;
+    border-radius: 999px;
+    border: 4px solid rgba(255,255,255,.95);
+    box-shadow: 0 10px 30px rgba(2,6,23,.18);
+    background: #fff;
+  }
+  .hero-title{
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .doctor-name{
+    margin: 0 0 .25rem 0;
+    font-weight: 900;
+    letter-spacing: -.4px;
+    color: var(--text);
+    line-height: 1.15;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+
+  .rating-inline i{ margin-right:2px; }
+  .muted{ color: var(--muted); }
+
+  .facts{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 12px;
+  }
+  @media (max-width: 576px){
+    .facts{ grid-template-columns: 1fr; }
+    .avatar{ width: 104px; height: 104px; }
+  }
+  .fact{
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255,255,255,.9) 0%, rgba(247,250,252,.9) 100%);
+    border-radius: var(--r-md);
+    padding: 16px;
+  }
+  .fact .k{ font-size:.78rem; color: var(--muted); margin-bottom: 2px; }
+  .fact .v{ font-weight: 700; color: var(--text); }
+
+  .share-btns a, .share-btns button{ text-decoration:none; }
+  .share-btns i{ vertical-align: middle; }
+
+  .review{
+    border-bottom: 1px solid rgba(15,23,42,.08);
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+  }
+  .review:last-child{ border-bottom:none; padding-bottom:0; margin-bottom:0; }
+
+  .doctor-response{
+    background: rgba(13,138,188,.06);
+    border: 1px solid rgba(13,138,188,.16);
+    border-left: 5px solid rgba(13,138,188,.55);
+    border-radius: 14px;
+  }
+</style>
 {% endblock %}
 
 {% block og_type %}profile{% endblock %}
 {% block og_title %}{{ doctor.name }} - {{ doctor.specialty.name }} in {{ doctor.city.name }}{% endblock %}
 {% block og_description %}{{ doctor.specialty.name }} with {{ doctor.experience }} years experience in {{ doctor.city.name }}, Nepal.{% if doctor.avg_rating > 0 %} Rated {{ "%.1f"|format(doctor.avg_rating) }}/5 by {{ doctor.rating_count }} patients.{% endif %}{% endblock %}
 {% block og_image %}{{ url_for('serve_photo', filename=doctor.photo_url.replace('photos/', ''), _external=True) if doctor.photo_url else request.url_root + 'static/img/logo.png' }}{% endblock %}
-
 {% block twitter_title %}{{ doctor.name }} - {{ doctor.specialty.name }} in {{ doctor.city.name }}{% endblock %}
 {% block twitter_description %}{{ doctor.specialty.name }} with {{ doctor.experience }} years experience in {{ doctor.city.name }}, Nepal{% endblock %}
 {% block twitter_image %}{{ url_for('serve_photo', filename=doctor.photo_url.replace('photos/', ''), _external=True) if doctor.photo_url else request.url_root + 'static/img/logo.png' }}{% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="container">
+<div class="profile-bg">
+
+  <!-- HERO -->
+  <div class="hero mb-4">
+    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+      <div class="d-flex align-items-center gap-3">
+        {% if doctor.photo_url %}
+          {% set photo_path = doctor.photo_url.replace('photos/', '') %}
+          <img src="{{ url_for('serve_photo', filename=photo_path) }}"
+               alt="{{ doctor.name }}"
+               class="avatar"
+               onerror="this.src='{{ doctor|doctor_avatar }}'">
+        {% else %}
+          <img src="{{ doctor|doctor_avatar }}" alt="{{ doctor.name }}" class="avatar">
+        {% endif %}
+
+        <div class="hero-title">
+          <h1 class="doctor-name">
+            {{ doctor.name|doctor_title }}
+          </h1>
+
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <span class="pill"><i class="fas fa-stethoscope"></i> {{ doctor.specialty.name }}</span>
+            <span class="pill"><i class="fas fa-map-marker-alt"></i> {{ doctor.city.name }}</span>
+            {% if doctor.experience is defined %}
+            <span class="pill"><i class="fas fa-briefcase-medical"></i> {{ doctor.experience }} yrs</span>
+            {% endif %}
+          </div>
+
+          <div class="mt-2 d-flex flex-wrap gap-2">
+            {% if doctor.is_verified %}
+            <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Verified</span>
+            {% endif %}
+            {% if doctor.subscription_tier == 'featured' %}
+            <span class="badge text-white" style="background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);">
+              <i class="fas fa-star me-1"></i>Featured
+            </span>
+            {% elif doctor.subscription_tier == 'premium' %}
+            <span class="badge bg-info text-white"><i class="fas fa-crown me-1"></i>Premium</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="text-md-end">
+        <div class="mb-2">
+          <div class="rating-inline">
+            {% set full_stars = avg_rating | int %}
+            {% set has_half_star = (avg_rating - full_stars) >= 0.5 %}
+            {% for i in range(full_stars) %}<i class="fas fa-star text-warning"></i>{% endfor %}
+            {% if has_half_star %}<i class="fas fa-star-half-alt text-warning"></i>{% endif %}
+            {% for i in range(5 - full_stars - (1 if has_half_star else 0)) %}<i class="far fa-star text-warning"></i>{% endfor %}
+          </div>
+          <div class="muted" style="font-weight:600;">
+            {{ "%.1f"|format(avg_rating) }} / 5 · {{ ratings|length }} reviews
+          </div>
+        </div>
+
+        {% if 'user_id' in session and session.get('doctor_id') != doctor.id %}
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">
+            <i class="fas fa-star me-2"></i>Write a Review
+          </button>
+        {% elif 'user_id' not in session %}
+          <a class="btn btn-primary" href="{{ url_for('login', next=request.url) }}">
+            <i class="fas fa-sign-in-alt me-2"></i>Login to Review
+          </a>
+        {% else %}
+          <span class="badge bg-warning text-dark"><i class="fas fa-info-circle me-1"></i>You are viewing your profile</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- SIDEBAR -->
     <div class="col-md-4 mb-4">
-        <div class="card shadow-sm doctor-profile-sidebar">
-            <div class="card-body text-center">
-                {% if doctor.photo_url %}
-                {% set photo_path = doctor.photo_url.replace('photos/', '') %}
-                <img src="{{ url_for('serve_photo', filename=photo_path) }}"
-                     class="rounded-circle mb-3"
-                     alt="{{ doctor.name }}"
-                     style="width: 200px; height: 200px; object-fit: cover;"
-                     onerror="this.src='{{ doctor|doctor_avatar }}'">
-                {% else %}
-                <img src="{{ doctor|doctor_avatar }}"
-                     class="rounded-circle mb-3"
-                     alt="{{ doctor.name }}"
-                     style="width: 200px; height: 200px; object-fit: cover;">
-                {% endif %}
-                <h3 class="card-title">{{ doctor.name }}</h3>
+      <div class="sticky-side">
 
-                <!-- Tier Badges -->
+        <div class="card-clean mb-3">
+          <div class="card-body">
+            <h5 class="mb-2" style="font-weight:800; color:var(--text);">Contact & Booking</h5>
+            <p class="muted mb-3">Use official contact details if available.</p>
+
+            {% if doctor.phone_number %}
+              {% if tier_features is defined and tier_features.can_show_contact %}
                 <div class="mb-2">
-                    {% if doctor.is_verified %}
-                    <span class="badge bg-success me-1">
-                        <i class="fas fa-check-circle me-1"></i>Verified
-                    </span>
-                    {% endif %}
-
-                    {% if doctor.subscription_tier == 'featured' %}
-                    <span class="badge bg-gradient text-white me-1" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-size: 0.85rem; padding: 0.4rem 0.7rem;">
-                        <i class="fas fa-star me-1"></i>Featured
-                    </span>
-                    {% elif doctor.subscription_tier == 'premium' %}
-                    <span class="badge bg-info text-white me-1" style="font-size: 0.8rem;">
-                        <i class="fas fa-crown me-1"></i>Premium
-                    </span>
-                    {% endif %}
+                  <button class="btn btn-success w-100" id="showPhoneBtn" onclick="revealPhone()">
+                    <i class="fas fa-phone me-2"></i>Show Contact
+                  </button>
                 </div>
-                {% if session.get('is_admin') %}
-                <a href="{{ url_for('admin_doctor_edit', doctor_id=doctor.id) }}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
-                    <i class="fas fa-edit me-2"></i>Edit Doctor
+
+                <div class="d-none" id="phoneNumberRevealed">
+                  <div class="text-center mb-2 fw-bold" style="font-size: 1.1rem;">
+                    {{ doctor.phone_number }}
+                  </div>
+                  <div class="d-grid gap-2">
+                    <a href="https://wa.me/{{ doctor.phone_number | replace('+', '') | replace(' ', '') | replace('-', '') }}"
+                       class="btn btn-success" target="_blank">
+                      <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                    </a>
+                    <a href="tel:{{ doctor.phone_number }}" class="btn btn-outline-success">
+                      <i class="fas fa-phone me-2"></i>Call
+                    </a>
+                  </div>
+                </div>
+              {% else %}
+                <div class="alert alert-info small mb-0">
+                  <i class="fas fa-lock me-2"></i>
+                  <strong>Contact info</strong> available with
+                  <a href="{{ url_for('subscription_pricing') }}" class="alert-link">Premium</a>
+                </div>
+              {% endif %}
+            {% else %}
+              <div class="alert alert-light border small mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                Contact information is not available.
+              </div>
+            {% endif %}
+
+            {% if doctor.clinic %}
+            <hr>
+            <div class="d-flex align-items-start gap-2">
+              <i class="fas fa-hospital text-primary mt-1"></i>
+              <div>
+                <div class="muted small">Clinic / Hospital</div>
+                <a href="{{ url_for('clinic_profile', slug=doctor.clinic.slug) }}" class="text-decoration-none" style="font-weight:700;">
+                  {{ doctor.clinic.name }}
                 </a>
-                {% endif %}
-                <p class="card-text text-muted">{{ doctor.specialty.name }}</p>
-                <p class="card-text"><i class="fas fa-map-marker-alt me-2"></i>{{ doctor.city.name }}</p>
-                {% if doctor.clinic %}
-                <p class="card-text text-muted">
-                    <i class="fas fa-hospital me-2"></i>
-                    <a href="{{ url_for('clinic_profile', slug=doctor.clinic.slug) }}" class="text-muted text-decoration-none">{{ doctor.clinic.name }}</a>
-                </p>
-                {% endif %}
-
-                <!-- Phone Number with Click-to-Reveal -->
-                {% if doctor.phone_number %}
-                    {% if tier_features is defined and tier_features.can_show_contact %}
-                    <div class="mb-3">
-                        <button class="btn btn-success btn-sm w-100" id="showPhoneBtn" onclick="revealPhone()">
-                            <i class="fas fa-phone me-2"></i>Show Contact
-                        </button>
-                        <div class="d-none" id="phoneNumberRevealed">
-                            <div class="text-center mb-2 fw-bold" style="font-size: 1.1rem;">
-                                {{ doctor.phone_number }}
-                            </div>
-                            <div class="d-grid gap-2">
-                                <a href="https://wa.me/{{ doctor.phone_number | replace('+', '') | replace(' ', '') | replace('-', '') }}"
-                                   class="btn btn-success btn-sm" target="_blank">
-                                    <i class="fab fa-whatsapp me-2"></i>WhatsApp
-                                </a>
-                                <a href="tel:{{ doctor.phone_number }}" class="btn btn-outline-success btn-sm">
-                                    <i class="fas fa-phone me-2"></i>Call
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    {% else %}
-                    <!-- Upgrade prompt for free tier -->
-                    <div class="mb-3">
-                        <div class="alert alert-info small mb-0">
-                            <i class="fas fa-lock me-2"></i>
-                            <strong>Contact info</strong> available with <a href="{{ url_for('subscription_pricing') }}" class="alert-link">Premium</a>
-                        </div>
-                    </div>
-                    {% endif %}
-                {% endif %}
-
-                <div class="mb-3">
-                    <div class="rating mb-2">
-                        {% set full_stars = avg_rating | int %}
-                        {% set has_half_star = (avg_rating - full_stars) >= 0.5 %}
-                        
-                        {% for i in range(full_stars) %}
-                        <i class="fas fa-star text-warning"></i>
-                        {% endfor %}
-                        
-                        {% if has_half_star %}
-                        <i class="fas fa-star-half-alt text-warning"></i>
-                        {% endif %}
-                        
-                        {% for i in range(5 - full_stars - (1 if has_half_star else 0)) %}
-                        <i class="far fa-star text-warning"></i>
-                        {% endfor %}
-                    </div>
-                    <span class="text-muted">{{ "%.1f"|format(avg_rating) }} out of 5 ({{ ratings | length }} reviews)</span>
-                </div>
-                
-                {% if 'user_id' in session %}
-                    {% if session.get('doctor_id') == doctor.id %}
-                    <div class="alert alert-warning">
-                        <i class="fas fa-info-circle me-2"></i>
-                        You cannot rate your own profile.
-                    </div>
-                    {% else %}
-                    <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#ratingModal">
-                        <i class="fas fa-star me-2"></i>Rate This Doctor
-                    </button>
-                    {% endif %}
-                {% else %}
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    You must be <a href="{{ url_for('login', next=request.url) }}" class="alert-link">logged in</a> to rate this doctor.
-                </div>
-                {% endif %}
+              </div>
             </div>
+            {% endif %}
+          </div>
         </div>
 
-        <!-- Social Media Share - Compact -->
-        <div class="card shadow-sm mt-3">
-            <div class="card-body py-3">
-                <div class="d-flex align-items-center justify-content-between">
-                    <small class="text-muted me-3">Share:</small>
-                    <div class="d-flex gap-3">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}"
-                           target="_blank"
-                           class="text-primary"
-                           title="Share on Facebook">
-                            <i class="fab fa-facebook fa-lg"></i>
-                        </a>
-                        <a href="https://twitter.com/intent/tweet?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!&url={{ request.url }}"
-                           target="_blank"
-                           class="text-info"
-                           title="Share on Twitter">
-                            <i class="fab fa-twitter fa-lg"></i>
-                        </a>
-                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url }}"
-                           target="_blank"
-                           class="text-primary"
-                           title="Share on LinkedIn">
-                            <i class="fab fa-linkedin fa-lg"></i>
-                        </a>
-                        <a href="https://wa.me/?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!%20{{ request.url }}"
-                           target="_blank"
-                           class="text-success"
-                           title="Share on WhatsApp">
-                            <i class="fab fa-whatsapp fa-lg"></i>
-                        </a>
-                        <button onclick="copyProfileLink()"
-                                class="btn btn-link p-0 text-secondary"
-                                id="copyLinkBtn"
-                                title="Copy Link">
-                            <i class="fas fa-link fa-lg"></i>
-                        </button>
-                    </div>
-                </div>
+        <!-- Share card -->
+        <div class="card-clean mb-3">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="muted small">Share this profile</div>
+              <div class="d-flex gap-3 share-btns">
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" class="text-primary" title="Facebook">
+                  <i class="fab fa-facebook fa-lg"></i>
+                </a>
+                <a href="https://twitter.com/intent/tweet?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!&url={{ request.url }}"
+                   target="_blank" class="text-info" title="Twitter">
+                  <i class="fab fa-twitter fa-lg"></i>
+                </a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url }}" target="_blank" class="text-primary" title="LinkedIn">
+                  <i class="fab fa-linkedin fa-lg"></i>
+                </a>
+                <a href="https://wa.me/?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!%20{{ request.url }}"
+                   target="_blank" class="text-success" title="WhatsApp">
+                  <i class="fab fa-whatsapp fa-lg"></i>
+                </a>
+                <button onclick="copyProfileLink()" class="btn btn-link p-0 text-secondary" id="copyLinkBtn" title="Copy Link">
+                  <i class="fas fa-link fa-lg"></i>
+                </button>
+              </div>
             </div>
+          </div>
         </div>
 
-        <!-- Doctor Promotion Badge (If verified doctor is viewing their own profile) -->
+        <!-- Claim / Promote -->
         {% if session.get('doctor_id') == doctor.id and doctor.is_verified %}
-        <div class="card shadow-sm mt-3 border-success">
-            <div class="card-body">
-                <h6 class="card-title text-success mb-3">
-                    <i class="fas fa-bullhorn me-2"></i>Promote Your Profile!
-                </h6>
-                <p class="small text-muted mb-3">Share your verified profile on social media to attract more patients!</p>
-                <div class="alert alert-success small mb-0">
-                    <i class="fas fa-gift me-2"></i>
-                    <strong>Tell your colleagues:</strong> RankSewa is 100% FREE for all doctors until April 25, 2026!
-                </div>
+        <div class="card-clean border-success">
+          <div class="card-body">
+            <h6 class="text-success mb-2" style="font-weight:800;">
+              <i class="fas fa-bullhorn me-2"></i>Promote Your Profile
+            </h6>
+            <p class="small muted mb-2">Sharing your profile helps patients find you faster.</p>
+            <div class="alert alert-success small mb-0">
+              <i class="fas fa-gift me-2"></i>
+              <strong>Tell your colleagues:</strong> RankSewa is FREE for all doctors until April 25, 2026.
             </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="card-clean">
+          <div class="card-body">
+            <h6 class="mb-2" style="font-weight:800; color:var(--text);">
+              <i class="fas fa-user-check me-2 text-primary"></i>Are you this doctor?
+            </h6>
+            <p class="small muted mb-3">Claim your profile to update details, respond to reviews, and access analytics.</p>
+            <a href="{{ url_for('claim_profile') }}" class="btn btn-outline-primary w-100">
+              <i class="fas fa-bolt me-2"></i>Claim This Profile
+            </a>
+          </div>
         </div>
         {% endif %}
+
+        {% if session.get('is_admin') %}
+        <div class="mt-3">
+          <a href="{{ url_for('admin_doctor_edit', doctor_id=doctor.id) }}" class="btn btn-outline-secondary btn-sm w-100">
+            <i class="fas fa-edit me-2"></i>Admin: Edit Doctor
+          </a>
+        </div>
+        {% endif %}
+      </div>
     </div>
-    
+
+    <!-- MAIN -->
     <div class="col-md-8">
-        {# Banner Ad - Hidden for MVP Launch #}
-        {# {% from 'partials/ad_display.html' import render_ad %}
-        {{ render_ad(banner_ad, 'mb-4') }} #}
 
-        <!-- Featured Doctor Banner -->
-        {% if doctor.subscription_tier == 'featured' %}
-        <div class="alert alert-dismissible fade show mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;" role="alert">
-            <div class="d-flex align-items-center">
-                <div class="me-3" style="font-size: 2rem;">
-                    <i class="fas fa-certificate"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <h5 class="mb-1" style="color: white;"><i class="fas fa-star me-2"></i>Featured Doctor</h5>
-                    <p class="mb-0 small">This doctor has a Featured Premium profile with verified credentials and priority visibility.</p>
-                </div>
-            </div>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+      {% if doctor.subscription_tier == 'featured' %}
+      <div class="alert alert-dismissible fade show mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;" role="alert">
+        <div class="d-flex align-items-center">
+          <div class="me-3" style="font-size: 2rem;"><i class="fas fa-certificate"></i></div>
+          <div class="flex-grow-1">
+            <h5 class="mb-1" style="color:white;"><i class="fas fa-star me-2"></i>Featured Doctor</h5>
+            <p class="mb-0 small">Featured profiles receive priority visibility and enhanced patient tools.</p>
+          </div>
         </div>
-        {% endif %}
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+      </div>
+      {% endif %}
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h4 class="card-title mb-3">About</h4>
-                <p class="card-text">{{ doctor.description }}</p>
-                
-                <hr>
-
-                <div class="row">
-                    {% if doctor.nmc_number %}
-                    <div class="col-md-6 mb-3">
-                        <h5>NMC Registration</h5>
-                        <p class="card-text"><span class="badge bg-primary">{{ doctor.nmc_number }}</span></p>
-                    </div>
-                    {% endif %}
-                    <div class="col-md-6 mb-3">
-                        <h5>Specialty</h5>
-                        <p class="card-text">{{ doctor.specialty.name }}</p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <h5>Experience</h5>
-                        <p class="card-text">{{ doctor.experience }} years</p>
-                    </div>
-                    {% if doctor.workplace is defined and doctor.workplace %}
-                    <div class="col-md-6 mb-3">
-                        <h5>Works At</h5>
-                        <p class="card-text">{{ doctor.workplace }}</p>
-                    </div>
-                    {% endif %}
-                    {% if doctor.education %}
-                    <div class="col-md-6 mb-3">
-                        <h5>Education</h5>
-                        <p class="card-text">{{ doctor.education }}</p>
-                    </div>
-                    {% endif %}
-                    {% if doctor.college %}
-                    <div class="col-md-6 mb-3">
-                        <h5>College</h5>
-                        <p class="card-text">{{ doctor.college }}</p>
-                    </div>
-                    {% endif %}
-                </div>
-
-                {% if doctor.working_hours is defined and doctor.working_hours %}
-                {% set working_hours_data = doctor.working_hours|from_json %}
-                {% if working_hours_data %}
-                    {% if tier_features is defined and tier_features.can_show_hours %}
-                    <hr>
-                    <div class="row">
-                        <div class="col-12">
-                            <h5 class="mb-3">
-                                <i class="far fa-clock me-2"></i>Working Hours
-                            </h5>
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <tbody>
-                                        {% set days_order = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
-                                        {% set days_display = {'monday': 'Monday', 'tuesday': 'Tuesday', 'wednesday': 'Wednesday', 'thursday': 'Thursday', 'friday': 'Friday', 'saturday': 'Saturday', 'sunday': 'Sunday'} %}
-                                        {% for day in days_order %}
-                                            {% if day in working_hours_data %}
-                                            <tr>
-                                                <td class="fw-bold" style="width: 30%;">{{ days_display[day] }}</td>
-                                                <td>{{ working_hours_data[day] }}</td>
-                                            </tr>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p class="text-muted small mb-0">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Hours may vary. Please call ahead to confirm availability.
-                            </p>
-                        </div>
-                    </div>
-                    {% else %}
-                    <hr>
-                    <div class="row">
-                        <div class="col-12">
-                            <h5 class="mb-3">
-                                <i class="far fa-clock me-2"></i>Working Hours
-                            </h5>
-                            <div class="alert alert-info small">
-                                <i class="fas fa-lock me-2"></i>
-                                <strong>Appointment hours</strong> available with <a href="{{ url_for('subscription_pricing') }}" class="alert-link">Premium</a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                {% endif %}
-                {% endif %}
+      <!-- About + Quick Facts -->
+      <div class="card-clean mb-4">
+        <div class="card-body">
+          <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+            <div>
+              <h4 class="mb-1" style="font-weight:900; color:var(--text);">About</h4>
+              <div class="muted">Trusted information for patients. Please verify details before visiting.</div>
             </div>
-        </div>
+            {% if doctor.nmc_number %}
+            <span class="pill"><i class="fas fa-id-card"></i> NMC: <strong>{{ doctor.nmc_number }}</strong></span>
+            {% endif %}
+          </div>
 
-        {# Inline ad between About and Reviews - Hidden for MVP Launch #}
-        {# {{ render_ad(inline_ad, 'my-4') }} #}
+          <div class="mt-3">
+            {% if doctor.description %}
+              <p class="mb-0">{{ doctor.description }}</p>
+            {% else %}
+              <p class="muted mb-0">No description provided yet.</p>
+            {% endif %}
+          </div>
 
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h4 class="card-title mb-3">Patient Reviews</h4>
-                
-                {% if ratings %}
-                {% for rating in ratings %}
-                <div class="review mb-4 pb-3 border-bottom">
-                    <div class="d-flex justify-content-between mb-2">
-                        <div>
-                            <h6 class="mb-0">
-                                {{ rating.user_name }}
-                                <span class="badge bg-
-                                    {%- if rating.user.tier == 'platinum' -%}info
-                                    {%- elif rating.user.tier == 'gold' -%}warning
-                                    {%- elif rating.user.tier == 'silver' -%}secondary
-                                    {%- else -%}light text-dark
-                                    {%- endif -%} ms-1" style="font-size: 0.7rem;">
-                                    {{ rating.user.tier_name }}
-                                </span>
-                            </h6>
-                            <small class="text-muted">{{ rating.user.review_count }} reviews</small>
-                        </div>
-                        <div>
-                            {% for i in range(rating.rating) %}
-                            <i class="fas fa-star text-warning"></i>
-                            {% endfor %}
-                            {% for i in range(5 - rating.rating) %}
-                            <i class="far fa-star text-warning"></i>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <p class="card-text">{{ rating.comment }}</p>
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div>
-                            <small class="text-muted">{{ rating.created_at.strftime('%B %d, %Y') }}</small>
-                            {% if rating.helpful_count > 0 %}
-                            <span class="badge bg-light text-dark ms-2">
-                                <i class="fas fa-thumbs-up me-1"></i>{{ rating.helpful_count }} found this helpful
-                            </span>
-                            {% endif %}
-                        </div>
-                        <div class="d-flex gap-2">
-                            {% if 'user_id' in session %}
-                            {% if session.get('user_id') != rating.user_id %}
-                            <form method="POST" action="{{ url_for('mark_helpful') }}" class="d-inline">
-                                <input type="hidden" name="rating_id" value="{{ rating.id }}">
-                                <input type="hidden" name="doctor_slug" value="{{ doctor.slug }}">
-                                {% set user_voted = rating.helpful_votes | selectattr('user_id', 'equalto', session.get('user_id')) | list | length > 0 %}
-                                <button type="submit" class="btn btn-sm btn-{{ 'primary' if user_voted else 'outline-primary' }}">
-                                    <i class="fas fa-thumbs-up me-1"></i>{{ 'Helpful' if not user_voted else 'Marked Helpful' }}
-                                </button>
-                            </form>
-                            {% endif %}
-                            {% endif %}
-                            <button class="btn btn-sm btn-outline-secondary flag-review-btn"
-                                    data-rating-id="{{ rating.id }}"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#flagReviewModal">
-                                <i class="fas fa-flag me-1"></i>Flag
-                            </button>
-                        </div>
-                    </div>
+          <hr class="my-4">
 
-                    {% if rating.doctor_response %}
-                    <div class="ms-4 mt-3 p-3 bg-light border-start border-primary border-4 rounded">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <strong class="text-primary">
-                                <i class="fas fa-user-md me-1"></i>Doctor's Response
-                            </strong>
-                            <small class="text-muted">
-                                {{ rating.doctor_response.created_at.strftime('%B %d, %Y') }}
-                            </small>
-                        </div>
-                        <p class="mb-0">{{ rating.doctor_response.response_text }}</p>
-                    </div>
-                    {% endif %}
+          <div class="facts">
+            <div class="fact">
+              <div class="k">Specialty</div>
+              <div class="v">{{ doctor.specialty.name }}</div>
+            </div>
+            <div class="fact">
+              <div class="k">Experience</div>
+              <div class="v">{{ doctor.experience }} years</div>
+            </div>
+
+            {% if doctor.workplace is defined and doctor.workplace %}
+            <div class="fact">
+              <div class="k">Works at</div>
+              <div class="v">{{ doctor.workplace }}</div>
+            </div>
+            {% endif %}
+
+            {% if doctor.education %}
+            <div class="fact">
+              <div class="k">Education</div>
+              <div class="v">{{ doctor.education }}</div>
+            </div>
+            {% endif %}
+
+            {% if doctor.college %}
+            <div class="fact">
+              <div class="k">College</div>
+              <div class="v">{{ doctor.college }}</div>
+            </div>
+            {% endif %}
+
+            {% if doctor.practice_address %}
+            <div class="fact" style="grid-column: 1 / -1;">
+              <div class="k">Practice address</div>
+              <div class="v">{{ doctor.practice_address }}</div>
+            </div>
+            {% endif %}
+          </div>
+
+          {% if doctor.working_hours is defined and doctor.working_hours %}
+            {% set working_hours_data = doctor.working_hours|from_json %}
+            {% if working_hours_data %}
+              <hr class="my-4">
+              <h5 class="mb-3" style="font-weight:900; color:var(--text);">
+                <i class="far fa-clock me-2"></i>Working Hours
+              </h5>
+
+              {% if tier_features is defined and tier_features.can_show_hours %}
+                <div class="table-responsive">
+                  <table class="table table-sm">
+                    <tbody>
+                      {% set days_order = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'] %}
+                      {% set days_display = {'monday':'Monday','tuesday':'Tuesday','wednesday':'Wednesday','thursday':'Thursday','friday':'Friday','saturday':'Saturday','sunday':'Sunday'} %}
+                      {% for day in days_order %}
+                        {% if day in working_hours_data %}
+                        <tr>
+                          <td class="fw-bold" style="width:30%;">{{ days_display[day] }}</td>
+                          <td>{{ working_hours_data[day] }}</td>
+                        </tr>
+                        {% endif %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
                 </div>
-                {% endfor %}
-                {% else %}
-                <p class="card-text text-muted">No reviews yet. Be the first to review this doctor.</p>
-                {% endif %}
-                
-                {% if 'user_id' in session %}
-                    {% if session.get('doctor_id') == doctor.id %}
-                    <div class="alert alert-warning mt-3">
-                        <i class="fas fa-info-circle me-2"></i>
-                        You cannot rate your own profile.
-                    </div>
-                    {% else %}
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">
-                        <i class="fas fa-star me-2"></i>Rate This Doctor
+                <p class="text-muted small mb-0"><i class="fas fa-info-circle me-1"></i>Hours may vary. Please call ahead to confirm.</p>
+              {% else %}
+                <div class="alert alert-info small mb-0">
+                  <i class="fas fa-lock me-2"></i>
+                  <strong>Appointment hours</strong> available with <a href="{{ url_for('subscription_pricing') }}" class="alert-link">Premium</a>
+                </div>
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div class="card-clean">
+        <div class="card-body">
+          <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+            <div>
+              <h4 class="mb-1" style="font-weight:900; color:var(--text);">Patient Reviews</h4>
+              <div class="muted">Only real users can post reviews. Be respectful and honest.</div>
+            </div>
+            {% if 'user_id' in session and session.get('doctor_id') != doctor.id %}
+              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">
+                <i class="fas fa-star me-2"></i>Write a Review
+              </button>
+            {% endif %}
+          </div>
+
+          <hr class="my-3">
+
+          {% if ratings %}
+            {% for rating in ratings %}
+              <div class="review">
+                <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap mb-2">
+                  <div>
+                    <h6 class="mb-0" style="font-weight:800;">
+                      {{ rating.user_name }}
+                      <span class="badge bg-
+                        {%- if rating.user.tier == 'platinum' -%}info
+                        {%- elif rating.user.tier == 'gold' -%}warning
+                        {%- elif rating.user.tier == 'silver' -%}secondary
+                        {%- else -%}light text-dark
+                        {%- endif -%} ms-1" style="font-size: .72rem;">
+                        {{ rating.user.tier_name }}
+                      </span>
+                    </h6>
+                    <small class="text-muted">{{ rating.user.review_count }} reviews · {{ rating.created_at.strftime('%B %d, %Y') }}</small>
+                  </div>
+
+                  <div>
+                    {% for i in range(rating.rating) %}<i class="fas fa-star text-warning"></i>{% endfor %}
+                    {% for i in range(5 - rating.rating) %}<i class="far fa-star text-warning"></i>{% endfor %}
+                  </div>
+                </div>
+
+                <p class="mb-2">{{ rating.comment }}</p>
+
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <div>
+                    {% if rating.helpful_count > 0 %}
+                      <span class="badge bg-light text-dark">
+                        <i class="fas fa-thumbs-up me-1"></i>{{ rating.helpful_count }} found this helpful
+                      </span>
+                    {% endif %}
+                  </div>
+
+                  <div class="d-flex gap-2">
+                    {% if 'user_id' in session and session.get('user_id') != rating.user_id %}
+                      <form method="POST" action="{{ url_for('mark_helpful') }}" class="d-inline">
+                        <input type="hidden" name="rating_id" value="{{ rating.id }}">
+                        <input type="hidden" name="doctor_slug" value="{{ doctor.slug }}">
+                        {% set user_voted = rating.helpful_votes | selectattr('user_id', 'equalto', session.get('user_id')) | list | length > 0 %}
+                        <button type="submit" class="btn btn-sm btn-{{ 'primary' if user_voted else 'outline-primary' }}">
+                          <i class="fas fa-thumbs-up me-1"></i>{{ 'Helpful' if not user_voted else 'Marked Helpful' }}
+                        </button>
+                      </form>
+                    {% endif %}
+
+                    <button class="btn btn-sm btn-outline-secondary flag-review-btn"
+                            data-rating-id="{{ rating.id }}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#flagReviewModal">
+                      <i class="fas fa-flag me-1"></i>Flag
                     </button>
-                    {% endif %}
-                {% else %}
-                <div class="alert alert-info mt-3">
-                    <i class="fas fa-info-circle me-2"></i>
-                    You must be <a href="{{ url_for('login', next=request.url) }}" class="alert-link">logged in</a> to rate a doctor.
+                  </div>
                 </div>
+
+                {% if rating.doctor_response %}
+                  <div class="doctor-response mt-3 p-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">
+                      <strong class="text-primary">
+                        <i class="fas fa-user-md me-1"></i>Doctor's Response
+                      </strong>
+                      <small class="text-muted">{{ rating.doctor_response.created_at.strftime('%B %d, %Y') }}</small>
+                    </div>
+                    <p class="mb-0">{{ rating.doctor_response.response_text }}</p>
+                  </div>
                 {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="muted mb-0">No reviews yet. Be the first to review this doctor.</p>
+          {% endif %}
+
+          {% if 'user_id' in session %}
+            {% if session.get('doctor_id') == doctor.id %}
+              <div class="alert alert-warning mt-3">
+                <i class="fas fa-info-circle me-2"></i>You cannot rate your own profile.
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="alert alert-info mt-3">
+              <i class="fas fa-info-circle me-2"></i>
+              You must be <a href="{{ url_for('login', next=request.url) }}" class="alert-link">logged in</a> to rate a doctor.
             </div>
+          {% endif %}
         </div>
+      </div>
+
     </div>
+  </div>
 </div>
+</div><!-- /container -->
 
 <!-- Rating Modal -->
 <div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="ratingModalLabel">Rate This Doctor</h5>
+                <h5 class="modal-title" id="ratingModalLabel">Write a Review</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ url_for('rate_doctor') }}" method="post">
@@ -657,7 +808,6 @@
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
@@ -681,9 +831,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if (initialRating > 0) {
-        setStars(initialRating);
-    }
+    if (initialRating > 0) setStars(initialRating);
 
     stars.forEach(star => {
         star.addEventListener('click', function() {
@@ -691,7 +839,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ratingInput.value = rating;
             setStars(rating);
         });
-
         star.addEventListener('mouseenter', function() {
             const rating = parseInt(this.dataset.value);
             setStars(rating);
@@ -702,44 +849,32 @@ document.addEventListener('DOMContentLoaded', function() {
         setStars(parseInt(ratingInput.value));
     });
 
-    if (ratingForm) {
-        ratingForm.addEventListener('submit', function(event) {
-            // Let the browser submit the form normally.
-            // The 'action' attribute on the form tag will handle the request.
-        });
-    }
-
-    // Toggle "Was doctor on time?" field based on appointment status
+    // Toggle "Was doctor on time?" based on appointment status
     const appointmentYes = document.getElementById('appointment_yes');
     const appointmentNo = document.getElementById('appointment_no');
     const doctorOnTimeContainer = document.getElementById('doctor_on_time_container');
 
     function toggleDoctorOnTimeField() {
-        if (appointmentYes.checked) {
+        if (appointmentYes && appointmentYes.checked) {
             doctorOnTimeContainer.style.display = 'block';
-        } else {
+        } else if (doctorOnTimeContainer) {
             doctorOnTimeContainer.style.display = 'none';
-            // Clear the doctor_on_time selection when hidden
             document.getElementsByName('doctor_on_time').forEach(radio => radio.checked = false);
         }
     }
+    if (appointmentYes) appointmentYes.addEventListener('change', toggleDoctorOnTimeField);
+    if (appointmentNo) appointmentNo.addEventListener('change', toggleDoctorOnTimeField);
 
-    appointmentYes.addEventListener('change', toggleDoctorOnTimeField);
-    appointmentNo.addEventListener('change', toggleDoctorOnTimeField);
-
-    // Handle flag review button clicks
+    // Flag review buttons
     const flagButtons = document.querySelectorAll('.flag-review-btn');
     const flagRatingIdInput = document.getElementById('flag_rating_id');
-
     flagButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const ratingId = this.dataset.ratingId;
-            flagRatingIdInput.value = ratingId;
+            flagRatingIdInput.value = this.dataset.ratingId;
         });
     });
 });
 
-// Copy profile link to clipboard
 function copyProfileLink() {
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(function() {
@@ -748,7 +883,6 @@ function copyProfileLink() {
         btn.innerHTML = '<i class="fas fa-check fa-lg"></i>';
         btn.classList.remove('text-secondary');
         btn.classList.add('text-success');
-
         setTimeout(function() {
             btn.innerHTML = originalHTML;
             btn.classList.remove('text-success');
@@ -759,14 +893,11 @@ function copyProfileLink() {
     });
 }
 
-// Reveal phone number with WhatsApp and Call options
 function revealPhone() {
     const btn = document.getElementById('showPhoneBtn');
     const revealed = document.getElementById('phoneNumberRevealed');
-
-    // Hide button, show contact options
-    btn.classList.add('d-none');
-    revealed.classList.remove('d-none');
+    if (btn) btn.classList.add('d-none');
+    if (revealed) revealed.classList.remove('d-none');
 }
 </script>
 {% endblock %}
