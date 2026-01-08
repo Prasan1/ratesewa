@@ -16,7 +16,7 @@ def set_featured_doctors():
         # List of Featured doctors
         featured_doctors = [
             'Dr. Bilakshan Mishra',
-            'Subin Paudel'
+            'Sabin Paudel'
         ]
 
         updated = []
