@@ -813,6 +813,210 @@ footer {
     overflow: hidden;
 }
 
+/* V2 Doctor Card Design - Clean & Spacious */
+.doctor-card-v2 {
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.doctor-card-v2:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+.doctor-card-v2.featured {
+    border-left: 4px solid #C9B46A;
+}
+
+/* Card Header - Rating & Verified */
+.doctor-card-header {
+    background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+/* Rating Badge */
+.doctor-rating-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.doctor-rating-badge .rating-stars {
+    color: #F59E0B;
+    font-size: 1rem;
+}
+
+.doctor-rating-badge .rating-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.doctor-rating-badge .rating-count {
+    font-weight: 400;
+    color: var(--muted);
+    font-size: 0.875rem;
+}
+
+.doctor-rating-badge.no-rating {
+    color: var(--muted);
+}
+
+.doctor-rating-badge.no-rating .rating-icon {
+    color: #9CA3AF;
+    font-size: 1rem;
+}
+
+.doctor-rating-badge.no-rating .rating-text {
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+/* Verified Badge */
+.doctor-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+/* Card Content */
+.doctor-card-content {
+    padding: 20px;
+}
+
+/* Avatar */
+.doctor-avatar-v2 {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+}
+
+.doctor-avatar-v2 img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #E5E7EB;
+}
+
+/* Doctor Info */
+.doctor-info-v2 {
+    flex-grow: 1;
+}
+
+.doctor-name-v2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.doctor-meta-v2 {
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    line-height: 1.5;
+}
+
+.doctor-meta-v2 i {
+    width: 14px;
+}
+
+/* Experience Badge */
+.doctor-exp-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: rgba(4, 130, 136, 0.1);
+    color: var(--brand);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: 1px solid rgba(4, 130, 136, 0.2);
+}
+
+/* Card Footer */
+.doctor-card-footer {
+    padding: 0 20px 20px 20px;
+}
+
+.doctor-card-footer .btn {
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.doctor-card-footer .btn-outline-primary {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.doctor-card-footer .btn-outline-primary:hover {
+    background: var(--brand);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(4, 130, 136, 0.25);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .doctor-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .doctor-rating-badge .rating-stars {
+        font-size: 0.9rem;
+    }
+
+    .doctor-rating-badge .rating-text {
+        font-size: 0.85rem;
+    }
+
+    .doctor-verified-badge {
+        font-size: 0.75rem;
+        padding: 5px 10px;
+    }
+
+    .doctor-card-content {
+        padding: 16px;
+    }
+
+    .doctor-avatar-v2 {
+        width: 50px;
+        height: 50px;
+    }
+
+    .doctor-name-v2 {
+        font-size: 1rem;
+    }
+
+    .doctor-meta-v2 {
+        font-size: 0.8rem;
+    }
+
+    .doctor-card-footer {
+        padding: 0 16px 16px 16px;
+    }
+}
+
     .profile-header {
         padding: 22px;
         text-align: center;
