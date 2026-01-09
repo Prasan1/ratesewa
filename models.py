@@ -95,11 +95,12 @@ class Doctor(db.Model):
     clinic_managers = db.relationship('ClinicManagerDoctor', backref='doctor', lazy=True)
 
     # Normalized data relationships
-    contact = db.relationship('DoctorContact', backref='doctor', uselist=False, lazy='joined')
-    subscription = db.relationship('DoctorSubscription', backref='doctor', uselist=False, lazy='joined')
-    credentials = db.relationship('DoctorCredentials', backref='doctor', uselist=False, lazy='joined')
-    settings = db.relationship('DoctorSettings', backref='doctor', uselist=False, lazy='joined')
-    medical_tools = db.relationship('DoctorMedicalTools', backref='doctor', uselist=False, lazy='joined')
+    # Using lazy='select' for backward compatibility - tables may not exist yet in production
+    contact = db.relationship('DoctorContact', backref='doctor', uselist=False, lazy='select')
+    subscription = db.relationship('DoctorSubscription', backref='doctor', uselist=False, lazy='select')
+    credentials = db.relationship('DoctorCredentials', backref='doctor', uselist=False, lazy='select')
+    settings = db.relationship('DoctorSettings', backref='doctor', uselist=False, lazy='select')
+    medical_tools = db.relationship('DoctorMedicalTools', backref='doctor', uselist=False, lazy='select')
 
     @property
     def avg_rating(self):
