@@ -94,6 +94,8 @@
         height: 300px;
         background: radial-gradient(circle, rgba(13, 148, 136, 0.08) 0%, transparent 70%);
         border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
     }
 
     .avatar-lg {
@@ -124,6 +126,11 @@
         display: flex;
         flex-direction: column;
         gap: 18px;
+    }
+
+    .profile-hero .hero-content {
+        position: relative;
+        z-index: 1;
     }
 
     .hero-badges {
@@ -278,10 +285,11 @@
     }
 
     .fact-item {
-        background: #f8fafc;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
         padding: 16px;
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        border: 1px solid rgba(17, 24, 39, 0.08);
+        box-shadow: 0 6px 14px rgba(17, 24, 39, 0.06);
     }
     .fact-label {
         font-size: 0.8rem;
@@ -289,11 +297,25 @@
         color: var(--text-muted);
         font-weight: 600;
         margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
     .fact-value {
         font-size: 1.1rem;
         font-weight: 700;
         color: var(--text-main);
+    }
+    .fact-item.full {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+    .fact-item.full .fact-value {
+        font-size: 1rem;
+        font-weight: 600;
     }
 
     .review-item {
@@ -323,9 +345,57 @@
         margin-top: 16px;
     }
 
+    .review-summary {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+        padding: 16px;
+        border-radius: 14px;
+        border: 1px solid var(--border-color);
+        background: #f8fafc;
+    }
+    .summary-score {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+    }
+    .summary-score .score {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+    .summary-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .summary-bar {
+        display: grid;
+        grid-template-columns: 24px 1fr 40px;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+    .summary-bar .bar {
+        height: 8px;
+        border-radius: 999px;
+        background: #e5e7eb;
+        overflow: hidden;
+    }
+    .summary-bar .bar span {
+        display: block;
+        height: 100%;
+        background: var(--brand);
+        border-radius: 999px;
+    }
+
     .modal-content { border-radius: var(--radius); border: none; }
     .modal-header { background: #f8fafc; border-bottom: 1px solid var(--border-color); padding: 20px 24px; }
     .modal-title { font-weight: 700; }
+    .modal-body { padding: 24px; min-height: 100px; display: block !important; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border-color); }
 
     @media (max-width: 768px) {
         .profile-container { padding: 10px; }
@@ -347,6 +417,7 @@
         .content-card { padding: 20px 16px; }
         .facts-grid { grid-template-columns: 1fr; }
         .hero-actions-card { width: 100%; }
+        .review-summary { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 430px) {
@@ -517,15 +588,21 @@
           {% endif %}
         </div>
 
-        <div class="sidebar-card">
-          <h5 class="fw-bold mb-3">Share Profile</h5>
-          <div class="d-flex justify-content-center gap-3">
-            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" class="text-secondary"><i class="fab fa-facebook fa-lg"></i></a>
-            <a href="https://twitter.com/intent/tweet?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!&url={{ request.url }}" target="_blank" class="text-secondary"><i class="fab fa-twitter fa-lg"></i></a>
-            <a href="https://wa.me/?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!%20{{ request.url }}" target="_blank" class="text-secondary"><i class="fab fa-whatsapp fa-lg"></i></a>
-            <button onclick="copyProfileLink()" class="btn btn-link text-secondary p-0" id="copyLinkBtn"><i class="fas fa-link fa-lg"></i></button>
-          </div>
+      <div class="sidebar-card">
+        <h5 class="fw-bold mb-3">Share Profile</h5>
+        <p class="text-muted small mb-3">Help patients find this doctor faster.</p>
+        <div class="d-flex justify-content-center gap-3">
+          <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" class="text-secondary"><i class="fab fa-facebook fa-lg"></i></a>
+          <a href="https://twitter.com/intent/tweet?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!&url={{ request.url }}" target="_blank" class="text-secondary"><i class="fab fa-twitter fa-lg"></i></a>
+          <a href="https://wa.me/?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!%20{{ request.url }}" target="_blank" class="text-secondary"><i class="fab fa-whatsapp fa-lg"></i></a>
+          <button onclick="copyProfileLink()" class="btn btn-link text-secondary p-0" id="copyLinkBtn"><i class="fas fa-link fa-lg"></i></button>
         </div>
+        <div class="text-center mt-3">
+          <button onclick="copyProfileLink()" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-link me-2"></i>Copy profile link
+          </button>
+        </div>
+      </div>
 
         {% if session.get('doctor_id') == doctor.id and doctor.is_verified %}
           <div class="sidebar-card border-success" style="border: 1px solid #d1fae5; background: #ecfdf5;">
@@ -584,41 +661,33 @@
 
         <div class="facts-grid">
           <div class="fact-item">
-            <div class="fact-label">Specialty</div>
+            <div class="fact-label"><i class="fas fa-stethoscope text-brand"></i>Specialty</div>
             <div class="fact-value">{{ doctor.specialty.name }}</div>
           </div>
           <div class="fact-item">
-            <div class="fact-label">Experience</div>
+            <div class="fact-label"><i class="fas fa-briefcase-medical text-brand"></i>Experience</div>
             <div class="fact-value">{{ doctor.experience }} years</div>
           </div>
 
-          {% if doctor.workplace is defined and doctor.workplace %}
-            <div class="fact-item">
-              <div class="fact-label">Works at</div>
-              <div class="fact-value">{{ doctor.workplace }}</div>
-            </div>
-          {% endif %}
+          <div class="fact-item">
+            <div class="fact-label"><i class="fas fa-hospital text-brand"></i>Works at</div>
+            <div class="fact-value">{{ doctor.workplace or 'Not provided' }}</div>
+          </div>
 
-          {% if doctor.education %}
-            <div class="fact-item">
-              <div class="fact-label">Education</div>
-              <div class="fact-value">{{ doctor.education }}</div>
-            </div>
-          {% endif %}
+          <div class="fact-item">
+            <div class="fact-label"><i class="fas fa-graduation-cap text-brand"></i>Education</div>
+            <div class="fact-value">{{ doctor.education or 'Not provided' }}</div>
+          </div>
 
-          {% if doctor.college %}
-            <div class="fact-item">
-              <div class="fact-label">College</div>
-              <div class="fact-value">{{ doctor.college }}</div>
-            </div>
-          {% endif %}
+          <div class="fact-item">
+            <div class="fact-label"><i class="fas fa-university text-brand"></i>College</div>
+            <div class="fact-value">{{ doctor.college or 'Not provided' }}</div>
+          </div>
 
-          {% if doctor.practice_address %}
-            <div class="fact-item" style="grid-column: 1 / -1;">
-              <div class="fact-label">Practice address</div>
-              <div class="fact-value" style="font-size: 1rem; font-weight: 500;">{{ doctor.practice_address }}</div>
-            </div>
-          {% endif %}
+          <div class="fact-item full">
+            <div class="fact-label"><i class="fas fa-map-marker-alt text-brand"></i>Practice address</div>
+            <div class="fact-value">{{ doctor.practice_address or 'Not provided' }}</div>
+          </div>
         </div>
 
         {% if doctor.working_hours is defined and doctor.working_hours %}
@@ -671,6 +740,34 @@
 
         <hr class="mb-4">
 
+        {% set total_reviews = ratings|length %}
+        {% if total_reviews > 0 %}
+        <div class="review-summary mb-4">
+          <div class="summary-score">
+            <div class="score">{{ "%.1f"|format(avg_rating) }}</div>
+            <div class="star-rating">
+              {% set full_stars = avg_rating | int %}
+              {% set has_half_star = (avg_rating - full_stars) >= 0.5 %}
+              {% for i in range(full_stars) %}<i class="fas fa-star"></i>{% endfor %}
+              {% if has_half_star %}<i class="fas fa-star-half-alt"></i>{% endif %}
+              {% for i in range(5 - full_stars - (1 if has_half_star else 0)) %}<i class="far fa-star"></i>{% endfor %}
+            </div>
+            <div class="text-muted small">{{ total_reviews }} total reviews</div>
+          </div>
+          <div class="summary-bars">
+            {% for stars in [5,4,3,2,1] %}
+            {% set count = rating_breakdown[stars] %}
+            {% set percent = (count * 100 / total_reviews) if total_reviews > 0 else 0 %}
+            <div class="summary-bar">
+              <span>{{ stars }}</span>
+              <div class="bar"><span style="width: {{ percent }}%;"></span></div>
+              <span>{{ count }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
         {% if ratings %}
           {% for rating in ratings %}
             <div class="review-item">
@@ -681,8 +778,24 @@
                     <span class="badge bg-light text-dark ms-1" style="font-size: 0.7rem;">
                       {{ rating.user.tier_name }}
                     </span>
+                    {% if rating.user.created_at and now %}
+                      {% set account_age_days = (now - rating.user.created_at).days %}
+                      {% if rating.user.review_count >= 3 or rating.user.helpful_count >= 5 %}
+                        {% if account_age_days >= 7 %}
+                          <span class="badge bg-success ms-1" style="font-size: 0.7rem;">
+                            Trusted Reviewer
+                          </span>
+                        {% endif %}
+                      {% endif %}
+                    {% endif %}
                   </h6>
-                  <small class="text-muted">{{ rating.user.review_count }} reviews · {{ rating.created_at.strftime('%B %d, %Y') }}</small>
+                  <small class="text-muted">
+                    {{ rating.user.review_count }} reviews
+                    {% if rating.user.created_at %}
+                      · Member since {{ rating.user.created_at.strftime('%Y') }}
+                    {% endif %}
+                    · {{ rating.created_at.strftime('%B %d, %Y') }}
+                  </small>
                 </div>
                 <div class="star-rating">
                   {% for i in range(rating.rating) %}<i class="fas fa-star"></i>{% endfor %}
@@ -759,18 +872,145 @@
 
 <!-- Rating Modal -->
 <div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
       <div class="modal-header">
         <h5 class="modal-title" id="ratingModalLabel">Write a Review</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form action="{{ url_for('rate_doctor') }}" method="post">
+      <form action="{{ url_for('rate_doctor') }}" method="post" id="ratingForm">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <input type="hidden" name="doctor_id" value="{{ doctor.id }}">
         <input type="hidden" name="doctor_slug" value="{{ doctor.slug }}">
         <div class="modal-body">
-          <!-- (your modal body unchanged) -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Your rating</label>
+            <div class="review-star-rating d-flex gap-1" data-rating="0" role="radiogroup" aria-label="Star rating">
+              {% for i in range(1, 6) %}
+              <button type="button" class="star btn btn-link p-0" data-value="{{ i }}" aria-label="{{ i }} star">
+                <i class="far fa-star fa-lg"></i>
+              </button>
+              {% endfor %}
+            </div>
+            <small class="text-muted">1 = Poor, 5 = Excellent</small>
+            <input type="hidden" id="rating-input" name="rating">
+          </div>
+
+          <div class="mb-2">
+            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#reviewDetails" aria-expanded="false" aria-controls="reviewDetails">
+              Optional visit details
+            </button>
+            <small class="text-muted d-block">Add context like wait time or visit type.</small>
+          </div>
+
+          <div class="collapse" id="reviewDetails">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="visit_time" class="form-label fw-semibold">Visit time</label>
+                <select id="visit_time" name="visit_time" class="form-select">
+                  <option value="">Select</option>
+                  <option value="morning">Morning</option>
+                  <option value="afternoon">Afternoon</option>
+                  <option value="evening">Evening</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Appointment</label>
+                <div class="d-flex gap-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="had_appointment" id="appointment_yes" value="yes">
+                    <label class="form-check-label" for="appointment_yes">Yes</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="had_appointment" id="appointment_no" value="no">
+                    <label class="form-check-label" for="appointment_no">No</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-md-6">
+                <label for="visit_type" class="form-label fw-semibold">Visit type</label>
+                <select id="visit_type" name="visit_type" class="form-select">
+                  <option value="">Select</option>
+                  <option value="first">First visit</option>
+                  <option value="follow_up">Follow-up</option>
+                  <option value="emergency">Emergency</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="visit_reason" class="form-label fw-semibold">Reason for visit</label>
+                <input type="text" id="visit_reason" name="visit_reason" class="form-control" placeholder="e.g., Skin allergy, fever">
+              </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-md-6">
+                <label for="recommendation" class="form-label fw-semibold">Would you recommend?</label>
+                <select id="recommendation" name="recommendation" class="form-select">
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="value_rating" class="form-label fw-semibold">Value for money</label>
+                <select id="value_rating" name="value_rating" class="form-select">
+                  <option value="">Select</option>
+                  {% for i in range(1, 6) %}
+                  <option value="{{ i }}">{{ i }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-md-6">
+                <label for="bedside_rating" class="form-label fw-semibold">Bedside manner</label>
+                <select id="bedside_rating" name="bedside_rating" class="form-select">
+                  <option value="">Select</option>
+                  {% for i in range(1, 6) %}
+                  <option value="{{ i }}">{{ i }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="cleanliness_rating" class="form-label fw-semibold">Clinic cleanliness</label>
+                <select id="cleanliness_rating" name="cleanliness_rating" class="form-select">
+                  <option value="">Select</option>
+                  {% for i in range(1, 6) %}
+                  <option value="{{ i }}">{{ i }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-md-6">
+                <label for="wait_time_minutes" class="form-label fw-semibold">Wait time (minutes)</label>
+                <input type="number" id="wait_time_minutes" name="wait_time_minutes" class="form-control" min="0" max="300" placeholder="e.g., 15">
+              </div>
+              <div class="col-md-6" id="doctor_on_time_container" style="display: none;">
+                <label class="form-label fw-semibold">Doctor on time</label>
+                <div class="d-flex gap-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="doctor_on_time" id="doctor_on_time_yes" value="yes">
+                    <label class="form-check-label" for="doctor_on_time_yes">Yes</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="doctor_on_time" id="doctor_on_time_no" value="no">
+                    <label class="form-check-label" for="doctor_on_time_no">No</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3 mt-3">
+            <label for="comment" class="form-label fw-semibold">Your review</label>
+            <textarea id="comment" name="comment" class="form-control" rows="4" placeholder="Share your experience..." required></textarea>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -794,9 +1034,10 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const stars = document.querySelectorAll('.star-rating .star');
+  const stars = document.querySelectorAll('.review-star-rating .star');
   const ratingInput = document.getElementById('rating-input');
-  const sr = document.querySelector('.star-rating');
+  const sr = document.querySelector('.review-star-rating');
+  const ratingForm = document.getElementById('ratingForm');
   const initialRating = sr ? parseInt(sr.dataset.rating || "0") : 0;
 
   function setStars(rating) {
@@ -830,6 +1071,23 @@ document.addEventListener('DOMContentLoaded', function() {
   if (sr) {
     sr.addEventListener('mouseleave', function() {
       setStars(parseInt((ratingInput && ratingInput.value) || "0"));
+    });
+  }
+
+  if (ratingForm) {
+    ratingForm.addEventListener('submit', function(event) {
+      const ratingValue = ratingInput ? ratingInput.value : '';
+      const commentField = document.getElementById('comment');
+      const commentValue = commentField ? commentField.value.trim() : '';
+      if (!ratingValue) {
+        event.preventDefault();
+        alert('Please select a star rating before submitting.');
+        return;
+      }
+      if (!commentValue) {
+        event.preventDefault();
+        alert('Please write a short review before submitting.');
+      }
     });
   }
 
