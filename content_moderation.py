@@ -27,7 +27,8 @@ def check_review_content(text):
         issues.append('contains_profanity')
 
     # Check minimum length (prevent spam)
-    if len(text.strip()) < 10:
+    words = [w for w in text.strip().split() if w]
+    if len(words) < 2:
         issues.append('too_short')
 
     # Check maximum length (prevent spam)
@@ -65,11 +66,14 @@ def moderate_review(rating_text, comment_text=''):
             'message': str (user-friendly message if rejected)
         }
     """
-    # Check rating text (doctor name, etc)
-    rating_check = check_review_content(rating_text)
+    # Check rating text (doctor name, etc) - only if provided
+    if rating_text and rating_text.strip():
+        rating_check = check_review_content(rating_text)
+    else:
+        rating_check = {'is_clean': True, 'issues': []}
 
     # Check comment if provided
-    if comment_text:
+    if comment_text and comment_text.strip():
         comment_check = check_review_content(comment_text)
     else:
         comment_check = {'is_clean': True, 'issues': []}
