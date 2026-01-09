@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, make_response, abort
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, make_response, abort, send_from_directory
 from sqlalchemy.orm import joinedload
 from sqlalchemy import or_
 import re
@@ -803,6 +803,28 @@ def from_json_filter(json_string):
         return json.loads(json_string)
     except (json.JSONDecodeError, TypeError):
         return {}
+
+
+@app.template_filter('markdown')
+def markdown_filter(text):
+    """
+    Jinja template filter to convert Markdown to HTML.
+    Usage in templates: {{ article.content|markdown|safe }}
+    """
+    if not text:
+        return ''
+
+    import markdown
+    from markdown.extensions import fenced_code, tables, nl2br
+
+    md = markdown.Markdown(extensions=[
+        'fenced_code',
+        'tables',
+        'nl2br',
+        'toc'
+    ])
+
+    return md.convert(text)
 
 
 @app.template_filter('doctor_title')
@@ -2097,6 +2119,13 @@ def clinic_profile(slug):
     doctors = Doctor.query.filter_by(clinic_id=clinic.id, is_active=True).order_by(Doctor.name.asc()).all()
     return render_template('clinic_profile.html', clinic=clinic, doctors=doctors)
 
+
+@app.route('/sw.js')
+def service_worker():
+    response = make_response(send_from_directory(app.static_folder, 'sw.js'))
+    response.headers['Cache-Control'] = 'no-cache'
+    return response
+
 @app.route('/doctors')
 def get_doctors():
     city_id = request.args.get('city_id', '')
@@ -2111,17 +2140,23 @@ def get_doctors():
 
     avg_rating = func.coalesce(func.avg(Rating.rating), 0).label('avg_rating')
     rating_count = func.count(Rating.id).label('rating_count')
+    # Weighted rating to avoid single-review dominance
+    global_avg = 3.5
+    min_reviews = 5
+    rating_score = ((avg_rating * rating_count) + (global_avg * min_reviews)) / (rating_count + min_reviews)
     sort_rank = case(
         (and_(Doctor.is_featured.is_(True), Doctor.is_verified.is_(True)), 0),
-        (Doctor.is_verified.is_(True), 1),
-        (rating_count > 0, 2),
-        else_=3
+        (and_(Doctor.is_verified.is_(True), rating_count > 0), 1),  # Verified WITH ratings
+        (Doctor.is_verified.is_(True), 2),  # Verified without ratings
+        (rating_count > 0, 3),  # Has ratings but not verified
+        else_=4
     ).label('sort_rank')
 
     rating_stats = db.session.query(
         Doctor.id.label('doctor_id'),
         avg_rating,
         rating_count,
+        rating_score.label('rating_score'),
         sort_rank
     ).outerjoin(Rating).group_by(Doctor.id).subquery()
 
@@ -2129,6 +2164,7 @@ def get_doctors():
         Doctor,
         rating_stats.c.avg_rating,
         rating_stats.c.rating_count,
+        rating_stats.c.rating_score,
         rating_stats.c.sort_rank
     ).join(rating_stats, Doctor.id == rating_stats.c.doctor_id).options(
         selectinload(Doctor.city),
@@ -2156,10 +2192,14 @@ def get_doctors():
     total_pages = (total_doctors + per_page - 1) // per_page  # Ceiling division
 
     # Order by priority:
-    # 1) Featured + verified, 2) Verified, 3) Highest rated, 4) Others
+    # 0) Featured + verified
+    # 1) Verified with ratings (sorted by rating score)
+    # 2) Verified without ratings (sorted alphabetically)
+    # 3) Has ratings but not verified
+    # 4) Others
     query = query.order_by(
         rating_stats.c.sort_rank.asc(),
-        rating_stats.c.avg_rating.desc(),
+        rating_stats.c.rating_score.desc(),
         Doctor.name.asc()
     )
 
@@ -2169,7 +2209,7 @@ def get_doctors():
 
     # Serialize to JSON
     doctors_list = []
-    for d, avg_rating_value, rating_count_value, _sort_rank in doctors:
+    for d, avg_rating_value, rating_count_value, _rating_score, _sort_rank in doctors:
         # Generate proper photo URL
         photo_url = None
         if d.photo_url:
@@ -4758,6 +4798,37 @@ def user_profile():
     total_points = user.points
     tier = user.tier
     tier_name = user.tier_name
+    tier_thresholds = {
+        'bronze': 51,
+        'silver': 151,
+        'gold': 300
+    }
+    next_tier = None
+    next_tier_points = None
+    if tier in tier_thresholds:
+        next_tier_points = tier_thresholds[tier]
+        next_tier = 'silver' if tier == 'bronze' else 'gold' if tier == 'silver' else 'platinum'
+    points_to_next = max(0, next_tier_points - total_points) if next_tier_points else 0
+
+    # Recent activity (ratings + appointments)
+    activities = []
+    for rating in ratings[:6]:
+        activities.append({
+            'type': 'review',
+            'title': f"Reviewed {rating.doctor.name}",
+            'date': rating.created_at,
+            'url': url_for('doctor_profile', slug=rating.doctor.slug),
+            'meta': f"{rating.rating}★"
+        })
+    for appt in appointments[:6]:
+        activities.append({
+            'type': 'appointment',
+            'title': f"Booked appointment with {appt.doctor.name}",
+            'date': appt.created_at,
+            'url': url_for('doctor_profile', slug=appt.doctor.slug),
+            'meta': appt.status.capitalize()
+        })
+    activities = sorted(activities, key=lambda item: item['date'], reverse=True)[:6]
 
     return render_template('user_profile.html',
                          user=user,
@@ -4768,7 +4839,10 @@ def user_profile():
                          total_helpful_received=total_helpful_received,
                          total_points=total_points,
                          tier=tier,
-                         tier_name=tier_name)
+                         tier_name=tier_name,
+                         next_tier=next_tier,
+                         points_to_next=points_to_next,
+                         activities=activities)
 
 @app.route('/change-password', methods=['POST'])
 @login_required

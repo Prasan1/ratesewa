@@ -432,6 +432,18 @@ $(document).ready(function() {
         width: '100%'
     });
 
+    // Handle URL parameters (e.g., ?city=1&specialty=2)
+    const urlParams = new URLSearchParams(window.location.search);
+    const cityParam = urlParams.get('city');
+    const specialtyParam = urlParams.get('specialty');
+
+    if (cityParam) {
+        $('#citySelect').val(cityParam).trigger('change');
+    }
+    if (specialtyParam) {
+        $('#specialtySelect').val(specialtyParam).trigger('change');
+    }
+
     loadDoctors(); // Initial load - no scroll
 
     $('#filterBtn').click(function() {
@@ -562,28 +574,36 @@ function displayDoctors(response) {
         const verifiedBadge = doctor.is_verified
             ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>'
             : '';
-        const clinicLine = doctor.clinic_name
-            ? `<p class="card-text text-muted small mb-0"><i class="fas fa-hospital me-1"></i><a href="/clinic/${doctor.clinic_slug}" class="text-muted text-decoration-none">${doctor.clinic_name}</a></p>`
-            : '';
         const adminEditButton = isAdmin
             ? `<a href="/admin/doctors/${doctor.id}/edit" class="btn btn-outline-secondary btn-sm ms-2">Edit</a>`
             : '';
 
-        const ratingText = hasRatings
-            ? `${avgRating} (${ratingCount} reviews)`
-            : `No reviews yet`;
+        const ratingLabel = hasRatings
+            ? `${avgRating} (${ratingCount})`
+            : 'No reviews yet';
+        const ratingStat = `<span class="doctor-stat"><span class="rating">${starHtml}</span><span>${ratingLabel}</span></span>`;
         const cityName = (doctor.city_name || '').replace(/\s+/g, ' ').trim();
         const cityLabel = cityName || 'Unknown';
+        const specialtyName = doctor.specialty_name || 'General Practice';
 
         const imgSrc = doctor.photo_url || getDoctorAvatar(doctor.name, doctor.id);
+        const clinicMeta = doctor.clinic_name
+            ? `<span class="doctor-meta-item"><i class="fas fa-hospital"></i><a href="/clinic/${doctor.clinic_slug}" class="text-muted text-decoration-none">${doctor.clinic_name}</a></span>`
+            : '';
+        const workplaceMeta = !doctor.clinic_name && doctor.workplace
+            ? `<span class="doctor-meta-item"><i class="fas fa-briefcase-medical"></i><span>${doctor.workplace}</span></span>`
+            : '';
+        const experienceStat = doctor.experience && doctor.experience > 0
+            ? `<span class="doctor-stat"><i class="fas fa-clock"></i>${doctor.experience}+ yrs</span>`
+            : '';
 
         html += `
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card doctor-card h-100 ${doctor.is_featured ? 'featured' : ''} ${doctor.is_verified ? 'verified' : ''}">
                     <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div class="d-flex align-items-center">
-                                <div class="doctor-avatar me-3">
+                        <div class="doctor-header">
+                            <div class="doctor-identity">
+                                <div class="doctor-avatar">
                                     <img
                                         src="${imgSrc}"
                                         data-name="${String(doctor.name || '')}"
@@ -596,41 +616,36 @@ function displayDoctors(response) {
                                         onerror="this.onerror=null; this.src=getDoctorAvatar(this.dataset.name, parseInt(this.dataset.id || '0', 10));"
                                     >
                                 </div>
-                                <div class="doctor-info flex-grow-1">
-                                    <h5 class="card-title mb-1">${doctor.name}</h5>
-                                    <div class="doctor-chips">
-                                        <span class="chip">
-                                            <i class="fas fa-stethoscope"></i>
-                                            <span>${doctor.specialty_name}</span>
-                                        </span>
+                                <div class="doctor-title">
+                                    <div class="doctor-name">${doctor.name}</div>
+                                    <div class="doctor-subtitle">
+                                        <i class="fas fa-stethoscope"></i>
+                                        <span>${specialtyName}</span>
                                     </div>
-                                    <div class="doctor-location">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>${cityLabel}</span>
-                                    </div>
-                                    ${clinicLine}
                                 </div>
                             </div>
-                            <div class="text-end">
+                            <div class="doctor-badges">
                                 ${verifiedBadge}
                             </div>
                         </div>
 
-                        <div class="doctor-details">
-                            ${doctor.experience && doctor.experience > 0 ? `<p class="card-text small mb-1"><strong>Experience:</strong> ${doctor.experience} years</p>` : ''}
-                            ${doctor.workplace ? `<p class="card-text small mb-1"><strong>Works At:</strong> ${doctor.workplace}</p>` : ''}
-
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="rating me-2">
-                                    ${starHtml}
-                                </div>
-                                <span class="text-muted small">${ratingText}</span>
-                            </div>
-
-                            ${doctor.description ? `<p class="card-text small text-muted clamp-2">${doctor.description}</p>` : ''}
+                        <div class="doctor-meta">
+                            <span class="doctor-meta-item"><i class="fas fa-map-marker-alt"></i><span>${cityLabel}</span></span>
                         </div>
 
-                        <div class="d-flex align-items-center">
+                        <div class="doctor-info-lines">
+                            <div class="info-line"><strong>Experience:</strong> ${doctor.experience && doctor.experience > 0 ? doctor.experience + ' years' : 'Not specified'}</div>
+                            ${(doctor.workplace || doctor.clinic_name) ? `<div class="info-line"><strong>Works At:</strong> ${doctor.workplace || doctor.clinic_name}</div>` : ''}
+                        </div>
+
+                        <div class="doctor-rating-section">
+                            <span class="rating-display">${starHtml}</span>
+                            <span class="text-muted small">${ratingLabel}</span>
+                        </div>
+
+                        ${doctor.description ? `<p class="doctor-summary">${doctor.description}</p>` : ''}
+
+                        <div class="doctor-actions">
                             <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Doctor</a>
                             ${adminEditButton}
                         </div>
@@ -699,14 +714,10 @@ function displayDoctors(response) {
 }
 
 function generateStarRatingHtml(rating, ratingCount) {
-    if (!ratingCount) {
-        return '';
-    }
-
     let html = '';
-    const numericRating = parseFloat(rating);
+    const numericRating = ratingCount ? parseFloat(rating) : 0;
     const fullStars = Math.floor(numericRating);
-    const hasHalfStar = (numericRating - fullStars) >= 0.5;
+    const hasHalfStar = ratingCount && (numericRating - fullStars) >= 0.5;
 
     for (let i = 0; i < fullStars; i++) {
         html += '<i class="fas fa-star text-warning"></i>';
@@ -716,9 +727,9 @@ function generateStarRatingHtml(rating, ratingCount) {
         html += '<i class="fas fa-star-half-alt text-warning"></i>';
     }
 
-    const emptyStars = 5 - Math.ceil(numericRating);
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
     for (let i = 0; i < emptyStars; i++) {
-        html += '<i class="far fa-star text-warning"></i>';
+        html += '<i class="far fa-star text-muted"></i>';
     }
 
     return html;

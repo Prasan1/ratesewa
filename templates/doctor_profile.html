@@ -433,6 +433,17 @@
         .hero-content { display: flex; flex-direction: column; align-items: center; }
         .avatar-lg { width: 120px; height: 120px; margin-bottom: 16px; }
 
+        /* Smaller badge on mobile profile */
+        .hero-title .verification-badge {
+            width: 22px;
+            height: 22px;
+            margin-left: 8px;
+        }
+
+        .hero-title .verification-badge i {
+            font-size: 11px;
+        }
+
         .hero-actions {
             display: flex;
             flex-direction: column;
@@ -501,17 +512,6 @@
       <div class="col-md-9">
         <div class="hero-main">
           <div class="hero-identity">
-            <div class="hero-badges">
-              {% if doctor.is_verified %}
-                <span class="status-pill verified"><i class="fas fa-check-circle me-1"></i>Verified</span>
-              {% endif %}
-              {% if doctor.subscription_tier == 'featured' %}
-                <span class="status-pill featured"><i class="fas fa-star me-1"></i>Featured</span>
-              {% elif doctor.subscription_tier == 'premium' %}
-                <span class="status-pill premium"><i class="fas fa-crown me-1"></i>Premium</span>
-              {% endif %}
-            </div>
-
             <h1 class="hero-title">{{ doctor.name|doctor_title }}</h1>
             <div class="hero-tagline">
               {{ doctor.specialty.name }} in {{ doctor.city.name }}
