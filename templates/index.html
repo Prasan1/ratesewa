@@ -35,13 +35,13 @@
 
                     <div class="trust-strip mb-4">
                         <div class="trust-item">
-                            <i class="fas fa-shield-alt me-2 text-brand"></i>NMC number checked (when available)
+                            <i class="fas fa-shield-alt me-2 text-brand"></i>NMC Verified
                         </div>
                         <div class="trust-item">
-                            <i class="fas fa-star me-2 text-brand"></i>Real patient reviews
+                            <i class="fas fa-star me-2 text-brand"></i>Real Reviews
                         </div>
                         <div class="trust-item">
-                            <i class="fas fa-map-marker-alt me-2 text-brand"></i>Nationwide coverage
+                            <i class="fas fa-map-marker-alt me-2 text-brand"></i>27,000+ Doctors
                         </div>
                     </div>
 
@@ -571,7 +571,9 @@ function displayDoctors(response) {
 
         const ratingText = hasRatings
             ? `${avgRating} (${ratingCount} reviews)`
-            : `⭐ No reviews yet — <a href="/doctor/${doctor.slug}" class="text-primary">Be the first to review</a>`;
+            : `No reviews yet`;
+        const cityName = (doctor.city_name || '').replace(/\s+/g, ' ').trim();
+        const cityLabel = cityName || 'Unknown';
 
         const imgSrc = doctor.photo_url || getDoctorAvatar(doctor.name, doctor.id);
 
@@ -579,36 +581,43 @@ function displayDoctors(response) {
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card doctor-card h-100 ${doctor.is_featured ? 'featured' : ''} ${doctor.is_verified ? 'verified' : ''}">
                     <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="doctor-avatar me-3">
-                                <img
-                                    src="${imgSrc}"
-                                    data-name="${String(doctor.name || '')}"
-                                    data-id="${doctor.id}"
-                                    class="rounded-circle"
-                                    alt="${doctor.name}"
-                                    width="80"
-                                    height="80"
-                                    loading="lazy"
-                                    onerror="this.onerror=null; this.src=getDoctorAvatar(this.dataset.name, parseInt(this.dataset.id || '0', 10));"
-                                >
-                            </div>
-                            <div class="doctor-info flex-grow-1">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <h5 class="card-title mb-1">${doctor.name}</h5>
-                                    ${verifiedBadge}
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="doctor-avatar me-3">
+                                    <img
+                                        src="${imgSrc}"
+                                        data-name="${String(doctor.name || '')}"
+                                        data-id="${doctor.id}"
+                                        class="rounded-circle"
+                                        alt="${doctor.name}"
+                                        width="80"
+                                        height="80"
+                                        loading="lazy"
+                                        onerror="this.onerror=null; this.src=getDoctorAvatar(this.dataset.name, parseInt(this.dataset.id || '0', 10));"
+                                    >
                                 </div>
-                                <p class="card-text text-muted mb-1">${doctor.specialty_name}</p>
-                                <p class="card-text text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i>${doctor.city_name}</p>
-                                ${clinicLine}
+                                <div class="doctor-info flex-grow-1">
+                                    <h5 class="card-title mb-1">${doctor.name}</h5>
+                                    <div class="doctor-chips">
+                                        <span class="chip">
+                                            <i class="fas fa-stethoscope"></i>
+                                            <span>${doctor.specialty_name}</span>
+                                        </span>
+                                    </div>
+                                    <div class="doctor-location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>${cityLabel}</span>
+                                    </div>
+                                    ${clinicLine}
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                ${verifiedBadge}
                             </div>
                         </div>
 
                         <div class="doctor-details">
-                            ${doctor.is_verified && doctor.nmc_number ? `<p class="card-text small mb-1"><strong>NMC#:</strong> ${doctor.nmc_number}</p>` : ''}
                             ${doctor.experience && doctor.experience > 0 ? `<p class="card-text small mb-1"><strong>Experience:</strong> ${doctor.experience} years</p>` : ''}
-                            ${doctor.education ? `<p class="card-text small mb-1"><strong>Education:</strong> ${doctor.education}</p>` : ''}
-                            ${doctor.college ? `<p class="card-text small mb-1"><strong>College:</strong> ${doctor.college}</p>` : ''}
                             ${doctor.workplace ? `<p class="card-text small mb-1"><strong>Works At:</strong> ${doctor.workplace}</p>` : ''}
 
                             <div class="d-flex align-items-center mb-2">
@@ -618,11 +627,11 @@ function displayDoctors(response) {
                                 <span class="text-muted small">${ratingText}</span>
                             </div>
 
-                            <p class="card-text small text-muted">${doctor.description}</p>
+                            ${doctor.description ? `<p class="card-text small text-muted clamp-2">${doctor.description}</p>` : ''}
                         </div>
 
                         <div class="d-flex align-items-center">
-                            <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                            <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Doctor</a>
                             ${adminEditButton}
                         </div>
                     </div>

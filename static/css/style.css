@@ -749,21 +749,69 @@ footer {
     }
 
     .trust-strip {
-        justify-content: flex-start;
+        justify-content: center;
+        gap: 8px;
     }
 
     .trust-item {
         width: auto;
-        flex: 1 1 calc(50% - 10px);
-        justify-content: flex-start;
-        text-align: left;
-        font-size: 0.8rem;
-        padding: 8px 10px;
+        flex: 0 1 auto;
+        white-space: nowrap;
+        justify-content: center;
+        text-align: center;
+        font-size: 0.75rem;
+        padding: 8px 12px;
     }
 
-    .doctor-card {
-        margin-bottom: 15px;
+    .trust-item i {
+        font-size: 0.7rem;
     }
+
+.doctor-card {
+    margin-bottom: 15px;
+}
+
+.doctor-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.doctor-chips .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    background: rgba(4, 130, 136, 0.08);
+    color: var(--ink);
+}
+
+.doctor-chips .chip i {
+    color: var(--brand);
+}
+
+.doctor-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.doctor-location i {
+    color: var(--brand);
+}
+
+.clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
     .profile-header {
         padding: 22px;
