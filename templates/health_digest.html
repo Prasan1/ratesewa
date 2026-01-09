@@ -20,7 +20,7 @@
     </div>
 
     <div class="compass-tabs mb-4">
-        <ul class="nav nav-pills justify-content-center flex-nowrap" role="tablist">
+        <ul class="nav nav-pills justify-content-center flex-wrap" role="tablist" style="gap: 0.5rem;">
             <li class="nav-item" role="presentation">
                 <a class="nav-link {% if not current_category %}active{% endif %}" href="{{ url_for('health_digest') }}">All</a>
             </li>
@@ -215,12 +215,14 @@
 <style>
 .compass-tabs {
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding: 0 8px 4px;
+    scroll-padding-left: 8px;
 }
 
 .compass-tabs .nav {
     gap: 8px;
     flex-wrap: nowrap;
+    justify-content: flex-start;
 }
 
 .compass-tabs .nav-link {
