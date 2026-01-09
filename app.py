@@ -5,6 +5,7 @@ import re
 import os
 import json
 from datetime import datetime, timedelta
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
@@ -150,6 +151,44 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def generate_email_token(email):
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    return serializer.dumps(email, salt='email-verify')
+
+def confirm_email_token(token, max_age=60 * 60 * 24):
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    try:
+        return serializer.loads(token, salt='email-verify', max_age=max_age)
+    except (BadSignature, SignatureExpired):
+        return None
+
+def send_email_verification(user):
+    if not resend_key:
+        return False
+    token = generate_email_token(user.email)
+    verify_url = url_for('verify_email', token=token, _external=True)
+    subject = "Verify your RankSewa email"
+    html = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 520px;">
+          <h2 style="color: #2563eb;">Verify your email</h2>
+          <p>Thanks for joining RankSewa. Please verify your email to continue.</p>
+          <p><a href="{verify_url}" style="display:inline-block; padding:12px 20px; background:#2563eb; color:#fff; text-decoration:none; border-radius:6px;">Verify Email</a></p>
+          <p style="font-size: 12px; color:#6b7280;">This link expires in 24 hours.</p>
+        </div>
+    """
+    params = {"from": "RankSewa <support@ranksewa.com>", "to": [user.email], "subject": subject, "html": html}
+    try:
+        resend.Emails.send(params)
+        return True
+    except Exception as e:
+        print(f"❌ Failed to send verification email: {e}")
+        return False
+
+def get_client_ip():
+    forwarded_for = request.headers.get('X-Forwarded-For', '')
+    if forwarded_for:
+        return forwarded_for.split(',')[0].strip()
+    return request.remote_addr
 
 def admin_required(f):
     from functools import wraps
@@ -182,9 +221,18 @@ def doctor_required(f):
             session.clear()
             flash('Your account has been deactivated. Please contact support.', 'danger')
             return redirect(url_for('login'))
-        if user.role != 'doctor' or not user.doctor_id:
+        if user.role != 'doctor':
             flash('Doctor access required. Please claim your profile first.', 'warning')
             return redirect(url_for('claim_profile'))
+        if not user.doctor_id:
+            pending_verification = VerificationRequest.query.filter_by(
+                user_id=user.id,
+                status='pending'
+            ).first()
+            if pending_verification:
+                return redirect(url_for('verification_submitted'))
+            flash('Please submit your verification documents to continue.', 'warning')
+            return redirect(url_for('doctor_self_register'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -850,13 +898,9 @@ def register():
         email = request.form['email']
         password = request.form['password']
         is_doctor = request.form.get('is_doctor') == '1'
-        is_clinic_manager = request.form.get('is_clinic_manager') == '1'
 
         if not name or not email or not password:
             flash('All fields are required.', 'danger')
-            return redirect(url_for('register'))
-        if is_doctor and is_clinic_manager:
-            flash('Please select either doctor or clinic manager, not both.', 'danger')
             return redirect(url_for('register'))
 
         # Check if email already exists
@@ -866,26 +910,21 @@ def register():
             return redirect(url_for('register'))
 
         # Create new user
-        user = User(name=name, email=email)
+        user = User(name=name, email=email, email_verified=False)
         user.set_password(password)
-        if is_clinic_manager:
-            user.role = 'clinic_manager'
-        if is_doctor or is_clinic_manager:
-            user.is_active = False
 
         try:
             db.session.add(user)
             db.session.commit()
 
+            send_email_verification(user)
+
             # If user indicated they're a doctor, auto-login and redirect to claim profile
             if is_doctor:
-                flash('Registration received. Please wait for admin approval before logging in.', 'info')
-                return redirect(url_for('login'))
-            if is_clinic_manager:
-                flash('Registration received. Please wait for admin approval before logging in.', 'info')
-                return redirect(url_for('login'))
+                flash('Check your email to verify your account before logging in.', 'success')
+                return redirect(url_for('login', next=url_for('claim_profile')))
             else:
-                flash('Registration successful! Please log in.', 'success')
+                flash('Check your email to verify your account before logging in.', 'success')
                 return redirect(url_for('login'))
 
         except Exception as e:
@@ -904,6 +943,14 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if user and user.check_password(password):
+            if not user.email_verified:
+                now = datetime.utcnow().timestamp()
+                last_sent = session.get('verification_sent_at', 0)
+                if now - last_sent > 300:
+                    send_email_verification(user)
+                    session['verification_sent_at'] = now
+                flash('Please verify your email before logging in. We sent a new verification link.', 'warning')
+                return redirect(url_for('login'))
             if not user.is_active:
                 flash('Your account is not active yet. Please wait for admin approval.', 'warning')
                 return redirect(url_for('login'))
@@ -956,13 +1003,21 @@ def facebook_callback():
 
     email = profile.get('email')
     if not email:
-        email = f"{profile.get('id')}@facebook.local"
+        flash('Email not provided by Facebook. Please use email signup or Google login.', 'warning')
+        return redirect(url_for('login'))
 
     user = User.query.filter_by(email=email).first()
     if not user:
-        user = User(name=profile.get('name') or 'Facebook User', email=email)
+        user = User(
+            name=profile.get('name') or 'Facebook User',
+            email=email,
+            email_verified=True
+        )
         user.set_password(os.urandom(16).hex())
         db.session.add(user)
+        db.session.commit()
+    elif not user.email_verified:
+        user.email_verified = True
         db.session.commit()
 
     if is_admin_email(user.email) and not user.is_admin:
@@ -1035,9 +1090,12 @@ def google_authorized():
     user = User.query.filter_by(email=email).first()
     if not user:
         # Create new user
-        user = User(name=name, email=email)
+        user = User(name=name, email=email, email_verified=True)
         user.set_password(os.urandom(16).hex())  # Random password for OAuth users
         db.session.add(user)
+        db.session.commit()
+    elif not user.email_verified:
+        user.email_verified = True
         db.session.commit()
 
     # Check if user is admin
@@ -1062,6 +1120,22 @@ def google_authorized():
     if next_page and is_safe_url(next_page):
         return redirect(next_page)
     return redirect(url_for('index'))
+
+@app.route('/verify-email/<token>')
+def verify_email(token):
+    email = confirm_email_token(token)
+    if not email:
+        flash('Verification link is invalid or expired. Please log in to request a new link.', 'warning')
+        return redirect(url_for('login'))
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        flash('Account not found. Please register again.', 'danger')
+        return redirect(url_for('register'))
+    if not user.email_verified:
+        user.email_verified = True
+        db.session.commit()
+    flash('Email verified successfully. You can log in now.', 'success')
+    return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
@@ -2151,11 +2225,19 @@ def admin_doctors():
     # Pagination
     page = request.args.get('page', 1, type=int)
     per_page = 50  # Show 50 doctors per page
+    show_tests = request.args.get('show_tests', '0') == '1'
 
     query = Doctor.query.options(joinedload(Doctor.city), joinedload(Doctor.specialty), joinedload(Doctor.clinic))
     search = request.args.get('q', '').strip()
     if search:
         query = query.filter(Doctor.name.ilike(f"%{search}%"))
+    if not show_tests:
+        test_filters = or_(
+            Doctor.name.ilike('test%'),
+            Doctor.slug.ilike('test%'),
+            Doctor.nmc_number.ilike('test%')
+        )
+        query = query.filter(~test_filters)
 
     # Paginate instead of loading all at once
     pagination = query.order_by(Doctor.name.asc()).paginate(
@@ -2167,7 +2249,8 @@ def admin_doctors():
     return render_template('admin_doctors.html',
                          doctors=pagination.items,
                          pagination=pagination,
-                         search=search)
+                         search=search,
+                         show_tests=show_tests)
 
 @app.route('/admin/doctors/new', methods=['GET', 'POST'])
 @admin_required
@@ -2990,8 +3073,21 @@ def admin_users():
     # Pagination for scalability
     page = request.args.get('page', 1, type=int)
     per_page = 50
+    show_tests = request.args.get('show_tests', '0') == '1'
 
-    pagination = User.query.order_by(User.name.asc()).paginate(
+    query = User.query
+    if not show_tests:
+        test_filters = or_(
+            User.email.ilike('test%'),
+            User.email.ilike('%@test%'),
+            User.email.ilike('%@email.com'),
+            User.email.ilike('%@example.com'),
+            User.email.ilike('%@mailinator.com'),
+            User.email.ilike('%@yopmail.com')
+        )
+        query = query.filter(~test_filters)
+
+    pagination = query.order_by(User.name.asc()).paginate(
         page=page,
         per_page=per_page,
         error_out=False
@@ -2999,7 +3095,8 @@ def admin_users():
 
     return render_template('admin_users.html',
                          users=pagination.items,
-                         pagination=pagination)
+                         pagination=pagination,
+                         show_tests=show_tests)
 
 @app.route('/admin/users/<int:user_id>/status', methods=['POST'])
 @admin_required
@@ -3361,6 +3458,13 @@ def doctor_profile(slug):
 
     # Calculate average rating (use property)
     avg_rating = doctor.avg_rating
+    rating_breakdown = {
+        5: len([r for r in ratings if r.rating == 5]),
+        4: len([r for r in ratings if r.rating == 4]),
+        3: len([r for r in ratings if r.rating == 3]),
+        2: len([r for r in ratings if r.rating == 2]),
+        1: len([r for r in ratings if r.rating == 1])
+    }
 
     # Get ads for this page
     banner_ad = ad_manager.get_ad_for_position('profile_top',
@@ -3377,6 +3481,8 @@ def doctor_profile(slug):
                           doctor=doctor,
                           ratings=ratings,
                           avg_rating=avg_rating,
+                          rating_breakdown=rating_breakdown,
+                          now=datetime.utcnow(),
                           banner_ad=banner_ad,
                           inline_ad=inline_ad,
                           tier_features=tier_features)
@@ -3394,6 +3500,12 @@ def rate_doctor():
     had_appointment = request.form.get('had_appointment') == 'yes'  # yes/no -> boolean
     wait_time_minutes = request.form.get('wait_time_minutes')  # integer
     doctor_on_time = request.form.get('doctor_on_time')  # yes/no/null
+    visit_type = request.form.get('visit_type')
+    visit_reason = request.form.get('visit_reason')
+    recommendation = request.form.get('recommendation')
+    value_rating = request.form.get('value_rating')
+    bedside_rating = request.form.get('bedside_rating')
+    cleanliness_rating = request.form.get('cleanliness_rating')
 
     if not doctor_id or not rating_value:
         flash('Please provide a rating.', 'danger')
@@ -3440,6 +3552,48 @@ def rate_doctor():
     # Check if this is the first review for this doctor
     is_first_review = Rating.query.filter_by(doctor_id=doctor_id).count() == 0
 
+    now = datetime.utcnow()
+    ip_address = get_client_ip()
+    user_agent = request.headers.get('User-Agent', '')[:255]
+
+    suspicion_score = 0
+    suspicion_reasons = []
+
+    if user.created_at:
+        account_age = now - user.created_at
+        if account_age < timedelta(days=1):
+            suspicion_score += 2
+            suspicion_reasons.append('new account')
+        elif account_age < timedelta(days=3):
+            suspicion_score += 1
+            suspicion_reasons.append('recent account')
+
+    recent_user_reviews = Rating.query.filter(
+        Rating.user_id == user_id,
+        Rating.created_at >= now - timedelta(hours=24)
+    ).count()
+    if recent_user_reviews >= 3:
+        suspicion_score += 2
+        suspicion_reasons.append('high review volume')
+
+    if ip_address:
+        recent_ip_reviews = Rating.query.filter(
+            Rating.ip_address == ip_address,
+            Rating.created_at >= now - timedelta(hours=24),
+            Rating.user_id != user_id
+        ).count()
+        if recent_ip_reviews >= 2:
+            suspicion_score += 2
+            suspicion_reasons.append('shared IP activity')
+
+    if rating_value in (1, 5):
+        comment_length = len(comment.strip()) if comment else 0
+        if comment_length < 20:
+            suspicion_score += 1
+            suspicion_reasons.append('extreme rating with short comment')
+
+    is_suspected = suspicion_score >= 3
+
     # Create new rating with visit experience details
     new_rating = Rating(
         doctor_id=doctor_id,
@@ -3449,14 +3603,45 @@ def rate_doctor():
         visit_time=visit_time,
         had_appointment=had_appointment,
         wait_time_minutes=int(wait_time_minutes) if wait_time_minutes else None,
-        doctor_on_time=True if doctor_on_time == 'yes' else (False if doctor_on_time == 'no' else None)
+        doctor_on_time=True if doctor_on_time == 'yes' else (False if doctor_on_time == 'no' else None),
+        visit_type=visit_type or None,
+        visit_reason=visit_reason.strip() if visit_reason else None,
+        recommendation=recommendation or None,
+        value_rating=int(value_rating) if value_rating else None,
+        bedside_rating=int(bedside_rating) if bedside_rating else None,
+        cleanliness_rating=int(cleanliness_rating) if cleanliness_rating else None,
+        ip_address=ip_address,
+        user_agent=user_agent,
+        suspicion_score=suspicion_score,
+        is_suspected=is_suspected
     )
     db.session.add(new_rating)
     db.session.flush()  # Flush to get the rating ID
 
+    # Calculate credibility score
+    from credibility import calculate_credibility_score, get_credibility_tier
+    user = User.query.get(user_id)
+    credibility_score, credibility_signals = calculate_credibility_score(new_rating, user)
+    credibility_tier = get_credibility_tier(credibility_score)
+
+    # Update the rating with credibility score
+    new_rating.credibility_score = credibility_score
+
+    # Auto-flag low credibility reviews
+    if credibility_tier == 'suspicious':
+        new_rating.is_suspected = True
+
+    if is_suspected:
+        auto_flag = ReviewFlag(
+            rating_id=new_rating.id,
+            reporter_user_id=None,
+            reason='spam',
+            additional_details='Auto-flagged: ' + ', '.join(suspicion_reasons)
+        )
+        db.session.add(auto_flag)
+
     # Award points and badges using gamification system
     from gamification import process_new_review
-    user = User.query.get(user_id)
     result = process_new_review(user, new_rating, is_first_for_doctor=is_first_review)
 
     # Show success message with points earned
@@ -4532,6 +4717,14 @@ def user_profile():
 
     # If user is an approved doctor, redirect to doctor dashboard
     if user.role == 'doctor':
+        pending_verification = VerificationRequest.query.filter_by(
+            user_id=user_id,
+            status='pending'
+        ).first()
+        if pending_verification:
+            return redirect(url_for('verification_submitted'))
+        if not user.doctor_id:
+            return redirect(url_for('doctor_self_register'))
         return redirect(url_for('doctor_dashboard'))
 
     # Check if user has pending verification request

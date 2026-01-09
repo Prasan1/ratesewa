@@ -125,6 +125,8 @@ class User(db.Model):
     name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(200), unique=True, nullable=False, index=True)
     password = db.Column(db.String(255), nullable=False)
+    email_verified = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_admin = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
 
@@ -231,12 +233,23 @@ class Rating(db.Model):
     rating = db.Column(db.Integer, nullable=False)
     comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    ip_address = db.Column(db.String(45), nullable=True)
+    user_agent = db.Column(db.String(255), nullable=True)
+    suspicion_score = db.Column(db.Integer, default=0)
+    is_suspected = db.Column(db.Boolean, default=False)
+    credibility_score = db.Column(db.Integer, default=0)  # Community-based credibility (0-100+)
 
     # Visit experience details (new fields for better patient insights)
     visit_time = db.Column(db.String(20), nullable=True)  # Morning/Afternoon/Evening
     had_appointment = db.Column(db.Boolean, default=False)  # Did they have an appointment?
     wait_time_minutes = db.Column(db.Integer, nullable=True)  # How long they waited
     doctor_on_time = db.Column(db.Boolean, nullable=True)  # Was doctor on time? (for appointments)
+    visit_type = db.Column(db.String(20), nullable=True)  # first/follow_up/emergency
+    visit_reason = db.Column(db.String(255), nullable=True)
+    recommendation = db.Column(db.String(5), nullable=True)  # yes/no
+    value_rating = db.Column(db.Integer, nullable=True)
+    bedside_rating = db.Column(db.Integer, nullable=True)
+    cleanliness_rating = db.Column(db.Integer, nullable=True)
 
     # Relationships
     doctor_response = db.relationship('DoctorResponse', backref='rating', uselist=False, lazy=True)
