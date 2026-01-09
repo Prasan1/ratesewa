@@ -25,9 +25,16 @@ engine = create_engine(DATABASE_URL)
 # Define all missing columns for each table
 migrations = {
     'users': [
+        ('created_at', 'TIMESTAMP', 'CURRENT_TIMESTAMP'),
         ('email_verified', 'BOOLEAN', 'FALSE'),
+        ('is_admin', 'BOOLEAN', 'FALSE'),
+        ('is_active', 'BOOLEAN', 'TRUE'),
+        ('role', "VARCHAR(20)", "'patient'"),
+        ('doctor_id', 'INTEGER', 'NULL'),
+        ('points', 'INTEGER', '0'),
     ],
     'ratings': [
+        ('created_at', 'TIMESTAMP', 'CURRENT_TIMESTAMP'),
         ('ip_address', 'VARCHAR(45)', 'NULL'),
         ('user_agent', 'VARCHAR(255)', 'NULL'),
         ('suspicion_score', 'INTEGER', '0'),
@@ -83,9 +90,16 @@ try:
                     trans = conn.begin()
 
                     # Build ALTER TABLE statement
+                    # Handle special cases for default values
                     if default == 'NULL':
                         sql = f"ALTER TABLE {table_name} ADD COLUMN {column_name} {data_type} DEFAULT {default}"
+                    elif default == 'CURRENT_TIMESTAMP':
+                        sql = f"ALTER TABLE {table_name} ADD COLUMN {column_name} {data_type} DEFAULT {default}"
+                    elif default.startswith("'") and default.endswith("'"):
+                        # String literal already quoted
+                        sql = f"ALTER TABLE {table_name} ADD COLUMN {column_name} {data_type} DEFAULT {default}"
                     else:
+                        # Numeric or boolean default
                         sql = f"ALTER TABLE {table_name} ADD COLUMN {column_name} {data_type} DEFAULT {default}"
 
                     conn.execute(text(sql))
