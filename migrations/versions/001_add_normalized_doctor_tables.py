@@ -19,7 +19,7 @@ depends_on = None
 def upgrade():
     # Create doctor_contact table
     op.create_table('doctor_contact',
-        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True),
         sa.Column('doctor_id', sa.Integer(), nullable=False),
         sa.Column('phone_number', sa.String(length=20), nullable=True),
         sa.Column('practice_address', sa.Text(), nullable=True),
@@ -35,7 +35,7 @@ def upgrade():
 
     # Create doctor_subscription table
     op.create_table('doctor_subscription',
-        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True),
         sa.Column('doctor_id', sa.Integer(), nullable=False),
         sa.Column('subscription_tier', sa.String(length=20), nullable=True),
         sa.Column('subscription_expires_at', sa.DateTime(), nullable=True),
@@ -51,7 +51,7 @@ def upgrade():
 
     # Create doctor_credentials table
     op.create_table('doctor_credentials',
-        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True),
         sa.Column('doctor_id', sa.Integer(), nullable=False),
         sa.Column('nmc_number', sa.String(length=50), nullable=True),
         sa.Column('external_clinic_url', sa.Text(), nullable=True),
@@ -64,7 +64,7 @@ def upgrade():
 
     # Create doctor_settings table
     op.create_table('doctor_settings',
-        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True),
         sa.Column('doctor_id', sa.Integer(), nullable=False),
         sa.Column('photo_url', sa.Text(), nullable=True),
         sa.Column('working_hours', sa.Text(), nullable=True),
@@ -79,7 +79,7 @@ def upgrade():
 
     # Create doctor_medical_tools table
     op.create_table('doctor_medical_tools',
-        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True),
         sa.Column('doctor_id', sa.Integer(), nullable=False),
         sa.Column('signature_image', sa.Text(), nullable=True),
         sa.Column('clinic_letterhead', sa.Text(), nullable=True),
@@ -98,7 +98,7 @@ def upgrade():
 
     # Create doctor_template_usage table
     op.create_table('doctor_template_usage',
-        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True),
         sa.Column('doctor_id', sa.Integer(), nullable=False),
         sa.Column('template_type', sa.String(length=50), nullable=True),
         sa.Column('generated_at', sa.DateTime(), nullable=True),
