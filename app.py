@@ -7,6 +7,7 @@ import json
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
+from flask_migrate import Migrate
 from authlib.integrations.flask_client import OAuth
 from models import db, City, Specialty, Clinic, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag, BadgeDefinition, UserBadge, ReviewHelpful, Article, ArticleCategory, ClinicManagerDoctor, ClinicAccount, DoctorContact, DoctorSubscription, DoctorCredentials, DoctorSettings, DoctorMedicalTools, DoctorTemplateUsage
 from config import Config
@@ -98,6 +99,9 @@ app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'jpg', 'jpeg', 'png'}
 
 # Initialize SQLAlchemy
 db.init_app(app)
+
+# Initialize Flask-Migrate
+migrate = Migrate(app, db)
 
 # Initialize CSRF Protection
 csrf = CSRFProtect(app)
