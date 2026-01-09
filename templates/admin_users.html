@@ -6,7 +6,18 @@
 <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mb-4">
     <div>
         <h2 class="mb-1">Manage Users</h2>
-        <p class="text-muted mb-0">Remove users who violate policies or spam.</p>
+        <p class="text-muted mb-0">Review accounts and take action carefully.</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if show_tests %}
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_users') }}">
+                Hide test users
+            </a>
+        {% else %}
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_users', show_tests=1) }}">
+                Show test users
+            </a>
+        {% endif %}
     </div>
 </div>
 
@@ -14,23 +25,35 @@
     <table class="table table-hover align-middle">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
+                <th>User</th>
                 <th>Role</th>
+                <th>Email Verified</th>
                 <th>Status</th>
+                <th>Created</th>
                 <th class="text-end">Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for user in users %}
             <tr>
-                <td class="fw-semibold">{{ user.name }}</td>
-                <td>{{ user.email }}</td>
+                <td>
+                    <div class="fw-semibold">{{ user.name }}</div>
+                    <div class="text-muted small">{{ user.email }}</div>
+                </td>
                 <td>
                     {% if user.is_admin %}
                         <span class="badge bg-success">Admin</span>
+                    {% elif user.role == 'doctor' %}
+                        <span class="badge bg-primary">Doctor</span>
                     {% else %}
                         <span class="badge bg-warning">User</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.email_verified %}
+                        <span class="badge bg-success">Verified</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Unverified</span>
                     {% endif %}
                 </td>
                 <td>
@@ -38,6 +61,13 @@
                         <span class="badge bg-success">Active</span>
                     {% else %}
                         <span class="badge bg-danger">Inactive</span>
+                    {% endif %}
+                </td>
+                <td class="text-muted small">
+                    {% if user.created_at %}
+                        {{ user.created_at.strftime('%b %d, %Y') }}
+                    {% else %}
+                        -
                     {% endif %}
                 </td>
                 <td class="text-end">
@@ -58,11 +88,13 @@
                         </form>
 
                         <!-- Activate/Deactivate -->
-                        <form method="post" action="{{ url_for('admin_user_status', user_id=user.id) }}" class="d-inline">
+                        <form method="post" action="{{ url_for('admin_user_status', user_id=user.id) }}" class="d-inline js-user-status" data-email="{{ user.email }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             {% if user.is_active %}
                             <input type="hidden" name="action" value="deactivate"/>
-                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('⚠️ DEACTIVATE {{ user.name }}?\n\nThis will:\n- Log them out immediately\n- Prevent them from logging in\n- Hide their reviews\n\nAre you sure?');">Deactivate</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                Deactivate
+                            </button>
                             {% else %}
                             <input type="hidden" name="action" value="activate"/>
                             <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Reactivate {{ user.name }}? They will be able to log in again.');">
@@ -132,4 +164,24 @@
     </p>
 </nav>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.querySelectorAll('.js-user-status').forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+        const action = form.querySelector('input[name="action"]');
+        if (!action || action.value !== 'deactivate') {
+            return;
+        }
+        const email = form.dataset.email || '';
+        const typed = prompt(`Type the user's email to confirm deactivation:\n${email}`);
+        if (!typed || typed.trim().toLowerCase() !== email.toLowerCase()) {
+            event.preventDefault();
+            alert('Deactivation cancelled.');
+        }
+    });
+});
+</script>
 {% endblock %}

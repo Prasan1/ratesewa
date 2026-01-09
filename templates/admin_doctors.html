@@ -8,9 +8,20 @@
         <h2 class="mb-1">Manage Doctors</h2>
         <p class="text-muted mb-0">Create and maintain the doctor directory.</p>
     </div>
-    <a href="{{ url_for('admin_doctor_new') }}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Add Doctor
-    </a>
+    <div class="d-flex gap-2">
+        {% if show_tests %}
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_doctors') }}">
+                Hide test doctors
+            </a>
+        {% else %}
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_doctors', show_tests=1) }}">
+                Show test doctors
+            </a>
+        {% endif %}
+        <a href="{{ url_for('admin_doctor_new') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Doctor
+        </a>
+    </div>
 </div>
 
 <div class="card mb-4">
@@ -31,12 +42,13 @@
     <table class="table table-hover align-middle">
         <thead>
             <tr>
-                <th>Name</th>
+                <th>Profile</th>
                 <th>Specialty</th>
                 <th>City</th>
                 <th>Clinic</th>
-                <th>Featured</th>
-                <th>Verified</th>
+                <th>Tier</th>
+                <th>Badges</th>
+                <th>Owner</th>
                 <th>Status</th>
                 <th class="text-end">Actions</th>
             </tr>
@@ -46,23 +58,30 @@
             <tr>
                 <td>
                     <div class="fw-semibold">{{ doctor.name }}</div>
-                    <small class="text-muted">/{{ doctor.slug }}</small>
+                    <div class="text-muted small">/{{ doctor.slug }}</div>
+                    {% if doctor.nmc_number %}
+                        <div class="text-muted small">NMC: {{ doctor.nmc_number }}</div>
+                    {% endif %}
                 </td>
                 <td>{{ doctor.specialty.name }}</td>
                 <td>{{ doctor.city.name }}</td>
                 <td>{{ doctor.clinic.name if doctor.clinic else '—' }}</td>
                 <td>
-                    {% if doctor.is_featured %}
-                        <span class="badge bg-success">Featured</span>
-                    {% else %}
-                        <span class="badge bg-warning">Standard</span>
-                    {% endif %}
+                    <span class="badge bg-light text-dark border">{{ doctor.subscription_tier or 'free' }}</span>
                 </td>
                 <td>
                     {% if doctor.is_verified %}
-                        <span class="badge bg-success">Verified</span>
+                        <span class="badge bg-success me-1">Verified</span>
+                    {% endif %}
+                    {% if doctor.is_featured %}
+                        <span class="badge bg-primary">Featured</span>
+                    {% endif %}
+                </td>
+                <td class="text-muted small">
+                    {% if doctor.user_account %}
+                        {{ doctor.user_account.email }}
                     {% else %}
-                        <span class="badge bg-warning">Standard</span>
+                        —
                     {% endif %}
                 </td>
                 <td>
@@ -74,11 +93,11 @@
                 </td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_doctor_edit', doctor_id=doctor.id) }}">Edit</a>
-                    <form method="post" action="{{ url_for('admin_doctor_status', doctor_id=doctor.id) }}" class="d-inline">
+                    <form method="post" action="{{ url_for('admin_doctor_status', doctor_id=doctor.id) }}" class="d-inline js-doctor-status" data-name="{{ doctor.name }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         {% if doctor.is_active %}
                         <input type="hidden" name="action" value="deactivate"/>
-                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Deactivate this doctor?');">Deactivate</button>
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Deactivate</button>
                         {% else %}
                         <input type="hidden" name="action" value="activate"/>
                         <button type="submit" class="btn btn-sm btn-outline-success">Reactivate</button>
@@ -153,4 +172,24 @@
     </p>
 </nav>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.querySelectorAll('.js-doctor-status').forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+        const action = form.querySelector('input[name="action"]');
+        if (!action || action.value !== 'deactivate') {
+            return;
+        }
+        const name = form.dataset.name || '';
+        const typed = prompt(`Type the doctor's full name to confirm deactivation:\n${name}`);
+        if (!typed || typed.trim().toLowerCase() !== name.toLowerCase()) {
+            event.preventDefault();
+            alert('Deactivation cancelled.');
+        }
+    });
+});
+</script>
 {% endblock %}
