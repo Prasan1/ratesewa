@@ -397,6 +397,34 @@
     .modal-body { padding: 24px; min-height: 100px; display: block !important; }
     .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border-color); }
 
+    /* Review details collapsible section */
+    #reviewDetails {
+        background: #f8fafc;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 12px;
+    }
+
+    #reviewDetails.show {
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .review-details-chevron {
+        transition: transform 0.3s ease;
+    }
+
     @media (max-width: 768px) {
         .profile-container { padding: 10px; }
         .profile-hero { padding: 24px 16px; text-align: center; }
@@ -896,11 +924,17 @@
             <input type="hidden" id="rating-input" name="rating">
           </div>
 
-          <div class="mb-2">
-            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#reviewDetails" aria-expanded="false" aria-controls="reviewDetails">
-              Optional visit details
-            </button>
-            <small class="text-muted d-block">Add context like wait time or visit type.</small>
+          <div class="mb-3">
+            <div class="d-grid">
+              <button class="btn btn-outline-primary text-start d-flex align-items-center justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#reviewDetails" aria-expanded="false" aria-controls="reviewDetails">
+                <span>
+                  <i class="fas fa-plus-circle me-2"></i>
+                  <strong>Add Visit Details</strong> <span class="text-muted small">(Optional)</span>
+                </span>
+                <i class="fas fa-chevron-down review-details-chevron"></i>
+              </button>
+            </div>
+            <small class="text-muted d-block mt-1 ms-2">Help others by sharing wait time, visit type, and more.</small>
           </div>
 
           <div class="collapse" id="reviewDetails">
@@ -1115,6 +1149,22 @@ document.addEventListener('DOMContentLoaded', function() {
       if (flagRatingIdInput) flagRatingIdInput.value = this.dataset.ratingId;
     });
   });
+
+  // Animate chevron icon for review details collapse
+  const reviewDetailsCollapse = document.getElementById('reviewDetails');
+  const reviewDetailsChevron = document.querySelector('.review-details-chevron');
+
+  if (reviewDetailsCollapse && reviewDetailsChevron) {
+    reviewDetailsCollapse.addEventListener('show.bs.collapse', function() {
+      reviewDetailsChevron.style.transform = 'rotate(180deg)';
+      reviewDetailsChevron.style.transition = 'transform 0.3s ease';
+    });
+
+    reviewDetailsCollapse.addEventListener('hide.bs.collapse', function() {
+      reviewDetailsChevron.style.transform = 'rotate(0deg)';
+      reviewDetailsChevron.style.transition = 'transform 0.3s ease';
+    });
+  }
 });
 
 function copyProfileLink() {
