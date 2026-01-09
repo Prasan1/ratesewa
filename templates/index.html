@@ -577,71 +577,61 @@ function displayDoctors(response) {
 
         const imgSrc = doctor.photo_url || getDoctorAvatar(doctor.name, doctor.id);
 
-        // Build rating badge
-        const ratingBadge = hasRatings
-            ? `<div class="doctor-rating-badge">
-                <span class="rating-stars">${starHtml}</span>
-                <span class="rating-text">${avgRating} <span class="rating-count">(${ratingCount} reviews)</span></span>
-               </div>`
-            : `<div class="doctor-rating-badge no-rating">
-                <span class="rating-icon"><i class="far fa-star"></i></span>
-                <span class="rating-text">No reviews yet</span>
-               </div>`;
-
-        const verifiedBadgeNew = doctor.is_verified
-            ? `<span class="doctor-verified-badge">
-                <i class="fas fa-shield-check me-1"></i>Verified
-               </span>`
-            : '';
-
-        const experienceBadge = doctor.experience && doctor.experience > 0
-            ? `<span class="doctor-exp-badge">
-                <i class="fas fa-calendar-check me-1"></i>${doctor.experience} years
-               </span>`
-            : '';
-
         html += `
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card doctor-card-v2 h-100 ${doctor.is_featured ? 'featured' : ''} ${doctor.is_verified ? 'verified' : ''}">
-                    <div class="card-body p-0">
-                        <!-- Rating section at top -->
-                        <div class="doctor-card-header">
-                            ${ratingBadge}
-                            ${verifiedBadgeNew}
-                        </div>
-
-                        <!-- Doctor info -->
-                        <div class="doctor-card-content">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="doctor-avatar-v2 me-3">
+                <div class="card doctor-card h-100 ${doctor.is_featured ? 'featured' : ''} ${doctor.is_verified ? 'verified' : ''}">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="doctor-avatar me-3">
                                     <img
                                         src="${imgSrc}"
                                         data-name="${String(doctor.name || '')}"
                                         data-id="${doctor.id}"
                                         class="rounded-circle"
                                         alt="${doctor.name}"
+                                        width="80"
+                                        height="80"
                                         loading="lazy"
                                         onerror="this.onerror=null; this.src=getDoctorAvatar(this.dataset.name, parseInt(this.dataset.id || '0', 10));"
                                     >
                                 </div>
-                                <div class="doctor-info-v2 flex-grow-1">
-                                    <h5 class="doctor-name-v2">${doctor.name}</h5>
-                                    <div class="doctor-meta-v2">
-                                        <span><i class="fas fa-stethoscope text-brand me-1"></i>${doctor.specialty_name}</span>
+                                <div class="doctor-info flex-grow-1">
+                                    <h5 class="card-title mb-1">${doctor.name}</h5>
+                                    <div class="doctor-chips">
+                                        <span class="chip">
+                                            <i class="fas fa-stethoscope"></i>
+                                            <span>${doctor.specialty_name}</span>
+                                        </span>
                                     </div>
-                                    <div class="doctor-meta-v2">
-                                        <span><i class="fas fa-map-marker-alt text-brand me-1"></i>${cityLabel}</span>
+                                    <div class="doctor-location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>${cityLabel}</span>
                                     </div>
-                                    ${experienceBadge ? `<div class="mt-2">${experienceBadge}</div>` : ''}
+                                    ${clinicLine}
                                 </div>
+                            </div>
+                            <div class="text-end">
+                                ${verifiedBadge}
                             </div>
                         </div>
 
-                        <!-- Action button -->
-                        <div class="doctor-card-footer">
-                            <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary w-100">
-                                View Profile <i class="fas fa-arrow-right ms-1"></i>
-                            </a>
+                        <div class="doctor-details">
+                            ${doctor.experience && doctor.experience > 0 ? `<p class="card-text small mb-1"><strong>Experience:</strong> ${doctor.experience} years</p>` : ''}
+                            ${doctor.workplace ? `<p class="card-text small mb-1"><strong>Works At:</strong> ${doctor.workplace}</p>` : ''}
+
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="rating me-2">
+                                    ${starHtml}
+                                </div>
+                                <span class="text-muted small">${ratingText}</span>
+                            </div>
+
+                            ${doctor.description ? `<p class="card-text small text-muted clamp-2">${doctor.description}</p>` : ''}
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Doctor</a>
                             ${adminEditButton}
                         </div>
                     </div>
