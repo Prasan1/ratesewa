@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Health Digest - RankSewa{% endblock %}
+{% block title %}Compass - RankSewa{% endblock %}
 
 {% block head %}
 <style>
@@ -14,9 +14,25 @@
 {% block content %}
 <div class="container my-5">
     <!-- Header Section -->
-    <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold mb-3">Health Digest</h1>
-        <p class="lead text-muted">Expert health information and wellness tips for Nepal</p>
+    <div class="text-center mb-4">
+        <h1 class="display-4 fw-bold mb-3">Compass</h1>
+        <p class="lead text-muted">Direction for better health and healthcare decisions</p>
+    </div>
+
+    <div class="compass-tabs mb-4">
+        <ul class="nav nav-pills justify-content-center flex-nowrap" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link {% if not current_category %}active{% endif %}" href="{{ url_for('health_digest') }}">All</a>
+            </li>
+            {% for cat in categories %}
+            <li class="nav-item" role="presentation">
+                <a class="nav-link {% if current_category and current_category.slug == cat.slug %}active{% endif %}"
+                   href="{{ url_for('health_digest', category=cat.slug) }}">
+                    <i class="fas {{ cat.icon }} me-1"></i>{{ cat.name }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 
     <div class="row">
@@ -61,63 +77,59 @@
                 </div>
             </div>
 
-            <!-- Articles List -->
+            <!-- Articles Grid -->
             {% if articles %}
-                {% for article in articles %}
-                <article class="digest-item {% if article.is_featured %}is-featured{% endif %}">
-                    <div class="row g-0 align-items-start">
-                        <div class="col-md-9 order-2 order-md-1">
-                            <div class="digest-body">
-                                <div class="digest-meta">
-                                    <span class="digest-kicker">
-                                        <i class="fas {{ article.category.icon }} me-1"></i>
-                                        {{ article.category.name }}
-                                    </span>
-                                    {% if article.is_featured %}
-                                    <span class="digest-featured">Featured</span>
-                                    {% endif %}
-                                    <span class="digest-readtime">
-                                        <i class="far fa-clock me-1"></i>{{ article.read_time }} min read
-                                    </span>
-                                </div>
-                                <h3 class="digest-title">
-                                    <a href="{{ url_for('article_detail', slug=article.slug) }}" class="text-decoration-none text-dark">
-                                        {{ article.title }}
-                                    </a>
-                                </h3>
-                                <p class="digest-summary">{{ article.summary or (article.content[:150] + '...') }}</p>
-                                <div class="digest-footer">
-                                    <span><i class="fas fa-user-edit me-1"></i>{{ article.author_name }}</span>
-                                    <span class="mx-1">•</span>
-                                    <span><i class="far fa-calendar me-1"></i>{{ article.published_at.strftime('%b %d, %Y') if article.published_at else article.created_at.strftime('%b %d, %Y') }}</span>
-                                    <span class="mx-1">•</span>
-                                    <a href="{{ url_for('article_detail', slug=article.slug) }}" class="digest-link">Read article</a>
-                                </div>
+                <div class="digest-grid">
+                    {% for article in articles %}
+                    <article class="digest-card {% if loop.first %}digest-card-featured{% endif %} {% if article.is_featured %}is-featured{% endif %}">
+                        <a href="{{ url_for('article_detail', slug=article.slug) }}" class="digest-thumb" style="background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite;">
+                            {% if article.featured_image %}
+                                {% if article.featured_image.startswith('/static/') or article.featured_image.startswith('http') %}
+                                    <img src="{{ article.featured_image }}"
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='img/' + article.featured_image) }}"
+                                {% endif %}
+                            {% else %}
+                                <img src="https://picsum.photos/seed/article{{ article.id }}/600/420"
+                            {% endif %}
+                                 alt="{{ article.title }}"
+                                 loading="lazy"
+                                 width="600"
+                                 height="420"
+                                 style="opacity: 0; transition: opacity 0.3s;"
+                                 onload="this.style.opacity=1; this.parentElement.style.animation='none'; this.parentElement.style.background='transparent';"
+                                 onerror="this.src='https://picsum.photos/seed/article{{ article.id }}/600/420'; this.style.opacity=1;">
+                        </a>
+                        <div class="digest-body">
+                            <div class="digest-meta">
+                                <span class="digest-kicker">
+                                    <i class="fas {{ article.category.icon }} me-1"></i>
+                                    {{ article.category.name }}
+                                </span>
+                                {% if article.is_featured %}
+                                <span class="digest-featured">Featured</span>
+                                {% endif %}
+                                <span class="digest-readtime">
+                                    <i class="far fa-clock me-1"></i>{{ article.read_time }} min read
+                                </span>
+                            </div>
+                            <h3 class="digest-title">
+                                <a href="{{ url_for('article_detail', slug=article.slug) }}" class="text-decoration-none text-dark">
+                                    {{ article.title }}
+                                </a>
+                            </h3>
+                            <p class="digest-summary">{{ article.summary or (article.content[:160] + '...') }}</p>
+                            <div class="digest-footer">
+                                <span><i class="fas fa-user-edit me-1"></i>{{ article.author_name }}</span>
+                                <span class="mx-1">•</span>
+                                <span><i class="far fa-calendar me-1"></i>{{ article.published_at.strftime('%b %d, %Y') if article.published_at else article.created_at.strftime('%b %d, %Y') }}</span>
+                                <span class="mx-1">•</span>
+                                <a href="{{ url_for('article_detail', slug=article.slug) }}" class="digest-link">Read article</a>
                             </div>
                         </div>
-                        <div class="col-md-3 order-1 order-md-2">
-                            <a href="{{ url_for('article_detail', slug=article.slug) }}" class="digest-thumb" style="background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite;">
-                                {% if article.featured_image %}
-                                    {% if article.featured_image.startswith('/static/') or article.featured_image.startswith('http') %}
-                                        <img src="{{ article.featured_image }}"
-                                    {% else %}
-                                        <img src="{{ url_for('static', filename='img/' + article.featured_image) }}"
-                                    {% endif %}
-                                {% else %}
-                                    <img src="https://picsum.photos/seed/article{{ article.id }}/400/300"
-                                {% endif %}
-                                     alt="{{ article.title }}"
-                                     loading="lazy"
-                                     width="400"
-                                     height="300"
-                                     style="opacity: 0; transition: opacity 0.3s;"
-                                     onload="this.style.opacity=1; this.parentElement.style.animation='none'; this.parentElement.style.background='transparent';"
-                                     onerror="this.src='https://picsum.photos/seed/article{{ article.id }}/400/300'; this.style.opacity=1;">
-                            </a>
-                        </div>
-                    </div>
-                </article>
-                {% endfor %}
+                    </article>
+                    {% endfor %}
+                </div>
             {% else %}
                 <div class="text-center py-5">
                     <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
@@ -139,12 +151,19 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h5 class="card-title mb-3">
-                        <i class="fas fa-list me-2"></i>Categories
+                        <i class="fas fa-list me-2"></i>All Categories
                     </h5>
                     <div class="list-group list-group-flush">
+                        <a href="{{ url_for('health_digest') }}"
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if not current_category %}active{% endif %}">
+                            <span>
+                                <i class="fas fa-layer-group me-2"></i>All
+                            </span>
+                            <span class="badge bg-primary rounded-pill">{{ categories|map(attribute='articles')|map('length')|sum }}</span>
+                        </a>
                         {% for cat in categories %}
                         <a href="{{ url_for('health_digest', category=cat.slug) }}"
-                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if current_category and current_category.slug == cat.slug %}active{% endif %}">
                             <span>
                                 <i class="fas {{ cat.icon }} me-2"></i>{{ cat.name }}
                             </span>
@@ -194,21 +213,56 @@
 </div>
 
 <style>
-.digest-item {
-    padding: 22px 0;
+.compass-tabs {
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.compass-tabs .nav {
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.compass-tabs .nav-link {
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--ink);
+    background: #ffffff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 6px 14px;
+    white-space: nowrap;
+}
+
+.compass-tabs .nav-link.active {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+}
+
+.digest-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    align-content: start;
+    grid-auto-flow: dense;
+}
+
+.digest-card {
+    padding-bottom: 18px;
     border-bottom: 1px solid var(--border);
 }
 
-.digest-item:first-of-type {
-    padding-top: 0;
+.digest-card-featured {
+    grid-column: span 2;
 }
 
 .digest-meta {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: 8px;
+    margin: 10px 0 6px;
 }
 
 .digest-kicker {
@@ -234,14 +288,23 @@
 
 .digest-title {
     font-family: 'Fraunces', 'Georgia', serif;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     margin-bottom: 6px;
+    line-height: 1.2;
+}
+
+.digest-card-featured .digest-title {
+    font-size: 2rem;
 }
 
 .digest-summary {
     color: var(--muted);
     font-size: 0.95rem;
     margin-bottom: 12px;
+}
+
+.digest-card-featured .digest-summary {
+    font-size: 1rem;
 }
 
 .digest-footer {
@@ -265,7 +328,7 @@
 
 .digest-thumb {
     display: block;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
     background: #f2f4f3;
     box-shadow: var(--shadow-sm);
@@ -278,17 +341,40 @@
     aspect-ratio: 4 / 3;
 }
 
+.digest-card-featured .digest-thumb img {
+    aspect-ratio: 16 / 9;
+}
+
+@media (max-width: 992px) {
+    .digest-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .digest-card-featured {
+        grid-column: span 2;
+    }
+
+    .digest-card-featured .digest-title {
+        font-size: 1.6rem;
+    }
+}
+
 @media (max-width: 768px) {
-    .digest-item {
-        padding: 18px 0;
+    .digest-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .digest-card-featured {
+        grid-column: span 1;
     }
 
     .digest-title {
-        font-size: 1.25rem;
+        font-size: 1.2rem;
     }
 
-    .digest-thumb {
-        margin-bottom: 12px;
+    .digest-card-featured .digest-title {
+        font-size: 1.35rem;
     }
 }
 </style>

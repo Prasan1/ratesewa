@@ -58,7 +58,7 @@
                 </div>
 
                 <div class="col-lg-6">
-                    <div class="search-container search-card" id="searchSection">
+                    <div class="search-container search-card search-card--primary" id="searchSection">
                         <h3 class="text-center">
                             <i class="fas fa-search me-2"></i>Search Doctors in Nepal
                         </h3>
@@ -74,6 +74,7 @@
                                         <i class="fas fa-user-md me-2"></i>Doctor name
                                     </label>
                                     <input type="text" id="nameSearch" class="form-control" placeholder="e.g., Dr. S. K. Aryal" autocomplete="off">
+                                    <small class="text-muted">Press Enter or click Search to see results.</small>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="citySelect" class="form-label">
@@ -104,6 +105,7 @@
                                     <button type="button" id="filterBtn" class="btn btn-primary btn-lg w-100">
                                         <i class="fas fa-search me-2"></i>Search Doctors
                                     </button>
+                                    <small class="text-muted d-block mt-2">Results appear below the search box.</small>
                                 </div>
                             </div>
 
@@ -380,9 +382,14 @@
         </div>
 
         <!-- Results -->
-        <div class="row">
+        <div class="row" id="resultsSection">
             <div class="col-12">
-                <h2 class="mb-2">Doctor List</h2>
+                <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+                    <h2 class="mb-0">
+                        <i class="fas fa-list me-2"></i><span id="resultsTitle">Doctor List</span>
+                    </h2>
+                    <span id="resultsCount" class="badge bg-primary" style="display: none;"></span>
+                </div>
                 <p class="text-muted mb-3 small">Verified profiles appear first to help patients choose with confidence.</p>
 
                 <div id="doctorList" class="row">
@@ -430,7 +437,7 @@ $(document).ready(function() {
 
     // Use Select2 change event instead of regular change
     $('#citySelect, #specialtySelect').on('select2:select select2:clear', function() {
-        loadDoctors(1, false); // User changed filter - keep focus in input
+        loadDoctors(1, false); // Update results without auto-scroll
     });
 
     // Search as user types (with debounce)
@@ -438,7 +445,7 @@ $(document).ready(function() {
     $('#nameSearch').on('input', function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(function() {
-            loadDoctors(1, false); // User searched by name - keep focus in input
+            loadDoctors(1, false); // Update results without auto-scroll
         }, 500);
     });
 
@@ -462,6 +469,23 @@ $(document).ready(function() {
 
 let currentPage = 1;
 let shouldScroll = false; // Track if we should scroll after loading doctors
+
+function scrollToResults() {
+    if (!shouldScroll) {
+        return;
+    }
+
+    setTimeout(function() {
+        const target = $("#resultsSection");
+        if (!target.length) {
+            return;
+        }
+
+        $('html, body').animate({
+            scrollTop: target.offset().top - 100
+        }, 600, 'swing');
+    }, 100);
+}
 
 function loadDoctors(page = 1, scroll = false) {
     const cityId = $('#citySelect').val();
@@ -510,8 +534,19 @@ function displayDoctors(response) {
     const doctors = response.doctors || response; // Handle both old and new format
     const pagination = response.pagination;
 
+    // Update results title and count
+    if (pagination && pagination.total_doctors > 0) {
+        $('#resultsTitle').text('Search Results');
+        $('#resultsCount').text(`${pagination.total_doctors} ${pagination.total_doctors === 1 ? 'doctor' : 'doctors'} found`).show();
+    } else {
+        $('#resultsTitle').text('Doctor List');
+        $('#resultsCount').hide();
+    }
+
     if (!doctors || doctors.length === 0) {
-        $('#doctorList').html('<div class="col-12"><div class="alert alert-info">No doctors found.</div></div>');
+        $('#doctorList').html('<div class="col-12"><div class="alert alert-info">No doctors found matching your search.</div></div>');
+        $('#resultsCount').hide();
+        scrollToResults();
         return;
     }
 
@@ -645,13 +680,10 @@ function displayDoctors(response) {
 
         $('#doctorList').append(paginationHtml);
 
-        // Only scroll to results if user actively searched/filtered/paginated (not on initial load)
-        if (shouldScroll) {
-            $('html, body').animate({
-                scrollTop: $("#doctorList").offset().top - 100
-            }, 500);
-        }
     }
+
+    // Only scroll to results if user actively searched/filtered/paginated (not on initial load)
+    scrollToResults();
 }
 
 function generateStarRatingHtml(rating, ratingCount) {

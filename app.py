@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from authlib.integrations.flask_client import OAuth
-from models import db, City, Specialty, Clinic, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag, BadgeDefinition, UserBadge, ReviewHelpful, Article, ArticleCategory, ClinicManagerDoctor, ClinicAccount
+from models import db, City, Specialty, Clinic, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag, BadgeDefinition, UserBadge, ReviewHelpful, Article, ArticleCategory, ClinicManagerDoctor, ClinicAccount, DoctorContact, DoctorSubscription, DoctorCredentials, DoctorSettings, DoctorMedicalTools, DoctorTemplateUsage
 from config import Config
 import ad_manager
 import upload_utils
@@ -17,8 +17,11 @@ import stripe
 import subscription_config
 import promo_config
 import resend
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import secrets
+import qrcode
+from io import BytesIO
+import base64
 
 # Import text_utils with fallback
 try:
@@ -1171,21 +1174,13 @@ def article_detail(slug):
     # Get related doctors if article has a related specialty
     related_doctors = []
     if article.related_specialty_id:
-        # Try to get verified doctors first
         related_doctors = Doctor.query.filter_by(
             specialty_id=article.related_specialty_id,
-            is_active=True,
-            is_verified=True
-        ).order_by(Doctor.is_featured.desc())\
-         .limit(4).all()
-
-        # If no verified doctors found, fall back to all active doctors
-        if not related_doctors:
-            related_doctors = Doctor.query.filter_by(
-                specialty_id=article.related_specialty_id,
-                is_active=True
-            ).order_by(Doctor.is_featured.desc(), Doctor.is_verified.desc())\
-             .limit(4).all()
+            is_active=True
+        ).order_by(
+            Doctor.is_featured.desc(),
+            Doctor.is_verified.desc()
+        ).limit(4).all()
 
     return render_template('article_detail.html',
                          article=article,
@@ -3972,6 +3967,215 @@ def doctor_dashboard():
                          response_rate=response_rate,
                          verification_request=verification_request,
                          tier_features=tier_features)
+
+
+@app.route('/doctor/qr-code/generate')
+@doctor_required
+def generate_qr_code():
+    """Generate QR code for doctor's public profile"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    # Generate the profile URL
+    profile_url = url_for('doctor_profile', slug=doctor.slug, _external=True)
+
+    # Create QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(profile_url)
+    qr.make(fit=True)
+
+    # Create image
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    # Save to bytes
+    img_io = BytesIO()
+    img.save(img_io, 'PNG')
+    img_io.seek(0)
+
+    response = make_response(img_io.getvalue())
+    response.headers['Content-Type'] = 'image/png'
+    response.headers['Content-Disposition'] = f'inline; filename=qr-code-{doctor.slug}.png'
+
+    return response
+
+
+@app.route('/doctor/qr-code/preview')
+@doctor_required
+def preview_printable_qr():
+    """Preview the printable template (inline, no download)"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    # Generate the same template but serve inline
+    profile_url = url_for('doctor_profile', slug=doctor.slug, _external=True)
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=10,
+        border=2,
+    )
+    qr.add_data(profile_url)
+    qr.make(fit=True)
+    qr_img = qr.make_image(fill_color="#0D8ABC", back_color="white")
+
+    width, height = 1240, 1754
+    template = Image.new('RGB', (width, height), 'white')
+    draw = ImageDraw.Draw(template)
+
+    try:
+        title_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 60)
+        name_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 50)
+        body_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 35)
+        small_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28)
+    except:
+        title_font = ImageFont.load_default()
+        name_font = ImageFont.load_default()
+        body_font = ImageFont.load_default()
+        small_font = ImageFont.load_default()
+
+    draw.text((620, 80), "RankSewa", font=title_font, fill='#0D8ABC', anchor='mm')
+    draw.text((620, 150), "Nepal's Doctor Directory", font=small_font, fill='#64748b', anchor='mm')
+    draw.rectangle([(120, 200), (1120, 205)], fill='#0D8ABC')
+
+    doctor_name = doctor.name if hasattr(doctor, 'name') else "Doctor"
+    draw.text((620, 280), doctor_name, font=name_font, fill='#0f172a', anchor='mm')
+
+    specialty_text = f"{doctor.specialty.name} • {doctor.city.name}"
+    draw.text((620, 340), specialty_text, font=body_font, fill='#64748b', anchor='mm')
+
+    qr_size = 600
+    qr_img_resized = qr_img.resize((qr_size, qr_size), Image.Resampling.LANCZOS)
+    qr_position = ((width - qr_size) // 2, 450)
+    template.paste(qr_img_resized, qr_position)
+
+    draw.text((620, 1100), "Scan to Rate Your Experience", font=body_font, fill='#0f172a', anchor='mm')
+    draw.text((620, 1160), "Share your feedback and help other patients", font=small_font, fill='#64748b', anchor='mm')
+
+    instructions = [
+        "1. Open your phone's camera app",
+        "2. Point it at this QR code",
+        "3. Tap the notification to visit profile",
+        "4. Write your review"
+    ]
+
+    y_offset = 1250
+    for instruction in instructions:
+        draw.text((620, y_offset), instruction, font=small_font, fill='#64748b', anchor='mm')
+        y_offset += 45
+
+    draw.rectangle([(120, 1550), (1120, 1555)], fill='#0D8ABC')
+    draw.text((620, 1620), "Thank you for your feedback!", font=body_font, fill='#0D8ABC', anchor='mm')
+    draw.text((620, 1680), f"{profile_url}", font=small_font, fill='#94a3b8', anchor='mm')
+
+    img_io = BytesIO()
+    template.save(img_io, 'PNG', quality=95)
+    img_io.seek(0)
+
+    response = make_response(img_io.getvalue())
+    response.headers['Content-Type'] = 'image/png'
+    response.headers['Content-Disposition'] = f'inline; filename=preview-qr-{doctor.slug}.png'
+
+    return response
+
+
+@app.route('/doctor/qr-code/printable')
+@doctor_required
+def generate_printable_qr():
+    """Generate a printable template with QR code and doctor info (download)"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    # Generate the profile URL
+    profile_url = url_for('doctor_profile', slug=doctor.slug, _external=True)
+
+    # Create QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=10,
+        border=2,
+    )
+    qr.add_data(profile_url)
+    qr.make(fit=True)
+    qr_img = qr.make_image(fill_color="#0D8ABC", back_color="white")
+
+    # Create a nice printable template
+    # A4 size at 300 DPI: 2480 x 3508 pixels, but we'll use 1240 x 1754 (half size for web)
+    width, height = 1240, 1754
+    template = Image.new('RGB', (width, height), 'white')
+    draw = ImageDraw.Draw(template)
+
+    # Try to load a nice font, fallback to default
+    try:
+        title_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 60)
+        name_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 50)
+        body_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 35)
+        small_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28)
+    except:
+        title_font = ImageFont.load_default()
+        name_font = ImageFont.load_default()
+        body_font = ImageFont.load_default()
+        small_font = ImageFont.load_default()
+
+    # Add RankSewa branding at top
+    draw.text((620, 80), "RankSewa", font=title_font, fill='#0D8ABC', anchor='mm')
+    draw.text((620, 150), "Nepal's Doctor Directory", font=small_font, fill='#64748b', anchor='mm')
+
+    # Add decorative line
+    draw.rectangle([(120, 200), (1120, 205)], fill='#0D8ABC')
+
+    # Add doctor name
+    doctor_name = doctor.name if hasattr(doctor, 'name') else "Doctor"
+    draw.text((620, 280), doctor_name, font=name_font, fill='#0f172a', anchor='mm')
+
+    # Add specialty
+    specialty_text = f"{doctor.specialty.name} • {doctor.city.name}"
+    draw.text((620, 340), specialty_text, font=body_font, fill='#64748b', anchor='mm')
+
+    # Add QR code (resize to fit nicely)
+    qr_size = 600
+    qr_img_resized = qr_img.resize((qr_size, qr_size), Image.Resampling.LANCZOS)
+    qr_position = ((width - qr_size) // 2, 450)
+    template.paste(qr_img_resized, qr_position)
+
+    # Add call to action
+    draw.text((620, 1100), "Scan to Rate Your Experience", font=body_font, fill='#0f172a', anchor='mm')
+    draw.text((620, 1160), "Share your feedback and help other patients", font=small_font, fill='#64748b', anchor='mm')
+
+    # Add instructions
+    instructions = [
+        "1. Open your phone's camera app",
+        "2. Point it at this QR code",
+        "3. Tap the notification to visit profile",
+        "4. Write your review"
+    ]
+
+    y_offset = 1250
+    for instruction in instructions:
+        draw.text((620, y_offset), instruction, font=small_font, fill='#64748b', anchor='mm')
+        y_offset += 45
+
+    # Add footer
+    draw.rectangle([(120, 1550), (1120, 1555)], fill='#0D8ABC')
+    draw.text((620, 1620), "Thank you for your feedback!", font=body_font, fill='#0D8ABC', anchor='mm')
+    draw.text((620, 1680), f"{profile_url}", font=small_font, fill='#94a3b8', anchor='mm')
+
+    # Save to bytes
+    img_io = BytesIO()
+    template.save(img_io, 'PNG', quality=95)
+    img_io.seek(0)
+
+    response = make_response(img_io.getvalue())
+    response.headers['Content-Type'] = 'image/png'
+    response.headers['Content-Disposition'] = f'attachment; filename=review-qr-{doctor.slug}.png'
+
+    return response
 
 
 @app.route('/doctor/profile/edit', methods=['GET', 'POST'])

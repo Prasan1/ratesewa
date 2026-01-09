@@ -94,6 +94,13 @@ class Doctor(db.Model):
     review_responses = db.relationship('DoctorResponse', backref='doctor', lazy=True)
     clinic_managers = db.relationship('ClinicManagerDoctor', backref='doctor', lazy=True)
 
+    # Normalized data relationships
+    contact = db.relationship('DoctorContact', backref='doctor', uselist=False, lazy='joined')
+    subscription = db.relationship('DoctorSubscription', backref='doctor', uselist=False, lazy='joined')
+    credentials = db.relationship('DoctorCredentials', backref='doctor', uselist=False, lazy='joined')
+    settings = db.relationship('DoctorSettings', backref='doctor', uselist=False, lazy='joined')
+    medical_tools = db.relationship('DoctorMedicalTools', backref='doctor', uselist=False, lazy='joined')
+
     @property
     def avg_rating(self):
         """Calculate average rating for the doctor"""
@@ -617,3 +624,119 @@ class DoctorAnalytics(db.Model):
 
     def __repr__(self):
         return f'<DoctorAnalytics doctor_id={self.doctor_id} date={self.date}>'
+
+
+# ============================================================================
+# NORMALIZED DOCTOR TABLES
+# ============================================================================
+
+class DoctorContact(db.Model):
+    """Contact and location information for doctors"""
+    __tablename__ = 'doctor_contact'
+
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False, unique=True)
+    phone_number = db.Column(db.String(20))
+    practice_address = db.Column(db.Text)
+    workplace = db.Column(db.Text)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<DoctorContact doctor_id={self.doctor_id}>'
+
+
+class DoctorSubscription(db.Model):
+    """Subscription and billing information for doctors"""
+    __tablename__ = 'doctor_subscription'
+
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False, unique=True)
+    subscription_tier = db.Column(db.String(20), default='free')
+    subscription_expires_at = db.Column(db.DateTime)
+    trial_ends_at = db.Column(db.DateTime)
+    stripe_customer_id = db.Column(db.String(255))
+    profile_views = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<DoctorSubscription doctor_id={self.doctor_id} tier={self.subscription_tier}>'
+
+
+class DoctorCredentials(db.Model):
+    """Professional credentials for doctors"""
+    __tablename__ = 'doctor_credentials'
+
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False, unique=True)
+    nmc_number = db.Column(db.String(50))
+    external_clinic_url = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<DoctorCredentials doctor_id={self.doctor_id}>'
+
+
+class DoctorSettings(db.Model):
+    """Settings and preferences for doctors"""
+    __tablename__ = 'doctor_settings'
+
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False, unique=True)
+    photo_url = db.Column(db.Text)
+    working_hours = db.Column(db.Text)
+    clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<DoctorSettings doctor_id={self.doctor_id}>'
+
+
+class DoctorMedicalTools(db.Model):
+    """Medical tools configuration (certificates, prescriptions)"""
+    __tablename__ = 'doctor_medical_tools'
+
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False, unique=True)
+
+    # Signature & Branding
+    signature_image = db.Column(db.Text)
+    clinic_letterhead = db.Column(db.Text)
+
+    # Default Values
+    default_clinic_name = db.Column(db.String(255))
+    default_clinic_address = db.Column(db.Text)
+    default_consultation_fee = db.Column(db.Integer)
+
+    # Preferences (JSON)
+    certificate_settings = db.Column(db.Text)
+    prescription_settings = db.Column(db.Text)
+
+    # Access Control
+    tools_enabled = db.Column(db.Boolean, default=True)
+
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<DoctorMedicalTools doctor_id={self.doctor_id}>'
+
+
+class DoctorTemplateUsage(db.Model):
+    """Analytics for medical template usage"""
+    __tablename__ = 'doctor_template_usage'
+
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
+    template_type = db.Column(db.String(50))
+    generated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    patient_name = db.Column(db.String(100))
+
+    def __repr__(self):
+        return f'<DoctorTemplateUsage doctor_id={self.doctor_id} type={self.template_type}>'
