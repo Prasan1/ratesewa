@@ -330,6 +330,15 @@ a:hover {
     color: var(--muted);
 }
 
+.doctor-card .doctor-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
 .doctor-card .doctor-meta {
     display: flex;
     flex-wrap: wrap;
