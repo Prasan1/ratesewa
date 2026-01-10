@@ -9,7 +9,7 @@ from datetime import datetime
 def add_nmc_article():
     with app.app_context():
         # Read article content
-        with open('article_nmc_verification.md', 'r') as f:
+        with open('docs/article_nmc_verification.md', 'r') as f:
             content = f.read()
 
         # Get or create category
