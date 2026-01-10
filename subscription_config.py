@@ -15,12 +15,11 @@ SUBSCRIPTION_TIERS = {
             'Verification badge',
             'Respond to reviews',
             'Basic profile editing',
-            'Profile photo upload'  # Updated: Now included in Basic tier
+            'Profile photo upload'
         ],
         'locked_features': [
             'Analytics dashboard',
             'Contact info visible',
-            'Photo gallery (multiple photos)',  # Updated: Multiple photos still Premium+
             'Appointment hours',
             'Priority placement',
             'Featured badge'
@@ -35,7 +34,6 @@ SUBSCRIPTION_TIERS = {
             'All Free features',
             'Analytics dashboard',
             'Contact info visible on profile',
-            'Photo gallery (up to 5 photos)',
             'Display appointment hours',
             'Monthly performance reports',
             'Priority email support'
@@ -119,11 +117,11 @@ TIER_FEATURES = {
     'free': {
         'can_view_analytics': False,
         'can_show_contact': False,
-        'can_upload_photos': True,  # Updated: Now allowed in Basic tier
+        'can_upload_photos': True,
         'can_show_hours': False,
         'is_featured': False,
         'search_boost_multiplier': 1.0,
-        'max_photos': 1  # Updated: Allow 1 profile photo in Basic tier
+        'max_photos': 1
     },
     'premium': {
         'can_view_analytics': True,
@@ -132,7 +130,7 @@ TIER_FEATURES = {
         'can_show_hours': True,
         'is_featured': False,
         'search_boost_multiplier': 1.5,
-        'max_photos': 5
+        'max_photos': 1
     },
     'featured': {
         'can_view_analytics': True,
@@ -141,7 +139,7 @@ TIER_FEATURES = {
         'can_show_hours': True,
         'is_featured': True,
         'search_boost_multiplier': 3.0,
-        'max_photos': 5  # Same as Premium
+        'max_photos': 1
     }
 }
 
