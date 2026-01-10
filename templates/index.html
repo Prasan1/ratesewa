@@ -545,6 +545,16 @@ function getDoctorAvatar(doctorName, doctorId) {
     return `https://api.dicebear.com/7.x/initials/svg?seed=${seed}&backgroundColor=${color}`;
 }
 
+function normalizeDoctorDescription(description) {
+    if (!description) {
+        return '';
+    }
+
+    const temp = document.createElement('div');
+    temp.innerHTML = String(description);
+    return (temp.textContent || temp.innerText || '').replace(/\s+/g, ' ').trim();
+}
+
 function displayDoctors(response) {
     const doctors = response.doctors || response; // Handle both old and new format
     const pagination = response.pagination;
@@ -597,6 +607,8 @@ function displayDoctors(response) {
             ? `<span class="doctor-stat"><i class="fas fa-clock"></i>${doctor.experience}+ yrs</span>`
             : '';
 
+        const descriptionText = normalizeDoctorDescription(doctor.description);
+
         html += `
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card doctor-card h-100 ${doctor.is_featured ? 'featured' : ''} ${doctor.is_verified ? 'verified' : ''}">
@@ -643,7 +655,7 @@ function displayDoctors(response) {
                             <span class="text-muted small">${ratingLabel}</span>
                         </div>
 
-                        ${doctor.description ? `<p class="doctor-summary">${doctor.description}</p>` : ''}
+                        ${descriptionText ? `<p class="doctor-summary">${descriptionText}</p>` : ''}
 
                         <div class="doctor-actions">
                             <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Doctor</a>

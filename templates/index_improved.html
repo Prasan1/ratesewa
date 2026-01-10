@@ -366,7 +366,7 @@ $(document).ready(function() {
             // IMPROVED: Better "no reviews" messaging
             const ratingText = hasRatings
                 ? `${avgRating} (${ratingCount} reviews)`
-                : '⭐ No reviews yet — <a href="/doctor/' + doctor.slug + '" class="text-primary">Be the first to review</a>';
+                : 'No reviews yet';
 
             html += `
                 <div class="col-md-6 col-lg-4 mb-4">
@@ -413,14 +413,10 @@ $(document).ready(function() {
     }
 
     function generateStarRatingHtml(rating, ratingCount) {
-        if (!ratingCount) {
-            return '';  // Return empty, let the text show improved message
-        }
-
         let html = '';
-        const numericRating = parseFloat(rating);
+        const numericRating = ratingCount ? parseFloat(rating) : 0;
         const fullStars = Math.floor(numericRating);
-        const hasHalfStar = (numericRating - fullStars) >= 0.5;
+        const hasHalfStar = ratingCount && (numericRating - fullStars) >= 0.5;
 
         for (let i = 0; i < fullStars; i++) {
             html += '<i class="fas fa-star text-warning"></i>';
@@ -430,9 +426,9 @@ $(document).ready(function() {
             html += '<i class="fas fa-star-half-alt text-warning"></i>';
         }
 
-        const emptyStars = 5 - Math.ceil(numericRating);
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
         for (let i = 0; i < emptyStars; i++) {
-            html += '<i class="far fa-star text-warning"></i>';
+            html += '<i class="far fa-star text-muted"></i>';
         }
 
         return html;
