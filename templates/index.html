@@ -538,6 +538,7 @@ function loadDoctors(page = 1, scroll = false) {
 }
 
 const isAdmin = {{ 'true' if session.get('is_admin') else 'false' }};
+const currentUserRole = {{ (session.get('role') or '')|tojson }};
 
 // Generate professional avatar URL for doctors without photos
 function getDoctorAvatar(doctorName, doctorId) {
@@ -587,88 +588,122 @@ function displayDoctors(response) {
     doctors.forEach(doctor => {
         const ratingCount = doctor.rating_count || 0;
         const hasRatings = ratingCount > 0;
-        const avgRating = hasRatings ? parseFloat(doctor.avg_rating).toFixed(1) : '';
-        const starHtml = generateStarRatingHtml(doctor.avg_rating, ratingCount);
-        const verifiedBadge = doctor.is_verified
-            ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>'
-            : '';
+        const avgRating = hasRatings ? parseFloat(doctor.avg_rating).toFixed(1) : '0.0';
+        const starTextHtml = generateStarTextHtml(doctor.avg_rating, ratingCount);
+
         const adminEditButton = isAdmin
-            ? `<a href="/admin/doctors/${doctor.id}/edit" class="btn btn-outline-secondary btn-sm ms-2">Edit</a>`
+            ? `<a href="/admin/doctors/${doctor.id}/edit" class="btn btn-outline-secondary btn-sm btn-admin-edit">Edit</a>`
             : '';
 
-        const ratingLabel = hasRatings
-            ? `${avgRating} (${ratingCount})`
-            : 'No reviews yet';
-        const ratingStat = `<span class="doctor-stat"><span class="rating">${starHtml}</span><span>${ratingLabel}</span></span>`;
         const cityName = (doctor.city_name || '').replace(/\s+/g, ' ').trim();
-        const cityLabel = cityName || 'Unknown';
+        const cityLabel = cityName || 'Not specified';
         const specialtyName = doctor.specialty_name || 'General Practice';
+        const experienceLabel = doctor.experience && doctor.experience > 0 ? `${doctor.experience} Years` : 'N/A';
+        const practiceLabel = doctor.clinic_name || doctor.workplace || 'Not specified';
 
         const imgSrc = doctor.photo_url || getDoctorAvatar(doctor.name, doctor.id);
-        const clinicMeta = doctor.clinic_name
-            ? `<span class="doctor-meta-item"><i class="fas fa-hospital"></i><a href="/clinic/${doctor.clinic_slug}" class="text-muted text-decoration-none">${doctor.clinic_name}</a></span>`
-            : '';
-        const workplaceMeta = !doctor.clinic_name && doctor.workplace
-            ? `<span class="doctor-meta-item"><i class="fas fa-briefcase-medical"></i><span>${doctor.workplace}</span></span>`
-            : '';
-        const experienceStat = doctor.experience && doctor.experience > 0
-            ? `<span class="doctor-stat"><i class="fas fa-clock"></i>${doctor.experience}+ yrs</span>`
+
+        // Verified badge HTML
+        const verifiedBadgeHtml = doctor.is_verified
+            ? `<div class="badge-verified-v2"><i class="fas fa-check"></i></div>`
             : '';
 
+        // Rating pill classes
+        const ratingPillClass = hasRatings ? 'rating-pill-v2' : 'rating-pill-v2 no-rating';
+        const emptyStarsHtml = '<i class="far fa-star"></i>'.repeat(5);
+        const ratingDisplay = hasRatings
+            ? `<span class="stars-v2">${starTextHtml}</span><span class="rating-score-v2">${avgRating}</span><span class="rating-count-v2">(${ratingCount})</span>`
+            : `<span class="stars-v2">${emptyStarsHtml}</span><span class="rating-count-v2">No reviews yet</span>`;
+
+        // Featured badge - now inline with name
+        const featuredBadgeHtml = doctor.is_featured
+            ? `<span class="badge-featured-v2">Featured</span>`
+            : '';
+
+        const claimButton = (!doctor.is_claimed && currentUserRole !== 'doctor' && !isAdmin)
+            ? `<a href="/claim-profile/${doctor.id}" class="btn-claim-v2"><i class="fas fa-bolt"></i>Claim Profile</a>`
+            : '';
+
+        // Description text (sanitized and truncated)
         const descriptionText = normalizeDoctorDescription(doctor.description);
 
         html += `
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card doctor-card h-100 ${doctor.is_featured ? 'featured' : ''} ${doctor.is_verified ? 'verified' : ''}">
-                    <div class="card-body">
-                        <div class="doctor-header">
-                            <div class="doctor-identity">
-                                <div class="doctor-avatar">
-                                    <img
-                                        src="${imgSrc}"
-                                        data-name="${String(doctor.name || '')}"
-                                        data-id="${doctor.id}"
-                                        class="rounded-circle"
-                                        alt="${doctor.name}"
-                                        width="80"
-                                        height="80"
-                                        loading="lazy"
-                                        onerror="this.onerror=null; this.src=getDoctorAvatar(this.dataset.name, parseInt(this.dataset.id || '0', 10));"
-                                    >
-                                </div>
-                                <div class="doctor-title">
-                                    <div class="doctor-name">${doctor.name}</div>
-                                    <div class="doctor-subtitle">
-                                        <i class="fas fa-stethoscope"></i>
-                                        <span>${specialtyName}</span>
-                                    </div>
-                                    <div class="doctor-location">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>${cityLabel}</span>
-                                    </div>
-                                </div>
+                <div class="ranksewa-card-v2 h-100 ${doctor.is_featured ? 'featured' : ''}">
+
+                    <!-- HEADER -->
+                    <div class="card-header-v2">
+                        <!-- Avatar + Verified Badge -->
+                        <div class="avatar-wrapper-v2">
+                            <div class="avatar-halo"></div>
+                            <img
+                                src="${imgSrc}"
+                                data-name="${String(doctor.name || '')}"
+                                data-id="${doctor.id}"
+                                alt="${doctor.name}"
+                                class="doctor-avatar-v2"
+                                loading="lazy"
+                                onerror="this.onerror=null; this.src=getDoctorAvatar(this.dataset.name, parseInt(this.dataset.id || '0', 10));"
+                            >
+                            ${verifiedBadgeHtml}
+                        </div>
+
+                        <!-- Name -->
+                        <h2 class="doctor-name-v2">${doctor.name}</h2>
+
+                        <div class="rating-stack-v2">
+                            <!-- Rating -->
+                            <div class="${ratingPillClass}">
+                                ${ratingDisplay}
                             </div>
-                            <div class="doctor-badges">
-                                ${verifiedBadge}
+
+                            <!-- Featured badge (if applicable) -->
+                            ${featuredBadgeHtml}
+                        </div>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="card-body-v2">
+                        <!-- Detail Row 1 -->
+                        <div class="detail-grid-v2">
+                            <div class="detail-pill-v2">
+                                <i class="fas fa-stethoscope detail-icon-v2"></i>
+                                <span class="detail-label-v2">Specialty</span>
+                                <span class="detail-value-v2">${specialtyName}</span>
+                            </div>
+                            <div class="detail-pill-v2">
+                                <i class="fas fa-map-marker-alt detail-icon-v2"></i>
+                                <span class="detail-label-v2">Location</span>
+                                <span class="detail-value-v2">${cityLabel}</span>
                             </div>
                         </div>
 
-                        <div class="doctor-info-lines">
-                            <div class="info-line"><strong>Experience:</strong> ${doctor.experience && doctor.experience > 0 ? doctor.experience + ' years' : 'Not specified'}</div>
-                            ${(doctor.workplace || doctor.clinic_name) ? `<div class="info-line"><strong>Works At:</strong> ${doctor.workplace || doctor.clinic_name}</div>` : ''}
+                        <!-- Detail Row 2 -->
+                        <div class="detail-grid-v2">
+                            <div class="detail-pill-v2">
+                                <i class="fas fa-briefcase-medical detail-icon-v2"></i>
+                                <span class="detail-label-v2">Experience</span>
+                                <span class="detail-value-v2">${experienceLabel}</span>
+                            </div>
+                            <div class="detail-pill-v2">
+                                <i class="fas fa-hospital detail-icon-v2"></i>
+                                <span class="detail-label-v2">Practice</span>
+                                <span class="detail-value-v2">${practiceLabel}</span>
+                            </div>
                         </div>
 
-                        <div class="doctor-rating-section">
-                            <span class="rating-display">${starHtml}</span>
-                            <span class="text-muted small">${ratingLabel}</span>
-                        </div>
+                        <!-- Description -->
+                        ${descriptionText ? `<p class="description-v2">${descriptionText}</p>` : ''}
+                    </div>
 
-                        ${descriptionText ? `<p class="doctor-summary">${descriptionText}</p>` : ''}
-
-                        <div class="doctor-actions">
-                            <a href="/doctor/${doctor.slug}" class="btn btn-outline-primary btn-sm">View Doctor</a>
-                            ${adminEditButton}
-                        </div>
+                    <!-- FOOTER -->
+                    <div class="card-footer-v2">
+                        <a href="/doctor/${doctor.slug}" class="btn-view-v2">
+                            View Profile
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        ${claimButton}
+                        ${adminEditButton}
                     </div>
                 </div>
             </div>
@@ -752,6 +787,26 @@ function generateStarRatingHtml(rating, ratingCount) {
         html += '<i class="far fa-star text-muted"></i>';
     }
 
+    return html;
+}
+
+// Generate small Font Awesome star rating
+function generateStarTextHtml(rating, ratingCount) {
+    const numericRating = ratingCount ? parseFloat(rating) : 0;
+    const fullStars = Math.floor(numericRating);
+    const hasHalfStar = ratingCount && (numericRating - fullStars) >= 0.5;
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+    let html = '';
+    for (let i = 0; i < fullStars; i++) {
+        html += '<i class="fas fa-star"></i>';
+    }
+    if (hasHalfStar) {
+        html += '<i class="fas fa-star-half-alt"></i>';
+    }
+    for (let i = 0; i < emptyStars; i++) {
+        html += '<i class="far fa-star"></i>';
+    }
     return html;
 }
 </script>

@@ -7,9 +7,17 @@
     <div class="col-md-6">
         <div class="card shadow-sm">
             <div class="card-body">
+                {% set next_path = request.args.get('next', '') %}
                 <h2 class="card-title text-center mb-4">
                     <i class="fas fa-sign-in-alt me-2"></i>Login to RankSewa
                 </h2>
+
+                {% if 'claim-profile' in next_path %}
+                <div class="alert alert-info">
+                    <strong>Claiming your profile?</strong> Use Google to sign up or log in instantly, or register with email below.
+                    After login you will return to your claim.
+                </div>
+                {% endif %}
 
                 <form method="POST" action="{{ url_for('login', next=request.args.get('next')) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -45,9 +53,12 @@
                         <i class="fab fa-google me-2"></i>Continue with Google
                     </a>
                 </div>
+                <p class="text-center text-muted small mt-2 mb-0">
+                    Works for both new accounts and existing users.
+                </p>
 
                 <div class="text-center mt-3">
-                    <p class="text-muted">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+                    <p class="text-muted">Don't have an account? <a href="{{ url_for('register', next=request.args.get('next')) }}">Register here</a></p>
                 </div>
             </div>
         </div>

@@ -14,11 +14,12 @@
                 <!-- NMC Required Notice -->
                 <div class="alert alert-warning border-0 shadow-sm mb-3">
                     <h6 class="mb-2">
-                        <i class="fas fa-exclamation-triangle me-2"></i>NMC Registration Required
+                        <i class="fas fa-exclamation-triangle me-2"></i>NMC Required for Verification
                     </h6>
                     <p class="mb-0 small">
-                        To claim or create a doctor profile on RankSewa, you must be registered with the
+                        To earn the verified badge on RankSewa, you must be registered with the
                         <strong>Nepal Medical Council (NMC)</strong>. A valid NMC registration number is required during verification.
+                        You can claim your profile first and verify later.
                         <a href="https://nmc.org.np" target="_blank" rel="noopener" class="alert-link">
                             Check NMC registration <i class="fas fa-external-link-alt small"></i>
                         </a>
@@ -31,7 +32,7 @@
                         <div>
                             <h5 class="mb-1"><i class="fas fa-compass me-2"></i>Start here</h5>
                             <div class="text-muted">
-                                Choose one option to get verified and access your doctor dashboard.
+                                Claim your profile now to access your dashboard. Verification is optional for badges.
                             </div>
                         </div>
                         <div class="d-flex gap-2 flex-wrap">
@@ -85,8 +86,8 @@
                                 </form>
 
                                 <div class="d-flex flex-wrap gap-2 mt-3">
-                                    <span class="badge rounded-pill text-bg-light border">Verification review in 2–3 days</span>
-                                    <span class="badge rounded-pill text-bg-light border">Secure document checks</span>
+                                    <span class="badge rounded-pill text-bg-light border">Claim in minutes</span>
+                                    <span class="badge rounded-pill text-bg-light border">Verify later for badges</span>
                                     <span class="badge rounded-pill text-bg-light border">Free to claim</span>
                                 </div>
 
@@ -180,7 +181,7 @@
                                     <div>
                                         <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}"
                                            class="btn btn-primary">
-                                            <i class="fas fa-hand-paper me-2"></i>Claim This Profile
+                                            <i class="fas fa-bolt me-2"></i>Claim Instantly
                                         </a>
                                     </div>
                                 </div>
@@ -237,8 +238,8 @@
                                         <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
                                              style="width: 36px; height: 36px;">2</div>
                                         <div>
-                                            <div class="fw-semibold">Upload verification documents</div>
-                                            <div class="text-muted small">NMC license or degree, and ID for review.</div>
+                                            <div class="fw-semibold">Claim instantly</div>
+                                            <div class="text-muted small">Get dashboard access right away. Verification is optional for badges.</div>
                                         </div>
                                     </div>
 
@@ -246,8 +247,8 @@
                                         <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
                                              style="width: 36px; height: 36px;">3</div>
                                         <div>
-                                            <div class="fw-semibold">Get verified and manage your profile</div>
-                                            <div class="text-muted small">Respond to reviews and track engagement.</div>
+                                            <div class="fw-semibold">Verify when ready</div>
+                                            <div class="text-muted small">Submit documents anytime to earn the verified badge and featured placement.</div>
                                         </div>
                                     </div>
                                 </div>

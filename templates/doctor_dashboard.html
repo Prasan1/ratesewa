@@ -447,6 +447,11 @@
 
 <div class="container">
     <div class="dash-wrap">
+        {% set has_photo = doctor.photo_url and doctor.photo_url|length > 0 %}
+        {% set has_edu = doctor.education and doctor.education|length > 2 %}
+        {% set has_college = doctor.college and doctor.college|length > 2 %}
+        {% set has_address = doctor.practice_address and doctor.practice_address|length > 5 %}
+        {% set has_phone = doctor.phone_number and doctor.phone_number|length > 5 %}
         {% set ns = namespace(missing=[], done=[]) %}
         {% if has_photo %}{% set _ = ns.done.append({'label':'Add a profile photo'}) %}{% else %}{% set _ = ns.missing.append({'label':'Add a profile photo'}) %}{% endif %}
         {% if has_edu %}{% set _ = ns.done.append({'label':'Add education'}) %}{% else %}{% set _ = ns.missing.append({'label':'Add education'}) %}{% endif %}
@@ -485,14 +490,33 @@
                                 <i class="fas fa-stethoscope me-2"></i>{{ doctor.specialty.name }}
                             </p>
                             <div class="d-flex flex-wrap gap-2 mb-2">
+                                {% if doctor.is_verified %}
                                 <span class="verified-badge">
                                     <i class="fas fa-check-circle"></i>
                                     <span>Verified Doctor</span>
                                 </span>
+                                {% else %}
+                                <span class="pill">
+                                    <i class="fas fa-info-circle"></i> Unverified profile
+                                </span>
+                                {% endif %}
                                 <span class="pill">
                                     <i class="fas fa-shield-alt"></i> Private dashboard
                                 </span>
                             </div>
+                            {% if not doctor.is_verified %}
+                            <div class="alert alert-warning py-2 px-3 mb-0" style="border-radius: 12px;">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                    <small class="mb-0">
+                                        <i class="fas fa-shield-alt me-1"></i>
+                                        Get the verified badge by submitting documents.
+                                    </small>
+                                    <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-sm btn-outline-dark">
+                                        Verify now
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -713,11 +737,6 @@
             </div>
 
             <!-- Profile strength card -->
-            {% set has_edu = doctor.education and doctor.education|length > 2 %}
-            {% set has_college = doctor.college and doctor.college|length > 2 %}
-            {% set has_address = doctor.practice_address and doctor.practice_address|length > 5 %}
-            {% set has_phone = doctor.phone_number and doctor.phone_number|length > 5 %}
-            {% set has_photo = doctor.photo_url %}
             {% set strength_points = 0 %}
             {% if has_photo %}{% set strength_points = strength_points + 20 %}{% endif %}
             {% if has_edu %}{% set strength_points = strength_points + 20 %}{% endif %}
@@ -921,9 +940,15 @@
                         <div class="mb-3">
                             <label class="text-muted small mb-1">Account Type</label>
                             <div>
+                                {% if doctor.is_verified %}
                                 <span class="badge bg-primary" style="padding: 0.5rem 1rem; border-radius: 50px;">
                                     <i class="fas fa-user-md"></i> Verified Doctor
                                 </span>
+                                {% else %}
+                                <span class="badge bg-light text-dark" style="padding: 0.5rem 1rem; border-radius: 50px; border: 1px solid rgba(0,0,0,0.08);">
+                                    <i class="fas fa-user-md"></i> Doctor account (unverified)
+                                </span>
+                                {% endif %}
                             </div>
                         </div>
 

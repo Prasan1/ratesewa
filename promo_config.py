@@ -4,16 +4,16 @@ Manages time-limited promotions and free tier upgrades
 """
 from datetime import datetime, timedelta
 
-# New Year 2025 Promotion
+# Launch Promotion (ends April 25, 2026)
 CURRENT_PROMOTION = {
     'enabled': True,
-    'name': 'New Year Special 2025',
-    'description': 'All premium features FREE for 8 weeks!',
-    'start_date': datetime(2025, 1, 1),
-    'end_date': datetime(2025, 2, 26),  # 8 weeks from Jan 1
+    'name': 'Launch Special 2026',
+    'description': 'All featured features FREE until April 25, 2026!',
+    'start_date': datetime(2026, 1, 1),
+    'end_date': datetime(2026, 4, 25),
     'auto_upgrade_to': 'featured',  # Auto-grant this tier to all doctors
     'show_pricing': True,  # Still show pricing to build anticipation
-    'banner_message': '🎉 New Year Special: All Premium Features FREE until Feb 26, 2025!',
+    'banner_message': '🎉 Launch Special: All Featured Features FREE until Apr 25, 2026!',
     'banner_color': '#10b981',  # Green
 }
 

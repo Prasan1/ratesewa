@@ -141,7 +141,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
-            flash('You need to be logged in to access this page.', 'warning')
+            flash('Please log in or create an account to continue.', 'warning')
             return redirect(url_for('login', next=request.url))
         user = User.query.get(session['user_id'])
         if not user or not user.is_active:
@@ -162,11 +162,19 @@ def confirm_email_token(token, max_age=60 * 60 * 24):
     except (BadSignature, SignatureExpired):
         return None
 
+def should_show_dev_verify_link():
+    env = os.getenv('FLASK_ENV', '').lower()
+    return app.debug or env in {'development', 'local'} or os.getenv('SHOW_DEV_VERIFY_LINK') == '1'
+
 def send_email_verification(user):
-    if not resend_key:
-        return False
     token = generate_email_token(user.email)
     verify_url = url_for('verify_email', token=token, _external=True)
+
+    if not resend_key:
+        if should_show_dev_verify_link():
+            return verify_url
+        return None
+
     subject = "Verify your RankSewa email"
     html = f"""
         <div style="font-family: Arial, sans-serif; max-width: 520px;">
@@ -179,10 +187,12 @@ def send_email_verification(user):
     params = {"from": "RankSewa <support@ranksewa.com>", "to": [user.email], "subject": subject, "html": html}
     try:
         resend.Emails.send(params)
-        return True
+        return None
     except Exception as e:
         print(f"❌ Failed to send verification email: {e}")
-        return False
+        if should_show_dev_verify_link():
+            return verify_url
+        return None
 
 def get_client_ip():
     forwarded_for = request.headers.get('X-Forwarded-For', '')
@@ -233,6 +243,9 @@ def doctor_required(f):
                 return redirect(url_for('verification_submitted'))
             flash('Please submit your verification documents to continue.', 'warning')
             return redirect(url_for('doctor_self_register'))
+        doctor = user.doctor_profile
+        if doctor:
+            enforce_subscription_expiry(doctor)
         return f(*args, **kwargs)
     return decorated_function
 
@@ -460,6 +473,35 @@ def build_doctor_analytics_context(doctor):
         'traffic_sources': traffic_sources,
         'chart_data': chart_data
     }
+
+def enforce_subscription_expiry(doctor):
+    if not doctor or not doctor.subscription_expires_at:
+        return
+    if promo_config.is_promotion_active():
+        return
+    if datetime.utcnow() <= doctor.subscription_expires_at:
+        return
+    if doctor.subscription_tier in {'premium', 'featured'}:
+        doctor.subscription_tier = 'free'
+        doctor.is_featured = False
+        doctor.subscription_expires_at = None
+        db.session.commit()
+
+def clear_expired_subscriptions():
+    if promo_config.is_promotion_active():
+        return
+    now = datetime.utcnow()
+    updated = Doctor.query.filter(
+        Doctor.subscription_expires_at.isnot(None),
+        Doctor.subscription_expires_at < now,
+        Doctor.subscription_tier.in_(['premium', 'featured'])
+    ).update({
+        Doctor.subscription_tier: 'free',
+        Doctor.is_featured: False,
+        Doctor.subscription_expires_at: None
+    }, synchronize_session=False)
+    if updated:
+        db.session.commit()
 
 # --- Helper Function for Slugs ---
 def generate_slug(name):
@@ -915,11 +957,13 @@ def optimize_and_save_article_image(image_file):
 # --- Authentication Routes ---
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    next_url = request.args.get('next', '')
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
         is_doctor = request.form.get('is_doctor') == '1'
+        next_url = request.form.get('next', '') or request.args.get('next', '')
 
         if not name or not email or not password:
             flash('All fields are required.', 'danger')
@@ -939,22 +983,27 @@ def register():
             db.session.add(user)
             db.session.commit()
 
-            send_email_verification(user)
+            verify_url = send_email_verification(user)
+            if verify_url:
+                flash(f'DEV: Verify your email here: {verify_url}', 'info')
 
             # If user indicated they're a doctor, auto-login and redirect to claim profile
-            if is_doctor:
-                flash('Check your email to verify your account before logging in.', 'success')
-                return redirect(url_for('login', next=url_for('claim_profile')))
-            else:
-                flash('Check your email to verify your account before logging in.', 'success')
-                return redirect(url_for('login'))
+            redirect_next = next_url if is_safe_url(next_url) else None
+
+            if is_doctor and not redirect_next:
+                redirect_next = url_for('claim_profile')
+
+            flash('Check your email to verify your account before logging in.', 'success')
+            if redirect_next:
+                return redirect(url_for('login', next=redirect_next))
+            return redirect(url_for('login'))
 
         except Exception as e:
             db.session.rollback()
             flash('An error occurred during registration.', 'danger')
             return redirect(url_for('register'))
 
-    return render_template('register.html')
+    return render_template('register.html', next_url=next_url)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -969,7 +1018,9 @@ def login():
                 now = datetime.utcnow().timestamp()
                 last_sent = session.get('verification_sent_at', 0)
                 if now - last_sent > 300:
-                    send_email_verification(user)
+                    verify_url = send_email_verification(user)
+                    if verify_url:
+                        flash(f'DEV: Verify your email here: {verify_url}', 'info')
                     session['verification_sent_at'] = now
                 flash('Please verify your email before logging in. We sent a new verification link.', 'warning')
                 return redirect(url_for('login'))
@@ -1400,7 +1451,7 @@ def claim_profile_form(doctor_id):
     doctor = Doctor.query.get_or_404(doctor_id)
 
     # Check if doctor is already claimed
-    if doctor.user_account:
+    if doctor.user_account and doctor.user_account.id != session['user_id']:
         flash('This profile has already been claimed.', 'warning')
         return redirect(url_for('claim_profile'))
 
@@ -1428,6 +1479,41 @@ def claim_profile_form(doctor_id):
                           current_user=User.query.get(session['user_id']))
 
 
+@app.route('/claim-profile/<int:doctor_id>/quick', methods=['POST'])
+@login_required
+def claim_profile_quick(doctor_id):
+    """Instantly link a doctor profile to the logged-in user without verification."""
+    doctor = Doctor.query.get_or_404(doctor_id)
+    user = User.query.get(session['user_id'])
+
+    if doctor.user_account and doctor.user_account.id != user.id:
+        flash('This profile has already been claimed.', 'warning')
+        return redirect(url_for('claim_profile'))
+
+    if user.doctor_id and user.doctor_id != doctor_id:
+        flash('Your account is already linked to another doctor profile.', 'warning')
+        return redirect(url_for('doctor_dashboard'))
+
+    if user.role == 'doctor' and user.doctor_id == doctor_id:
+        flash('Your profile is already linked to this account.', 'info')
+        return redirect(url_for('doctor_dashboard'))
+
+    existing_request = VerificationRequest.query.filter_by(
+        user_id=user.id
+    ).order_by(VerificationRequest.created_at.desc()).first()
+
+    if existing_request and existing_request.status == 'pending' and existing_request.doctor_id != doctor_id:
+        flash('You already have a pending verification request. Please wait for review before claiming another profile.', 'warning')
+        return redirect(url_for('verification_submitted'))
+
+    user.doctor_id = doctor_id
+    user.role = 'doctor'
+    db.session.commit()
+
+    flash('Profile claimed! You can verify your credentials anytime to earn the verified badge.', 'success')
+    return redirect(url_for('doctor_dashboard'))
+
+
 @app.route('/claim-profile/<int:doctor_id>/submit', methods=['POST'])
 @login_required
 def claim_profile_submit(doctor_id):
@@ -1435,7 +1521,7 @@ def claim_profile_submit(doctor_id):
     doctor = Doctor.query.get_or_404(doctor_id)
 
     # Check if doctor is already claimed
-    if doctor.user_account:
+    if doctor.user_account and doctor.user_account.id != session['user_id']:
         flash('This profile has already been claimed.', 'warning')
         return redirect(url_for('claim_profile'))
 
@@ -2128,6 +2214,7 @@ def service_worker():
 
 @app.route('/doctors')
 def get_doctors():
+    clear_expired_subscriptions()
     city_id = request.args.get('city_id', '')
     specialty_id = request.args.get('specialty_id', '')
     name_search = request.args.get('name', '')
@@ -2169,7 +2256,8 @@ def get_doctors():
     ).join(rating_stats, Doctor.id == rating_stats.c.doctor_id).options(
         selectinload(Doctor.city),
         selectinload(Doctor.specialty),
-        selectinload(Doctor.clinic)
+        selectinload(Doctor.clinic),
+        selectinload(Doctor.user_account)
     ).filter(Doctor.is_active.is_(True))  # Show all active doctors (NMC city = practice location)
 
     if city_id:
@@ -2243,6 +2331,7 @@ def get_doctors():
             'photo_url': photo_url,
             'is_featured': d.is_featured,
             'is_verified': d.is_verified,
+            'is_claimed': d.user_account is not None,
             'avg_rating': float(avg_rating_value or 0),
             'rating_count': int(rating_count_value or 0)
         })
@@ -3428,6 +3517,7 @@ def doctor_profile(slug):
     # Query doctor by slug with eager loading to avoid N+1 queries
     from sqlalchemy.orm import joinedload
 
+    clear_expired_subscriptions()
     doctor = Doctor.query.options(
         joinedload(Doctor.ratings).joinedload(Rating.user),
         joinedload(Doctor.specialty),
@@ -3963,6 +4053,12 @@ def admin_verification_detail(request_id):
                 if verification_request.is_new_doctor:
                     # Create new doctor profile from verification data
                     from slugify import slugify
+                    promo_end = promo_config.CURRENT_PROMOTION.get('end_date')
+                    qualifies_for_lifetime = bool(
+                        promo_end
+                        and verification_request.created_at
+                        and verification_request.created_at <= promo_end
+                    )
 
                     # Generate unique slug
                     base_slug = slugify(verification_request.proposed_name)
@@ -3986,13 +4082,16 @@ def admin_verification_detail(request_id):
                         practice_address=verification_request.practice_address,
                         is_verified=True,  # Immediately verified upon approval
                         is_active=True,
-                        is_featured=False,
-                        subscription_tier='free',  # Start with free tier
+                        is_featured=qualifies_for_lifetime,
+                        subscription_tier='featured' if qualifies_for_lifetime else 'free',
                         description=f"Verified doctor with {verification_request.proposed_experience} years of experience."
                     )
 
                     db.session.add(new_doctor)
                     db.session.flush()  # Get the doctor ID
+
+                    if qualifies_for_lifetime:
+                        new_doctor.subscription_expires_at = None
 
                     # Link user to the new doctor profile
                     user.doctor_id = new_doctor.id
@@ -4020,6 +4119,16 @@ def admin_verification_detail(request_id):
                     # Mark doctor as verified
                     doctor = verification_request.doctor
                     doctor.is_verified = True
+                    promo_end = promo_config.CURRENT_PROMOTION.get('end_date')
+                    qualifies_for_lifetime = bool(
+                        promo_end
+                        and verification_request.created_at
+                        and verification_request.created_at <= promo_end
+                    )
+                    if qualifies_for_lifetime:
+                        doctor.subscription_tier = 'featured'
+                        doctor.is_featured = True
+                        doctor.subscription_expires_at = None
                     doctor.nmc_number = verification_request.nmc_number
                     doctor.phone_number = verification_request.phone_number
                     doctor.practice_address = verification_request.practice_address

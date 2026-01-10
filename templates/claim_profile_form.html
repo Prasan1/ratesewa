@@ -30,19 +30,45 @@
             </div>
         </div>
 
+        <!-- Quick Claim -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div>
+                        <h5 class="mb-1"><i class="fas fa-bolt me-2 text-primary"></i>Claim instantly (no documents)</h5>
+                        <p class="text-muted small mb-0">
+                            Get access to your free dashboard, update details, and respond to reviews.
+                            Verification is optional and only required for the verified/featured badges.
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <form method="POST" action="{{ url_for('claim_profile_quick', doctor_id=doctor.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check-circle me-2"></i>Claim Now
+                            </button>
+                        </form>
+                        <a href="#verification-section" class="btn btn-outline-secondary">
+                            <i class="fas fa-shield-alt me-2"></i>Verify Instead
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Verification Form -->
-        <div class="card shadow-sm">
+        <div class="card shadow-sm" id="verification-section">
             <div class="card-body p-4">
                 <h4 class="card-title mb-4">
-                    <i class="fas fa-clipboard-check me-2"></i>Verification Information
+                    <i class="fas fa-clipboard-check me-2"></i>Verification (for badges)
                 </h4>
 
                 <p class="text-muted mb-4">
-                    Please provide the following information to verify your identity and claim this profile.
+                    Submit verification when you're ready to earn the verified badge and featured placement.
                     All information will be reviewed by our admin team.
                 </p>
 
-                <form method="POST" action="{{ url_for('claim_profile_submit', doctor_id=doctor.id) }}" enctype="multipart/form-data">
+                <form id="verificationForm" method="POST" action="{{ url_for('claim_profile_submit', doctor_id=doctor.id) }}" enctype="multipart/form-data">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
                     <!-- NMC Number -->
@@ -246,10 +272,36 @@
         </div>
     </div>
 </div>
+
+<!-- Verification Modal -->
+<div class="modal fade" id="verificationModal" tabindex="-1" aria-labelledby="verificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="verificationModalLabel">Verification needed</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="verificationModalBody">
+                Please upload your Government ID to continue.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+const verificationModal = new bootstrap.Modal(document.getElementById('verificationModal'));
+const verificationModalBody = document.getElementById('verificationModalBody');
+
+function showVerificationModal(message) {
+    verificationModalBody.textContent = message;
+    verificationModal.show();
+}
+
 // File size validation
 document.querySelectorAll('input[type="file"]').forEach(input => {
     input.addEventListener('change', function() {
@@ -257,7 +309,7 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
         if (file) {
             const maxSize = 10 * 1024 * 1024; // 10MB
             if (file.size > maxSize) {
-                alert('File size exceeds 10MB. Please upload a smaller file.');
+                showVerificationModal('File size exceeds 10MB. Please upload a smaller file.');
                 this.value = '';
             }
         }
@@ -265,12 +317,12 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
 });
 
 // Form validation
-document.querySelector('form').addEventListener('submit', function(e) {
+document.getElementById('verificationForm').addEventListener('submit', function(e) {
     const govtIdInput = document.getElementById('govt_id');
 
     if (!govtIdInput.files || govtIdInput.files.length === 0) {
         e.preventDefault();
-        alert('Please upload your Government ID to continue');
+        showVerificationModal('Please upload your Government ID to continue.');
         return false;
     }
 });
