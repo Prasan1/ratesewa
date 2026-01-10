@@ -626,6 +626,7 @@ function displayDoctors(response) {
 
         // Description text (sanitized and truncated)
         const descriptionText = normalizeDoctorDescription(doctor.description);
+        const descriptionLine = descriptionText || `Specialist in ${specialtyName} • ${cityLabel}`;
 
         html += `
             <div class="col-md-6 col-lg-4 mb-4">
@@ -693,7 +694,7 @@ function displayDoctors(response) {
                         </div>
 
                         <!-- Description -->
-                        ${descriptionText ? `<p class="description-v2">${descriptionText}</p>` : ''}
+                        ${descriptionLine ? `<p class="description-v2">${descriptionLine}</p>` : ''}
                     </div>
 
                     <!-- FOOTER -->

@@ -2044,10 +2044,11 @@ html {
     margin: 12px 0 0 0;
     padding: 0;
     background: transparent;
-    font-size: 0.85rem;
-    line-height: 1.55;
-    color: #64748b;
-    max-height: 4.65em; /* 3 lines × 1.55 line-height */
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: #475569;
+    max-height: 4.5em; /* 3 lines × 1.5 line-height */
+    min-height: 4.5em;
     overflow: hidden;
     position: relative;
 }
@@ -2161,10 +2162,11 @@ html {
     }
 
     .description-v2 {
-        font-size: 0.8rem;
+        font-size: 0.88rem;
         margin-top: 8px;
         -webkit-line-clamp: 3;
         max-height: 4.2em;
+        min-height: 4.2em;
     }
 
     .card-footer-v2 {
@@ -2188,6 +2190,48 @@ html {
     .detail-grid-v2 {
         grid-template-columns: 1fr;
     }
+
+    .card-header-v2 {
+        padding: 18px 16px 14px 16px;
+    }
+
+    .avatar-wrapper-v2 {
+        width: 92px;
+        height: 92px;
+        margin-bottom: 12px;
+    }
+
+    .doctor-avatar-v2 {
+        width: 92px !important;
+        height: 92px !important;
+        max-width: 92px !important;
+        max-height: 92px !important;
+    }
+
+    .doctor-name-v2 {
+        font-size: 1.15rem;
+    }
+
+    .rating-pill-v2 {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+
+    .detail-label-v2 {
+        font-size: 0.62rem;
+    }
+
+    .detail-value-v2 {
+        font-size: 0.82rem;
+    }
+
+    .description-v2 {
+        font-size: 0.85rem;
+    }
+
+    .btn-view-v2 {
+        font-size: 0.9rem;
+    }
 }
 
 /* Extra small screens (small phones) */
@@ -2197,20 +2241,20 @@ html {
     }
 
     .avatar-wrapper-v2 {
-        width: 72px;
-        height: 72px;
+        width: 80px;
+        height: 80px;
         margin-bottom: 8px;
     }
 
     .doctor-avatar-v2 {
-        width: 72px !important;
-        height: 72px !important;
-        max-width: 72px !important;
-        max-height: 72px !important;
+        width: 80px !important;
+        height: 80px !important;
+        max-width: 80px !important;
+        max-height: 80px !important;
     }
 
     .doctor-name-v2 {
-        font-size: 1rem;
+        font-size: 1.05rem;
     }
 
     .card-body-v2 {
@@ -2236,6 +2280,7 @@ html {
     .description-v2 {
         -webkit-line-clamp: 2;
         max-height: 2.8em;
+        min-height: 2.8em;
     }
 
     .card-footer-v2 {
