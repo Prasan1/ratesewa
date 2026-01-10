@@ -2177,6 +2177,17 @@ html {
         width: 100%;
         justify-content: center;
     }
+
+    .btn-claim-v2 {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .detail-grid-v2 {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Extra small screens (small phones) */
