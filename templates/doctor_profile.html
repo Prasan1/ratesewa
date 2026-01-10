@@ -326,6 +326,48 @@
     }
     .whatsapp-btn:hover { opacity: 0.9; }
 
+    .sidebar-links {
+        display: grid;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .sidebar-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        background: #fff;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar-link i {
+        color: var(--brand);
+    }
+
+    .sidebar-link:hover {
+        border-color: var(--brand-light);
+        color: var(--brand);
+        transform: translateY(-1px);
+    }
+
+    .locked-note {
+        background: #f8fafc;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 12px 14px;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        text-align: left;
+    }
+
     .content-card {
         background: white;
         border-radius: var(--radius);
@@ -692,6 +734,31 @@
         .fact-value { font-size: 0.95rem; }
         .review-item { padding: 14px 0; }
         .review-author { font-size: 0.95rem; }
+        .breadcrumb-nav { padding: 12px 0; }
+    }
+
+    /* Back Navigation */
+    .back-nav {
+        padding: 12px 0;
+        margin-bottom: 16px;
+    }
+
+    .back-link {
+        color: #64748b;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 8px 16px;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .back-link:hover {
+        color: #0d9488;
+        background: #f1f5f9;
     }
 </style>
 {% endblock %}
@@ -705,6 +772,26 @@
 {% block twitter_image %}{{ url_for('serve_photo', filename=doctor.photo_url.replace('photos/', ''), _external=True) if doctor.photo_url else request.url_root + 'static/img/logo.png' }}{% endblock %}
 
 {% block content %}
+<!-- Back Navigation -->
+<nav class="back-nav">
+    <div class="container">
+        <a href="javascript:history.back()" class="back-link" onclick="handleBackClick(event)">
+            <i class="fas fa-arrow-left"></i> Back to Search
+        </a>
+    </div>
+</nav>
+<script>
+function handleBackClick(e) {
+    // If there's history, go back; otherwise go to homepage
+    if (window.history.length > 1) {
+        e.preventDefault();
+        window.history.back();
+    } else {
+        window.location.href = '{{ url_for("index") }}#resultsSection';
+    }
+}
+</script>
+
 <div class="profile-container">
 
   <!-- HERO SECTION -->
@@ -739,29 +826,9 @@
             </div>
             <div class="hero-tagline">
               {{ doctor.specialty.name }} in {{ doctor.city.name }}
-            </div>
-
-            <div class="hero-chips">
-              <span class="hero-chip"><i class="fas fa-stethoscope"></i>{{ doctor.specialty.name }}</span>
-              <span class="hero-chip"><i class="fas fa-map-marker-alt"></i>{{ doctor.city.name }}</span>
               {% if doctor.experience is defined %}
-                <span class="hero-chip"><i class="fas fa-briefcase-medical"></i>{{ doctor.experience }} yrs</span>
+                • {{ doctor.experience }} yrs
               {% endif %}
-              {% if doctor.nmc_number %}
-                <span class="hero-chip"><i class="fas fa-id-card"></i>NMC {{ doctor.nmc_number }}</span>
-              {% endif %}
-            </div>
-
-            <div class="hero-action-row">
-              {% set map_query = doctor.practice_address or doctor.workplace or doctor.city.name %}
-              {% if map_query %}
-                <a class="hero-action-link" href="https://www.google.com/maps/search/?api=1&query={{ map_query|urlencode }}" target="_blank" rel="noopener">
-                  <i class="fas fa-map-marked-alt"></i>Map
-                </a>
-              {% endif %}
-              <a class="hero-action-link" href="#contactCard"><i class="fas fa-phone"></i>Contact</a>
-              <a class="hero-action-link" href="#reviewsSection"><i class="fas fa-star"></i>Reviews</a>
-              <a class="hero-action-link" href="#shareProfileCard"><i class="fas fa-share-alt"></i>Share</a>
             </div>
           </div>
 
@@ -828,18 +895,28 @@
                 </div>
               </div>
             {% else %}
-              <div class="alert alert-info small mb-0">
+              <div class="locked-note">
                 <i class="fas fa-lock me-2"></i>
-                <strong>Contact info</strong> available with
-                <a href="{{ url_for('subscription_pricing') }}" class="alert-link fw-bold">Premium</a>
+                Contact details are available for <strong>Premium/Featured</strong> doctors.
               </div>
             {% endif %}
           {% else %}
-            <div class="alert alert-light border small mb-0">
+            <div class="locked-note">
               <i class="fas fa-info-circle me-2"></i>
               Contact information is not available.
             </div>
           {% endif %}
+
+          <div class="sidebar-links">
+            {% set map_query = doctor.practice_address or doctor.workplace or doctor.city.name %}
+            {% if map_query %}
+              <a class="sidebar-link" href="https://www.google.com/maps/search/?api=1&query={{ map_query|urlencode }}" target="_blank" rel="noopener">
+                <i class="fas fa-map-marked-alt"></i>Map
+              </a>
+            {% endif %}
+            <a class="sidebar-link" href="#reviewsSection"><i class="fas fa-star"></i>Reviews</a>
+            <a class="sidebar-link" href="#shareProfileCard"><i class="fas fa-share-alt"></i>Share</a>
+          </div>
 
           {% if doctor.clinic %}
             <hr class="my-4">
@@ -939,9 +1016,6 @@
             <h3 class="section-title mb-0 border-0">About</h3>
             <p class="text-muted small mb-0">Trusted information for patients. Please verify details before visiting.</p>
           </div>
-          {% if doctor.nmc_number %}
-            <span class="status-pill"><i class="fas fa-id-card"></i> NMC: <strong>{{ doctor.nmc_number }}</strong></span>
-          {% endif %}
         </div>
 
         <p class="mb-4">{{ doctor.description or 'No description provided yet.' }}</p>
@@ -969,6 +1043,11 @@
           <div class="fact-item">
             <div class="fact-label"><i class="fas fa-university text-brand"></i>College</div>
             <div class="fact-value">{{ doctor.college or 'Not provided' }}</div>
+          </div>
+
+          <div class="fact-item">
+            <div class="fact-label"><i class="fas fa-id-card text-brand"></i>NMC Number</div>
+            <div class="fact-value">{{ doctor.nmc_number or 'Not provided' }}</div>
           </div>
 
           <div class="fact-item full">

@@ -81,7 +81,7 @@
     <!-- Local Font Awesome -->
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fontawesome/all.min.css') }}">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260110o">
     {% block head %}{% endblock %}
 </head>
 <body>
@@ -293,7 +293,7 @@
     <!-- Local jQuery -->
     <script src="{{ url_for('static', filename='vendor/jquery/jquery-3.6.0.min.js') }}"></script>
     <!-- Custom JS -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=20260110o"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
