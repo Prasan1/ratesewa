@@ -155,6 +155,163 @@ a:hover {
 .footer-surface {
     background: linear-gradient(135deg, var(--footer-grad-start) 0%, var(--footer-grad-end) 100%) !important;
     box-shadow: 0 -12px 24px rgba(17, 29, 35, 0.08);
+    border-top: 1px solid rgba(4, 130, 136, 0.12);
+}
+
+.footer-bridge {
+    height: 36px;
+    background:
+        linear-gradient(180deg, rgba(248, 248, 245, 0) 0%, rgba(244, 250, 251, 0.7) 60%, rgba(244, 250, 251, 1) 100%);
+    position: relative;
+}
+
+.footer-bridge::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: 10px;
+    height: 1px;
+    background: rgba(4, 130, 136, 0.12);
+}
+
+/* Doctor Dashboard - Working Hours */
+.working-hours-card {
+    border-radius: 18px;
+    border: 1px solid rgba(4, 130, 136, 0.12);
+    overflow: hidden;
+}
+
+.working-hours-header {
+    background: linear-gradient(135deg, var(--dash-3-start) 0%, var(--dash-3-end) 100%);
+    border: none;
+    padding: 18px 24px;
+    color: #ffffff;
+}
+
+.working-hours-title {
+    color: #ffffff;
+}
+
+.working-hours-body {
+    padding: 24px;
+}
+
+.working-hours-intro {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hours-grid {
+    row-gap: 16px;
+}
+
+.hours-field {
+    background: rgba(244, 250, 251, 0.7);
+    border-radius: 14px;
+    padding: 12px 14px 10px;
+    border: 1px solid rgba(4, 130, 136, 0.1);
+}
+
+.hours-field.is-closed {
+    background: rgba(231, 238, 240, 0.7);
+    border-color: rgba(120, 130, 140, 0.18);
+}
+
+.hours-input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hours-label {
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+}
+
+.hours-input {
+    border-radius: 10px;
+    border: 1px solid rgba(4, 130, 136, 0.16);
+}
+
+.hours-input:focus {
+    border-color: rgba(4, 130, 136, 0.4);
+    box-shadow: 0 0 0 0.2rem rgba(4, 130, 136, 0.12);
+}
+
+.hours-closed-toggle {
+    white-space: nowrap;
+    min-width: 78px;
+}
+
+.hours-quickfill {
+    background: rgba(244, 250, 251, 0.7);
+    border: 1px solid rgba(4, 130, 136, 0.12);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.hours-quickfill-label {
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+}
+
+.hours-quickfill-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hours-quickfill-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.hours-hint {
+    display: block;
+    margin-top: 6px;
+}
+
+.hours-tip {
+    border-radius: 12px;
+}
+
+/* Doctor Profile Edit */
+.profile-edit-card {
+    border-radius: 18px;
+    border: 1px solid rgba(4, 130, 136, 0.12);
+    overflow: hidden;
+}
+
+.profile-edit-header {
+    background: linear-gradient(135deg, var(--dash-1-start) 0%, var(--dash-1-end) 100%);
+    color: #ffffff;
+    padding: 18px 24px;
+    border: none;
+}
+
+.profile-edit-body {
+    padding: 28px 28px 32px;
+}
+
+.profile-edit-note {
+    border-radius: 12px;
+}
+
+.profile-edit-divider {
+    border-color: rgba(4, 130, 136, 0.12);
+}
+
+.profile-edit-section {
+    margin-bottom: 10px;
+}
+
+.profile-edit-warning {
+    border-radius: 12px;
 }
 
 .gradient-brand {
@@ -290,6 +447,7 @@ a:hover {
     flex-direction: column;
     flex-grow: 1;
     gap: 12px;
+    font-family: 'Plus Jakarta Sans', 'Source Sans 3', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .doctor-card .doctor-details {
@@ -320,6 +478,7 @@ a:hover {
     color: var(--ink);
     margin-bottom: 4px;
     line-height: 1.3;
+    font-family: 'Playfair Display', 'Fraunces', 'Georgia', serif;
 }
 
 .doctor-card .doctor-subtitle {
@@ -946,6 +1105,32 @@ a:hover {
     color: #6e2c28;
 }
 
+/* Homepage Section Divider */
+.section-divider {
+    position: relative;
+    height: 28px;
+    margin: 22px 0 26px;
+}
+
+.section-divider::before {
+    content: "";
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    top: 50%;
+    height: 1px;
+    background: rgba(4, 130, 136, 0.16);
+    transform: translateY(-50%);
+}
+
+.section-divider::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(4, 130, 136, 0), rgba(4, 130, 136, 0.08), rgba(4, 130, 136, 0));
+    opacity: 0.6;
+}
+
 /* Modal Enhancements */
 .modal-content {
     border: none;
@@ -973,6 +1158,138 @@ a:hover {
 .doctor-profile-sidebar img {
     border: 4px solid var(--surface);
     box-shadow: 0 6px 14px rgba(17, 29, 35, 0.12);
+}
+
+/* Review Cards */
+.review-masonry {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.review-card {
+    background: var(--surface);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(227, 231, 232, 0.8);
+    box-shadow: var(--shadow-sm);
+    width: 100%;
+}
+
+.review-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.review-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(4, 130, 136, 0.12);
+    color: var(--brand-dark);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    font-family: 'Fraunces', 'Georgia', serif;
+}
+
+.reviewer-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.reviewer-name {
+    font-weight: 700;
+    color: var(--ink);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    line-height: 1.2;
+}
+
+.reviewer-badge {
+    background: rgba(4, 130, 136, 0.12);
+    color: var(--brand-dark);
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.reviewer-badge.is-trusted {
+    background: rgba(34, 197, 94, 0.14);
+    color: #166534;
+}
+
+.reviewer-subtitle {
+    color: var(--muted);
+    font-size: 0.8rem;
+}
+
+.review-stars {
+    color: var(--accent-gold);
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.review-body {
+    color: var(--muted);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin: 12px 0 0;
+}
+
+.review-footer {
+    margin-top: 14px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.review-helpful {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+}
+
+.review-helpful i {
+    color: var(--brand);
+}
+
+.review-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.doctor-response {
+    margin-top: 14px;
+    padding: 12px;
+    background: var(--surface-alt);
+    border-radius: 12px;
+    border: 1px solid var(--border);
 }
 
 /* Footer */
@@ -1054,6 +1371,10 @@ footer {
 .doctor-card {
     margin-bottom: 15px;
 }
+
+    .review-masonry {
+        grid-template-columns: 1fr;
+    }
 
 .doctor-chips {
     display: flex;
