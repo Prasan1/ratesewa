@@ -482,7 +482,7 @@ a:hover {
 }
 
 .doctor-card .doctor-subtitle {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 6px;
     font-size: 0.85rem;
@@ -490,7 +490,7 @@ a:hover {
 }
 
 .doctor-card .doctor-location {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 6px;
     font-size: 0.85rem;
@@ -551,7 +551,27 @@ a:hover {
     color: var(--ink);
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    background: var(--surface-alt);
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+}
+
+.doctor-card .doctor-rating-section .rating-display i {
+    color: var(--accent-gold);
+}
+
+.doctor-card .doctor-rating-section .rating-display .rating-score-v2 {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.doctor-card .doctor-rating-section .rating-display .rating-count-v2 {
+    color: var(--muted);
+    font-weight: 600;
+    margin-left: 4px;
 }
 
 .doctor-card .doctor-stats {
@@ -599,33 +619,79 @@ a:hover {
 .doctor-card .doctor-actions {
     margin-top: auto;
     display: flex;
-    align-items: center;
+    justify-content: center;
     gap: 8px;
 }
 
 .doctor-card .btn-view-doctor {
-    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
-    color: #ffffff;
-    border: none;
-    border-radius: 999px;
-    padding: 9px 18px;
-    font-weight: 700;
-    font-size: 0.88rem;
-    letter-spacing: 0.3px;
+    background: transparent;
+    color: var(--brand);
+    border: 2px solid var(--brand);
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    box-shadow: 0 8px 18px rgba(4, 130, 136, 0.22);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    justify-content: center;
+    transition: background 0.2s ease, color 0.2s ease;
     text-decoration: none;
+}
+
+@media (max-width: 576px) {
+    .doctor-card .doctor-actions {
+        justify-content: center;
+    }
+
+    .doctor-card .btn-view-doctor {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+        min-height: 44px;
+    }
 }
 
 .doctor-card .btn-view-doctor:hover,
 .doctor-card .btn-view-doctor:focus {
+    background: var(--brand);
     color: #ffffff;
-    transform: translateY(-1px);
-    box-shadow: 0 12px 24px rgba(4, 130, 136, 0.3);
-    background: linear-gradient(135deg, var(--brand-dark) 0%, #045052 100%);
+}
+
+/* Claim Profile Link for Unclaimed Doctors */
+.claim-link {
+    display: block;
+    text-align: center;
+    font-size: 0.78rem;
+    color: #475569;
+    margin-top: 10px;
+    text-decoration: none;
+}
+
+.claim-link:hover {
+    color: var(--brand);
+    text-decoration: underline;
+}
+
+.claim-link.claim-link-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #f8fafc;
+    color: #0f766e;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+}
+
+.claim-link.claim-link-pill:hover {
+    background: #ffffff;
+    color: var(--brand);
+    text-decoration: none;
+    border-color: rgba(4, 130, 136, 0.3);
 }
 
 /* Limit description text to 3 lines to keep cards uniform */

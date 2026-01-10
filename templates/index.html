@@ -569,7 +569,6 @@ function normalizeDoctorDescription(description) {
 function displayDoctors(response, shouldScroll = true) {
     const doctors = response.doctors || response; // Handle both old and new format
     const pagination = response.pagination;
-    const isMobile = window.matchMedia('(max-width: 576px)').matches;
 
     // Update results title and count
     if (pagination && pagination.total_doctors > 0) {
@@ -628,97 +627,18 @@ function displayDoctors(response, shouldScroll = true) {
             ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>'
             : '';
 
-        const claimButton = (!doctor.is_claimed && currentUserRole !== 'doctor' && !isAdmin)
-            ? `<a href="/claim-profile/${doctor.id}" class="btn-claim-v2"><i class="fas fa-bolt"></i>Claim Profile</a>`
+        // Claim link for unclaimed profiles - subtle text
+        const showClaimPrompt = !doctor.is_claimed && currentUserRole !== 'doctor' && !isAdmin;
+        const claimLinkHtml = showClaimPrompt
+            ? `<a href="/claim-profile/${doctor.id}" class="claim-link claim-link-pill"><i class="fas fa-bolt"></i>Is this you? Claim profile</a>`
             : '';
+        const claimButton = '';
 
         // Description text (sanitized and truncated)
         const descriptionText = normalizeDoctorDescription(doctor.description);
         const descriptionLine = descriptionText || `Specialist in ${specialtyName} • ${cityLabel}`;
 
-        const desktopCardHtml = `
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="ranksewa-card-v2 h-100 ${doctor.is_featured ? 'featured' : ''}">
-
-                    <!-- HEADER -->
-                    <div class="card-header-v2">
-                        <!-- Avatar + Verified Badge -->
-                        <div class="avatar-wrapper-v2">
-                            <div class="avatar-halo"></div>
-                            <img
-                                src="${imgSrc}"
-                                data-name="${String(doctor.name || '')}"
-                                data-id="${doctor.id}"
-                                alt="${doctor.name}"
-                                class="doctor-avatar-v2"
-                                loading="lazy"
-                                onerror="this.onerror=null; this.src=getDoctorAvatar(this.dataset.name, parseInt(this.dataset.id || '0', 10));"
-                            >
-                            ${verifiedBadgeHtmlV2}
-                        </div>
-
-                        <!-- Name -->
-                        <h2 class="doctor-name-v2">${doctor.name}</h2>
-
-                        <div class="rating-stack-v2">
-                            <!-- Rating -->
-                            <div class="${ratingPillClass}">
-                                ${ratingDisplay}
-                            </div>
-
-                            <!-- Featured badge (if applicable) -->
-                            ${featuredBadgeHtml}
-                        </div>
-                    </div>
-
-                    <!-- BODY -->
-                    <div class="card-body-v2">
-                        <!-- Detail Row 1 -->
-                        <div class="detail-grid-v2">
-                            <div class="detail-pill-v2">
-                                <i class="fas fa-stethoscope detail-icon-v2"></i>
-                                <span class="detail-label-v2">Specialty</span>
-                                <span class="detail-value-v2">${specialtyName}</span>
-                            </div>
-                            <div class="detail-pill-v2">
-                                <i class="fas fa-map-marker-alt detail-icon-v2"></i>
-                                <span class="detail-label-v2">Location</span>
-                                <span class="detail-value-v2">${cityLabel}</span>
-                            </div>
-                        </div>
-
-                        <!-- Detail Row 2 -->
-                        <div class="detail-grid-v2">
-                            <div class="detail-pill-v2">
-                                <i class="fas fa-briefcase-medical detail-icon-v2"></i>
-                                <span class="detail-label-v2">Experience</span>
-                                <span class="detail-value-v2">${experienceLabel}</span>
-                            </div>
-                            <div class="detail-pill-v2">
-                                <i class="fas fa-hospital detail-icon-v2"></i>
-                                <span class="detail-label-v2">Practice</span>
-                                <span class="detail-value-v2">${practiceLabel}</span>
-                            </div>
-                        </div>
-
-                        <!-- Description -->
-                        ${descriptionLine ? `<p class="description-v2">${descriptionLine}</p>` : ''}
-                    </div>
-
-                    <!-- FOOTER -->
-                    <div class="card-footer-v2">
-                        <a href="/doctor/${doctor.slug}" class="btn-view-v2">
-                            View Profile
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                        ${claimButton}
-                        ${adminEditButton}
-                    </div>
-                </div>
-            </div>
-        `;
-
-        const mobileCardHtml = `
+        const cardHtml = `
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card doctor-card h-100 ${doctor.is_featured ? 'featured' : ''} ${doctor.is_verified ? 'verified' : ''}">
                     <div class="card-body">
@@ -754,14 +674,13 @@ function displayDoctors(response, shouldScroll = true) {
                             </div>
                         </div>
 
+                        <div class="doctor-rating-section">
+                            <span class="rating-display rating-display-inline">${ratingDisplay}</span>
+                        </div>
+
                         <div class="doctor-info-lines">
                             <div class="info-line"><strong>Experience:</strong> ${experienceLabel}</div>
                             <div class="info-line"><strong>Practice:</strong> ${practiceLabel}</div>
-                        </div>
-
-                        <div class="doctor-rating-section">
-                            <span class="rating-display">${starTextHtml || emptyStarsHtml}</span>
-                            <span class="text-muted small">${hasRatings ? `${avgRating} (${ratingCount})` : 'No reviews yet'}</span>
                         </div>
 
                         ${descriptionLine ? `<p class="doctor-summary">${descriptionLine}</p>` : ''}
@@ -769,17 +688,16 @@ function displayDoctors(response, shouldScroll = true) {
                         <div class="doctor-actions">
                             <a href="/doctor/${doctor.slug}" class="btn btn-view-doctor btn-sm">
                                 View Profile
-                                <i class="fas fa-arrow-right"></i>
                             </a>
-                            ${claimButton}
                             ${adminEditButton}
                         </div>
+                        ${claimLinkHtml}
                     </div>
                 </div>
             </div>
         `;
 
-        html += isMobile ? mobileCardHtml : desktopCardHtml;
+        html += cardHtml;
     });
 
     $('#doctorList').html(html);
@@ -842,17 +760,6 @@ function displayDoctors(response, shouldScroll = true) {
     }
 }
 
-const mobileQuery = window.matchMedia('(max-width: 576px)');
-mobileQuery.addEventListener('change', () => {
-    if (lastDoctorsResponse) {
-        displayDoctors(lastDoctorsResponse, false);
-    }
-});
-window.addEventListener('resize', () => {
-    if (lastDoctorsResponse) {
-        displayDoctors(lastDoctorsResponse, false);
-    }
-});
 
 function generateStarRatingHtml(rating, ratingCount) {
     let html = '';

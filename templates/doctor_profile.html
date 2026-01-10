@@ -113,7 +113,17 @@
         font-weight: 700;
         color: var(--text-main);
         margin-bottom: 0.5rem;
-        line-height: 1.1;
+        line-height: 1.2;
+    }
+
+    .verified-inline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--brand);
+        font-size: 0.7em;
+        margin-left: 6px;
+        vertical-align: middle;
     }
 
     .hero-tagline {
@@ -815,15 +825,17 @@ function handleBackClick(e) {
       <div class="col-md-9">
         <div class="hero-main">
           <div class="hero-identity">
-            <h1 class="hero-title">{{ doctor.name|doctor_title }}</h1>
-            <div class="hero-badges">
+            <h1 class="hero-title">
+              {{ doctor.name|doctor_title }}
               {% if doctor.is_verified %}
-                <span class="status-pill verified"><i class="fas fa-check-circle"></i>Verified</span>
+                <span class="verified-inline"><i class="fas fa-check-circle"></i></span>
               {% endif %}
-              {% if doctor.subscription_tier == 'featured' or doctor.is_featured %}
+            </h1>
+            {% if doctor.subscription_tier == 'featured' or doctor.is_featured %}
+            <div class="hero-badges">
                 <span class="status-pill featured"><i class="fas fa-crown"></i>Featured</span>
-              {% endif %}
             </div>
+            {% endif %}
             <div class="hero-tagline">
               {{ doctor.specialty.name }} in {{ doctor.city.name }}
               {% if doctor.experience is defined %}
@@ -932,14 +944,13 @@ function handleBackClick(e) {
       <div class="sidebar-card" id="shareProfileCard">
         <h5 class="fw-bold mb-3">Share Profile</h5>
         <p class="text-muted small mb-3">Help patients find this doctor faster.</p>
-        <div class="d-flex justify-content-center gap-3">
+        <div class="d-flex justify-content-center gap-4">
           <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" class="text-secondary"><i class="fab fa-facebook fa-lg"></i></a>
           <a href="https://twitter.com/intent/tweet?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!&url={{ request.url }}" target="_blank" class="text-secondary"><i class="fab fa-twitter fa-lg"></i></a>
           <a href="https://wa.me/?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!%20{{ request.url }}" target="_blank" class="text-secondary"><i class="fab fa-whatsapp fa-lg"></i></a>
-          <button onclick="copyProfileLink()" class="btn btn-link text-secondary p-0" id="copyLinkBtn"><i class="fas fa-link fa-lg"></i></button>
         </div>
         <div class="text-center mt-3">
-          <button onclick="copyProfileLink()" class="btn btn-outline-primary btn-sm">
+          <button onclick="copyProfileLink()" class="btn btn-outline-primary btn-sm" id="copyLinkBtn">
             <i class="fas fa-link me-2"></i>Copy profile link
           </button>
         </div>
