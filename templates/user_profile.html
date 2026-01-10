@@ -5,16 +5,36 @@
 {% block content %}
 <div class="row">
     <div class="col-md-3 mb-4">
-        <div class="card shadow-sm">
-            <div class="profile-header text-center">
-                <i class="fas fa-user-circle profile-avatar" style="font-size: 120px;"></i>
+        <div class="card shadow-sm profile-card">
+            <div class="profile-banner">
+                <div class="profile-avatar-circle" aria-hidden="true">
+                    {{ user.name[:1]|upper }}
+                </div>
             </div>
             <div class="card-body text-center">
                 <h4 class="mb-1">{{ user.name }}</h4>
                 <p class="text-muted mb-2">{{ user.email }}</p>
-                {% if session.get('is_admin') %}
-                <span class="badge bg-primary">Admin</span>
+                <div class="profile-meta">
+                    <span><i class="fas fa-calendar-alt me-1"></i>Joined {{ user.created_at.strftime('%b %Y') }}</span>
+                    <span><i class="fas fa-star me-1"></i>{{ user.review_count }} reviews</span>
+                </div>
+                <div class="profile-meta">
+                    <span><i class="fas fa-thumbs-up me-1"></i>{{ total_helpful_received }} helpful</span>
+                    <span><i class="fas fa-trophy me-1"></i>{{ tier_name }}</span>
+                </div>
+                {% if user.review_count > 0 %}
+                <p class="profile-about">Thanks for helping others choose better care.</p>
+                {% else %}
+                <p class="profile-about">Share your first review and build your profile.</p>
                 {% endif %}
+                <div class="profile-tags">
+                    {% if user.email_verified %}
+                    <span class="badge bg-success">Email Verified</span>
+                    {% endif %}
+                    {% if session.get('is_admin') %}
+                    <span class="badge bg-primary">Admin</span>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
@@ -115,6 +135,24 @@
                         {% endif %}
                     </div>
                 </div>
+
+                {% if next_tier %}
+                <div class="next-goal mt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <strong>Next tier: {{ next_tier|capitalize }}</strong>
+                        <span class="text-muted small">{{ points_to_next }} pts to go</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-primary" role="progressbar"
+                             style="width: {{ ((total_points / (total_points + points_to_next)) * 100) | round | int }}%"
+                             aria-valuenow="{{ total_points }}" aria-valuemin="0" aria-valuemax="{{ total_points + points_to_next }}">
+                        </div>
+                    </div>
+                    <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-primary mt-2 w-100">
+                        Write a review to level up
+                    </a>
+                </div>
+                {% endif %}
 
                 <!-- Badges -->
                 {% if user_badges %}
@@ -230,6 +268,71 @@
             </small>
         </div>
         {% endif %}
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Reviews</div>
+                        <div class="stat-value">{{ user.review_count }}</div>
+                        <div class="stat-meta">Your published reviews</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Helpful Votes</div>
+                        <div class="stat-value">{{ total_helpful_received }}</div>
+                        <div class="stat-meta">Community appreciation</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm stat-card">
+                    <div class="card-body">
+                        <div class="stat-label">Appointments</div>
+                        <div class="stat-value">{{ appointments|length }}</div>
+                        <div class="stat-meta">Booked so far</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>Recent Activity
+                    </h4>
+                    <span class="text-muted small">Last 6 items</span>
+                </div>
+                {% if activities %}
+                <div class="activity-list">
+                    {% for activity in activities %}
+                    <a class="activity-item" href="{{ activity.url }}">
+                        <div class="activity-icon">
+                            {% if activity.type == 'review' %}
+                            <i class="fas fa-star"></i>
+                            {% else %}
+                            <i class="fas fa-calendar-check"></i>
+                            {% endif %}
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">{{ activity.title }}</div>
+                            <div class="activity-meta">{{ activity.meta }} • {{ activity.date.strftime('%b %d, %Y') }}</div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No activity yet. Start by booking an appointment or leaving a review.</p>
+                <a href="{{ url_for('index') }}" class="btn btn-sm btn-primary mt-3">
+                    <i class="fas fa-search me-2"></i>Find a Doctor
+                </a>
+                {% endif %}
+            </div>
+        </div>
 
         <!-- Appointments Section -->
         <div class="card shadow-sm mb-4">

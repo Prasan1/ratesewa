@@ -112,6 +112,29 @@
         margin-top: 4px;
     }
 
+    .dash-divider {
+        position: relative;
+        height: 22px;
+        margin: 14px 0 24px;
+    }
+    .dash-divider::before {
+        content: "";
+        position: absolute;
+        left: 8%;
+        right: 8%;
+        top: 50%;
+        height: 1px;
+        background: rgba(15, 23, 42, 0.08);
+        transform: translateY(-50%);
+    }
+    .dash-divider::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(13, 138, 188, 0), rgba(13, 138, 188, 0.08), rgba(13, 138, 188, 0));
+        opacity: 0.6;
+    }
+
     /* ---------- Cards ---------- */
     .card-clean{
         border: 1px solid var(--border);
@@ -160,6 +183,14 @@
         box-shadow: var(--shadow);
         border-color: rgba(13,138,188,.35);
     }
+    .action-card--primary {
+        border-color: rgba(13,138,188,.45);
+        background: rgba(13, 138, 188, 0.06);
+        box-shadow: 0 10px 30px rgba(13, 138, 188, 0.12);
+    }
+    .action-card--secondary {
+        background: rgba(255, 255, 255, 0.9);
+    }
 
     .next-step-card {
         border: 1px solid rgba(255,255,255,0.24);
@@ -180,6 +211,131 @@
     .next-step-meta {
         font-size: 0.82rem;
         opacity: 0.9;
+    }
+
+    .today-strip {
+        margin-top: 18px;
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+    }
+    .today-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 140px;
+    }
+    .today-label {
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+    }
+    .today-value {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+    .today-sub {
+        font-size: 0.82rem;
+        color: var(--muted);
+    }
+    .today-action {
+        margin-left: auto;
+    }
+    @media (max-width: 768px) {
+        .today-strip {
+            gap: 12px;
+        }
+        .today-item {
+            min-width: 120px;
+        }
+        .today-action {
+            width: 100%;
+        }
+        .today-action .btn {
+            width: 100%;
+        }
+    }
+
+    .soft-hints {
+        margin-top: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .soft-hint {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px dashed rgba(15, 23, 42, 0.16);
+        background: rgba(255, 255, 255, 0.7);
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+    .soft-hint i {
+        color: var(--brand);
+    }
+
+    .zero-review-banner {
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        background: rgba(255, 248, 235, 0.8);
+        color: var(--text);
+        flex-wrap: wrap;
+    }
+
+    .zero-review-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: rgba(251, 191, 36, 0.2);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #b45309;
+        flex: 0 0 42px;
+    }
+
+    .zero-review-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: 0.9rem;
+    }
+
+    .zero-review-text span {
+        color: var(--muted);
+        font-size: 0.85rem;
+    }
+
+    .zero-review-action {
+        margin-left: auto;
+    }
+
+    @media (max-width: 768px) {
+        .zero-review-action {
+            width: 100%;
+        }
+        .zero-review-action .btn {
+            width: 100%;
+        }
     }
 
     .ranked-checklist {
@@ -405,6 +561,57 @@
             </div>
         </div>
 
+        <div class="today-strip">
+            <div class="today-item">
+                <div class="today-label">Reviews</div>
+                <div class="today-value">{{ review_count }}</div>
+                <div class="today-sub">Total so far</div>
+            </div>
+            <div class="today-item">
+                <div class="today-label">Rating</div>
+                <div class="today-value">{{ "%.1f"|format(avg_rating) }}/5</div>
+                <div class="today-sub">{{ "%.0f"|format(response_rate) }}% response rate</div>
+            </div>
+            <div class="today-item">
+                <div class="today-label">Profile</div>
+                <div class="today-value">{{ progress_percent }}% complete</div>
+                <div class="today-sub">{{ completed_actions }}/{{ total_actions }} essentials</div>
+            </div>
+            <div class="today-action">
+                {% if ns.missing|length > 0 %}
+                <a href="{{ url_for('doctor_profile_edit') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-pen me-2"></i>Complete profile
+                </a>
+                {% else %}
+                <a href="{{ url_for('doctor_profile', slug=doctor.slug) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-share-alt me-2"></i>Share profile
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="soft-hints">
+            <span class="soft-hint"><i class="fas fa-qrcode"></i>Share your review QR code</span>
+            <span class="soft-hint"><i class="fas fa-search"></i>Optimize your profile for search</span>
+        </div>
+
+        {% if review_count == 0 %}
+        <div class="zero-review-banner">
+            <div class="zero-review-icon">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="zero-review-text">
+                <strong>First review makes a big difference.</strong>
+                <span>Share your QR code with patients to get your first review.</span>
+            </div>
+            <div class="zero-review-action">
+                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#qrCodeModal">
+                    <i class="fas fa-qrcode me-2"></i>Open QR Code
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Privacy reassurance + value -->
         <div class="mb-4">
             <div class="privacy-banner">
@@ -433,6 +640,8 @@
             </div>
         </div>
         {% endif %}
+
+        <div class="dash-divider" aria-hidden="true"></div>
 
         <!-- Stats -->
         <div class="section-title-row">
@@ -489,6 +698,8 @@
                 </div>
             </div>
         </div>
+
+        <div class="dash-divider" aria-hidden="true"></div>
 
         <!-- Quick Actions + Profile Strength -->
         <div class="row mb-4">
@@ -553,7 +764,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <a href="{{ url_for('doctor_profile_edit') }}" class="text-decoration-none">
-                            <div class="action-card card h-100">
+                            <div class="action-card action-card--primary card h-100">
                                 <div class="card-body text-center p-4">
                                     <div style="width: 58px; height: 58px; background: linear-gradient(135deg, var(--dash-1-start) 0%, var(--dash-1-end) 100%); border-radius: 50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 1rem;">
                                         <i class="fas fa-edit fa-2x text-white"></i>
@@ -567,7 +778,7 @@
 
                     <div class="col-md-6 mb-3">
                         <a href="{{ url_for('doctor_reviews') }}" class="text-decoration-none">
-                            <div class="action-card card h-100">
+                            <div class="action-card action-card--secondary card h-100">
                                 <div class="card-body text-center p-4">
                                     <div style="width: 58px; height: 58px; background: linear-gradient(135deg, var(--dash-2-start) 0%, var(--dash-2-end) 100%); border-radius: 50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 1rem;">
                                         <i class="fas fa-comments fa-2x text-white"></i>
@@ -582,7 +793,7 @@
                     <div class="col-md-6 mb-3">
                         {% if tier_features is defined and tier_features.can_view_analytics %}
                         <a href="{{ url_for('doctor_analytics') }}" class="text-decoration-none">
-                            <div class="action-card card h-100">
+                            <div class="action-card action-card--secondary card h-100">
                                 <div class="card-body text-center p-4">
                                     <div style="width: 58px; height: 58px; background: linear-gradient(135deg, var(--dash-3-start) 0%, var(--dash-3-end) 100%); border-radius: 50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 1rem;">
                                         <i class="fas fa-chart-bar fa-2x text-white"></i>
@@ -594,7 +805,7 @@
                         </a>
                         {% else %}
                         <a href="{{ url_for('subscription_pricing') }}" class="text-decoration-none">
-                            <div class="action-card card h-100" style="border-color: rgba(255,193,7,.6);">
+                            <div class="action-card action-card--secondary card h-100" style="border-color: rgba(255,193,7,.6);">
                                 <div class="card-body text-center p-4">
                                     <div style="width: 58px; height: 58px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border-radius: 50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 1rem;">
                                         <i class="fas fa-lock fa-2x text-white"></i>
@@ -611,7 +822,7 @@
 
                     <div class="col-md-6 mb-3">
                         <div class="text-decoration-none" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#qrCodeModal">
-                            <div class="action-card card h-100">
+                            <div class="action-card action-card--secondary card h-100">
                                 <div class="card-body text-center p-4">
                                     <div style="width: 58px; height: 58px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 1rem;">
                                         <i class="fas fa-qrcode fa-2x text-white"></i>
@@ -625,7 +836,7 @@
 
                     <div class="col-md-6 mb-3">
                         <a href="{{ url_for('subscription_pricing') }}" class="text-decoration-none">
-                            <div class="action-card card h-100">
+                            <div class="action-card action-card--secondary card h-100">
                                 <div class="card-body text-center p-4">
                                     <div style="width: 58px; height: 58px; background: linear-gradient(135deg, var(--dash-4-start) 0%, var(--dash-4-end) 100%); border-radius: 50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 1rem;">
                                         <i class="fas fa-rocket fa-2x text-white"></i>
@@ -640,6 +851,8 @@
                 </div>
             </div>
         </div>
+
+        <div class="dash-divider" aria-hidden="true"></div>
 
         <!-- Keep your existing Detailed Information / Working Hours / Help sections unchanged -->
         <!-- (I’m leaving them as-is so you don’t lose any functionality.) -->
@@ -736,21 +949,23 @@
             </div>
         </div>
 
+        <div class="dash-divider" aria-hidden="true"></div>
+
         <!-- Working Hours (your original section stays) -->
         <div class="row mb-4">
             <div class="col-12">
-                <div class="card shadow-sm" style="border-radius: 16px; border: none;">
-                    <div class="card-header" style="background: linear-gradient(135deg, var(--dash-3-start) 0%, var(--dash-3-end) 100%); border-radius: 16px 16px 0 0; border: none;">
-                        <h5 class="mb-0 text-white">
+                <div class="card shadow-sm working-hours-card">
+                    <div class="card-header working-hours-header">
+                        <h5 class="mb-0 working-hours-title">
                             <i class="far fa-clock me-2"></i>Working Hours
                             {% if tier_features is defined and not tier_features.can_show_hours %}
                             <span class="badge bg-warning text-dark float-end">Premium</span>
                             {% endif %}
                         </h5>
                     </div>
-                    <div class="card-body p-4">
+                    <div class="card-body working-hours-body">
                         {% if tier_features is defined and tier_features.can_show_hours %}
-                        <p class="text-muted mb-4">
+                        <p class="text-muted mb-4 working-hours-intro">
                             <i class="fas fa-info-circle me-1"></i>
                             Set your working hours to help patients know when you're available.
                         </p>
@@ -758,7 +973,19 @@
                         <form method="POST" action="{{ url_for('doctor_update_working_hours') }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
-                            <div class="row">
+                            <div class="hours-quickfill mb-4">
+                                <div class="hours-quickfill-label">Quick fill</div>
+                                <div class="hours-quickfill-controls">
+                                    <input type="text" class="form-control hours-input" id="hoursQuickFill" placeholder="e.g., 9:00 AM - 5:00 PM">
+                                    <div class="hours-quickfill-actions">
+                                        <button type="button" class="btn btn-outline-primary btn-sm" data-quickfill="weekdays">Apply to Weekdays</button>
+                                        <button type="button" class="btn btn-outline-primary btn-sm" data-quickfill="all">Apply to All</button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" data-quickfill="clear">Clear All</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row hours-grid">
                                 {% set days_order = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
                                 {% set days_display = {'monday': 'Monday', 'tuesday': 'Tuesday', 'wednesday': 'Wednesday', 'thursday': 'Thursday', 'friday': 'Friday', 'saturday': 'Saturday', 'sunday': 'Sunday'} %}
                                 {% set working_hours_data = {} %}
@@ -767,17 +994,20 @@
                                 {% endif %}
 
                                 {% for day in days_order %}
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ day }}" class="form-label fw-bold">{{ days_display[day] }}</label>
-                                    <input type="text" class="form-control" id="{{ day }}" name="{{ day }}"
+                                <div class="col-md-6 mb-3 hours-field">
+                                    <label for="{{ day }}" class="form-label hours-label">{{ days_display[day] }}</label>
+                                    <div class="hours-input-row">
+                                        <input type="text" class="form-control hours-input" id="{{ day }}" name="{{ day }}" data-day="{{ day }}"
                                            value="{{ working_hours_data[day] if working_hours_data and day in working_hours_data else '' }}"
                                            placeholder="e.g., 9:00 AM - 5:00 PM or Closed">
-                                    <small class="text-muted">Leave blank or write "Closed" if not available</small>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm hours-closed-toggle" data-day="{{ day }}">Closed</button>
+                                    </div>
+                                    <small class="text-muted hours-hint">Leave blank or write "Closed" if not available</small>
                                 </div>
                                 {% endfor %}
                             </div>
 
-                            <div class="alert alert-info mt-3">
+                            <div class="alert alert-info mt-3 hours-tip">
                                 <i class="fas fa-lightbulb me-2"></i>
                                 <strong>Tips:</strong> Use formats like "9:00 AM - 5:00 PM", "10:00-17:00", or "By appointment only"
                             </div>
@@ -807,6 +1037,8 @@
                 </div>
             </div>
         </div>
+
+        <div class="dash-divider" aria-hidden="true"></div>
 
         <!-- Help -->
         <div class="card shadow-sm mb-2" style="border-radius: 16px; border: none; background: linear-gradient(135deg, #f8f5ff 0%, #e8f5e9 100%);">
@@ -903,4 +1135,69 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const quickFillInput = document.getElementById('hoursQuickFill');
+        const fields = Array.from(document.querySelectorAll('.hours-input[data-day]'));
+        const closedToggles = Array.from(document.querySelectorAll('.hours-closed-toggle'));
+
+        const markClosedState = (field, isClosed) => {
+            const wrapper = field.closest('.hours-field');
+            if (!wrapper) return;
+            wrapper.classList.toggle('is-closed', isClosed);
+        };
+
+        fields.forEach((field) => {
+            const value = (field.value || '').trim().toLowerCase();
+            if (value === 'closed') {
+                markClosedState(field, true);
+            }
+        });
+
+        closedToggles.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const day = btn.dataset.day;
+                const field = fields.find((input) => input.dataset.day === day);
+                if (!field) return;
+                const isClosed = (field.value || '').trim().toLowerCase() === 'closed';
+                field.value = isClosed ? '' : 'Closed';
+                markClosedState(field, !isClosed);
+            });
+        });
+
+        const applyQuickFill = (scope) => {
+            if (!quickFillInput) return;
+            const value = quickFillInput.value.trim();
+
+            if (scope === 'clear') {
+                fields.forEach((field) => {
+                    field.value = '';
+                    markClosedState(field, false);
+                });
+                return;
+            }
+
+            if (!value) return;
+
+            const targetDays = scope === 'weekdays'
+                ? ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+                : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+            fields.forEach((field) => {
+                if (!targetDays.includes(field.dataset.day)) return;
+                const isClosed = (field.value || '').trim().toLowerCase() === 'closed';
+                if (!isClosed) {
+                    field.value = value;
+                }
+            });
+        };
+
+        document.querySelectorAll('[data-quickfill]').forEach((btn) => {
+            btn.addEventListener('click', () => applyQuickFill(btn.dataset.quickfill));
+        });
+    });
+</script>
 {% endblock %}
