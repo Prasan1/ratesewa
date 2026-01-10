@@ -46,3 +46,7 @@ Thumbs.db
 
 # Archive/temporary files
 _archive/
+
+# Backups and internal docs
+_backups/
+docs/
