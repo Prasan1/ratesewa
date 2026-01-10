@@ -529,6 +529,7 @@ function loadDoctors(page = 1, scroll = false) {
             page: page
         },
         success: function(response) {
+            lastDoctorsResponse = response;
             displayDoctors(response);
         },
         error: function() {
@@ -537,6 +538,7 @@ function loadDoctors(page = 1, scroll = false) {
     });
 }
 
+let lastDoctorsResponse = null;
 const isAdmin = {{ 'true' if session.get('is_admin') else 'false' }};
 const currentUserRole = {{ (session.get('role') or '')|tojson }};
 
@@ -564,9 +566,10 @@ function normalizeDoctorDescription(description) {
     return (temp.textContent || temp.innerText || '').replace(/\s+/g, ' ').trim();
 }
 
-function displayDoctors(response) {
+function displayDoctors(response, shouldScroll = true) {
     const doctors = response.doctors || response; // Handle both old and new format
     const pagination = response.pagination;
+    const isMobile = window.matchMedia('(max-width: 576px)').matches;
 
     // Update results title and count
     if (pagination && pagination.total_doctors > 0) {
@@ -580,7 +583,9 @@ function displayDoctors(response) {
     if (!doctors || doctors.length === 0) {
         $('#doctorList').html('<div class="col-12"><div class="alert alert-info">No doctors found matching your search.</div></div>');
         $('#resultsCount').hide();
-        scrollToResults();
+        if (shouldScroll) {
+            scrollToResults();
+        }
         return;
     }
 
@@ -603,8 +608,8 @@ function displayDoctors(response) {
 
         const imgSrc = doctor.photo_url || getDoctorAvatar(doctor.name, doctor.id);
 
-        // Verified badge HTML
-        const verifiedBadgeHtml = doctor.is_verified
+        // Verified badge HTML (v2 avatar)
+        const verifiedBadgeHtmlV2 = doctor.is_verified
             ? `<div class="badge-verified-v2"><i class="fas fa-check"></i></div>`
             : '';
 
@@ -619,6 +624,9 @@ function displayDoctors(response) {
         const featuredBadgeHtml = doctor.is_featured
             ? `<span class="badge-featured-v2">Featured</span>`
             : '';
+        const verifiedBadgeHtmlSimple = doctor.is_verified
+            ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>'
+            : '';
 
         const claimButton = (!doctor.is_claimed && currentUserRole !== 'doctor' && !isAdmin)
             ? `<a href="/claim-profile/${doctor.id}" class="btn-claim-v2"><i class="fas fa-bolt"></i>Claim Profile</a>`
@@ -628,7 +636,7 @@ function displayDoctors(response) {
         const descriptionText = normalizeDoctorDescription(doctor.description);
         const descriptionLine = descriptionText || `Specialist in ${specialtyName} • ${cityLabel}`;
 
-        html += `
+        const desktopCardHtml = `
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="ranksewa-card-v2 h-100 ${doctor.is_featured ? 'featured' : ''}">
 
@@ -646,7 +654,7 @@ function displayDoctors(response) {
                                 loading="lazy"
                                 onerror="this.onerror=null; this.src=getDoctorAvatar(this.dataset.name, parseInt(this.dataset.id || '0', 10));"
                             >
-                            ${verifiedBadgeHtml}
+                            ${verifiedBadgeHtmlV2}
                         </div>
 
                         <!-- Name -->
@@ -709,6 +717,69 @@ function displayDoctors(response) {
                 </div>
             </div>
         `;
+
+        const mobileCardHtml = `
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card doctor-card h-100 ${doctor.is_featured ? 'featured' : ''} ${doctor.is_verified ? 'verified' : ''}">
+                    <div class="card-body">
+                        <div class="doctor-header">
+                            <div class="doctor-identity">
+                                <div class="doctor-avatar">
+                                    <img
+                                        src="${imgSrc}"
+                                        data-name="${String(doctor.name || '')}"
+                                        data-id="${doctor.id}"
+                                        class="rounded-circle"
+                                        alt="${doctor.name}"
+                                        width="80"
+                                        height="80"
+                                        loading="lazy"
+                                        onerror="this.onerror=null; this.src=getDoctorAvatar(this.dataset.name, parseInt(this.dataset.id || '0', 10));"
+                                    >
+                                </div>
+                                <div class="doctor-title">
+                                    <div class="doctor-name">${doctor.name}</div>
+                                    <div class="doctor-subtitle">
+                                        <i class="fas fa-stethoscope"></i>
+                                        <span>${specialtyName}</span>
+                                    </div>
+                                    <div class="doctor-location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>${cityLabel}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="doctor-badges">
+                                ${verifiedBadgeHtmlSimple}
+                            </div>
+                        </div>
+
+                        <div class="doctor-info-lines">
+                            <div class="info-line"><strong>Experience:</strong> ${experienceLabel}</div>
+                            <div class="info-line"><strong>Practice:</strong> ${practiceLabel}</div>
+                        </div>
+
+                        <div class="doctor-rating-section">
+                            <span class="rating-display">${starTextHtml || emptyStarsHtml}</span>
+                            <span class="text-muted small">${hasRatings ? `${avgRating} (${ratingCount})` : 'No reviews yet'}</span>
+                        </div>
+
+                        ${descriptionLine ? `<p class="doctor-summary">${descriptionLine}</p>` : ''}
+
+                        <div class="doctor-actions">
+                            <a href="/doctor/${doctor.slug}" class="btn btn-view-doctor btn-sm">
+                                View Profile
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                            ${claimButton}
+                            ${adminEditButton}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        html += isMobile ? mobileCardHtml : desktopCardHtml;
     });
 
     $('#doctorList').html(html);
@@ -766,8 +837,22 @@ function displayDoctors(response) {
     }
 
     // Only scroll to results if user actively searched/filtered/paginated (not on initial load)
-    scrollToResults();
+    if (shouldScroll) {
+        scrollToResults();
+    }
 }
+
+const mobileQuery = window.matchMedia('(max-width: 576px)');
+mobileQuery.addEventListener('change', () => {
+    if (lastDoctorsResponse) {
+        displayDoctors(lastDoctorsResponse, false);
+    }
+});
+window.addEventListener('resize', () => {
+    if (lastDoctorsResponse) {
+        displayDoctors(lastDoctorsResponse, false);
+    }
+});
 
 function generateStarRatingHtml(rating, ratingCount) {
     let html = '';
