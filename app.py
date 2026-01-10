@@ -1763,118 +1763,143 @@ def doctor_self_register_submit():
         # This prevents real doctors from being locked out by fraudulent submissions
         # Admin sees red "Duplicate" warnings and can compare documents side-by-side
 
-        # Handle file uploads - only govt_id is mandatory
+        # Create a doctor profile immediately (verification is optional)
+        new_doctor = Doctor(
+            name=name,
+            slug=generate_unique_slug(name),
+            city_id=city_id,
+            specialty_id=specialty_id,
+            education=education,
+            college=college,
+            experience=experience,
+            nmc_number=nmc_number,
+            phone_number=phone_number,
+            practice_address=practice_address,
+            is_verified=False,
+            subscription_tier='free'
+        )
+
+        user = User.query.get(user_id)
+        user.role = 'doctor'
+
+        db.session.add(new_doctor)
+        db.session.flush()
+        user.doctor_id = new_doctor.id
+        db.session.commit()
+
+        session['role'] = 'doctor'
+
+        # Handle optional verification documents
         medical_degree = request.files.get('medical_degree')
         govt_id = request.files.get('govt_id')
         practice_license = request.files.get('practice_license')
 
-        if not govt_id or not govt_id.filename:
-            flash('Government ID is required for verification.', 'danger')
-            return redirect(url_for('doctor_self_register'))
-
-        # Create a temporary doctor ID for file storage (use user_id as placeholder)
-        temp_doctor_id = f"new_{session['user_id']}"
-
-        # Save files to R2 (with local fallback)
-        upload_folder = app.config['UPLOAD_FOLDER']
-        govt_id_path = None
-
-        # Try R2 first
-        try:
-            govt_id_path = r2_storage.save_verification_document(
-                govt_id, temp_doctor_id, 'govt_id'
-            )
-        except Exception as e:
-            print(f"R2 upload failed, falling back to local storage: {e}")
-            govt_id_path = None
-
-        # Fallback to local storage if R2 fails
-        if not govt_id_path:
+        if govt_id and govt_id.filename:
             try:
-                govt_id.seek(0)  # Reset file pointer
-            except Exception:
-                pass  # File might be closed, try upload anyway
+                upload_folder = app.config['UPLOAD_FOLDER']
+                govt_id_path = None
 
-            govt_id_path = upload_utils.save_verification_document(
-                govt_id, upload_folder, temp_doctor_id, 'govt_id'
-            )
-            if not govt_id_path:
-                flash('Error uploading government ID. Please try again.', 'danger')
-                return redirect(url_for('doctor_self_register'))
+                # Try R2 first
+                try:
+                    govt_id_path = r2_storage.save_verification_document(
+                        govt_id, new_doctor.id, 'govt_id'
+                    )
+                except Exception as e:
+                    print(f"R2 upload failed, falling back to local storage: {e}")
+                    govt_id_path = None
 
-        # Optional medical degree
-        medical_degree_path = None
-        if medical_degree and medical_degree.filename:
-            try:
-                medical_degree_path = r2_storage.save_verification_document(
-                    medical_degree, temp_doctor_id, 'medical_degree'
-                )
-            except Exception as e:
-                print(f"R2 upload failed for medical_degree, falling back: {e}")
+                # Fallback to local storage if R2 fails
+                if not govt_id_path:
+                    try:
+                        govt_id.seek(0)  # Reset file pointer
+                    except Exception:
+                        pass  # File might be closed, try upload anyway
+
+                    govt_id_path = upload_utils.save_verification_document(
+                        govt_id, upload_folder, new_doctor.id, 'govt_id'
+                    )
+                    if not govt_id_path:
+                        flash('Profile created, but government ID upload failed. You can submit verification later.', 'warning')
+                        return redirect(url_for('doctor_dashboard'))
+
+                # Optional medical degree
                 medical_degree_path = None
+                if medical_degree and medical_degree.filename:
+                    try:
+                        medical_degree_path = r2_storage.save_verification_document(
+                            medical_degree, new_doctor.id, 'medical_degree'
+                        )
+                    except Exception as e:
+                        print(f"R2 upload failed for medical_degree, falling back: {e}")
+                        medical_degree_path = None
 
-            # Fallback to local if R2 fails
-            if not medical_degree_path:
-                try:
-                    medical_degree.seek(0)
-                except Exception:
-                    pass
-                medical_degree_path = upload_utils.save_verification_document(
-                    medical_degree, upload_folder, temp_doctor_id, 'medical_degree'
-                )
+                    # Fallback to local if R2 fails
+                    if not medical_degree_path:
+                        try:
+                            medical_degree.seek(0)
+                        except Exception:
+                            pass
+                        medical_degree_path = upload_utils.save_verification_document(
+                            medical_degree, upload_folder, new_doctor.id, 'medical_degree'
+                        )
 
-        # Optional practice license
-        practice_license_path = None
-        if practice_license and practice_license.filename:
-            try:
-                practice_license_path = r2_storage.save_verification_document(
-                    practice_license, temp_doctor_id, 'practice_license'
-                )
-            except Exception as e:
-                print(f"R2 upload failed for practice_license, falling back: {e}")
+                # Optional practice license
                 practice_license_path = None
+                if practice_license and practice_license.filename:
+                    try:
+                        practice_license_path = r2_storage.save_verification_document(
+                            practice_license, new_doctor.id, 'practice_license'
+                        )
+                    except Exception as e:
+                        print(f"R2 upload failed for practice_license, falling back: {e}")
+                        practice_license_path = None
 
-            # Fallback to local if R2 fails
-            if not practice_license_path:
-                try:
-                    practice_license.seek(0)
-                except Exception:
-                    pass
-                practice_license_path = upload_utils.save_verification_document(
-                    practice_license, upload_folder, temp_doctor_id, 'practice_license'
+                    # Fallback to local if R2 fails
+                    if not practice_license_path:
+                        try:
+                            practice_license.seek(0)
+                        except Exception:
+                            pass
+                        practice_license_path = upload_utils.save_verification_document(
+                            practice_license, upload_folder, new_doctor.id, 'practice_license'
+                        )
+
+                # Create verification request for the existing profile
+                verification_request = VerificationRequest(
+                    doctor_id=new_doctor.id,
+                    user_id=session['user_id'],
+                    is_new_doctor=False,
+                    proposed_name=name,
+                    proposed_specialty_id=specialty_id,
+                    proposed_city_id=city_id,
+                    proposed_education=education,
+                    proposed_college=college,
+                    proposed_experience=experience,
+                    nmc_number=nmc_number,
+                    phone_number=phone_number,
+                    email=email,
+                    practice_address=practice_address,
+                    practice_city_id=city_id,  # Using same city for practice
+                    medical_degree_path=medical_degree_path,
+                    govt_id_path=govt_id_path,
+                    practice_license_path=practice_license_path,
+                    email_verified=True,  # Email is already verified through user account
+                    status='pending'
                 )
 
-        # Create verification request with is_new_doctor=True
-        verification_request = VerificationRequest(
-            doctor_id=None,  # No doctor profile yet
-            user_id=session['user_id'],
-            is_new_doctor=True,
-            proposed_name=name,
-            proposed_specialty_id=specialty_id,
-            proposed_city_id=city_id,
-            proposed_education=education,
-            proposed_college=college,
-            proposed_experience=experience,
-            nmc_number=nmc_number,
-            phone_number=phone_number,
-            email=email,
-            practice_address=practice_address,
-            practice_city_id=city_id,  # Using same city for practice
-            medical_degree_path=medical_degree_path,
-            govt_id_path=govt_id_path,
-            practice_license_path=practice_license_path,
-            email_verified=True,  # Email is already verified through user account
-            status='pending'
-        )
+                db.session.add(verification_request)
+                db.session.commit()
 
-        db.session.add(verification_request)
-        db.session.commit()
+                send_admin_verification_notification(verification_request, name, user.email)
+                return redirect(url_for('verification_submitted'))
+            except Exception as e:
+                db.session.rollback()
+                print(f"Verification submission failed after profile creation: {e}")
+                flash('Profile created, but verification submission failed. You can submit verification later.', 'warning')
+                return redirect(url_for('doctor_dashboard'))
 
-        # Send admin notification
-        user = User.query.get(user_id)
-        send_admin_verification_notification(verification_request, name, user.email)
-
-        return redirect(url_for('verification_submitted'))
+        flash('Profile created! You can submit verification anytime to earn the verified badge.', 'success')
+        return redirect(url_for('doctor_dashboard'))
 
     except ValueError as e:
         flash(str(e), 'danger')

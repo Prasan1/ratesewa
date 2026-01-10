@@ -20,7 +20,7 @@
                     </h2>
 
                     <p class="lead text-muted mb-4">
-                        Thank you for registering with RankSewa. Your doctor profile is now under review.
+                        Thank you! Your verification request is under review. Your profile stays live and will display a verified badge once approved.
                     </p>
 
                     <hr class="my-4">
@@ -59,8 +59,8 @@
                                         <span class="badge bg-primary rounded-circle" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">3</span>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
-                                        <strong>Profile Goes Live</strong>
-                                        <p class="small text-muted mb-0">Your verified profile appears in search results</p>
+                                        <strong>Verified Badge Added</strong>
+                                        <p class="small text-muted mb-0">Once approved, your profile shows a verified badge</p>
                                     </div>
                                 </div>
                             </div>
@@ -71,8 +71,8 @@
                                         <span class="badge bg-primary rounded-circle" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">4</span>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
-                                        <strong>Dashboard Access</strong>
-                                        <p class="small text-muted mb-0">Manage reviews, respond to patients, view analytics</p>
+                                        <strong>Keep Managing Your Profile</strong>
+                                        <p class="small text-muted mb-0">You can still update info and respond to reviews</p>
                                     </div>
                                 </div>
                             </div>
@@ -91,8 +91,8 @@
 
                     <!-- Action Buttons -->
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
-                        <a href="{{ url_for('user_profile') }}" class="btn btn-outline-primary">
-                            <i class="fas fa-user me-2"></i>View My Profile
+                        <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-user-md me-2"></i>Go to Dashboard
                         </a>
                         <a href="{{ url_for('index') }}" class="btn btn-primary">
                             <i class="fas fa-home me-2"></i>Go to Homepage

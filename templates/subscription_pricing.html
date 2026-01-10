@@ -20,6 +20,9 @@
                 <div class="text-center text-white py-3">
                     <h3 class="mb-2"><i class="fas fa-gift me-2"></i>{{ promo.message }}</h3>
                     <p class="mb-0 h5">⏰ {{ promo.days_left }} days left - No credit card required!</p>
+                    {% if not doctor.is_verified %}
+                    <div class="small mt-2">Verify your doctor account to activate the free Premium/Featured offer.</div>
+                    {% endif %}
                 </div>
             </div>
             {% endif %}
