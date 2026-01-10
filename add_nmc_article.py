@@ -244,7 +244,7 @@ def add_nmc_article():
             print(f"Article already exists (ID: {existing.id}). Updating instead...")
             existing.content = content
             existing.summary = "Learn how to verify your doctor's Nepal Medical Council (NMC) registration number online. Complete guide with step-by-step instructions to check doctor credentials and avoid unregistered practitioners."
-            existing.meta_description = "Complete guide to verifying doctors' NMC numbers in Nepal. Learn how to check doctor credentials online, understand NMC registration, and identify red flags. Protect yourself with verified information."
+            existing.meta_description = "Learn how to verify your doctor's NMC number online. Step-by-step guide to check credentials and spot red flags."
             existing.meta_keywords = "verify doctor nmc nepal, check doctor credentials nepal, nmc number lookup, nmc registration verification, verify medical license nepal, doctor verification nepal, nmc database search"
             existing.updated_at = datetime.utcnow()
             db.session.commit()
@@ -259,7 +259,7 @@ def add_nmc_article():
             category_id=category.id,
             summary="Learn how to verify your doctor's Nepal Medical Council (NMC) registration number online. Complete guide with step-by-step instructions to check doctor credentials and avoid unregistered practitioners.",
             content=content,
-            meta_description="Complete guide to verifying doctors' NMC numbers in Nepal. Learn how to check doctor credentials online, understand NMC registration, and identify red flags. Protect yourself with verified information.",
+            meta_description="Learn how to verify your doctor's NMC number online. Step-by-step guide to check credentials and spot red flags.",
             meta_keywords="verify doctor nmc nepal, check doctor credentials nepal, nmc number lookup, nmc registration verification, verify medical license nepal, doctor verification nepal, nmc database search",
             related_specialty_id=None,  # General article, not specialty-specific
             is_published=True,  # Publish immediately
