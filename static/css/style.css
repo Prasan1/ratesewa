@@ -2090,16 +2090,16 @@ html {
 
     .avatar-wrapper-v2 {
         position: relative !important;
-        width: 70px;
-        height: 70px;
+        width: 82px;
+        height: 82px;
         margin-bottom: 10px;
     }
 
     .doctor-avatar-v2 {
-        width: 70px !important;
-        height: 70px !important;
-        max-width: 70px !important;
-        max-height: 70px !important;
+        width: 82px !important;
+        height: 82px !important;
+        max-width: 82px !important;
+        max-height: 82px !important;
         border-width: 2px;
     }
 
@@ -2111,9 +2111,9 @@ html {
     }
 
     .badge-verified-v2 {
-        width: 20px;
-        height: 20px;
-        font-size: 10px;
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
         bottom: 0px !important;
         right: 0px !important;
         position: absolute !important;
@@ -2163,8 +2163,8 @@ html {
     .description-v2 {
         font-size: 0.8rem;
         margin-top: 8px;
-        -webkit-line-clamp: 2;
-        max-height: 2.5em;
+        -webkit-line-clamp: 3;
+        max-height: 4.2em;
     }
 
     .card-footer-v2 {
@@ -2197,16 +2197,16 @@ html {
     }
 
     .avatar-wrapper-v2 {
-        width: 60px;
-        height: 60px;
+        width: 72px;
+        height: 72px;
         margin-bottom: 8px;
     }
 
     .doctor-avatar-v2 {
-        width: 60px !important;
-        height: 60px !important;
-        max-width: 60px !important;
-        max-height: 60px !important;
+        width: 72px !important;
+        height: 72px !important;
+        max-width: 72px !important;
+        max-height: 72px !important;
     }
 
     .doctor-name-v2 {
@@ -2231,6 +2231,11 @@ html {
 
     .detail-value-v2 {
         font-size: 0.7rem;
+    }
+
+    .description-v2 {
+        -webkit-line-clamp: 2;
+        max-height: 2.8em;
     }
 
     .card-footer-v2 {
