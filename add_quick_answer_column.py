@@ -1,41 +1,45 @@
 #!/usr/bin/env python3
 """
-Add quick_answer column to articles table if it doesn't exist.
-Safe to run multiple times.
+Add quick_answer column using raw database connection.
 Usage: python add_quick_answer_column.py
 """
 
-from app import app, db
-from sqlalchemy import text
+import os
 
 def add_column():
-    with app.app_context():
-        # Rollback any failed transaction first
-        db.session.rollback()
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url:
+        print("❌ DATABASE_URL not set")
+        return
 
-        try:
-            # Check if column exists
-            result = db.session.execute(text("SELECT quick_answer FROM articles LIMIT 1"))
-            db.session.rollback()  # Clean up
+    # Handle postgres:// vs postgresql://
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+    import psycopg2
+
+    print("Connecting to database...")
+    conn = psycopg2.connect(database_url)
+    conn.autocommit = True
+    cur = conn.cursor()
+
+    try:
+        # Check if column exists
+        cur.execute("""
+            SELECT column_name FROM information_schema.columns
+            WHERE table_name = 'articles' AND column_name = 'quick_answer'
+        """)
+        if cur.fetchone():
             print("✅ Column 'quick_answer' already exists.")
-        except Exception as e:
-            db.session.rollback()  # Rollback failed SELECT
-
-            if "does not exist" in str(e) or "no such column" in str(e).lower():
-                # Column doesn't exist, add it
-                print("Adding 'quick_answer' column to articles table...")
-                try:
-                    db.session.execute(text("ALTER TABLE articles ADD COLUMN quick_answer TEXT"))
-                    db.session.commit()
-                    print("✅ Column added successfully!")
-                except Exception as e2:
-                    db.session.rollback()
-                    if "already exists" in str(e2) or "duplicate column" in str(e2).lower():
-                        print("✅ Column already exists.")
-                    else:
-                        print(f"❌ Error: {e2}")
-            else:
-                print(f"✅ Column check passed (might already exist)")
+        else:
+            print("Adding 'quick_answer' column...")
+            cur.execute("ALTER TABLE articles ADD COLUMN quick_answer TEXT")
+            print("✅ Column added successfully!")
+    except Exception as e:
+        print(f"❌ Error: {e}")
+    finally:
+        cur.close()
+        conn.close()
 
 if __name__ == '__main__':
     add_column()
