@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+"""
+Add all missing columns to database.
+Usage: python fix_missing_columns.py
+"""
+
+import os
+
+def fix_columns():
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url:
+        print("❌ DATABASE_URL not set")
+        return
+
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+    import psycopg2
+
+    print("Connecting to database...")
+    conn = psycopg2.connect(database_url)
+    conn.autocommit = True
+    cur = conn.cursor()
+
+    # List of columns to add: (table, column, type, default)
+    columns_to_add = [
+        ('doctors', 'ranksewa_network_enabled', 'BOOLEAN', 'FALSE'),
+        ('articles', 'quick_answer', 'TEXT', None),
+    ]
+
+    for table, column, col_type, default in columns_to_add:
+        try:
+            # Check if column exists
+            cur.execute("""
+                SELECT column_name FROM information_schema.columns
+                WHERE table_name = %s AND column_name = %s
+            """, (table, column))
+
+            if cur.fetchone():
+                print(f"✅ {table}.{column} already exists")
+            else:
+                print(f"Adding {table}.{column}...")
+                if default:
+                    cur.execute(f"ALTER TABLE {table} ADD COLUMN {column} {col_type} DEFAULT {default}")
+                else:
+                    cur.execute(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}")
+                print(f"✅ {table}.{column} added!")
+
+        except Exception as e:
+            print(f"⚠️  {table}.{column}: {e}")
+
+    cur.close()
+    conn.close()
+    print("\n✅ Done!")
+
+if __name__ == '__main__':
+    fix_columns()
