@@ -33,16 +33,49 @@ def fix_columns():
         # articles table
         ('articles', 'quick_answer', 'TEXT', None),
 
-        # clinics table
+        # clinics table - ALL columns from model
         ('clinics', 'city', 'VARCHAR(100)', None),
+        ('clinics', 'phone_number', 'VARCHAR(20)', None),
         ('clinics', 'phone', 'VARCHAR(20)', None),
+        ('clinics', 'email', 'VARCHAR(120)', None),
+        ('clinics', 'website', 'VARCHAR(200)', None),
+        ('clinics', 'description', 'TEXT', None),
+        ('clinics', 'logo_url', 'VARCHAR(500)', None),
         ('clinics', 'clinic_type', 'VARCHAR(50)', "'clinic'"),
+        ('clinics', 'is_featured', 'BOOLEAN', 'FALSE'),
+        ('clinics', 'is_active', 'BOOLEAN', 'TRUE'),
         ('clinics', 'is_verified', 'BOOLEAN', 'FALSE'),
         ('clinics', 'created_by_user_id', 'INTEGER', None),
         ('clinics', 'trial_ends_at', 'TIMESTAMP', None),
+        ('clinics', 'created_at', 'TIMESTAMP', 'NOW()'),
+        ('clinics', 'updated_at', 'TIMESTAMP', 'NOW()'),
 
         # users table
         ('users', 'email_verified', 'BOOLEAN', 'FALSE'),
+        ('users', 'role', 'VARCHAR(20)', "'patient'"),
+        ('users', 'doctor_id', 'INTEGER', None),
+        ('users', 'is_doctor_intent', 'BOOLEAN', 'FALSE'),
+        ('users', 'points', 'INTEGER', '0'),
+
+        # appointments table - new columns
+        ('appointments', 'clinic_doctor_id', 'INTEGER', None),
+        ('appointments', 'appointment_date', 'DATE', None),
+        ('appointments', 'appointment_time', 'TIME', None),
+        ('appointments', 'patient_name', 'VARCHAR(200)', None),
+        ('appointments', 'patient_phone', 'VARCHAR(20)', None),
+        ('appointments', 'patient_email', 'VARCHAR(120)', None),
+        ('appointments', 'patient_user_id', 'INTEGER', None),
+        ('appointments', 'reason', 'TEXT', None),
+        ('appointments', 'booking_code', 'VARCHAR(10)', None),
+        ('appointments', 'queue_position', 'INTEGER', None),
+        ('appointments', 'notes', 'TEXT', None),
+        ('appointments', 'confirmation_sent_at', 'TIMESTAMP', None),
+        ('appointments', 'confirmed_at', 'TIMESTAMP', None),
+        ('appointments', 'checked_in_at', 'TIMESTAMP', None),
+        ('appointments', 'completed_at', 'TIMESTAMP', None),
+        ('appointments', 'cancelled_at', 'TIMESTAMP', None),
+        ('appointments', 'cancellation_reason', 'VARCHAR(500)', None),
+        ('appointments', 'updated_at', 'TIMESTAMP', None),
     ]
 
     for table, column, col_type, default in columns_to_add:
