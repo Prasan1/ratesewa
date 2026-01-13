@@ -33,8 +33,16 @@ def fix_columns():
         # articles table
         ('articles', 'quick_answer', 'TEXT', None),
 
-        # clinics table (if needed)
+        # clinics table
+        ('clinics', 'city', 'VARCHAR(100)', None),
+        ('clinics', 'phone', 'VARCHAR(20)', None),
+        ('clinics', 'clinic_type', 'VARCHAR(50)', "'clinic'"),
+        ('clinics', 'is_verified', 'BOOLEAN', 'FALSE'),
+        ('clinics', 'created_by_user_id', 'INTEGER', None),
         ('clinics', 'trial_ends_at', 'TIMESTAMP', None),
+
+        # users table
+        ('users', 'email_verified', 'BOOLEAN', 'FALSE'),
     ]
 
     for table, column, col_type, default in columns_to_add:
