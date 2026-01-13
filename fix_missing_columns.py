@@ -24,8 +24,17 @@ def fix_columns():
 
     # List of columns to add: (table, column, type, default)
     columns_to_add = [
+        # doctors table
         ('doctors', 'ranksewa_network_enabled', 'BOOLEAN', 'FALSE'),
+        ('doctors', 'nmc_expiry_date', 'DATE', None),
+        ('doctors', 'accepted_insurance', 'TEXT', None),
+        ('doctors', 'trial_ends_at', 'TIMESTAMP', None),
+
+        # articles table
         ('articles', 'quick_answer', 'TEXT', None),
+
+        # clinics table (if needed)
+        ('clinics', 'trial_ends_at', 'TIMESTAMP', None),
     ]
 
     for table, column, col_type, default in columns_to_add:
