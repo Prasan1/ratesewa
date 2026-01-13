@@ -3,14 +3,53 @@
 {% block title %}Clinics - RankSewa{% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4">
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
     <div>
         <h2 class="mb-1">Clinics</h2>
-        <p class="text-muted mb-0">Browse clinics and discover their doctors.</p>
+        <p class="text-muted mb-0">Browse clinics and book appointments with doctors.</p>
     </div>
-    <a href="{{ url_for('clinic_manager_dashboard') }}" class="btn btn-outline-primary">
-        <i class="fas fa-briefcase-medical me-2"></i>For Clinic Managers
-    </a>
+    <div class="d-flex gap-2 align-items-center flex-wrap">
+        <form method="GET" action="{{ url_for('clinics') }}" class="d-flex gap-2">
+            <select name="city_id" class="form-select" style="min-width: 180px;" onchange="this.form.submit()">
+                <option value="">All Cities</option>
+                {% for city in cities %}
+                <option value="{{ city.id }}" {% if selected_city_id|string == city.id|string %}selected{% endif %}>
+                    {{ city.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </form>
+        {% if 'user_id' in session %}
+        <a href="{{ url_for('clinic_register') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-2"></i>Register Your Clinic
+        </a>
+        {% else %}
+        <a href="{{ url_for('login') }}?next={{ url_for('clinic_register') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-2"></i>Register Your Clinic
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- CTA Banner for Clinic Owners -->
+<div class="alert mb-4" style="background: linear-gradient(135deg, var(--brand-soft) 0%, #e0f2f1 100%); border: none; border-radius: 12px;">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h5 class="mb-1"><i class="fas fa-hospital me-2" style="color: var(--brand);"></i>Own a Clinic or Hospital?</h5>
+            <p class="mb-0 text-muted">Join our <strong>Availability & Flow Engine</strong> to streamline patient scheduling, reduce wait times, and let patients book appointments online.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            {% if 'user_id' in session %}
+            <a href="{{ url_for('clinic_register') }}" class="btn btn-success">
+                <i class="fas fa-rocket me-2"></i>Get Started Free
+            </a>
+            {% else %}
+            <a href="{{ url_for('login') }}?next={{ url_for('clinic_register') }}" class="btn btn-success">
+                <i class="fas fa-rocket me-2"></i>Get Started Free
+            </a>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 <div class="row g-4">
@@ -30,7 +69,7 @@
                 {% if clinic.description %}
                 <p class="text-muted small mb-3">{{ clinic.description }}</p>
                 {% endif %}
-                <a href="{{ url_for('clinic_profile', slug=clinic.slug) }}" class="btn btn-outline-primary btn-sm">View clinic</a>
+                <a href="{{ url_for('clinic_public_page', clinic_slug=clinic.slug) }}" class="btn btn-outline-primary btn-sm">View clinic</a>
             </div>
         </div>
     </div>

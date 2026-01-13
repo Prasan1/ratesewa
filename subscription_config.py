@@ -1,9 +1,76 @@
 """
 Subscription pricing and tier configuration
 Centralizes all subscription-related constants and pricing logic
+
+NEW 3-TIER MODEL:
+- User: Free (browse, review, book, health tracker)
+- Doctor: Free but NMC verification required (profile, reviews, stats, verified badge)
+- Clinic: NPR 4,999/month (Availability & Flow Engine)
 """
 
-# Subscription tiers
+# User tier (patients/public users)
+USER_TIER = {
+    'name': 'User',
+    'price_npr': 0,
+    'price_usd': 0,
+    'features': [
+        'Search and browse doctors',
+        'Read and write reviews',
+        'Book appointments at clinics',
+        'Appointment history & reminders',
+        'Save favorite doctors'
+    ],
+    'privacy_note': 'We collect only what\'s needed for bookings and reviews. We do not sell personal data.'
+}
+
+# Doctor tier (verified medical professionals)
+DOCTOR_TIER = {
+    'name': 'Doctor',
+    'price_npr': 0,
+    'price_usd': 0,
+    'requirements': [
+        'Valid NMC registration number',
+        'Government-issued ID',
+        'NMC certificate document'
+    ],
+    'features': [
+        'Verified badge on profile',
+        'Edit and manage your profile',
+        'Respond to patient reviews',
+        'Profile analytics dashboard',
+        'SEO-optimized profile page',
+        'Google search visibility',
+        'Profile photo upload',
+        'Join clinic affiliations'
+    ],
+    'notes': [
+        'Verification required within 30 days',
+        'Certificate expiry tracking',
+        'Re-verification required on expiry'
+    ]
+}
+
+# Clinic tier (hospitals, clinics, practices)
+CLINIC_TIER = {
+    'name': 'Clinic',
+    'price_npr': 4999,
+    'price_usd': 37,
+    'stripe_price_id': 'price_clinic_monthly',
+    'features': [
+        'Availability & Flow Engine access',
+        'Add verified doctors',
+        'Online appointment booking',
+        'Patient queue management',
+        'Doctor schedule management',
+        'Unavailability/leave management',
+        'Daily appointment tracking',
+        'Public clinic page'
+    ],
+    'highlight': 'For Clinics & Hospitals'
+}
+
+# Legacy subscription tiers (for backward compatibility during transition)
+# These will be deprecated after April 25, 2026
 SUBSCRIPTION_TIERS = {
     'free': {
         'name': 'Free',
@@ -11,88 +78,34 @@ SUBSCRIPTION_TIERS = {
         'price_npr': 0,
         'stripe_price_id': None,
         'features': [
-            'Profile listing',
-            'Verification badge',
-            'Respond to reviews',
-            'Basic profile editing',
-            'Profile photo upload'
+            'Profile listing (unverified)',
+            'Receive patient reviews',
+            'Basic visibility'
         ],
         'locked_features': [
+            'Verified badge (requires NMC verification)',
+            'Profile editing',
             'Analytics dashboard',
-            'Contact info visible',
-            'Appointment hours',
-            'Priority placement',
-            'Featured badge'
+            'Respond to reviews'
         ]
     },
-    'premium': {
-        'name': 'Premium',
-        'price_usd': 15,  # ~NPR 1,999 at 135 NPR/USD
-        'price_npr': 1999,
-        'stripe_price_id': 'price_premium_monthly',  # Will be set from Stripe Dashboard
+    'verified': {
+        'name': 'Verified Doctor',
+        'price_usd': 0,
+        'price_npr': 0,
+        'stripe_price_id': None,
         'features': [
-            'All Free features',
+            'Verified badge',
+            'Edit profile details',
+            'Respond to reviews',
             'Analytics dashboard',
-            'Contact info visible on profile',
-            'Display appointment hours',
-            'Monthly performance reports',
-            'Priority email support'
+            'Profile photo upload',
+            'Google search visibility',
+            'Join clinic affiliations'
         ],
-        'highlight': 'Most Popular'
-    },
-    'featured': {
-        'name': 'Featured Premium',
-        'price_usd': 22,  # ~NPR 2,999 at 135 NPR/USD
-        'price_npr': 2999,
-        'stripe_price_id': 'price_featured_monthly',  # Will be set from Stripe Dashboard
-        'features': [
-            'All Premium features',
-            'Featured badge on profile',
-            'Top of search results',
-            '3x priority in listings',
-            'Sponsored placement',
-            'Premium support (24h response)'
-        ],
-        'highlight': 'Best Value'
-    }
-}
-
-# Clinic tiers (multi-doctor billing)
-CLINIC_TIERS = {
-    'clinic_starter': {
-        'name': 'Clinic Starter',
-        'price_npr': 4999,
-        'price_usd': 37,
-        'max_doctors': 3,
-        'features': [
-            'Manage up to 3 doctors',
-            'Priority support (48h response)',
-            'Featured placement boosts',
-            'Enhanced analytics for managed profiles'
-        ]
-    },
-    'clinic_growth': {
-        'name': 'Clinic Growth',
-        'price_npr': 9999,
-        'price_usd': 74,
-        'max_doctors': 8,
-        'features': [
-            'Manage up to 8 doctors',
-            'Priority support (24h response)',
-            'Featured placement boosts',
-            'Enhanced analytics for managed profiles'
-        ]
-    },
-    'clinic_pro': {
-        'name': 'Clinic Pro',
-        'price_npr': 14999,
-        'price_usd': 111,
-        'max_doctors': 15,
-        'features': [
-            'Manage up to 15 doctors',
-            'Dedicated priority support',
-            'Featured placement boosts',
-            'Enhanced analytics for managed profiles'
+        'requirements': [
+            'Valid NMC registration',
+            'Government ID verification'
         ]
     }
 }
@@ -107,21 +120,44 @@ STRIPE_CONFIG = {
 
 # Trial configuration (for future use)
 TRIAL_CONFIG = {
-    'enabled': False,  # Set to True when offering trials
+    'enabled': False,
     'duration_days': 30,
-    'tier': 'premium'  # Which tier to trial
+    'tier': 'clinic'
 }
 
-# Feature flags for each tier
+# Feature flags for doctor profiles
+# NOTE: Rankings are based ONLY on reviews and verified status - NOT subscription tier
+# We do not sell visibility or ranking positions
+DOCTOR_FEATURES = {
+    'unverified': {
+        'can_view_analytics': False,
+        'can_show_contact': False,
+        'can_upload_photos': False,
+        'can_edit_profile': False,
+        'can_respond_reviews': False,
+        'is_verified': False,
+        'max_photos': 0
+    },
+    'verified': {
+        'can_view_analytics': True,
+        'can_show_contact': True,
+        'can_upload_photos': True,
+        'can_edit_profile': True,
+        'can_respond_reviews': True,
+        'is_verified': True,
+        'max_photos': 1
+    }
+}
+
+# Legacy tier features (for backward compatibility)
 TIER_FEATURES = {
     'free': {
         'can_view_analytics': False,
         'can_show_contact': False,
-        'can_upload_photos': True,
+        'can_upload_photos': False,
         'can_show_hours': False,
         'is_featured': False,
-        'search_boost_multiplier': 1.0,
-        'max_photos': 1
+        'max_photos': 0
     },
     'premium': {
         'can_view_analytics': True,
@@ -129,7 +165,6 @@ TIER_FEATURES = {
         'can_upload_photos': True,
         'can_show_hours': True,
         'is_featured': False,
-        'search_boost_multiplier': 1.5,
         'max_photos': 1
     },
     'featured': {
@@ -137,15 +172,37 @@ TIER_FEATURES = {
         'can_show_contact': True,
         'can_upload_photos': True,
         'can_show_hours': True,
-        'is_featured': True,
-        'search_boost_multiplier': 3.0,
+        'is_featured': False,  # Featured badge removed
+        'max_photos': 1
+    },
+    'verified': {
+        'can_view_analytics': True,
+        'can_show_contact': True,
+        'can_upload_photos': True,
+        'can_show_hours': True,
+        'is_featured': False,
         'max_photos': 1
     }
 }
 
 
+def get_user_tier_info():
+    """Get user tier information"""
+    return USER_TIER
+
+
+def get_doctor_tier_info():
+    """Get doctor tier information"""
+    return DOCTOR_TIER
+
+
+def get_clinic_tier_info():
+    """Get clinic tier information"""
+    return CLINIC_TIER
+
+
 def get_tier_info(tier_name):
-    """Get subscription tier information"""
+    """Get subscription tier information (legacy support)"""
     return SUBSCRIPTION_TIERS.get(tier_name, SUBSCRIPTION_TIERS['free'])
 
 
@@ -155,25 +212,20 @@ def can_access_feature(tier_name, feature_name):
     return tier_features.get(feature_name, False)
 
 
-def get_upgrade_options(current_tier):
-    """Get available upgrade options for current tier"""
-    tier_order = ['free', 'premium', 'featured']
-    current_index = tier_order.index(current_tier) if current_tier in tier_order else 0
+def is_doctor_verified(doctor):
+    """Check if a doctor is verified"""
+    if not doctor:
+        return False
+    return doctor.is_verified if hasattr(doctor, 'is_verified') else False
 
-    return [
-        {
-            'tier': tier,
-            'info': SUBSCRIPTION_TIERS[tier]
-        }
-        for tier in tier_order[current_index + 1:]
-    ]
+
+def get_doctor_features(doctor):
+    """Get feature access for a doctor based on verification status"""
+    if is_doctor_verified(doctor):
+        return DOCTOR_FEATURES['verified']
+    return DOCTOR_FEATURES['unverified']
 
 
 def calculate_price_npr(price_usd, exchange_rate=135):
     """Convert USD price to NPR (default rate: 135 NPR/USD)"""
     return int(price_usd * exchange_rate)
-
-
-def get_clinic_tier_info(tier_name):
-    """Get clinic tier information"""
-    return CLINIC_TIERS.get(tier_name, CLINIC_TIERS['clinic_starter'])

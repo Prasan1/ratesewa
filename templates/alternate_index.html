@@ -129,7 +129,7 @@
                                 {% if clinic.description %}
                                 <p class="text-muted small mb-3">{{ clinic.description }}</p>
                                 {% endif %}
-                                <a href="{{ url_for('clinic_profile', slug=clinic.slug) }}" class="btn btn-outline-primary btn-sm">View clinic</a>
+                                <a href="{{ url_for('clinic_public_page', clinic_slug=clinic.slug) }}" class="btn btn-outline-primary btn-sm">View clinic</a>
                             </div>
                         </div>
                     </div>

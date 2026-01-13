@@ -52,13 +52,20 @@
     <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='android-chrome-192x192.png') }}">
     <link rel="icon" type="image/png" sizes="512x512" href="{{ url_for('static', filename='android-chrome-512x512.png') }}">
 
-    <!-- Web App Manifest -->
-    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+    <!-- PWA Web App Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 
     <!-- Theme Color (for mobile browsers) -->
     <meta name="theme-color" content="#0D8ABC">
+
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="RankSewa">
+    <meta name="application-name" content="RankSewa">
+    <meta name="msapplication-TileColor" content="#0D8ABC">
+    <meta name="msapplication-config" content="none">
 
     <!-- Google tag (gtag.js) - Production Only -->
     {% if request.host not in ['localhost:5000', '127.0.0.1:5000', 'localhost', '127.0.0.1'] %}
@@ -125,13 +132,11 @@
                             <i class="fas fa-user-md me-1"></i>For Doctors
                         </a>
                     </li>
-                    {# For Clinics button - Hidden for MVP, can re-enable later
                     <li class="nav-item ms-lg-2">
-                        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('clinic_manager_dashboard') }}">
-                            <i class="fas fa-briefcase-medical me-1"></i>For Clinics
+                        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('clinics') }}">
+                            <i class="fas fa-hospital me-1"></i>Clinics
                         </a>
                     </li>
-                    #}
                     {% endif %}
                     {% if 'user_id' in session and session.get('is_admin') %}
                     <li class="nav-item dropdown">
@@ -139,19 +144,25 @@
                             <i class="fas fa-shield-alt me-1"></i>Admin
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                            <li><a class="dropdown-item" href="{{ url_for('admin_doctors') }}"><i class="fas fa-user-md me-2"></i>Manage Doctors</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('admin_articles') }}"><i class="fas fa-newspaper me-2"></i>Manage Articles</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('admin_email_composer') }}"><i class="fas fa-envelope me-2"></i>Email Composer</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('admin_cities') }}"><i class="fas fa-city me-2"></i>Manage Cities</a></li>
-                            <!-- Clinic features temporarily hidden for MVP launch -->
-                            <!-- <li><a class="dropdown-item" href="{{ url_for('admin_clinics') }}"><i class="fas fa-hospital me-2"></i>Manage Clinics</a></li> -->
-                            <li><a class="dropdown-item" href="{{ url_for('admin_specialties') }}"><i class="fas fa-stethoscope me-2"></i>Manage Specialties</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('admin_users') }}"><i class="fas fa-users me-2"></i>Manage Users</a></li>
+                            <li><a class="dropdown-item fw-semibold" href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
                             <li><hr class="dropdown-divider"></li>
+                            <li class="dropdown-header">Manage</li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_doctors') }}"><i class="fas fa-user-md me-2"></i>Doctors</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_clinics') }}"><i class="fas fa-hospital me-2"></i>Clinics</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_users') }}"><i class="fas fa-users me-2"></i>Users</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="dropdown-header">Actions</li>
                             <li><a class="dropdown-item" href="{{ url_for('admin_verification_requests') }}"><i class="fas fa-clipboard-check me-2"></i>Verification Requests</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('admin_appointments') }}"><i class="fas fa-calendar-check me-2"></i>Manage Appointments</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_appointments') }}"><i class="fas fa-calendar-check me-2"></i>Appointments</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-primary" href="{{ url_for('import_doctors_page') }}"><i class="fas fa-file-import me-2"></i>Import Doctors</a></li>
+                            <li class="dropdown-header">Content & Settings</li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_articles') }}"><i class="fas fa-newspaper me-2"></i>Articles</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_cities') }}"><i class="fas fa-city me-2"></i>Cities</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_specialties') }}"><i class="fas fa-stethoscope me-2"></i>Specialties</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="dropdown-header">Tools</li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin_email_composer') }}"><i class="fas fa-envelope me-2"></i>Email Composer</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('import_doctors_page') }}"><i class="fas fa-file-import me-2"></i>Import Doctors</a></li>
                         </ul>
                     </li>
                     {% endif %}
@@ -176,6 +187,8 @@
                             <li><hr class="dropdown-divider"></li>
                             {% endif %}
                             <li><a class="dropdown-item" href="{{ url_for('user_profile') }}"><i class="fas fa-user-circle me-2"></i>My Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('my_appointments') }}"><i class="fas fa-calendar-check me-2"></i>My Appointments</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('clinics') }}"><i class="fas fa-hospital me-2"></i>Clinics</a></li>
                             <li><hr class="dropdown-divider"></li>
                             {% endif %}
                             <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
@@ -288,6 +301,24 @@
         {{ render_ad(get_ad('mobile_bottom'), '') }}
     </div> #}
 
+    <!-- Global Alert Modal -->
+    <div class="modal fade" id="globalAlertModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px; border: none;">
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3" id="globalAlertIcon">
+                        <div style="width: 60px; height: 60px; background: var(--brand-soft); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="fas fa-info-circle fa-2x" style="color: var(--brand);"></i>
+                        </div>
+                    </div>
+                    <h5 class="mb-2" id="globalAlertTitle">Notice</h5>
+                    <p class="text-muted mb-4" id="globalAlertMessage">Message here</p>
+                    <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Local Bootstrap JS -->
     <script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
     <!-- Local jQuery -->
@@ -295,9 +326,44 @@
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}?v=20260110o"></script>
     <script>
+        // Global showAlert function to replace browser alert()
+        function showAlert(message, type = 'info', title = null) {
+            const modal = document.getElementById('globalAlertModal');
+            const iconDiv = document.getElementById('globalAlertIcon');
+            const titleEl = document.getElementById('globalAlertTitle');
+            const messageEl = document.getElementById('globalAlertMessage');
+
+            // Set message
+            messageEl.textContent = message;
+
+            // Set icon and title based on type
+            const configs = {
+                'info': { icon: 'fa-info-circle', color: 'var(--brand)', bg: 'var(--brand-soft)', title: 'Notice' },
+                'success': { icon: 'fa-check-circle', color: '#10b981', bg: '#d1fae5', title: 'Success' },
+                'error': { icon: 'fa-exclamation-circle', color: '#ef4444', bg: '#fee2e2', title: 'Error' },
+                'warning': { icon: 'fa-exclamation-triangle', color: '#f59e0b', bg: '#fef3c7', title: 'Warning' }
+            };
+            const config = configs[type] || configs['info'];
+
+            iconDiv.innerHTML = `<div style="width: 60px; height: 60px; background: ${config.bg}; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                <i class="fas ${config.icon} fa-2x" style="color: ${config.color};"></i>
+            </div>`;
+            titleEl.textContent = title || config.title;
+
+            // Show modal
+            new bootstrap.Modal(modal).show();
+        }
+
+        // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(() => {});
+                navigator.serviceWorker.register('/static/service-worker.js', { scope: '/' })
+                    .then((registration) => {
+                        console.log('RankSewa PWA: Service Worker registered');
+                    })
+                    .catch((error) => {
+                        console.log('RankSewa PWA: Service Worker registration failed');
+                    });
             });
         }
     </script>

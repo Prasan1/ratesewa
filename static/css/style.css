@@ -474,11 +474,11 @@ a:hover {
 
 .doctor-card .doctor-name {
     font-weight: 700;
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     color: var(--ink);
     margin-bottom: 4px;
     line-height: 1.3;
-    font-family: 'Playfair Display', 'Fraunces', 'Georgia', serif;
+    font-family: 'Plus Jakarta Sans', 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .doctor-card .doctor-subtitle {
@@ -606,14 +606,36 @@ a:hover {
 
 .doctor-card .doctor-summary {
     margin: 8px 0;
-    color: #475569;
-    font-size: 0.85rem;
-    line-height: 1.4;
-    max-height: 4.2em; /* 3 lines * 1.4 line-height */
+    color: #64748b;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    max-height: 4.5em; /* 3 lines */
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+    font-style: normal;
+}
+
+/* Star ratings - filled stars bright gold */
+.doctor-card .rating-display .fas.fa-star,
+.doctor-card .rating-display .fas.fa-star-half-alt,
+.doctor-card .stars-v2 .fas.fa-star,
+.doctor-card .stars-v2 .fas.fa-star-half-alt {
+    color: #f59e0b !important;
+}
+
+/* Empty stars - lighter gold, clearly different from filled */
+.doctor-card .rating-display .far.fa-star,
+.doctor-card .stars-v2 .far.fa-star {
+    color: #d1d5db !important;
+}
+
+/* No rating state - slightly muted background */
+.doctor-card .rating-display.no-rating,
+.rating-pill-v2.no-rating {
+    background: #f8fafc;
+    border-color: #e2e8f0;
 }
 
 .doctor-card .doctor-actions {
@@ -1107,6 +1129,64 @@ a:hover {
 }
 
 /* User Profile Enhancements */
+.profile-theme {
+    --brand: #0d9488;
+    --brand-hover: #0f766e;
+    --brand-dark: #0f766e;
+    --brand-light: #ccfbf1;
+    --brand-soft: #ccfbf1;
+    --brand-contrast: #f0fdfa;
+    --secondary: #06b6d4;
+    --text-main: #111827;
+    --text-muted: #6b7280;
+    --bg-body: #f8fafc;
+    --bg-card: #ffffff;
+    --border-color: #e5e7eb;
+    --accent: #0d9488;
+    --accent-dark: #0f766e;
+    --ink: #111827;
+    --muted: #6b7280;
+    --surface: #ffffff;
+    --surface-alt: #f8fafc;
+    --border: #e5e7eb;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --radius: 16px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--ink);
+}
+
+.profile-theme h1,
+.profile-theme h2,
+.profile-theme h3,
+.profile-theme h4,
+.profile-theme h5,
+.profile-theme h6 {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 0.2px;
+}
+
+.profile-theme .card {
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+.profile-theme .card.shadow-sm {
+    box-shadow: var(--shadow-sm);
+}
+
+.profile-theme .btn-primary {
+    background-color: var(--brand);
+    border-color: var(--brand);
+}
+
+.profile-theme .btn-primary:hover {
+    background-color: var(--brand-dark);
+    border-color: var(--brand-dark);
+}
+
 .profile-header {
     background: linear-gradient(135deg, #dae6e1 0%, #f2f4f2 100%);
     color: var(--ink);
@@ -1132,6 +1212,11 @@ a:hover {
     background: linear-gradient(135deg, rgba(4, 130, 136, 0.2), rgba(122, 165, 162, 0.2));
     position: relative;
     border-bottom: 1px solid var(--border);
+}
+
+.profile-theme .profile-banner {
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.18), rgba(204, 251, 241, 0.9));
+    border-bottom: 1px solid rgba(13, 148, 136, 0.15);
 }
 
 .profile-avatar-circle {
@@ -1186,6 +1271,11 @@ a:hover {
     border: 1px solid rgba(227, 231, 232, 0.8);
 }
 
+.profile-theme .stat-card {
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.08), rgba(248, 250, 252, 0.9));
+    border: 1px solid rgba(13, 148, 136, 0.12);
+}
+
 .stat-label {
     text-transform: uppercase;
     font-size: 0.7rem;
@@ -1224,6 +1314,11 @@ a:hover {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.profile-theme .activity-item {
+    background: rgba(13, 148, 136, 0.08);
+    border: 1px solid rgba(13, 148, 136, 0.14);
+}
+
 .activity-item:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
@@ -1256,6 +1351,11 @@ a:hover {
     border-radius: 12px;
     background: rgba(4, 130, 136, 0.06);
     border: 1px solid rgba(4, 130, 136, 0.12);
+}
+
+.profile-theme .next-goal {
+    background: rgba(13, 148, 136, 0.08);
+    border: 1px solid rgba(13, 148, 136, 0.15);
 }
 
 /* Status Badges */
@@ -2357,5 +2457,99 @@ html {
     .btn-view-v2 {
         padding: 8px 16px;
         font-size: 0.8rem;
+    }
+}
+
+/* ===== Mobile Optimizations for Key Pages ===== */
+
+/* Health Dashboard - Mobile */
+@media (max-width: 576px) {
+    .health-dashboard .card-body {
+        padding: 1rem;
+    }
+
+    .health-dashboard h2 {
+        font-size: 1.5rem;
+    }
+
+    .health-dashboard .btn-group .btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .health-dashboard .table {
+        font-size: 0.8rem;
+    }
+
+    .health-dashboard .table td,
+    .health-dashboard .table th {
+        padding: 0.5rem 0.4rem;
+    }
+}
+
+/* Doctor Profile - Mobile */
+@media (max-width: 768px) {
+    .profile-container {
+        padding: 10px 12px 20px;
+    }
+
+    .doctor-profile .fact-item {
+        padding: 0.75rem;
+    }
+
+    .doctor-profile .badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.5rem;
+    }
+}
+
+/* User Profile - Mobile */
+@media (max-width: 576px) {
+    .profile-theme .card-body {
+        padding: 1rem;
+    }
+
+    .profile-theme .stat-value {
+        font-size: 1.25rem;
+    }
+}
+
+/* Pricing Page - Mobile */
+@media (max-width: 768px) {
+    .pricing-card .card-body {
+        padding: 1.25rem;
+    }
+
+    .pricing-card h2 {
+        font-size: 1.5rem;
+    }
+
+    .pricing-card .list-unstyled li {
+        font-size: 0.9rem;
+    }
+}
+
+/* Touch-friendly buttons - minimum 44px height */
+@media (max-width: 768px) {
+    .btn-sm {
+        min-height: 38px;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-lg {
+        min-height: 48px;
+    }
+
+    /* Form inputs - larger touch targets */
+    .form-control,
+    .form-select {
+        min-height: 44px;
+        font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+
+    /* Better spacing for mobile forms */
+    .form-label {
+        font-size: 0.9rem;
+        margin-bottom: 0.4rem;
     }
 }

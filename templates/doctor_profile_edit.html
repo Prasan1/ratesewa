@@ -237,6 +237,21 @@
                             {% endif %}
                         </div>
 
+                        <!-- Accepted Insurance -->
+                        <div class="mb-3">
+                            <label for="accepted_insurance" class="form-label">
+                                <i class="fas fa-file-medical me-1"></i><strong>Accepted Insurance</strong>
+                            </label>
+                            <textarea class="form-control"
+                                      id="accepted_insurance"
+                                      name="accepted_insurance"
+                                      rows="3"
+                                      placeholder="e.g., Siddhartha Insurance, Nepal Life Insurance, IME General Insurance">{{ doctor.accepted_insurance or '' }}</textarea>
+                            <small class="form-text text-muted">
+                                List insurance providers you accept (one per line or comma-separated). This helps patients know if you accept their insurance.
+                            </small>
+                        </div>
+
                         <hr class="my-4 profile-edit-divider">
 
                         <!-- Important Notice -->
@@ -280,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Validate file size (5MB)
                 const maxSize = 5 * 1024 * 1024;
                 if (file.size > maxSize) {
-                    alert('File size must not exceed 5MB');
+                    showAlert('File size must not exceed 5MB', 'warning');
                     this.value = '';
                     return;
                 }

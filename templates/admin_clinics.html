@@ -30,15 +30,12 @@
                     <div class="fw-semibold">{{ clinic.name }}</div>
                     <div class="text-muted small">{{ clinic.phone_number or '—' }}</div>
                 </td>
-                <td>{{ clinic.city.name }}</td>
+                <td>{{ clinic.city or '—' }}</td>
                 <td>
                     {% if clinic.is_active %}
                     <span class="badge bg-success">Active</span>
                     {% else %}
                     <span class="badge bg-secondary">Inactive</span>
-                    {% endif %}
-                    {% if clinic.is_featured %}
-                    <span class="badge bg-warning text-dark ms-2">Featured</span>
                     {% endif %}
                 </td>
                 <td class="text-end">

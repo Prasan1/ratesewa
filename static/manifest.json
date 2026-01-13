@@ -1,0 +1,51 @@
+{
+  "name": "RankSewa - Find Doctors in Nepal",
+  "short_name": "RankSewa",
+  "description": "Find and review doctors in Nepal based on real patient experiences",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0D8ABC",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/static/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "medical", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Search Doctors",
+      "short_name": "Search",
+      "description": "Find doctors in Nepal",
+      "url": "/?source=pwa",
+      "icons": [{ "src": "/static/android-chrome-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Health Articles",
+      "short_name": "Articles",
+      "description": "Read health articles",
+      "url": "/health-digest?source=pwa",
+      "icons": [{ "src": "/static/android-chrome-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

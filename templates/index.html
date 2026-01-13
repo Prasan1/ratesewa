@@ -413,6 +413,133 @@
 
     </div><!-- /col -->
 </div><!-- /row -->
+
+<!-- Floating Back to Search Button -->
+<button id="backToSearchBtn" class="back-to-search-btn" onclick="scrollToSearch()" title="Back to search">
+    <i class="fas fa-search me-2"></i>New Search
+</button>
+
+<style>
+.back-to-search-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--accent) 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 24px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.back-to-search-btn.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.back-to-search-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+    .back-to-search-btn {
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+    }
+}
+
+/* Mobile - optimized for 70% mobile users */
+@media (max-width: 576px) {
+    .back-to-search-btn {
+        /* Safe area for notched phones (iPhone X+) */
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        right: 16px;
+        left: 16px;
+        /* Full width button for easier thumb tap */
+        width: calc(100% - 32px);
+        padding: 14px 20px;
+        font-size: 0.9rem;
+        text-align: center;
+        /* Minimum touch target size (48px recommended by Google) */
+        min-height: 48px;
+        /* Slide up from bottom animation */
+        transform: translateY(100px);
+    }
+
+    .back-to-search-btn.visible {
+        transform: translateY(0);
+    }
+
+    .back-to-search-btn:hover {
+        /* Disable hover effects on touch devices */
+        transform: translateY(0);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .back-to-search-btn:active {
+        /* Touch feedback */
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}
+</style>
+
+<script>
+// Show/hide floating search button based on scroll position
+function handleScrollButton() {
+    const searchSection = document.getElementById('searchSection');
+    const backBtn = document.getElementById('backToSearchBtn');
+
+    if (!searchSection || !backBtn) return;
+
+    const searchBottom = searchSection.getBoundingClientRect().bottom;
+
+    // Show button when search section is scrolled out of view
+    if (searchBottom < 0) {
+        backBtn.classList.add('visible');
+    } else {
+        backBtn.classList.remove('visible');
+    }
+}
+
+function scrollToSearch() {
+    const searchSection = document.getElementById('searchSection');
+    if (searchSection) {
+        searchSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Focus the name search input after scrolling
+        setTimeout(() => {
+            document.getElementById('nameSearch')?.focus();
+        }, 500);
+    }
+}
+
+// Throttle scroll event using requestAnimationFrame for smooth performance
+let scrollTicking = false;
+window.addEventListener('scroll', function() {
+    if (!scrollTicking) {
+        requestAnimationFrame(function() {
+            handleScrollButton();
+            scrollTicking = false;
+        });
+        scrollTicking = true;
+    }
+}, { passive: true });
+
+// Initial check
+document.addEventListener('DOMContentLoaded', handleScrollButton);
+</script>
 {% endblock %}
 
 {% block scripts %}
@@ -589,7 +716,7 @@ function displayDoctors(response, shouldScroll = true) {
     }
 
     let html = '';
-    doctors.forEach(doctor => {
+    doctors.forEach((doctor, index) => {
         const ratingCount = doctor.rating_count || 0;
         const hasRatings = ratingCount > 0;
         const avgRating = hasRatings ? parseFloat(doctor.avg_rating).toFixed(1) : '0.0';
@@ -603,7 +730,7 @@ function displayDoctors(response, shouldScroll = true) {
         const cityLabel = cityName || 'Not specified';
         const specialtyName = doctor.specialty_name || 'General Practice';
         const experienceLabel = doctor.experience && doctor.experience > 0 ? `${doctor.experience} Years` : 'N/A';
-        const practiceLabel = doctor.clinic_name || doctor.workplace || 'Not specified';
+        const practiceLabel = formatPracticeLocations(doctor.clinic_name || doctor.workplace || 'Not specified');
 
         const imgSrc = doctor.photo_url || getDoctorAvatar(doctor.name, doctor.id);
 
@@ -653,7 +780,8 @@ function displayDoctors(response, shouldScroll = true) {
                                         alt="${doctor.name}"
                                         width="80"
                                         height="80"
-                                        loading="lazy"
+                                        loading="${index < 6 ? 'eager' : 'lazy'}"
+                                        decoding="async"
                                         onerror="this.onerror=null; this.src=getDoctorAvatar(this.dataset.name, parseInt(this.dataset.id || '0', 10));"
                                     >
                                 </div>
@@ -760,6 +888,29 @@ function displayDoctors(response, shouldScroll = true) {
     }
 }
 
+
+// Format practice locations - show first location + "and X more" if multiple
+function formatPracticeLocations(practice) {
+    if (!practice || practice === 'Not specified') return practice;
+
+    // Split by common separators (periods, commas followed by space and capital, or explicit "and")
+    // Handle patterns like "Clinic A, City. Clinic B, City"
+    const locations = practice.split(/(?:\.\s+|\s*,\s+(?=[A-Z])|\s+and\s+)/i)
+        .map(s => s.trim())
+        .filter(s => s.length > 2);
+
+    if (locations.length <= 1) {
+        // Single location - truncate if too long
+        return practice.length > 50 ? practice.substring(0, 47) + '...' : practice;
+    }
+
+    // Multiple locations - show first + count
+    const firstLocation = locations[0].length > 35
+        ? locations[0].substring(0, 32) + '...'
+        : locations[0];
+    const moreCount = locations.length - 1;
+    return `${firstLocation} <span class="text-muted small">+${moreCount} more</span>`;
+}
 
 function generateStarRatingHtml(rating, ratingCount) {
     let html = '';

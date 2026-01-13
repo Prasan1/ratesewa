@@ -3,8 +3,32 @@
 {% block title %}My Profile{% endblock %}
 
 {% block content %}
+<div class="profile-theme">
+
+{% if show_doctor_verification_reminder %}
+<!-- Doctor Verification Reminder -->
+<div class="alert alert-info border-0 shadow-sm mb-4" style="border-radius: 12px;">
+    <div class="d-flex align-items-start">
+        <i class="fas fa-user-md me-3 mt-1" style="font-size: 1.5rem; color: var(--brand);"></i>
+        <div class="flex-grow-1">
+            <h6 class="mb-1" style="color: var(--ink);">Complete Your Doctor Verification</h6>
+            <p class="mb-2 small text-muted">
+                You indicated that you're a doctor during registration. Complete verification to access your doctor dashboard,
+                respond to patient reviews, and manage your professional profile.
+            </p>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ url_for('claim_profile') }}" class="btn btn-sm" style="background: var(--brand); color: white;">
+                    <i class="fas fa-check-circle me-1"></i> Complete Verification
+                </a>
+                <span class="small text-muted align-self-center">Takes 5 minutes</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <div class="row">
-    <div class="col-md-3 mb-4">
+    <div class="col-lg-4 col-md-5 mb-4">
         <div class="card shadow-sm profile-card">
             <div class="profile-banner">
                 <div class="profile-avatar-circle" aria-hidden="true">
@@ -183,7 +207,7 @@
         </div>
     </div>
 
-    <div class="col-md-9">
+    <div class="col-lg-8 col-md-7">
         <!-- Doctor Verification Status -->
         {% if verification_request %}
         {% if verification_request.status == 'pending' %}
@@ -288,15 +312,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm stat-card">
-                    <div class="card-body">
-                        <div class="stat-label">Appointments</div>
-                        <div class="stat-value">{{ appointments|length }}</div>
-                        <div class="stat-meta">Booked so far</div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="card shadow-sm mb-4">
@@ -326,77 +341,33 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="text-muted mb-0">No activity yet. Start by booking an appointment or leaving a review.</p>
-                <a href="{{ url_for('index') }}" class="btn btn-sm btn-primary mt-3">
-                    <i class="fas fa-search me-2"></i>Find a Doctor
-                </a>
+                <p class="text-muted mb-0">No activity yet. Start by leaving a review for a doctor you've visited.</p>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Appointments Section -->
+        <!-- My Appointments Section -->
         <div class="card shadow-sm mb-4">
             <div class="card-body">
-                <h4 class="card-title mb-3">
-                    <i class="fas fa-calendar-alt me-2"></i>My Appointments
-                </h4>
-
-                {% if appointments %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Doctor</th>
-                                <th>Date & Time</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for appt in appointments %}
-                            <tr>
-                                <td>
-                                    <a href="{{ url_for('doctor_profile', slug=appt.doctor.slug) }}">
-                                        {{ appt.doctor.name }}
-                                    </a>
-                                    <br>
-                                    <small class="text-muted">{{ appt.doctor.specialty.name }}</small>
-                                </td>
-                                <td>
-                                    {{ appt.appointment_date.strftime('%B %d, %Y') }}<br>
-                                    <small class="text-muted">{{ appt.appointment_time.strftime('%I:%M %p') }}</small>
-                                </td>
-                                <td>
-                                    {% if appt.status == 'pending' %}
-                                    <span class="badge bg-warning">Pending</span>
-                                    {% elif appt.status == 'confirmed' %}
-                                    <span class="badge bg-success">Confirmed</span>
-                                    {% elif appt.status == 'cancelled' %}
-                                    <span class="badge bg-danger">Cancelled</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if appt.is_ratable %}
-                                    <a href="{{ url_for('doctor_profile', slug=appt.doctor.slug) }}#ratingModal" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-star"></i> Rate
-                                    </a>
-                                    {% elif appt.is_rated %}
-                                    <span class="text-success"><i class="fas fa-check-circle"></i> Rated</span>
-                                    {% else %}
-                                    <span class="text-muted">-</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-calendar-check me-2" style="color: var(--brand);"></i>My Appointments
+                    </h4>
+                    <a href="{{ url_for('my_appointments') }}" class="btn btn-sm btn-outline-primary">View All</a>
                 </div>
-                {% else %}
-                <p class="text-muted">You haven't booked any appointments yet.</p>
-                <a href="{{ url_for('index') }}" class="btn btn-primary">
-                    <i class="fas fa-search me-2"></i>Find a Doctor
-                </a>
-                {% endif %}
+
+                <p class="text-muted mb-3">
+                    View and manage your clinic appointments. Check booking codes and appointment status.
+                </p>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{{ url_for('my_appointments') }}" class="btn btn-primary">
+                        <i class="fas fa-list me-2"></i>View My Appointments
+                    </a>
+                    <a href="{{ url_for('clinics') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-hospital me-2"></i>Browse Clinics
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -436,5 +407,6 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 {% endblock %}

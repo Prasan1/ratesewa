@@ -33,22 +33,65 @@ class Specialty(db.Model):
 
 
 class Clinic(db.Model):
+    """Medical clinic/hospital that can have multiple doctors"""
     __tablename__ = 'clinics'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     slug = db.Column(db.String(250), unique=True, nullable=False, index=True)
-    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
+    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=True)  # For legacy compatibility
     address = db.Column(db.Text, nullable=True)
+    city = db.Column(db.String(100), nullable=True)  # City name for new portal clinics
     phone_number = db.Column(db.String(20), nullable=True)
+    phone = db.Column(db.String(20), nullable=True)  # Alias for phone_number
+    email = db.Column(db.String(120), nullable=True)
+    website = db.Column(db.String(200), nullable=True)
     description = db.Column(db.Text, nullable=True)
+    logo_url = db.Column(db.String(500), nullable=True)
+
+    # Clinic type and status
+    clinic_type = db.Column(db.String(50), default='clinic')  # hospital, clinic, nursing_home, private_practice, polyclinic
     is_featured = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
+    is_verified = db.Column(db.Boolean, default=False)  # Admin verified
 
+    # Management (for clinic portal)
+    created_by_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
     doctors = db.relationship('Doctor', backref='clinic', lazy=True)
+    created_by = db.relationship('User', foreign_keys=[created_by_user_id], backref=db.backref('created_clinics', lazy=True))
 
     def __repr__(self):
         return f'<Clinic {self.name}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'slug': self.slug,
+            'address': self.address,
+            'city': self.city,
+            'phone': self.phone or self.phone_number,
+            'email': self.email,
+            'clinic_type': self.clinic_type,
+            'description': self.description,
+            'logo_url': self.logo_url,
+            'is_verified': self.is_verified,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+    def get_active_doctors(self):
+        """Get all approved and active doctors at this clinic"""
+        return ClinicDoctor.query.filter_by(
+            clinic_id=self.id,
+            status='approved',
+            is_active=True
+        ).all()
 
 
 class Doctor(db.Model):
@@ -69,13 +112,16 @@ class Doctor(db.Model):
     is_featured = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
     is_verified = db.Column(db.Boolean, default=False)
+    ranksewa_network_enabled = db.Column(db.Boolean, default=False)  # Allow patients to add to their network
 
     # Verification and contact info
     nmc_number = db.Column(db.String(50), unique=True, nullable=True)  # Nepal Medical Council registration
+    nmc_expiry_date = db.Column(db.Date, nullable=True)  # NULL = permanent license, otherwise expiry date
     phone_number = db.Column(db.String(20), nullable=True)
     practice_address = db.Column(db.Text, nullable=True)
     external_clinic_url = db.Column(db.Text, nullable=True)  # External clinic profile URL (e.g., ClinicOne)
     working_hours = db.Column(db.Text, nullable=True)  # JSON string: {"monday": "9:00-17:00", "tuesday": "9:00-17:00", ...}
+    accepted_insurance = db.Column(db.Text, nullable=True)  # Comma-separated list of accepted insurance providers
 
     # Analytics
     profile_views = db.Column(db.Integer, default=0)
@@ -133,13 +179,14 @@ class User(db.Model):
     # User role and doctor linkage
     role = db.Column(db.String(20), default='patient')  # 'patient', 'doctor', 'admin'
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=True)
+    is_doctor_intent = db.Column(db.Boolean, default=False)  # True if user checked "I am a doctor" during registration
 
     # Gamification
     points = db.Column(db.Integer, default=0)
 
     # Relationships
     ratings = db.relationship('Rating', backref='user', lazy=True)
-    appointments = db.relationship('Appointment', backref='user', lazy=True)
+    appointments = db.relationship('Appointment', foreign_keys='Appointment.user_id', backref='user', lazy=True)
     contact_messages = db.relationship('ContactMessage', backref='user', lazy=True)
     doctor_profile = db.relationship('Doctor', foreign_keys=[doctor_id], backref=db.backref('user_account', uselist=False), uselist=False)
     verification_requests = db.relationship('VerificationRequest', foreign_keys='VerificationRequest.user_id', backref='user', lazy=True)
@@ -270,24 +317,68 @@ class Rating(db.Model):
 
 
 class Appointment(db.Model):
+    """Patient appointment booking - supports both direct and clinic-based bookings"""
     __tablename__ = 'appointments'
 
     id = db.Column(db.Integer, primary_key=True)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    appointment_date = db.Column(db.Date)
-    appointment_time = db.Column(db.Time)
-    message = db.Column(db.Text)
-    status = db.Column(db.String(50), default='pending')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationship
+    # Legacy fields (for direct doctor bookings)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    message = db.Column(db.Text)  # Legacy message field
+
+    # Clinic booking fields
+    clinic_doctor_id = db.Column(db.Integer, db.ForeignKey('clinic_doctors.id'), nullable=True)
+
+    # Appointment timing
+    appointment_date = db.Column(db.Date, nullable=True)
+    appointment_time = db.Column(db.Time, nullable=True)
+
+    # Patient info (can be guest or registered user)
+    patient_name = db.Column(db.String(200), nullable=True)
+    patient_phone = db.Column(db.String(20), nullable=True)
+    patient_email = db.Column(db.String(120))
+    patient_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))  # If registered user
+
+    # Booking details
+    reason = db.Column(db.Text)  # Chief complaint / reason for visit
+    booking_code = db.Column(db.String(10), unique=True, nullable=True)  # For patient to check status
+
+    # Status tracking
+    status = db.Column(db.String(50), default='pending')  # pending, booked, confirmed, checked_in, in_progress, completed, no_show, cancelled
+    queue_position = db.Column(db.Integer)  # Position in queue for the day
+
+    # Staff notes
+    notes = db.Column(db.Text)  # Internal notes by clinic staff
+
+    # Confirmation tracking
+    confirmation_sent_at = db.Column(db.DateTime)
+    confirmed_at = db.Column(db.DateTime)
+    checked_in_at = db.Column(db.DateTime)
+    completed_at = db.Column(db.DateTime)
+    cancelled_at = db.Column(db.DateTime)
+    cancellation_reason = db.Column(db.String(500))
+
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
     rating = db.relationship('Rating', backref='appointment', uselist=False, lazy=True)
+    clinic_doctor = db.relationship('ClinicDoctor', backref=db.backref('appointments', lazy=True))
+    patient_user = db.relationship('User', foreign_keys=[patient_user_id], backref=db.backref('patient_appointments', lazy=True))
+
+    # Index for common queries
+    __table_args__ = (
+        db.Index('idx_appointment_date_doctor', 'clinic_doctor_id', 'appointment_date'),
+        db.Index('idx_appointment_booking_code', 'booking_code'),
+        db.Index('idx_appointment_patient_phone', 'patient_phone'),
+    )
 
     @property
     def is_ratable(self):
         """Check if this appointment can be rated"""
-        return self.status == 'confirmed' and self.rating is None
+        return self.status in ['confirmed', 'completed'] and self.rating is None
 
     @property
     def is_rated(self):
@@ -295,7 +386,71 @@ class Appointment(db.Model):
         return self.rating is not None
 
     def __repr__(self):
-        return f'<Appointment {self.id} - {self.status}>'
+        return f'<Appointment {self.booking_code or self.id} {self.status}>'
+
+    def to_dict(self, include_patient_details=False):
+        result = {
+            'id': self.id,
+            'booking_code': self.booking_code,
+            'appointment_date': self.appointment_date.isoformat() if self.appointment_date else None,
+            'appointment_time': self.appointment_time.strftime('%H:%M') if self.appointment_time else None,
+            'status': self.status,
+            'queue_position': self.queue_position,
+            'clinic_name': self.clinic_doctor.clinic.name if self.clinic_doctor else None,
+            'doctor_name': self.clinic_doctor.doctor.name if self.clinic_doctor else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+        if include_patient_details:
+            result.update({
+                'patient_name': self.patient_name,
+                'patient_phone': self.patient_phone,
+                'patient_email': self.patient_email,
+                'reason': self.reason,
+                'notes': self.notes
+            })
+
+        return result
+
+    @staticmethod
+    def generate_booking_code():
+        """Generate unique 8-character booking code"""
+        import random
+        import string
+        while True:
+            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            # Exclude confusing characters
+            code = code.replace('O', 'X').replace('0', 'Y').replace('I', 'Z').replace('1', 'W')
+            if not Appointment.query.filter_by(booking_code=code).first():
+                return code
+
+    def get_status_display(self):
+        """Human-readable status"""
+        status_map = {
+            'pending': 'Pending',
+            'booked': 'Booked',
+            'confirmed': 'Confirmed',
+            'checked_in': 'Checked In',
+            'in_progress': 'With Doctor',
+            'completed': 'Completed',
+            'no_show': 'No Show',
+            'cancelled': 'Cancelled'
+        }
+        return status_map.get(self.status, self.status)
+
+    def can_cancel(self):
+        """Check if appointment can still be cancelled"""
+        if self.status in ['completed', 'no_show', 'cancelled']:
+            return False
+
+        if not self.clinic_doctor:
+            return True  # Legacy appointments can always be cancelled
+
+        from datetime import datetime, timedelta
+        appointment_datetime = datetime.combine(self.appointment_date, self.appointment_time)
+        notice_hours = self.clinic_doctor.cancellation_notice_hours or 24
+
+        return datetime.now() < appointment_datetime - timedelta(hours=notice_hours)
 
 
 class ContactMessage(db.Model):
@@ -563,6 +718,7 @@ class Article(db.Model):
     summary = db.Column(db.Text)  # Short excerpt for listing page
     content = db.Column(db.Text, nullable=False)  # Full article content (HTML)
     featured_image = db.Column(db.String(500))  # URL to featured image
+    quick_answer = db.Column(db.Text)  # Quick answer box (reduces bounce rate)
 
     # Author (can be admin or doctor in future)
     author_type = db.Column(db.String(20), default='admin')  # 'admin' or 'doctor'
@@ -754,3 +910,371 @@ class DoctorTemplateUsage(db.Model):
 
     def __repr__(self):
         return f'<DoctorTemplateUsage doctor_id={self.doctor_id} type={self.template_type}>'
+
+
+# =============================================================================
+# PATIENT HEALTH TRACKING MODELS
+# =============================================================================
+
+class BPRecord(db.Model):
+    """Blood pressure readings for patient health tracking"""
+    __tablename__ = 'bp_records'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    systolic = db.Column(db.Integer, nullable=False)  # Top number (mmHg)
+    diastolic = db.Column(db.Integer, nullable=False)  # Bottom number (mmHg)
+    pulse = db.Column(db.Integer, nullable=True)  # Heart rate (bpm)
+    notes = db.Column(db.Text, nullable=True)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('bp_records', lazy=True))
+
+    def __repr__(self):
+        return f'<BPRecord {self.systolic}/{self.diastolic} for user {self.user_id}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'systolic': self.systolic,
+            'diastolic': self.diastolic,
+            'pulse': self.pulse,
+            'notes': self.notes,
+            'timestamp': self.timestamp.isoformat() if self.timestamp else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+
+class SugarRecord(db.Model):
+    """Blood sugar readings for patient health tracking"""
+    __tablename__ = 'sugar_records'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    value = db.Column(db.Integer, nullable=False)  # mg/dL
+    notes = db.Column(db.Text, nullable=True)  # Fasting, After meal, etc.
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('sugar_records', lazy=True))
+
+    def __repr__(self):
+        return f'<SugarRecord {self.value} mg/dL for user {self.user_id}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'value': self.value,
+            'notes': self.notes,
+            'timestamp': self.timestamp.isoformat() if self.timestamp else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+
+class Medication(db.Model):
+    """Medications tracked by patients"""
+    __tablename__ = 'medications'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    dosage = db.Column(db.String(100), nullable=False)  # e.g., "500mg"
+    frequency = db.Column(db.String(100), nullable=False)  # e.g., "Twice daily"
+    instructions = db.Column(db.Text, nullable=True)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('medications', lazy=True))
+
+    def __repr__(self):
+        return f'<Medication {self.name} for user {self.user_id}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'dosage': self.dosage,
+            'frequency': self.frequency,
+            'instructions': self.instructions,
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+
+class HealthConsent(db.Model):
+    """Tracks user consent for health tracking feature"""
+    __tablename__ = 'health_consents'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
+    terms_version = db.Column(db.String(20), nullable=False)  # e.g., "1.0"
+    accepted_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    ip_address = db.Column(db.String(50), nullable=True)
+
+    user = db.relationship('User', backref=db.backref('health_consent', uselist=False))
+
+    def __repr__(self):
+        return f'<HealthConsent user={self.user_id} v{self.terms_version}>'
+
+
+class PatientDoctor(db.Model):
+    """Links patients to their doctors for health data sharing"""
+    __tablename__ = 'patient_doctors'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
+    notes = db.Column(db.Text, nullable=True)  # e.g., "Primary care", "Cardiologist"
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('my_doctors', lazy=True))
+    doctor = db.relationship('Doctor', backref=db.backref('patients', lazy=True))
+
+    # Ensure unique patient-doctor pairs
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'doctor_id', name='unique_patient_doctor'),
+    )
+
+    def __repr__(self):
+        return f'<PatientDoctor user={self.user_id} doctor={self.doctor_id}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'doctor_id': self.doctor_id,
+            'doctor_name': self.doctor.name if self.doctor else None,
+            'doctor_specialty': self.doctor.specialty.name if self.doctor and self.doctor.specialty else None,
+            'notes': self.notes,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+
+# =============================================================================
+# CLINIC & APPOINTMENT SYSTEM
+# =============================================================================
+
+class ClinicStaff(db.Model):
+    """Staff members who can manage a clinic (admin, receptionist, etc.)"""
+    __tablename__ = 'clinic_staff'
+
+    id = db.Column(db.Integer, primary_key=True)
+    clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    role = db.Column(db.String(50), default='staff')  # admin, staff, receptionist
+    is_active = db.Column(db.Boolean, default=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    clinic = db.relationship('Clinic', backref=db.backref('staff', lazy=True))
+    user = db.relationship('User', backref=db.backref('clinic_roles', lazy=True))
+
+    # Ensure unique user per clinic
+    __table_args__ = (
+        db.UniqueConstraint('clinic_id', 'user_id', name='unique_clinic_staff'),
+    )
+
+    def __repr__(self):
+        return f'<ClinicStaff clinic={self.clinic_id} user={self.user_id} role={self.role}>'
+
+
+class ClinicDoctor(db.Model):
+    """Links verified doctors to clinics - requires doctor approval"""
+    __tablename__ = 'clinic_doctors'
+
+    id = db.Column(db.Integer, primary_key=True)
+    clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
+
+    # Role at clinic
+    role = db.Column(db.String(50), default='consultant')  # owner, consultant, visiting, resident
+
+    # Clinic-specific details (may differ from main profile)
+    consultation_fee = db.Column(db.Integer)  # Fee at THIS clinic (NPR)
+
+    # Approval workflow
+    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
+    invited_by_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    responded_at = db.Column(db.DateTime)
+    rejection_reason = db.Column(db.String(500))
+
+    # Appointment settings for this doctor at this clinic
+    slot_duration_minutes = db.Column(db.Integer, default=15)
+    max_patients_per_slot = db.Column(db.Integer, default=1)
+    accepts_online_booking = db.Column(db.Boolean, default=True)
+    booking_notice_hours = db.Column(db.Integer, default=2)  # Min hours before appointment
+    cancellation_notice_hours = db.Column(db.Integer, default=24)  # Min hours to cancel
+
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    clinic = db.relationship('Clinic', backref=db.backref('clinic_doctors', lazy=True))
+    doctor = db.relationship('Doctor', backref=db.backref('clinic_affiliations', lazy=True))
+    invited_by = db.relationship('User', backref=db.backref('doctor_invitations', lazy=True))
+
+    # Ensure unique doctor per clinic
+    __table_args__ = (
+        db.UniqueConstraint('clinic_id', 'doctor_id', name='unique_clinic_doctor'),
+    )
+
+    def __repr__(self):
+        return f'<ClinicDoctor clinic={self.clinic_id} doctor={self.doctor_id} status={self.status}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'clinic_id': self.clinic_id,
+            'clinic_name': self.clinic.name if self.clinic else None,
+            'doctor_id': self.doctor_id,
+            'doctor_name': self.doctor.name if self.doctor else None,
+            'role': self.role,
+            'consultation_fee': self.consultation_fee,
+            'status': self.status,
+            'slot_duration_minutes': self.slot_duration_minutes,
+            'accepts_online_booking': self.accepts_online_booking,
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+    def get_schedules(self):
+        """Get all active schedules for this doctor at this clinic"""
+        return ClinicSchedule.query.filter_by(
+            clinic_doctor_id=self.id,
+            is_active=True
+        ).order_by(ClinicSchedule.day_of_week).all()
+
+
+class ClinicSchedule(db.Model):
+    """Weekly schedule for a doctor at a specific clinic"""
+    __tablename__ = 'clinic_schedules'
+
+    id = db.Column(db.Integer, primary_key=True)
+    clinic_doctor_id = db.Column(db.Integer, db.ForeignKey('clinic_doctors.id'), nullable=False)
+
+    day_of_week = db.Column(db.Integer, nullable=False)  # 0=Sunday, 1=Monday, ..., 6=Saturday
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
+
+    # Capacity
+    max_appointments = db.Column(db.Integer, default=20)
+
+    # Overrides
+    is_active = db.Column(db.Boolean, default=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    clinic_doctor = db.relationship('ClinicDoctor', backref=db.backref('schedules', lazy=True))
+
+    def __repr__(self):
+        days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        return f'<ClinicSchedule {days[self.day_of_week]} {self.start_time}-{self.end_time}>'
+
+    def to_dict(self):
+        days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+        return {
+            'id': self.id,
+            'clinic_doctor_id': self.clinic_doctor_id,
+            'day_of_week': self.day_of_week,
+            'day_name': days[self.day_of_week],
+            'start_time': self.start_time.strftime('%H:%M') if self.start_time else None,
+            'end_time': self.end_time.strftime('%H:%M') if self.end_time else None,
+            'max_appointments': self.max_appointments,
+            'is_active': self.is_active
+        }
+
+    def get_time_slots(self, slot_duration_minutes=15):
+        """Generate available time slots for this schedule"""
+        from datetime import datetime, timedelta
+        slots = []
+        current = datetime.combine(datetime.today(), self.start_time)
+        end = datetime.combine(datetime.today(), self.end_time)
+
+        while current < end:
+            slots.append(current.time())
+            current += timedelta(minutes=slot_duration_minutes)
+
+        return slots
+
+
+class ScheduleException(db.Model):
+    """Exceptions to regular schedule (holidays, special hours, blocked days)"""
+    __tablename__ = 'schedule_exceptions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    clinic_doctor_id = db.Column(db.Integer, db.ForeignKey('clinic_doctors.id'), nullable=False)
+
+    exception_date = db.Column(db.Date, nullable=False)
+    exception_type = db.Column(db.String(20), nullable=False)  # closed, modified, special
+
+    # For modified hours (if not fully closed)
+    start_time = db.Column(db.Time)
+    end_time = db.Column(db.Time)
+
+    reason = db.Column(db.String(200))  # "Holiday", "Conference", "Personal leave"
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    clinic_doctor = db.relationship('ClinicDoctor', backref=db.backref('schedule_exceptions', lazy=True))
+
+    def __repr__(self):
+        return f'<ScheduleException {self.exception_date} {self.exception_type}>'
+
+
+class AppointmentReminder(db.Model):
+    """Track reminders sent for appointments"""
+    __tablename__ = 'appointment_reminders'
+
+    id = db.Column(db.Integer, primary_key=True)
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointments.id'), nullable=False)
+
+    reminder_type = db.Column(db.String(20), nullable=False)  # email, sms, whatsapp
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20), default='sent')  # sent, delivered, failed
+
+    # For tracking responses (SMS confirmation)
+    response_received = db.Column(db.Boolean, default=False)
+    response_text = db.Column(db.String(200))
+    response_at = db.Column(db.DateTime)
+
+    # Relationships
+    appointment = db.relationship('Appointment', backref=db.backref('reminders', lazy=True))
+
+    def __repr__(self):
+        return f'<AppointmentReminder {self.appointment_id} {self.reminder_type} {self.status}>'
+
+
+class PatientNoShowRecord(db.Model):
+    """Track patient no-show history for reliability scoring"""
+    __tablename__ = 'patient_no_show_records'
+
+    id = db.Column(db.Integer, primary_key=True)
+    patient_phone = db.Column(db.String(20), nullable=False, index=True)
+    patient_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointments.id'), nullable=False)
+    no_show_date = db.Column(db.Date, nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    appointment = db.relationship('Appointment', backref=db.backref('no_show_record', uselist=False))
+    patient_user = db.relationship('User', backref=db.backref('no_show_records', lazy=True))
+
+    def __repr__(self):
+        return f'<PatientNoShowRecord {self.patient_phone} {self.no_show_date}>'
+
+    @staticmethod
+    def get_no_show_count(patient_phone, months=6):
+        """Get number of no-shows in the past N months"""
+        from datetime import datetime, timedelta
+        cutoff_date = datetime.now().date() - timedelta(days=months * 30)
+        return PatientNoShowRecord.query.filter(
+            PatientNoShowRecord.patient_phone == patient_phone,
+            PatientNoShowRecord.no_show_date >= cutoff_date
+        ).count()

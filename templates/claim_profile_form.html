@@ -30,42 +30,27 @@
             </div>
         </div>
 
-        <!-- Quick Claim -->
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-body p-4">
-                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                    <div>
-                        <h5 class="mb-1"><i class="fas fa-bolt me-2 text-primary"></i>Claim instantly (no documents)</h5>
-                        <p class="text-muted small mb-0">
-                            Get access to your free dashboard, update details, and respond to reviews.
-                            Verification is optional and only required for the verified/featured badges.
-                        </p>
-                    </div>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <form method="POST" action="{{ url_for('claim_profile_quick', doctor_id=doctor.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-check-circle me-2"></i>Claim Now
-                            </button>
-                        </form>
-                        <a href="#verification-section" class="btn btn-outline-secondary">
-                            <i class="fas fa-shield-alt me-2"></i>Verify Instead
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <!-- Verification Required Notice -->
+        <div class="alert alert-info mb-4">
+            <h5 class="alert-heading mb-2">
+                <i class="fas fa-shield-alt me-2"></i>Verification Required
+            </h5>
+            <p class="mb-0">
+                To protect patients, all doctors must verify their credentials before accessing the dashboard.
+                Submit your documents below and we'll review them within 2-3 business days.
+            </p>
         </div>
 
         <!-- Verification Form -->
         <div class="card shadow-sm" id="verification-section">
             <div class="card-body p-4">
                 <h4 class="card-title mb-4">
-                    <i class="fas fa-clipboard-check me-2"></i>Verification (for badges)
+                    <i class="fas fa-clipboard-check me-2"></i>Verify Your Credentials
                 </h4>
 
                 <p class="text-muted mb-4">
-                    Submit verification when you're ready to earn the verified badge and featured placement.
-                    All information will be reviewed by our admin team.
+                    Complete this form to claim your profile. Once verified, you'll get full dashboard access
+                    including the verified badge and ability to respond to reviews.
                 </p>
 
                 <form id="verificationForm" method="POST" action="{{ url_for('claim_profile_submit', doctor_id=doctor.id) }}" enctype="multipart/form-data">
@@ -199,18 +184,19 @@
                         </small>
                     </div>
 
-                    <!-- Practice License Upload (Optional) -->
+                    <!-- NMC Practice License Upload (Required) -->
                     <div class="mb-4">
                         <label for="practice_license" class="form-label">
-                            <i class="fas fa-certificate me-2"></i>Practice License (Optional)
+                            <i class="fas fa-certificate me-2"></i>NMC Practice License <span class="text-danger">*</span>
                         </label>
                         <input type="file"
                                class="form-control"
                                id="practice_license"
                                name="practice_license"
-                               accept=".jpg,.jpeg,.png,.pdf">
+                               accept=".jpg,.jpeg,.png,.pdf"
+                               required>
                         <small class="form-text text-muted">
-                            Helps us verify you faster
+                            Upload your NMC registration certificate with photo ID visible
                         </small>
                     </div>
 
@@ -223,6 +209,27 @@
                             Your documents will be securely stored and only reviewed by our admin team for verification purposes.
                             We will never share your personal documents with third parties.
                         </small>
+                    </div>
+
+                    <!-- Ranksewa Network Opt-in -->
+                    <div class="card mb-4" style="border: 2px solid var(--brand); border-radius: 12px; background: var(--brand-soft);">
+                        <div class="card-body">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ranksewa_network" name="ranksewa_network" checked>
+                                <label class="form-check-label" for="ranksewa_network">
+                                    <strong><i class="fas fa-users me-2" style="color: var(--brand);"></i>Join Ranksewa Network</strong>
+                                </label>
+                            </div>
+                            <p class="text-muted small mb-0 mt-2 ms-4">
+                                Allow patients to add you to their health network and share their health data
+                                (BP, blood sugar, medications) with you for consultations. You agree to:
+                            </p>
+                            <ul class="text-muted small mb-0 mt-1 ms-4">
+                                <li>Use patient data only for their healthcare</li>
+                                <li>Not share, distribute, or export patient data outside Ranksewa</li>
+                                <li>Maintain patient confidentiality</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- Age Verification -->

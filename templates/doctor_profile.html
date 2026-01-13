@@ -66,7 +66,7 @@
     }
 
     .profile-container {
-        max-width: 1100px;
+        max-width: 1400px;
         margin: 0 auto;
         padding: 20px;
         font-family: 'Plus Jakarta Sans', sans-serif;
@@ -116,14 +116,22 @@
         line-height: 1.2;
     }
 
-    .verified-inline {
+    .verified-badge-below {
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        gap: 6px;
+        margin-top: 12px;
+        padding: 6px 14px;
+        background: var(--brand-light);
         color: var(--brand);
-        font-size: 0.7em;
-        margin-left: 6px;
-        vertical-align: middle;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .verified-badge-below i {
+        font-size: 0.9rem;
     }
 
     .hero-tagline {
@@ -439,6 +447,28 @@
         font-weight: 600;
     }
 
+    /* Practice locations list */
+    .practice-locations {
+        list-style: none;
+        padding-left: 0 !important;
+        margin: 0;
+    }
+    .practice-locations li {
+        padding: 4px 0;
+        padding-left: 20px;
+        position: relative;
+        font-weight: 600;
+    }
+    .practice-locations li::before {
+        content: '\f3c5';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        color: var(--brand);
+        font-size: 0.8rem;
+    }
+
     .review-item {
         border-bottom: 1px solid var(--border-color);
         padding: 24px 0;
@@ -749,8 +779,8 @@
 
     /* Back Navigation */
     .back-nav {
-        padding: 12px 0;
-        margin-bottom: 16px;
+        padding: 6px 0;
+        margin-bottom: 10px;
     }
 
     .back-link {
@@ -770,6 +800,10 @@
         color: #0d9488;
         background: #f1f5f9;
     }
+
+    .doctor-profile-page {
+        margin-top: -8px;
+    }
 </style>
 {% endblock %}
 
@@ -782,6 +816,7 @@
 {% block twitter_image %}{{ url_for('serve_photo', filename=doctor.photo_url.replace('photos/', ''), _external=True) if doctor.photo_url else request.url_root + 'static/img/logo.png' }}{% endblock %}
 
 {% block content %}
+<div class="doctor-profile-page">
 <!-- Back Navigation -->
 <nav class="back-nav">
     <div class="container">
@@ -802,7 +837,7 @@ function handleBackClick(e) {
 }
 </script>
 
-<div class="profile-container">
+<div class="profile-container profile-theme">
 
   <!-- HERO SECTION -->
   <div class="profile-hero">
@@ -819,18 +854,18 @@ function handleBackClick(e) {
         {% else %}
           <img src="{{ doctor|doctor_avatar }}" alt="{{ doctor.name }}" class="avatar-lg">
         {% endif %}
+        {% if doctor.is_verified %}
+          <div class="verified-badge-below">
+            <i class="fas fa-check-circle"></i> Verified
+          </div>
+        {% endif %}
       </div>
 
       <!-- Title & Meta Area -->
       <div class="col-md-9">
         <div class="hero-main">
           <div class="hero-identity">
-            <h1 class="hero-title">
-              {{ doctor.name|doctor_title }}
-              {% if doctor.is_verified %}
-                <span class="verified-inline"><i class="fas fa-check-circle"></i></span>
-              {% endif %}
-            </h1>
+            <h1 class="hero-title">{{ doctor.name|doctor_title }}</h1>
             {% if doctor.subscription_tier == 'featured' or doctor.is_featured %}
             <div class="hero-badges">
                 <span class="status-pill featured"><i class="fas fa-crown"></i>Featured</span>
@@ -934,7 +969,7 @@ function handleBackClick(e) {
             <hr class="my-4">
             <div class="text-start">
               <div class="text-muted small mb-1">Clinic / Hospital</div>
-              <a href="{{ url_for('clinic_profile', slug=doctor.clinic.slug) }}" class="text-decoration-none fw-bold text-dark">
+              <a href="{{ url_for('clinic_public_page', clinic_slug=doctor.clinic.slug) }}" class="text-decoration-none fw-bold text-dark">
                 <i class="fas fa-hospital me-2 text-brand"></i>{{ doctor.clinic.name }}
               </a>
             </div>
@@ -1014,7 +1049,7 @@ function handleBackClick(e) {
           <div class="me-3 fs-2"><i class="fas fa-certificate"></i></div>
           <div>
             <h5 class="mb-1 fw-bold"><i class="fas fa-star me-2"></i>Featured Doctor</h5>
-            <p class="mb-0 small opacity-75">Featured profiles receive priority visibility and enhanced patient tools.</p>
+            <p class="mb-0 small opacity-75">Featured doctors get enhanced analytics and premium support.</p>
           </div>
           <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="alert"></button>
         </div>
@@ -1041,9 +1076,24 @@ function handleBackClick(e) {
             <div class="fact-value">{{ doctor.experience }} years</div>
           </div>
 
-          <div class="fact-item">
+          <div class="fact-item{% if doctor.workplace and ('.' in doctor.workplace or doctor.workplace.count(',') > 2) %} full{% endif %}">
             <div class="fact-label"><i class="fas fa-hospital text-brand"></i>Works at</div>
-            <div class="fact-value">{{ doctor.workplace or 'Not provided' }}</div>
+            <div class="fact-value">
+              {% if doctor.workplace %}
+                {% set locations = doctor.workplace.replace('. ', '.|').replace(', ', ',|').split('|') %}
+                {% if locations|length > 1 %}
+                  <ul class="practice-locations mb-0 ps-3">
+                    {% for loc in locations if loc.strip() %}
+                    <li>{{ loc.strip().rstrip(',.') }}</li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  {{ doctor.workplace }}
+                {% endif %}
+              {% else %}
+                Not provided
+              {% endif %}
+            </div>
           </div>
 
           <div class="fact-item">
@@ -1063,11 +1113,82 @@ function handleBackClick(e) {
 
           <div class="fact-item full">
             <div class="fact-label"><i class="fas fa-map-marker-alt text-brand"></i>Practice address</div>
-            <div class="fact-value">{{ doctor.practice_address or 'Not provided' }}</div>
+            <div class="fact-value">
+              {% if doctor.practice_address %}
+                {{ doctor.practice_address|replace('\n', '<br>')|safe }}
+              {% else %}
+                Not provided
+              {% endif %}
+            </div>
           </div>
+
+          {% if doctor.accepted_insurance %}
+          <div class="fact-item full">
+            <div class="fact-label"><i class="fas fa-file-medical text-brand"></i>Accepted Insurance</div>
+            <div class="fact-value">
+              {% set insurances = doctor.accepted_insurance.replace('\n', ',').split(',') %}
+              {% for ins in insurances if ins.strip() %}
+              <span class="badge bg-light text-dark border me-1 mb-1">{{ ins.strip() }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
         </div>
 
-        {% if doctor.working_hours is defined and doctor.working_hours %}
+        {# Show clinic schedules if available, otherwise fall back to working hours #}
+        {% set ns = namespace(has_clinic_schedules=false) %}
+        {% if clinic_affiliations %}
+          {% for aff in clinic_affiliations %}
+            {% if aff.get_schedules()|length > 0 %}
+              {% set ns.has_clinic_schedules = true %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        {% if ns.has_clinic_schedules %}
+          <hr class="my-4">
+          <h4 class="h5 fw-bold mb-3"><i class="far fa-clock text-brand me-2"></i>Availability & Booking</h4>
+
+          {% for aff in clinic_affiliations %}
+            {% set schedules = aff.get_schedules() %}
+            {% if schedules %}
+            <div class="card mb-3" style="border-radius: 12px; border: 1px solid var(--border);">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <h6 class="mb-1">
+                      <i class="fas fa-hospital me-1 text-muted"></i>
+                      {{ aff.clinic.name }}
+                    </h6>
+                    <small class="text-muted">{{ aff.clinic.address }}, {{ aff.clinic.city }}</small>
+                  </div>
+                  {% if aff.consultation_fee %}
+                  <span class="badge bg-light text-dark">NPR {{ aff.consultation_fee }}</span>
+                  {% endif %}
+                </div>
+
+                <div class="d-flex flex-wrap gap-1 mb-3">
+                  {% set days_short = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] %}
+                  {% for s in schedules %}
+                  <span class="badge" style="background: var(--brand-soft); color: var(--brand);">
+                    {{ days_short[s.day_of_week] }} {{ s.start_time.strftime('%I:%M %p') }} - {{ s.end_time.strftime('%I:%M %p') }}
+                  </span>
+                  {% endfor %}
+                </div>
+
+                {% if aff.accepts_online_booking %}
+                <a href="{{ url_for('clinic_book_appointment', clinic_slug=aff.clinic.slug, doctor_id=doctor.id) }}" class="btn btn-primary btn-sm">
+                  <i class="fas fa-calendar-plus me-1"></i>Book Appointment
+                </a>
+                {% else %}
+                <span class="text-muted small"><i class="fas fa-phone me-1"></i>Call clinic to book</span>
+                {% endif %}
+              </div>
+            </div>
+            {% endif %}
+          {% endfor %}
+
+        {% elif doctor.working_hours is defined and doctor.working_hours %}
           {% set working_hours_data = doctor.working_hours|from_json %}
           {% if working_hours_data %}
             <hr class="my-4">
@@ -1249,6 +1370,7 @@ function handleBackClick(e) {
 
     </div>
   </div>
+</div>
 </div>
 
 <!-- Rating Modal -->
@@ -1498,12 +1620,12 @@ document.addEventListener('DOMContentLoaded', function() {
       const commentValue = commentField ? commentField.value.trim() : '';
       if (!ratingValue) {
         event.preventDefault();
-        alert('Please select a star rating before submitting.');
+        showAlert('Please select a star rating before submitting.', 'warning');
         return;
       }
       if (!commentValue) {
         event.preventDefault();
-        alert('Please write a short review before submitting.');
+        showAlert('Please write a short review before submitting.', 'warning');
       }
     });
   }
@@ -1565,7 +1687,7 @@ function copyProfileLink() {
       btn.classList.add('text-secondary');
     }, 2000);
   }).catch(function(err) {
-    alert('Failed to copy link: ' + err);
+    showAlert('Failed to copy link', 'error');
   });
 }
 

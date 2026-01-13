@@ -235,6 +235,18 @@
                     <form method="POST" class="mb-3" onsubmit="return confirm('Are you sure you want to APPROVE this verification request? This will link the user account to the doctor profile and mark the doctor as verified.');">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="action" value="approve"/>
+
+                        <!-- NMC License Expiry Date -->
+                        <div class="mb-3">
+                            <label for="nmc_expiry_date" class="form-label">
+                                <i class="fas fa-calendar-alt me-1"></i><strong>NMC License Expiry Date</strong> (optional)
+                            </label>
+                            <input type="date" class="form-control" id="nmc_expiry_date" name="nmc_expiry_date">
+                            <small class="form-text text-muted">
+                                Leave empty if the license is permanent. If set, doctor will be notified 30 days before expiry to renew.
+                            </small>
+                        </div>
+
                         <div class="d-grid">
                             <button type="submit" class="btn btn-success btn-lg">
                                 <i class="fas fa-check-circle me-2"></i>Approve Verification

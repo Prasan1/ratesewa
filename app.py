@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, make_response, abort, send_from_directory
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash, make_response, abort, send_from_directory, send_file
 from sqlalchemy.orm import joinedload
 from sqlalchemy import or_
 import re
@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
 from authlib.integrations.flask_client import OAuth
-from models import db, City, Specialty, Clinic, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag, BadgeDefinition, UserBadge, ReviewHelpful, Article, ArticleCategory, ClinicManagerDoctor, ClinicAccount, DoctorContact, DoctorSubscription, DoctorCredentials, DoctorSettings, DoctorMedicalTools, DoctorTemplateUsage
+from models import db, City, Specialty, Clinic, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag, BadgeDefinition, UserBadge, ReviewHelpful, Article, ArticleCategory, ClinicManagerDoctor, ClinicAccount, DoctorContact, DoctorSubscription, DoctorCredentials, DoctorSettings, DoctorMedicalTools, DoctorTemplateUsage, ClinicStaff, ClinicDoctor, ClinicSchedule, ScheduleException, AppointmentReminder, PatientNoShowRecord
 from config import Config
 import ad_manager
 import upload_utils
@@ -199,6 +199,63 @@ def get_client_ip():
     if forwarded_for:
         return forwarded_for.split(',')[0].strip()
     return request.remote_addr
+
+
+# --- Password Reset Functions ---
+def generate_password_reset_token(email):
+    """Generate a secure token for password reset"""
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    return serializer.dumps(email, salt='password-reset')
+
+
+def confirm_password_reset_token(token, max_age=3600):
+    """Validate password reset token (1 hour expiry)"""
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    try:
+        return serializer.loads(token, salt='password-reset', max_age=max_age)
+    except (BadSignature, SignatureExpired):
+        return None
+
+
+def send_password_reset_email(user):
+    """Send password reset email to user"""
+    token = generate_password_reset_token(user.email)
+    reset_url = url_for('reset_password', token=token, _external=True)
+
+    if not resend_key:
+        if should_show_dev_verify_link():
+            return reset_url
+        return None
+
+    subject = "Reset your RankSewa password"
+    html = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 520px;">
+          <h2 style="color: #0D8ABC;">Reset your password</h2>
+          <p>Hi {user.name},</p>
+          <p>We received a request to reset your password. Click the button below to create a new password:</p>
+          <p style="margin: 24px 0;">
+            <a href="{reset_url}" style="display:inline-block; padding:14px 28px; background:#0D8ABC; color:#fff; text-decoration:none; border-radius:6px; font-weight:600;">Reset Password</a>
+          </p>
+          <p style="font-size: 13px; color:#6b7280;">This link expires in 1 hour for security.</p>
+          <p style="font-size: 13px; color:#6b7280;">If you didn't request this, you can safely ignore this email.</p>
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+          <p style="font-size: 12px; color:#9ca3af;">RankSewa - Find Doctors in Nepal</p>
+        </div>
+    """
+    params = {
+        "from": "RankSewa <support@ranksewa.com>",
+        "to": [user.email],
+        "subject": subject,
+        "html": html
+    }
+    try:
+        resend.Emails.send(params)
+        return None
+    except Exception as e:
+        print(f"❌ Failed to send password reset email: {e}")
+        if should_show_dev_verify_link():
+            return reset_url
+        return None
 
 def admin_required(f):
     from functools import wraps
@@ -976,7 +1033,7 @@ def register():
             return redirect(url_for('register'))
 
         # Create new user
-        user = User(name=name, email=email, email_verified=False)
+        user = User(name=name, email=email, email_verified=False, is_doctor_intent=is_doctor)
         user.set_password(password)
 
         try:
@@ -1014,7 +1071,8 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if user and user.check_password(password):
-            if not user.email_verified:
+            # Skip email verification in local development
+            if not user.email_verified and is_production:
                 now = datetime.utcnow().timestamp()
                 last_sent = session.get('verification_sent_at', 0)
                 if now - last_sent > 300:
@@ -1042,6 +1100,72 @@ def login():
             flash('Invalid email or password.', 'danger')
 
     return render_template('login.html')
+
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    """Handle forgot password requests"""
+    if session.get('user_id'):
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+
+        if not email:
+            flash('Please enter your email address.', 'warning')
+            return render_template('forgot_password.html')
+
+        user = User.query.filter_by(email=email).first()
+
+        # Always show success message to prevent email enumeration
+        if user:
+            reset_url = send_password_reset_email(user)
+            if reset_url:
+                # Dev mode - show reset link
+                flash(f'DEV: Reset your password here: {reset_url}', 'info')
+
+        flash('If an account with that email exists, we sent a password reset link.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('forgot_password.html')
+
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    """Handle password reset with token"""
+    if session.get('user_id'):
+        return redirect(url_for('index'))
+
+    email = confirm_password_reset_token(token)
+    if not email:
+        flash('This password reset link is invalid or has expired.', 'danger')
+        return redirect(url_for('forgot_password'))
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        flash('User not found.', 'danger')
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+
+        if len(password) < 6:
+            flash('Password must be at least 6 characters long.', 'warning')
+            return render_template('reset_password.html', token=token)
+
+        if password != confirm_password:
+            flash('Passwords do not match.', 'warning')
+            return render_template('reset_password.html', token=token)
+
+        user.set_password(password)
+        db.session.commit()
+
+        flash('Your password has been reset successfully. Please log in.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('reset_password.html', token=token)
+
 
 @app.route('/login/facebook')
 def facebook_login():
@@ -1482,36 +1606,12 @@ def claim_profile_form(doctor_id):
 @app.route('/claim-profile/<int:doctor_id>/quick', methods=['POST'])
 @login_required
 def claim_profile_quick(doctor_id):
-    """Instantly link a doctor profile to the logged-in user without verification."""
-    doctor = Doctor.query.get_or_404(doctor_id)
-    user = User.query.get(session['user_id'])
-
-    if doctor.user_account and doctor.user_account.id != user.id:
-        flash('This profile has already been claimed.', 'warning')
-        return redirect(url_for('claim_profile'))
-
-    if user.doctor_id and user.doctor_id != doctor_id:
-        flash('Your account is already linked to another doctor profile.', 'warning')
-        return redirect(url_for('doctor_dashboard'))
-
-    if user.role == 'doctor' and user.doctor_id == doctor_id:
-        flash('Your profile is already linked to this account.', 'info')
-        return redirect(url_for('doctor_dashboard'))
-
-    existing_request = VerificationRequest.query.filter_by(
-        user_id=user.id
-    ).order_by(VerificationRequest.created_at.desc()).first()
-
-    if existing_request and existing_request.status == 'pending' and existing_request.doctor_id != doctor_id:
-        flash('You already have a pending verification request. Please wait for review before claiming another profile.', 'warning')
-        return redirect(url_for('verification_submitted'))
-
-    user.doctor_id = doctor_id
-    user.role = 'doctor'
-    db.session.commit()
-
-    flash('Profile claimed! You can verify your credentials anytime to earn the verified badge.', 'success')
-    return redirect(url_for('doctor_dashboard'))
+    """
+    Quick claim is DISABLED - all doctors must verify before accessing dashboard.
+    This route now redirects to the full verification form.
+    """
+    flash('To protect patients, all doctors must verify their credentials before accessing the dashboard.', 'info')
+    return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
 
 
 @app.route('/claim-profile/<int:doctor_id>/submit', methods=['POST'])
@@ -1553,9 +1653,13 @@ def claim_profile_submit(doctor_id):
         govt_id = request.files.get('govt_id')
         practice_license = request.files.get('practice_license')
 
-        # Validate required file upload (only govt_id is required)
+        # Validate required file uploads
         if not govt_id or not govt_id.filename:
             flash('Government ID is required for verification.', 'danger')
+            return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
+
+        if not practice_license or not practice_license.filename:
+            flash('NMC Practice License is required for verification.', 'danger')
             return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
 
         # Save files to R2 (with local fallback)
@@ -1627,6 +1731,10 @@ def claim_profile_submit(doctor_id):
                     practice_license, upload_folder, doctor_id, 'practice_license'
                 )
 
+        # Handle Ranksewa Network opt-in
+        ranksewa_network = request.form.get('ranksewa_network') == 'on'
+        doctor.ranksewa_network_enabled = ranksewa_network
+
         # Create verification request
         verification_request = VerificationRequest(
             doctor_id=doctor_id,
@@ -1697,16 +1805,28 @@ def doctor_self_register():
 @app.route('/doctor/self-register/submit', methods=['POST'])
 @login_required
 def doctor_self_register_submit():
-    """Process doctor self-registration submission"""
-    # Check if user already has a pending or approved verification request
+    """
+    Process doctor self-registration submission.
+
+    IMPORTANT: This creates a VerificationRequest only - NO doctor profile is created
+    and NO dashboard access is granted until admin approves the verification.
+    This protects patients from unverified/fake doctors.
+    """
     user_id = session['user_id']
+    user = User.query.get(user_id)
+
+    # Check if user already has a pending or approved verification request
     existing_request = VerificationRequest.query.filter_by(
         user_id=user_id
     ).order_by(VerificationRequest.created_at.desc()).first()
 
     if existing_request and existing_request.status in ['pending', 'approved']:
-        flash('You already have a verification request. Cannot submit another.', 'danger')
-        return redirect(url_for('user_profile'))
+        if existing_request.status == 'pending':
+            flash('You already have a pending verification request. Please wait for admin review.', 'info')
+            return redirect(url_for('verification_submitted'))
+        else:
+            flash('Your doctor profile is already verified.', 'success')
+            return redirect(url_for('doctor_dashboard'))
 
     try:
         # Get form data - all fields are mandatory
@@ -1743,170 +1863,133 @@ def doctor_self_register_submit():
             flash('Invalid specialty or city selected.', 'danger')
             return redirect(url_for('doctor_self_register'))
 
-        # Check if NMC number already exists
+        # Check if NMC number already exists - suggest claiming instead
         existing_doctor = Doctor.query.filter_by(nmc_number=nmc_number).first()
         if existing_doctor:
             flash('This NMC number is already registered. Please claim your existing profile instead.', 'warning')
             return redirect(url_for('claim_profile'))
 
-        # Check if THIS USER already has a pending verification request
-        existing_request = VerificationRequest.query.filter_by(
-            user_id=session['user_id'],
-            status='pending'
-        ).first()
-        if existing_request:
-            flash('You already have a pending verification request. Please wait for admin review.', 'info')
-            return redirect(url_for('verification_submitted'))
-
-        # Note: We intentionally allow multiple users to submit with the same NMC number
-        # Admin will review all requests and approve the legitimate one
-        # This prevents real doctors from being locked out by fraudulent submissions
-        # Admin sees red "Duplicate" warnings and can compare documents side-by-side
-
-        # Create a doctor profile immediately (verification is optional)
-        new_doctor = Doctor(
-            name=name,
-            slug=generate_unique_slug(name),
-            city_id=city_id,
-            specialty_id=specialty_id,
-            education=education,
-            college=college,
-            experience=experience,
-            nmc_number=nmc_number,
-            phone_number=phone_number,
-            practice_address=practice_address,
-            is_verified=False,
-            subscription_tier='free'
-        )
-
-        user = User.query.get(user_id)
-        user.role = 'doctor'
-
-        db.session.add(new_doctor)
-        db.session.flush()
-        user.doctor_id = new_doctor.id
-        db.session.commit()
-
-        session['role'] = 'doctor'
-
-        # Handle optional verification documents
-        medical_degree = request.files.get('medical_degree')
+        # Government ID is REQUIRED for verification
         govt_id = request.files.get('govt_id')
+        if not govt_id or not govt_id.filename:
+            flash('Government ID is required for verification.', 'danger')
+            return redirect(url_for('doctor_self_register'))
+
+        # NMC Practice License is REQUIRED for verification
         practice_license = request.files.get('practice_license')
+        if not practice_license or not practice_license.filename:
+            flash('NMC Practice License is required for verification.', 'danger')
+            return redirect(url_for('doctor_self_register'))
 
-        if govt_id and govt_id.filename:
+        # Handle document uploads
+        upload_folder = app.config['UPLOAD_FOLDER']
+
+        # Use a temporary ID for uploads (user_id since no doctor exists yet)
+        temp_upload_id = f"pending_{user_id}"
+
+        # Upload government ID (required)
+        govt_id_path = None
+        try:
+            govt_id_path = r2_storage.save_verification_document(
+                govt_id, temp_upload_id, 'govt_id'
+            )
+        except Exception as e:
+            print(f"R2 upload failed, falling back to local storage: {e}")
+
+        if not govt_id_path:
             try:
-                upload_folder = app.config['UPLOAD_FOLDER']
-                govt_id_path = None
+                govt_id.seek(0)
+            except Exception:
+                pass
+            govt_id_path = upload_utils.save_verification_document(
+                govt_id, upload_folder, temp_upload_id, 'govt_id'
+            )
 
-                # Try R2 first
+        if not govt_id_path:
+            flash('Failed to upload government ID. Please try again.', 'danger')
+            return redirect(url_for('doctor_self_register'))
+
+        # Optional medical degree
+        medical_degree = request.files.get('medical_degree')
+        medical_degree_path = None
+        if medical_degree and medical_degree.filename:
+            try:
+                medical_degree_path = r2_storage.save_verification_document(
+                    medical_degree, temp_upload_id, 'medical_degree'
+                )
+            except Exception as e:
+                print(f"R2 upload failed for medical_degree: {e}")
+
+            if not medical_degree_path:
                 try:
-                    govt_id_path = r2_storage.save_verification_document(
-                        govt_id, new_doctor.id, 'govt_id'
-                    )
-                except Exception as e:
-                    print(f"R2 upload failed, falling back to local storage: {e}")
-                    govt_id_path = None
-
-                # Fallback to local storage if R2 fails
-                if not govt_id_path:
-                    try:
-                        govt_id.seek(0)  # Reset file pointer
-                    except Exception:
-                        pass  # File might be closed, try upload anyway
-
-                    govt_id_path = upload_utils.save_verification_document(
-                        govt_id, upload_folder, new_doctor.id, 'govt_id'
-                    )
-                    if not govt_id_path:
-                        flash('Profile created, but government ID upload failed. You can submit verification later.', 'warning')
-                        return redirect(url_for('doctor_dashboard'))
-
-                # Optional medical degree
-                medical_degree_path = None
-                if medical_degree and medical_degree.filename:
-                    try:
-                        medical_degree_path = r2_storage.save_verification_document(
-                            medical_degree, new_doctor.id, 'medical_degree'
-                        )
-                    except Exception as e:
-                        print(f"R2 upload failed for medical_degree, falling back: {e}")
-                        medical_degree_path = None
-
-                    # Fallback to local if R2 fails
-                    if not medical_degree_path:
-                        try:
-                            medical_degree.seek(0)
-                        except Exception:
-                            pass
-                        medical_degree_path = upload_utils.save_verification_document(
-                            medical_degree, upload_folder, new_doctor.id, 'medical_degree'
-                        )
-
-                # Optional practice license
-                practice_license_path = None
-                if practice_license and practice_license.filename:
-                    try:
-                        practice_license_path = r2_storage.save_verification_document(
-                            practice_license, new_doctor.id, 'practice_license'
-                        )
-                    except Exception as e:
-                        print(f"R2 upload failed for practice_license, falling back: {e}")
-                        practice_license_path = None
-
-                    # Fallback to local if R2 fails
-                    if not practice_license_path:
-                        try:
-                            practice_license.seek(0)
-                        except Exception:
-                            pass
-                        practice_license_path = upload_utils.save_verification_document(
-                            practice_license, upload_folder, new_doctor.id, 'practice_license'
-                        )
-
-                # Create verification request for the existing profile
-                verification_request = VerificationRequest(
-                    doctor_id=new_doctor.id,
-                    user_id=session['user_id'],
-                    is_new_doctor=False,
-                    proposed_name=name,
-                    proposed_specialty_id=specialty_id,
-                    proposed_city_id=city_id,
-                    proposed_education=education,
-                    proposed_college=college,
-                    proposed_experience=experience,
-                    nmc_number=nmc_number,
-                    phone_number=phone_number,
-                    email=email,
-                    practice_address=practice_address,
-                    practice_city_id=city_id,  # Using same city for practice
-                    medical_degree_path=medical_degree_path,
-                    govt_id_path=govt_id_path,
-                    practice_license_path=practice_license_path,
-                    email_verified=True,  # Email is already verified through user account
-                    status='pending'
+                    medical_degree.seek(0)
+                except Exception:
+                    pass
+                medical_degree_path = upload_utils.save_verification_document(
+                    medical_degree, upload_folder, temp_upload_id, 'medical_degree'
                 )
 
-                db.session.add(verification_request)
-                db.session.commit()
+        # Upload NMC practice license (required - already validated above)
+        practice_license_path = None
+        try:
+            practice_license_path = r2_storage.save_verification_document(
+                practice_license, temp_upload_id, 'practice_license'
+            )
+        except Exception as e:
+            print(f"R2 upload failed for practice_license: {e}")
 
-                send_admin_verification_notification(verification_request, name, user.email)
-                return redirect(url_for('verification_submitted'))
-            except Exception as e:
-                db.session.rollback()
-                print(f"Verification submission failed after profile creation: {e}")
-                flash('Profile created, but verification submission failed. You can submit verification later.', 'warning')
-                return redirect(url_for('doctor_dashboard'))
+        if not practice_license_path:
+            try:
+                practice_license.seek(0)
+            except Exception:
+                pass
+            practice_license_path = upload_utils.save_verification_document(
+                practice_license, upload_folder, temp_upload_id, 'practice_license'
+            )
 
-        flash('Profile created! You can submit verification anytime to earn the verified badge.', 'success')
-        return redirect(url_for('doctor_dashboard'))
+        if not practice_license_path:
+            flash('Failed to upload NMC Practice License. Please try again.', 'danger')
+            return redirect(url_for('doctor_self_register'))
+
+        # Create verification request (NO doctor profile created yet)
+        verification_request = VerificationRequest(
+            doctor_id=None,  # No doctor profile exists yet
+            user_id=user_id,
+            is_new_doctor=True,  # This is a new doctor registration
+            proposed_name=name,
+            proposed_specialty_id=specialty_id,
+            proposed_city_id=city_id,
+            proposed_education=education,
+            proposed_college=college,
+            proposed_experience=experience,
+            nmc_number=nmc_number,
+            phone_number=phone_number,
+            email=email,
+            practice_address=practice_address,
+            practice_city_id=city_id,
+            medical_degree_path=medical_degree_path,
+            govt_id_path=govt_id_path,
+            practice_license_path=practice_license_path,
+            email_verified=True,  # Email verified through user account
+            status='pending'
+        )
+
+        db.session.add(verification_request)
+        db.session.commit()
+
+        # Notify admin of new verification request
+        send_admin_verification_notification(verification_request, name, user.email)
+
+        flash('Your verification request has been submitted! We will review your documents and notify you once approved.', 'success')
+        return redirect(url_for('verification_submitted'))
 
     except ValueError as e:
         flash(str(e), 'danger')
         return redirect(url_for('doctor_self_register'))
     except Exception as e:
         db.session.rollback()
-        flash(f'An error occurred while processing your registration: {str(e)}', 'danger')
+        print(f"Self-registration error: {e}")
+        flash(f'An error occurred while processing your registration. Please try again.', 'danger')
         return redirect(url_for('doctor_self_register'))
 
 
@@ -2167,7 +2250,8 @@ def inject_global_functions():
     return dict(
         get_ad=ad_manager.get_ad_for_position,
         get_promotion_banner=promo_config.get_promotion_banner,
-        is_promotion_active=promo_config.is_promotion_active
+        is_promotion_active=promo_config.is_promotion_active,
+        now=datetime.utcnow  # For license expiry checks in templates
     )
 
 # --- Main App Routes ---
@@ -2220,15 +2304,22 @@ def test_homepage():
 
 @app.route('/clinics')
 def clinics():
-    clinics = Clinic.query.filter_by(is_active=True).order_by(Clinic.is_featured.desc(), Clinic.name.asc()).all()
-    return render_template('clinics.html', clinics=clinics)
+    city_id = request.args.get('city_id', '')
 
+    query = Clinic.query.filter_by(is_active=True)
 
-@app.route('/clinic/<slug>')
-def clinic_profile(slug):
-    clinic = Clinic.query.filter_by(slug=slug, is_active=True).first_or_404()
-    doctors = Doctor.query.filter_by(clinic_id=clinic.id, is_active=True).order_by(Doctor.name.asc()).all()
-    return render_template('clinic_profile.html', clinic=clinic, doctors=doctors)
+    if city_id:
+        query = query.filter_by(city_id=city_id)
+
+    clinics_list = query.order_by(Clinic.is_featured.desc(), Clinic.name.asc()).all()
+
+    # Get all cities for filter dropdown
+    cities = City.query.order_by(City.name.asc()).all()
+
+    return render_template('clinics.html',
+                          clinics=clinics_list,
+                          cities=cities,
+                          selected_city_id=city_id)
 
 
 @app.route('/sw.js')
@@ -2372,6 +2463,54 @@ def get_doctors():
             'has_prev': page > 1
         }
     })
+
+@app.route('/admin')
+@app.route('/admin/dashboard')
+@admin_required
+def admin_dashboard():
+    """Admin dashboard with overview stats"""
+    from datetime import date, timedelta
+
+    # Get current user
+    current_user = db.session.get(User, session.get('user_id'))
+
+    # Calculate stats
+    today = date.today()
+    week_ago = today - timedelta(days=7)
+
+    stats = {
+        # Doctors
+        'doctors': Doctor.query.count(),
+        'verified_doctors': Doctor.query.filter_by(is_verified=True).count(),
+
+        # Clinics
+        'clinics': Clinic.query.count(),
+        'active_clinics': Clinic.query.filter_by(is_active=True).count(),
+        'clinics_with_doctors': db.session.query(Clinic.id).join(ClinicDoctor).filter(ClinicDoctor.status == 'approved').distinct().count(),
+
+        # Users
+        'users': User.query.count(),
+        'admin_users': User.query.filter_by(is_admin=True).count(),
+        'doctor_users': User.query.filter_by(role='doctor').count(),
+
+        # Verifications
+        'pending_verifications': VerificationRequest.query.filter_by(status='pending').count(),
+
+        # Appointments
+        'today_appointments': Appointment.query.filter(Appointment.appointment_date == today).count(),
+
+        # Settings
+        'cities': City.query.count(),
+        'specialties': Specialty.query.count(),
+
+        # Recent activity
+        'recent_reviews': Rating.query.filter(Rating.created_at >= week_ago).count(),
+        'recent_users': User.query.filter(User.created_at >= week_ago).count(),
+        'recent_appointments': Appointment.query.filter(Appointment.created_at >= week_ago).count(),
+    }
+
+    return render_template('admin_dashboard.html', stats=stats, current_user=current_user)
+
 
 @app.route('/admin/doctors')
 @admin_required
@@ -2745,7 +2884,7 @@ def admin_clinics():
     page = request.args.get('page', 1, type=int)
     per_page = 50
 
-    pagination = Clinic.query.options(joinedload(Clinic.city)).order_by(Clinic.name.asc()).paginate(
+    pagination = Clinic.query.order_by(Clinic.name.asc()).paginate(
         page=page,
         per_page=per_page,
         error_out=False
@@ -2759,29 +2898,26 @@ def admin_clinics():
 @app.route('/admin/clinics/new', methods=['GET', 'POST'])
 @admin_required
 def admin_clinic_new():
-    cities = City.query.order_by(City.name.asc()).all()
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
-        city_id = request.form.get('city_id')
+        city = request.form.get('city', '').strip()
         address = request.form.get('address', '').strip()
         phone_number = request.form.get('phone_number', '').strip()
         description = request.form.get('description', '').strip()
-        is_featured = bool(request.form.get('is_featured'))
         is_active = bool(request.form.get('is_active'))
 
-        if not name or not city_id:
+        if not name or not city:
             flash('Clinic name and city are required.', 'danger')
-            return render_template('admin_clinic_form.html', clinic=None, cities=cities)
+            return render_template('admin_clinic_form.html', clinic=None)
 
         slug = generate_unique_clinic_slug(name)
         clinic = Clinic(
             name=name,
             slug=slug,
-            city_id=int(city_id),
+            city=city,
             address=address or None,
             phone_number=phone_number or None,
             description=description or None,
-            is_featured=is_featured,
             is_active=is_active
         )
         db.session.add(clinic)
@@ -2789,51 +2925,56 @@ def admin_clinic_new():
         flash('Clinic added successfully.', 'success')
         return redirect(url_for('admin_clinics'))
 
-    return render_template('admin_clinic_form.html', clinic=None, cities=cities)
+    return render_template('admin_clinic_form.html', clinic=None)
 
 
 @app.route('/admin/clinics/<int:clinic_id>/edit', methods=['GET', 'POST'])
 @admin_required
 def admin_clinic_edit(clinic_id):
     clinic = Clinic.query.get_or_404(clinic_id)
-    cities = City.query.order_by(City.name.asc()).all()
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
-        city_id = request.form.get('city_id')
+        city = request.form.get('city', '').strip()
         address = request.form.get('address', '').strip()
         phone_number = request.form.get('phone_number', '').strip()
         description = request.form.get('description', '').strip()
-        is_featured = bool(request.form.get('is_featured'))
         is_active = bool(request.form.get('is_active'))
 
-        if not name or not city_id:
+        if not name or not city:
             flash('Clinic name and city are required.', 'danger')
-            return render_template('admin_clinic_form.html', clinic=clinic, cities=cities)
+            return render_template('admin_clinic_form.html', clinic=clinic)
 
         if name != clinic.name:
             clinic.slug = generate_unique_clinic_slug(name, clinic_id=clinic.id)
 
         clinic.name = name
-        clinic.city_id = int(city_id)
+        clinic.city = city
         clinic.address = address or None
         clinic.phone_number = phone_number or None
         clinic.description = description or None
-        clinic.is_featured = is_featured
         clinic.is_active = is_active
 
         db.session.commit()
         flash('Clinic updated successfully.', 'success')
         return redirect(url_for('admin_clinics'))
 
-    return render_template('admin_clinic_form.html', clinic=clinic, cities=cities)
+    return render_template('admin_clinic_form.html', clinic=clinic)
 
 
 @app.route('/admin/clinics/<int:clinic_id>/delete', methods=['POST'])
 @admin_required
 def admin_clinic_delete(clinic_id):
     clinic = Clinic.query.get_or_404(clinic_id)
-    if Doctor.query.filter_by(clinic_id=clinic.id).count() > 0:
-        flash('Clinic cannot be deleted while doctors are assigned.', 'warning')
+    # Check if clinic has any doctor affiliations
+    if ClinicDoctor.query.filter_by(clinic_id=clinic.id).count() > 0:
+        flash('Clinic cannot be deleted while doctors are affiliated. Remove all doctor affiliations first.', 'warning')
+        return redirect(url_for('admin_clinics'))
+
+    # Check for appointments
+    if Appointment.query.filter(Appointment.clinic_doctor_id.in_(
+        db.session.query(ClinicDoctor.id).filter_by(clinic_id=clinic.id)
+    )).count() > 0:
+        flash('Clinic cannot be deleted while it has appointment history.', 'warning')
         return redirect(url_for('admin_clinics'))
 
     db.session.delete(clinic)
@@ -3295,6 +3436,41 @@ def admin_user_toggle_admin(user_id):
 
     return redirect(url_for('admin_users'))
 
+
+@app.route('/admin/users/<int:user_id>/reviews')
+@admin_required
+def admin_user_reviews(user_id):
+    """View all reviews by a specific user"""
+    user = User.query.get_or_404(user_id)
+    reviews = Rating.query.filter_by(user_id=user_id).order_by(Rating.created_at.desc()).all()
+    return render_template('admin_user_reviews.html', user=user, reviews=reviews)
+
+
+@app.route('/admin/reviews/<int:review_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_review(review_id):
+    """Delete a review (admin only)"""
+    review = Rating.query.get_or_404(review_id)
+    doctor_name = review.doctor.name
+    user_name = review.user.name
+
+    try:
+        # Delete associated flags first
+        ReviewFlag.query.filter_by(rating_id=review_id).delete()
+        # Delete associated helpful votes
+        ReviewHelpful.query.filter_by(rating_id=review_id).delete()
+        # Delete the review
+        db.session.delete(review)
+        db.session.commit()
+        flash(f'Review by {user_name} for {doctor_name} has been deleted.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting review: {str(e)}', 'danger')
+
+    # Redirect back to the referring page
+    return redirect(request.referrer or url_for('admin_users'))
+
+
 # --- Admin Route: Toggle Featured Status ---
 @app.route('/admin/toggle_featured/<int:doctor_id>')
 @admin_required
@@ -3632,6 +3808,13 @@ def doctor_profile(slug):
     import subscription_config
     tier_features = subscription_config.TIER_FEATURES.get(doctor.subscription_tier, subscription_config.TIER_FEATURES['free'])
 
+    # Get clinic affiliations with schedules for this doctor
+    clinic_affiliations = ClinicDoctor.query.filter_by(
+        doctor_id=doctor.id,
+        status='approved',
+        is_active=True
+    ).all()
+
     return render_template('doctor_profile.html',
                           doctor=doctor,
                           ratings=ratings,
@@ -3640,11 +3823,17 @@ def doctor_profile(slug):
                           now=datetime.utcnow(),
                           banner_ad=banner_ad,
                           inline_ad=inline_ad,
-                          tier_features=tier_features)
+                          tier_features=tier_features,
+                          clinic_affiliations=clinic_affiliations)
 
 @app.route('/rate_doctor', methods=['POST'])
 @login_required
 def rate_doctor():
+    # Block doctors from reviewing - they need a separate patient account
+    if session.get('role') == 'doctor':
+        flash('Doctors cannot review other doctors. Please use a separate patient account.', 'warning')
+        return redirect(request.referrer or url_for('index'))
+
     doctor_id = request.form.get('doctor_id')
     rating_value = request.form.get('rating')
     comment = request.form.get('comment')
@@ -4074,6 +4263,16 @@ def admin_verification_detail(request_id):
             try:
                 user = verification_request.user
 
+                # Parse NMC expiry date if provided
+                nmc_expiry_date = None
+                nmc_expiry_str = request.form.get('nmc_expiry_date', '').strip()
+                if nmc_expiry_str:
+                    try:
+                        from datetime import datetime as dt
+                        nmc_expiry_date = dt.strptime(nmc_expiry_str, '%Y-%m-%d').date()
+                    except ValueError:
+                        flash('Invalid expiry date format. Proceeding without expiry date.', 'warning')
+
                 # Check if this is a new doctor registration
                 if verification_request.is_new_doctor:
                     # Create new doctor profile from verification data
@@ -4103,6 +4302,7 @@ def admin_verification_detail(request_id):
                         college=verification_request.proposed_college,
                         experience=verification_request.proposed_experience,
                         nmc_number=verification_request.nmc_number,
+                        nmc_expiry_date=nmc_expiry_date,  # Can be None for permanent licenses
                         phone_number=verification_request.phone_number,
                         practice_address=verification_request.practice_address,
                         is_verified=True,  # Immediately verified upon approval
@@ -4155,6 +4355,7 @@ def admin_verification_detail(request_id):
                         doctor.is_featured = True
                         doctor.subscription_expires_at = None
                     doctor.nmc_number = verification_request.nmc_number
+                    doctor.nmc_expiry_date = nmc_expiry_date  # Can be None for permanent licenses
                     doctor.phone_number = verification_request.phone_number
                     doctor.practice_address = verification_request.practice_address
 
@@ -4187,14 +4388,34 @@ def admin_verification_detail(request_id):
                     verification_request.reviewed_by = session['user_id']
                     verification_request.reviewed_at = datetime.utcnow()
 
+                    # IMPORTANT: Revoke dashboard access if user had it
+                    # This handles cases from the old flow where access was granted before approval
+                    user = verification_request.user
+                    access_revoked = False
+
+                    if user.role == 'doctor' or user.doctor_id:
+                        # Revoke user's doctor access
+                        user.role = 'patient'
+                        user.doctor_id = None
+                        access_revoked = True
+
+                    # If there's a linked doctor profile, deactivate it
+                    if verification_request.doctor_id:
+                        doctor = verification_request.doctor
+                        if doctor:
+                            doctor.is_verified = False
+                            doctor.is_active = False
+
                     db.session.commit()
 
                     # Send verification rejected email
-                    user = verification_request.user
-                    doctor_name = verification_request.proposed_name if verification_request.is_new_doctor else verification_request.doctor.name
+                    doctor_name = verification_request.proposed_name if verification_request.is_new_doctor else (verification_request.doctor.name if verification_request.doctor else 'Doctor')
                     send_verification_rejected_email(user.email, doctor_name, admin_notes)
 
-                    flash(f'Verification request rejected.', 'info')
+                    if access_revoked:
+                        flash(f'Verification request rejected and dashboard access revoked.', 'info')
+                    else:
+                        flash(f'Verification request rejected.', 'info')
                     return redirect(url_for('admin_verification_requests'))
 
                 except Exception as e:
@@ -4335,6 +4556,27 @@ def doctor_dashboard():
     import subscription_config
     tier_features = subscription_config.TIER_FEATURES.get(doctor.subscription_tier, subscription_config.TIER_FEATURES['free'])
 
+    # Get pending clinic invitations count
+    pending_invitations_count = ClinicDoctor.query.filter_by(
+        doctor_id=doctor.id,
+        status='pending'
+    ).count()
+
+    # Get upcoming appointments for this doctor
+    from datetime import date
+    upcoming_appointments = Appointment.query.filter(
+        Appointment.doctor_id == doctor.id,
+        Appointment.appointment_date >= date.today(),
+        Appointment.status.in_(['booked', 'confirmed'])
+    ).order_by(Appointment.appointment_date, Appointment.appointment_time).limit(10).all()
+
+    # Get today's appointments count
+    todays_appointments_count = Appointment.query.filter(
+        Appointment.doctor_id == doctor.id,
+        Appointment.appointment_date == date.today(),
+        Appointment.status.in_(['booked', 'confirmed', 'checked_in', 'in_progress'])
+    ).count()
+
     return render_template('doctor_dashboard.html',
                          doctor=doctor,
                          user=user,
@@ -4343,7 +4585,10 @@ def doctor_dashboard():
                          response_count=response_count,
                          response_rate=response_rate,
                          verification_request=verification_request,
-                         tier_features=tier_features)
+                         tier_features=tier_features,
+                         pending_invitations_count=pending_invitations_count,
+                         upcoming_appointments=upcoming_appointments,
+                         todays_appointments_count=todays_appointments_count)
 
 
 @app.route('/doctor/qr-code/generate')
@@ -4590,6 +4835,9 @@ def doctor_profile_edit():
                     else:
                         doctor.nmc_number = nmc_input
                         flash('NMC number added successfully!', 'success')
+
+            # Accepted insurance
+            doctor.accepted_insurance = request.form.get('accepted_insurance', '').strip()
 
             # Handle profile photo removal
             if 'remove_photo' in request.form and doctor.photo_url:
@@ -4911,6 +5159,14 @@ def user_profile():
     if pending_verification:
         return redirect(url_for('verification_submitted'))
 
+    # If user indicated doctor intent but never submitted verification, show a reminder
+    # (but don't block them from their patient profile)
+    show_doctor_verification_reminder = False
+    if user.is_doctor_intent and not user.doctor_id:
+        any_verification = VerificationRequest.query.filter_by(user_id=user_id).first()
+        if not any_verification:
+            show_doctor_verification_reminder = True
+
     # Get user's appointments
     appointments = Appointment.query.filter_by(user_id=user_id).order_by(Appointment.created_at.desc()).all()
 
@@ -4976,7 +5232,8 @@ def user_profile():
                          tier_name=tier_name,
                          next_tier=next_tier,
                          points_to_next=points_to_next,
-                         activities=activities)
+                         activities=activities,
+                         show_doctor_verification_reminder=show_doctor_verification_reminder)
 
 @app.route('/change-password', methods=['POST'])
 @login_required
@@ -5240,6 +5497,1775 @@ def test_r2_upload():
             results.append(f"Response: {e.response}")
 
     return '<pre>' + '\n'.join(results) + '</pre>'
+
+
+# =============================================================================
+# PATIENT HEALTH TRACKING ROUTES
+# =============================================================================
+
+# Current health terms version - increment when terms change
+HEALTH_TERMS_VERSION = "1.0"
+
+@app.route('/health')
+@login_required
+def health_dashboard():
+    """Health tracking dashboard"""
+    user = User.query.get(session['user_id'])
+
+    # Block verified doctors from accessing - they need a separate patient account
+    if session.get('role') == 'doctor':
+        flash('Health tracking is for patients only. Please use a separate patient account.', 'warning')
+        return redirect(url_for('index'))
+
+    # Note: Users who checked "I am a doctor" but haven't verified yet can still use
+    # patient features. Once verified, they lose access. If they need their old data,
+    # admin can export it manually (rare edge case).
+
+    from models import BPRecord, SugarRecord, Medication, PatientDoctor, HealthConsent
+    user_id = session['user_id']
+
+    # Check if user has accepted health tracking terms
+    consent = HealthConsent.query.filter_by(user_id=user_id).first()
+    needs_consent = consent is None or consent.terms_version != HEALTH_TERMS_VERSION
+
+    # Get latest readings
+    latest_bp = BPRecord.query.filter_by(user_id=user_id).order_by(BPRecord.timestamp.desc()).first()
+    latest_sugar = SugarRecord.query.filter_by(user_id=user_id).order_by(SugarRecord.timestamp.desc()).first()
+
+    # Get recent records (last 5)
+    recent_bp = BPRecord.query.filter_by(user_id=user_id).order_by(BPRecord.timestamp.desc()).limit(5).all()
+    recent_sugar = SugarRecord.query.filter_by(user_id=user_id).order_by(SugarRecord.timestamp.desc()).limit(5).all()
+
+    # Get active medications
+    medications = Medication.query.filter_by(user_id=user_id, is_active=True).order_by(Medication.created_at.desc()).all()
+
+    # Get patient's Ranksewa Network (linked doctors)
+    my_doctors = PatientDoctor.query.filter_by(user_id=user_id).all()
+
+    return render_template('health/dashboard.html',
+                          latest_bp=latest_bp,
+                          latest_sugar=latest_sugar,
+                          recent_bp=recent_bp,
+                          recent_sugar=recent_sugar,
+                          medications=medications,
+                          my_doctors=my_doctors,
+                          needs_consent=needs_consent,
+                          terms_version=HEALTH_TERMS_VERSION)
+
+
+@app.route('/health/vitals')
+@login_required
+def health_vitals():
+    """Vitals history page"""
+    # Block doctors from accessing
+    if session.get('role') == 'doctor':
+        flash('Health tracking is for patients only. Please use a separate patient account.', 'warning')
+        return redirect(url_for('index'))
+
+    from models import BPRecord, SugarRecord
+    user_id = session['user_id']
+
+    bp_records = BPRecord.query.filter_by(user_id=user_id).order_by(BPRecord.timestamp.desc()).limit(50).all()
+    sugar_records = SugarRecord.query.filter_by(user_id=user_id).order_by(SugarRecord.timestamp.desc()).limit(50).all()
+
+    return render_template('health/vitals.html',
+                          bp_records=bp_records,
+                          sugar_records=sugar_records)
+
+
+@app.route('/health/medications')
+@login_required
+def health_medications():
+    """Medications page"""
+    # Block doctors from accessing
+    if session.get('role') == 'doctor':
+        flash('Health tracking is for patients only. Please use a separate patient account.', 'warning')
+        return redirect(url_for('index'))
+
+    from models import Medication
+    user_id = session['user_id']
+
+    medications = Medication.query.filter_by(user_id=user_id).order_by(Medication.is_active.desc(), Medication.created_at.desc()).all()
+
+    return render_template('health/medications.html',
+                          medications=medications)
+
+
+# --- Health API Routes ---
+
+@app.route('/api/health/bp', methods=['GET', 'POST'])
+@login_required
+def api_health_bp():
+    """BP records API"""
+    from models import BPRecord
+    user_id = session['user_id']
+
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+            if not data:
+                return jsonify({'success': False, 'error': 'Invalid request'}), 400
+
+            systolic = data.get('systolic')
+            diastolic = data.get('diastolic')
+
+            if not systolic or not diastolic:
+                return jsonify({'success': False, 'error': 'Systolic and diastolic required'}), 400
+
+            # Parse timestamp or use now
+            timestamp = datetime.utcnow()
+            if data.get('timestamp'):
+                try:
+                    timestamp = datetime.fromisoformat(data['timestamp'].replace('Z', '+00:00'))
+                except:
+                    pass
+
+            bp_record = BPRecord(
+                user_id=user_id,
+                systolic=int(systolic),
+                diastolic=int(diastolic),
+                pulse=int(data.get('pulse')) if data.get('pulse') else None,
+                notes=data.get('notes', ''),
+                timestamp=timestamp
+            )
+            db.session.add(bp_record)
+            db.session.commit()
+
+            return jsonify({'success': True, 'id': bp_record.id, 'data': bp_record.to_dict()})
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    # GET - return user's BP records
+    records = BPRecord.query.filter_by(user_id=user_id).order_by(BPRecord.timestamp.desc()).limit(50).all()
+    return jsonify({'success': True, 'data': [r.to_dict() for r in records]})
+
+
+@app.route('/api/health/bp/<int:record_id>', methods=['DELETE'])
+@login_required
+def api_health_bp_delete(record_id):
+    """Delete BP record"""
+    from models import BPRecord
+    user_id = session['user_id']
+
+    record = BPRecord.query.filter_by(id=record_id, user_id=user_id).first()
+    if not record:
+        return jsonify({'success': False, 'error': 'Record not found'}), 404
+
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'success': True})
+
+
+@app.route('/api/health/sugar', methods=['GET', 'POST'])
+@login_required
+def api_health_sugar():
+    """Blood sugar records API"""
+    from models import SugarRecord
+    user_id = session['user_id']
+
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+            if not data:
+                return jsonify({'success': False, 'error': 'Invalid request'}), 400
+
+            value = data.get('value')
+            if not value:
+                return jsonify({'success': False, 'error': 'Value required'}), 400
+
+            # Parse timestamp or use now
+            timestamp = datetime.utcnow()
+            if data.get('timestamp'):
+                try:
+                    timestamp = datetime.fromisoformat(data['timestamp'].replace('Z', '+00:00'))
+                except:
+                    pass
+
+            sugar_record = SugarRecord(
+                user_id=user_id,
+                value=int(value),
+                notes=data.get('notes', ''),
+                timestamp=timestamp
+            )
+            db.session.add(sugar_record)
+            db.session.commit()
+
+            return jsonify({'success': True, 'id': sugar_record.id, 'data': sugar_record.to_dict()})
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    # GET - return user's sugar records
+    records = SugarRecord.query.filter_by(user_id=user_id).order_by(SugarRecord.timestamp.desc()).limit(50).all()
+    return jsonify({'success': True, 'data': [r.to_dict() for r in records]})
+
+
+@app.route('/api/health/sugar/<int:record_id>', methods=['DELETE'])
+@login_required
+def api_health_sugar_delete(record_id):
+    """Delete sugar record"""
+    from models import SugarRecord
+    user_id = session['user_id']
+
+    record = SugarRecord.query.filter_by(id=record_id, user_id=user_id).first()
+    if not record:
+        return jsonify({'success': False, 'error': 'Record not found'}), 404
+
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({'success': True})
+
+
+@app.route('/api/health/medications', methods=['GET', 'POST'])
+@login_required
+def api_health_medications():
+    """Medications API"""
+    from models import Medication
+    user_id = session['user_id']
+
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+            if not data:
+                return jsonify({'success': False, 'error': 'Invalid request'}), 400
+
+            name = data.get('name')
+            dosage = data.get('dosage')
+            frequency = data.get('frequency')
+
+            if not all([name, dosage, frequency]):
+                return jsonify({'success': False, 'error': 'Name, dosage, and frequency required'}), 400
+
+            medication = Medication(
+                user_id=user_id,
+                name=name,
+                dosage=dosage,
+                frequency=frequency,
+                instructions=data.get('instructions', ''),
+                is_active=True
+            )
+            db.session.add(medication)
+            db.session.commit()
+
+            return jsonify({'success': True, 'id': medication.id, 'data': medication.to_dict()})
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    # GET - return user's medications
+    medications = Medication.query.filter_by(user_id=user_id).order_by(Medication.is_active.desc(), Medication.created_at.desc()).all()
+    return jsonify({'success': True, 'data': [m.to_dict() for m in medications]})
+
+
+@app.route('/api/health/medications/<int:med_id>', methods=['DELETE'])
+@login_required
+def api_health_medication_delete(med_id):
+    """Delete/deactivate medication"""
+    from models import Medication
+    user_id = session['user_id']
+
+    medication = Medication.query.filter_by(id=med_id, user_id=user_id).first()
+    if not medication:
+        return jsonify({'success': False, 'error': 'Medication not found'}), 404
+
+    # Soft delete - just deactivate
+    medication.is_active = False
+    db.session.commit()
+    return jsonify({'success': True})
+
+
+@app.route('/api/health/stats')
+@login_required
+def api_health_stats():
+    """Get health statistics summary"""
+    from models import BPRecord, SugarRecord, Medication
+    from datetime import timedelta
+    user_id = session['user_id']
+
+    # Get counts
+    bp_count = BPRecord.query.filter_by(user_id=user_id).count()
+    sugar_count = SugarRecord.query.filter_by(user_id=user_id).count()
+    med_count = Medication.query.filter_by(user_id=user_id, is_active=True).count()
+
+    # Get 7-day averages
+    week_ago = datetime.utcnow() - timedelta(days=7)
+
+    recent_bp = BPRecord.query.filter(
+        BPRecord.user_id == user_id,
+        BPRecord.timestamp >= week_ago
+    ).all()
+
+    recent_sugar = SugarRecord.query.filter(
+        SugarRecord.user_id == user_id,
+        SugarRecord.timestamp >= week_ago
+    ).all()
+
+    bp_avg = None
+    if recent_bp:
+        avg_sys = sum(r.systolic for r in recent_bp) / len(recent_bp)
+        avg_dia = sum(r.diastolic for r in recent_bp) / len(recent_bp)
+        bp_avg = {'systolic': round(avg_sys), 'diastolic': round(avg_dia)}
+
+    sugar_avg = None
+    if recent_sugar:
+        sugar_avg = round(sum(r.value for r in recent_sugar) / len(recent_sugar))
+
+    return jsonify({
+        'success': True,
+        'data': {
+            'counts': {
+                'bp': bp_count,
+                'sugar': sugar_count,
+                'medications': med_count
+            },
+            'averages': {
+                'bp': bp_avg,
+                'sugar': sugar_avg
+            },
+            'recent_readings': {
+                'bp': len(recent_bp),
+                'sugar': len(recent_sugar)
+            }
+        }
+    })
+
+
+@app.route('/api/health/consent', methods=['POST'])
+@login_required
+def api_accept_health_consent():
+    """Accept health tracking terms and conditions"""
+    from models import HealthConsent
+
+    # Block doctors from accessing
+    if session.get('role') == 'doctor':
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    user_id = session['user_id']
+    data = request.get_json()
+    terms_version = data.get('terms_version', HEALTH_TERMS_VERSION)
+
+    try:
+        # Check if consent already exists
+        consent = HealthConsent.query.filter_by(user_id=user_id).first()
+
+        if consent:
+            # Update existing consent
+            consent.terms_version = terms_version
+            consent.accepted_at = datetime.utcnow()
+            consent.ip_address = request.remote_addr
+        else:
+            # Create new consent
+            consent = HealthConsent(
+                user_id=user_id,
+                terms_version=terms_version,
+                ip_address=request.remote_addr
+            )
+            db.session.add(consent)
+
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Terms accepted successfully'
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/health/export-pdf')
+@login_required
+def export_health_pdf():
+    """Export health vitals and medications as PDF for sharing with doctor"""
+    from models import BPRecord, SugarRecord, Medication
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.units import inch, cm
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+    from reportlab.graphics.shapes import Drawing, Line
+    from reportlab.graphics.charts.lineplots import LinePlot
+    from reportlab.graphics.widgets.markers import makeMarker
+    from io import BytesIO
+
+    # Block doctors from accessing
+    if session.get('role') == 'doctor':
+        flash('Health tracking is for patients only.', 'warning')
+        return redirect(url_for('index'))
+
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+
+    # Get all vitals (last 30 days)
+    from datetime import timedelta
+    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+
+    bp_records = BPRecord.query.filter(
+        BPRecord.user_id == user_id,
+        BPRecord.timestamp >= thirty_days_ago
+    ).order_by(BPRecord.timestamp.desc()).all()
+
+    sugar_records = SugarRecord.query.filter(
+        SugarRecord.user_id == user_id,
+        SugarRecord.timestamp >= thirty_days_ago
+    ).order_by(SugarRecord.timestamp.desc()).all()
+
+    medications = Medication.query.filter_by(user_id=user_id, is_active=True).all()
+
+    # Create PDF
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=1*cm, bottomMargin=1*cm, leftMargin=1.5*cm, rightMargin=1.5*cm)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Custom styles
+    title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=18, textColor=colors.HexColor('#0d9488'), spaceAfter=10)
+    section_style = ParagraphStyle('Section', parent=styles['Heading2'], fontSize=14, textColor=colors.HexColor('#1f2937'), spaceBefore=15, spaceAfter=8)
+    normal_style = ParagraphStyle('Normal', parent=styles['Normal'], fontSize=10, textColor=colors.HexColor('#374151'))
+    small_style = ParagraphStyle('Small', parent=styles['Normal'], fontSize=8, textColor=colors.HexColor('#6b7280'))
+
+    # Header
+    elements.append(Paragraph("Health Summary Report", title_style))
+    elements.append(Paragraph(f"Patient: {user.name or user.email}", normal_style))
+    elements.append(Paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}", small_style))
+    elements.append(Paragraph(f"Period: Last 30 days", small_style))
+    elements.append(Spacer(1, 0.3*inch))
+
+    # Medications Section
+    elements.append(Paragraph("Current Medications", section_style))
+    if medications:
+        med_data = [['Medication', 'Dosage', 'Frequency', 'Instructions']]
+        for med in medications:
+            med_data.append([med.name, med.dosage, med.frequency, med.instructions or '-'])
+
+        med_table = Table(med_data, colWidths=[2.5*inch, 1*inch, 1.3*inch, 2*inch])
+        med_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0d9488')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('TOPPADDING', (0, 0), (-1, 0), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8fafc')),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8fafc')]),
+        ]))
+        elements.append(med_table)
+    else:
+        elements.append(Paragraph("No active medications recorded.", small_style))
+
+    elements.append(Spacer(1, 0.3*inch))
+
+    # Blood Pressure Section
+    elements.append(Paragraph("Blood Pressure Readings", section_style))
+    if bp_records:
+        # Calculate averages
+        avg_sys = sum(r.systolic for r in bp_records) / len(bp_records)
+        avg_dia = sum(r.diastolic for r in bp_records) / len(bp_records)
+        elements.append(Paragraph(f"Average: {round(avg_sys)}/{round(avg_dia)} mmHg ({len(bp_records)} readings)", normal_style))
+        elements.append(Spacer(1, 0.1*inch))
+
+        # BP Chart
+        if len(bp_records) >= 2:
+            drawing = Drawing(500, 150)
+            lp = LinePlot()
+            lp.x = 40
+            lp.y = 20
+            lp.height = 110
+            lp.width = 420
+
+            # Reverse to show oldest first
+            bp_sorted = list(reversed(bp_records[:15]))  # Max 15 points
+            sys_data = [(i, r.systolic) for i, r in enumerate(bp_sorted)]
+            dia_data = [(i, r.diastolic) for i, r in enumerate(bp_sorted)]
+
+            lp.data = [sys_data, dia_data]
+            lp.lines[0].strokeColor = colors.HexColor('#ef4444')
+            lp.lines[0].symbol = makeMarker('Circle')
+            lp.lines[1].strokeColor = colors.HexColor('#3b82f6')
+            lp.lines[1].symbol = makeMarker('Circle')
+
+            lp.xValueAxis.valueMin = 0
+            lp.xValueAxis.valueMax = len(bp_sorted) - 1
+            lp.xValueAxis.labels.fontSize = 7
+            lp.yValueAxis.valueMin = 50
+            lp.yValueAxis.valueMax = 180
+
+            drawing.add(lp)
+            elements.append(drawing)
+            elements.append(Paragraph("Red: Systolic | Blue: Diastolic", small_style))
+            elements.append(Spacer(1, 0.1*inch))
+
+        # BP Table
+        bp_data = [['Date', 'Systolic', 'Diastolic', 'Pulse', 'Notes']]
+        for record in bp_records[:20]:  # Max 20 records
+            bp_data.append([
+                record.timestamp.strftime('%b %d, %I:%M %p'),
+                str(record.systolic),
+                str(record.diastolic),
+                str(record.pulse) if record.pulse else '-',
+                (record.notes[:30] + '...' if record.notes and len(record.notes) > 30 else record.notes) or '-'
+            ])
+
+        bp_table = Table(bp_data, colWidths=[1.6*inch, 0.8*inch, 0.8*inch, 0.6*inch, 2.5*inch])
+        bp_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#ef4444')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (1, 1), (3, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+            ('TOPPADDING', (0, 0), (-1, 0), 6),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#fef2f2')]),
+        ]))
+        elements.append(bp_table)
+    else:
+        elements.append(Paragraph("No blood pressure readings in the last 30 days.", small_style))
+
+    elements.append(Spacer(1, 0.3*inch))
+
+    # Blood Sugar Section
+    elements.append(Paragraph("Blood Sugar Readings", section_style))
+    if sugar_records:
+        avg_sugar = sum(r.value for r in sugar_records) / len(sugar_records)
+        elements.append(Paragraph(f"Average: {round(avg_sugar)} mg/dL ({len(sugar_records)} readings)", normal_style))
+        elements.append(Spacer(1, 0.1*inch))
+
+        # Sugar Chart
+        if len(sugar_records) >= 2:
+            drawing = Drawing(500, 150)
+            lp = LinePlot()
+            lp.x = 40
+            lp.y = 20
+            lp.height = 110
+            lp.width = 420
+
+            sugar_sorted = list(reversed(sugar_records[:15]))
+            sugar_data = [(i, r.value) for i, r in enumerate(sugar_sorted)]
+
+            lp.data = [sugar_data]
+            lp.lines[0].strokeColor = colors.HexColor('#f59e0b')
+            lp.lines[0].symbol = makeMarker('Circle')
+
+            lp.xValueAxis.valueMin = 0
+            lp.xValueAxis.valueMax = len(sugar_sorted) - 1
+            lp.xValueAxis.labels.fontSize = 7
+            lp.yValueAxis.valueMin = 50
+            lp.yValueAxis.valueMax = max(r.value for r in sugar_sorted) + 30
+
+            drawing.add(lp)
+            elements.append(drawing)
+            elements.append(Paragraph("Blood Sugar Trend (mg/dL)", small_style))
+            elements.append(Spacer(1, 0.1*inch))
+
+        # Sugar Table
+        sugar_data = [['Date', 'Value (mg/dL)', 'Notes']]
+        for record in sugar_records[:20]:
+            sugar_data.append([
+                record.timestamp.strftime('%b %d, %I:%M %p'),
+                str(record.value),
+                (record.notes[:40] + '...' if record.notes and len(record.notes) > 40 else record.notes) or '-'
+            ])
+
+        sugar_table = Table(sugar_data, colWidths=[1.6*inch, 1.2*inch, 3.5*inch])
+        sugar_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f59e0b')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (1, 1), (1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+            ('TOPPADDING', (0, 0), (-1, 0), 6),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#fffbeb')]),
+        ]))
+        elements.append(sugar_table)
+    else:
+        elements.append(Paragraph("No blood sugar readings in the last 30 days.", small_style))
+
+    # Footer
+    elements.append(Spacer(1, 0.5*inch))
+    elements.append(Paragraph("Generated by RankSewa Health Tracker - www.ranksewa.com", small_style))
+    elements.append(Paragraph("This report is for informational purposes only and should not replace professional medical advice.", small_style))
+
+    # Build PDF
+    doc.build(elements)
+    buffer.seek(0)
+
+    filename = f"health_report_{user.name or 'patient'}_{datetime.now().strftime('%Y%m%d')}.pdf"
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=filename,
+        mimetype='application/pdf'
+    )
+
+
+# =============================================================================
+# RANKSEWA NETWORK API (Patient-Doctor Links)
+# =============================================================================
+
+@app.route('/api/health/network')
+@login_required
+def api_health_network():
+    """Get patient's Ranksewa Network (linked doctors)"""
+    from models import PatientDoctor
+
+    # Block doctors from accessing
+    if session.get('role') == 'doctor':
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    user_id = session['user_id']
+    links = PatientDoctor.query.filter_by(user_id=user_id).all()
+
+    return jsonify({
+        'success': True,
+        'data': [link.to_dict() for link in links]
+    })
+
+
+@app.route('/api/health/network', methods=['POST'])
+@login_required
+def api_add_to_network():
+    """Add a doctor to patient's Ranksewa Network"""
+    from models import PatientDoctor, Doctor
+
+    # Block doctors from accessing
+    if session.get('role') == 'doctor':
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    user_id = session['user_id']
+    data = request.get_json()
+
+    doctor_id = data.get('doctor_id')
+    notes = data.get('notes', '')
+
+    if not doctor_id:
+        return jsonify({'success': False, 'error': 'Doctor ID required'}), 400
+
+    # Verify doctor exists and is verified
+    doctor = Doctor.query.get(doctor_id)
+    if not doctor:
+        return jsonify({'success': False, 'error': 'Doctor not found'}), 404
+    if not doctor.is_verified:
+        return jsonify({'success': False, 'error': 'Only verified doctors can be added to your network'}), 400
+    if not doctor.ranksewa_network_enabled:
+        return jsonify({'success': False, 'error': 'This doctor has not joined the Ranksewa Network'}), 400
+
+    # Check if already linked
+    existing = PatientDoctor.query.filter_by(user_id=user_id, doctor_id=doctor_id).first()
+    if existing:
+        return jsonify({'success': False, 'error': 'Doctor already in your network'}), 400
+
+    try:
+        link = PatientDoctor(
+            user_id=user_id,
+            doctor_id=doctor_id,
+            notes=notes
+        )
+        db.session.add(link)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'data': link.to_dict()
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/health/network/<int:link_id>', methods=['DELETE'])
+@login_required
+def api_remove_from_network(link_id):
+    """Remove a doctor from patient's Ranksewa Network"""
+    from models import PatientDoctor
+
+    # Block doctors from accessing
+    if session.get('role') == 'doctor':
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    user_id = session['user_id']
+
+    link = PatientDoctor.query.filter_by(id=link_id, user_id=user_id).first()
+    if not link:
+        return jsonify({'success': False, 'error': 'Not found'}), 404
+
+    try:
+        db.session.delete(link)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/health/network/search')
+@login_required
+def api_search_doctors_for_network():
+    """Search verified doctors to add to network"""
+    from models import Doctor, PatientDoctor
+
+    # Block doctors from accessing
+    if session.get('role') == 'doctor':
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    user_id = session['user_id']
+    query = request.args.get('q', '').strip()
+
+    if len(query) < 2:
+        return jsonify({'success': True, 'data': []})
+
+    # Get IDs of doctors already in network
+    existing_ids = [link.doctor_id for link in PatientDoctor.query.filter_by(user_id=user_id).all()]
+
+    # Search verified doctors who have opted into Ranksewa Network
+    doctors = Doctor.query.filter(
+        Doctor.is_verified == True,
+        Doctor.ranksewa_network_enabled == True,
+        Doctor.name.ilike(f'%{query}%'),
+        ~Doctor.id.in_(existing_ids) if existing_ids else True
+    ).limit(10).all()
+
+    return jsonify({
+        'success': True,
+        'data': [{
+            'id': d.id,
+            'name': d.name,
+            'specialty': d.specialty.name if d.specialty else None,
+            'city': d.city.name if d.city else None
+        } for d in doctors]
+    })
+
+
+# =============================================================================
+# CLINIC & APPOINTMENT SYSTEM ROUTES
+# =============================================================================
+
+@app.route('/clinic/register', methods=['GET', 'POST'])
+@login_required
+def clinic_register():
+    """Register a new clinic"""
+    from models import Clinic, ClinicStaff
+    from slugify import slugify
+
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        address = request.form.get('address', '').strip()
+        city = request.form.get('city', '').strip()
+        phone = request.form.get('phone', '').strip()
+        email = request.form.get('email', '').strip()
+        clinic_type = request.form.get('clinic_type', 'clinic')
+        description = request.form.get('description', '').strip()
+
+        # Validation
+        errors = []
+        if not name or len(name) < 3:
+            errors.append('Clinic name must be at least 3 characters')
+        if not address:
+            errors.append('Address is required')
+        if not city:
+            errors.append('City is required')
+
+        if errors:
+            for error in errors:
+                flash(error, 'danger')
+            return render_template('clinic/register.html')
+
+        # Generate unique slug
+        base_slug = slugify(name)
+        slug = base_slug
+        counter = 1
+        while Clinic.query.filter_by(slug=slug).first():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+
+        # Look up city_id from city name (case-insensitive)
+        city_record = City.query.filter(City.name.ilike(city)).first()
+        city_id = city_record.id if city_record else 1  # Default to Kathmandu (id=1) if not found
+
+        try:
+            # Create clinic
+            clinic = Clinic(
+                name=name,
+                slug=slug,
+                address=address,
+                city=city,
+                city_id=city_id,
+                phone=phone,
+                email=email,
+                clinic_type=clinic_type,
+                description=description,
+                created_by_user_id=session['user_id']
+            )
+            db.session.add(clinic)
+            db.session.flush()  # Get the clinic ID
+
+            # Add creator as admin staff
+            staff = ClinicStaff(
+                clinic_id=clinic.id,
+                user_id=session['user_id'],
+                role='admin'
+            )
+            db.session.add(staff)
+            db.session.commit()
+
+            flash('Clinic registered successfully! Now add doctors to your clinic.', 'success')
+            return redirect(url_for('clinic_dashboard', clinic_slug=clinic.slug))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error registering clinic: {str(e)}', 'danger')
+            return render_template('clinic/register.html')
+
+    return render_template('clinic/register.html')
+
+
+@app.route('/clinic/<clinic_slug>')
+def clinic_public_page(clinic_slug):
+    """Public clinic page showing all doctors"""
+    from models import Clinic, ClinicDoctor
+
+    clinic = Clinic.query.filter_by(slug=clinic_slug, is_active=True).first_or_404()
+
+    # Get approved doctors with their schedules
+    clinic_doctors = ClinicDoctor.query.filter_by(
+        clinic_id=clinic.id,
+        status='approved',
+        is_active=True
+    ).all()
+
+    return render_template('clinic/public_page.html',
+                          clinic=clinic,
+                          clinic_doctors=clinic_doctors)
+
+
+@app.route('/clinic/<clinic_slug>/dashboard')
+@login_required
+def clinic_dashboard(clinic_slug):
+    """Clinic management dashboard"""
+    from models import Clinic, ClinicStaff, ClinicDoctor, Appointment
+    from datetime import date
+
+    clinic = Clinic.query.filter_by(slug=clinic_slug).first_or_404()
+
+    # Check if user has access to this clinic
+    staff = ClinicStaff.query.filter_by(
+        clinic_id=clinic.id,
+        user_id=session['user_id'],
+        is_active=True
+    ).first()
+
+    if not staff and clinic.created_by_user_id != session['user_id']:
+        flash('You do not have access to this clinic dashboard.', 'danger')
+        return redirect(url_for('index'))
+
+    # Get all doctors (including pending)
+    clinic_doctors = ClinicDoctor.query.filter_by(clinic_id=clinic.id).all()
+
+    # Get today's appointments grouped by doctor
+    today = date.today()
+    today_appointments = {}
+    for cd in clinic_doctors:
+        if cd.status == 'approved':
+            appointments = Appointment.query.filter_by(
+                clinic_doctor_id=cd.id,
+                appointment_date=today
+            ).order_by(Appointment.appointment_time).all()
+            today_appointments[cd.id] = appointments
+
+    return render_template('clinic/dashboard.html',
+                          clinic=clinic,
+                          staff=staff,
+                          clinic_doctors=clinic_doctors,
+                          today_appointments=today_appointments,
+                          today=today)
+
+
+@app.route('/clinic/<clinic_slug>/add-doctor', methods=['GET', 'POST'])
+@login_required
+def clinic_add_doctor(clinic_slug):
+    """Add a doctor to the clinic"""
+    from models import Clinic, ClinicStaff, ClinicDoctor, Doctor
+
+    clinic = Clinic.query.filter_by(slug=clinic_slug).first_or_404()
+
+    # Check access
+    staff = ClinicStaff.query.filter_by(
+        clinic_id=clinic.id,
+        user_id=session['user_id'],
+        is_active=True
+    ).first()
+
+    if not staff and clinic.created_by_user_id != session['user_id']:
+        flash('You do not have access to add doctors.', 'danger')
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        doctor_id = request.form.get('doctor_id')
+        role = request.form.get('role', 'consultant')
+        consultation_fee = request.form.get('consultation_fee')
+
+        if not doctor_id:
+            flash('Please select a doctor.', 'danger')
+            return redirect(url_for('clinic_add_doctor', clinic_slug=clinic_slug))
+
+        # Check if doctor is verified
+        doctor = Doctor.query.get(doctor_id)
+        if not doctor or not doctor.is_verified:
+            flash('Only verified doctors can be added to clinics.', 'danger')
+            return redirect(url_for('clinic_add_doctor', clinic_slug=clinic_slug))
+
+        # Check if already added
+        existing = ClinicDoctor.query.filter_by(
+            clinic_id=clinic.id,
+            doctor_id=doctor_id
+        ).first()
+
+        if existing:
+            flash('This doctor has already been added to your clinic.', 'warning')
+            return redirect(url_for('clinic_dashboard', clinic_slug=clinic_slug))
+
+        try:
+            clinic_doctor = ClinicDoctor(
+                clinic_id=clinic.id,
+                doctor_id=doctor_id,
+                role=role,
+                consultation_fee=int(consultation_fee) if consultation_fee else None,
+                status='pending',
+                invited_by_user_id=session['user_id']
+            )
+            db.session.add(clinic_doctor)
+            db.session.commit()
+
+            flash(f'Invitation sent to Dr. {doctor.name}. They will need to accept before appearing on your clinic page.', 'success')
+            return redirect(url_for('clinic_dashboard', clinic_slug=clinic_slug))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error adding doctor: {str(e)}', 'danger')
+
+    # Get verified doctors for search
+    return render_template('clinic/add_doctor.html', clinic=clinic)
+
+
+@app.route('/api/clinic/search-doctors')
+@login_required
+def api_clinic_search_doctors():
+    """Search verified doctors to add to clinic"""
+    from models import Doctor
+
+    query = request.args.get('q', '').strip()
+    clinic_id = request.args.get('clinic_id')
+
+    if len(query) < 2:
+        return jsonify({'success': True, 'data': []})
+
+    # Get IDs of doctors already in this clinic
+    from models import ClinicDoctor
+    existing_ids = []
+    if clinic_id:
+        existing_ids = [cd.doctor_id for cd in ClinicDoctor.query.filter_by(clinic_id=clinic_id).all()]
+
+    # Search ONLY verified doctors
+    doctors = Doctor.query.filter(
+        Doctor.is_verified == True,
+        Doctor.name.ilike(f'%{query}%')
+    )
+
+    if existing_ids:
+        doctors = doctors.filter(~Doctor.id.in_(existing_ids))
+
+    doctors = doctors.limit(10).all()
+
+    return jsonify({
+        'success': True,
+        'data': [{
+            'id': d.id,
+            'name': d.name,
+            'specialty': d.specialty.name if d.specialty else 'General',
+            'city': d.city.name if d.city else '',
+            'photo_url': d.photo_url
+        } for d in doctors]
+    })
+
+
+@app.route('/clinic/<clinic_slug>/doctor/<int:clinic_doctor_id>/queue')
+@login_required
+def clinic_doctor_queue(clinic_slug, clinic_doctor_id):
+    """View and manage queue for a specific doctor"""
+    from models import Clinic, ClinicStaff, ClinicDoctor, Appointment
+    from datetime import date
+
+    clinic = Clinic.query.filter_by(slug=clinic_slug).first_or_404()
+
+    # Check access
+    staff = ClinicStaff.query.filter_by(
+        clinic_id=clinic.id,
+        user_id=session['user_id'],
+        is_active=True
+    ).first()
+
+    if not staff and clinic.created_by_user_id != session['user_id']:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('index'))
+
+    clinic_doctor = ClinicDoctor.query.get_or_404(clinic_doctor_id)
+
+    if clinic_doctor.clinic_id != clinic.id:
+        flash('Invalid doctor for this clinic.', 'danger')
+        return redirect(url_for('clinic_dashboard', clinic_slug=clinic_slug))
+
+    # Get selected date (default to today)
+    selected_date = request.args.get('date', date.today().isoformat())
+    try:
+        selected_date = date.fromisoformat(selected_date)
+    except:
+        selected_date = date.today()
+
+    # Get appointments for selected date
+    appointments = Appointment.query.filter_by(
+        clinic_doctor_id=clinic_doctor_id,
+        appointment_date=selected_date
+    ).order_by(Appointment.appointment_time).all()
+
+    return render_template('clinic/doctor_queue.html',
+                          clinic=clinic,
+                          clinic_doctor=clinic_doctor,
+                          appointments=appointments,
+                          selected_date=selected_date)
+
+
+@app.route('/api/clinic/appointment/<int:appointment_id>/status', methods=['POST'])
+@login_required
+def api_update_appointment_status(appointment_id):
+    """Update appointment status (check-in, complete, no-show, etc.)"""
+    from models import Appointment, ClinicDoctor, ClinicStaff, PatientNoShowRecord
+    from datetime import datetime
+
+    appointment = Appointment.query.get_or_404(appointment_id)
+    clinic_doctor = appointment.clinic_doctor
+    clinic = clinic_doctor.clinic
+
+    # Check access
+    staff = ClinicStaff.query.filter_by(
+        clinic_id=clinic.id,
+        user_id=session['user_id'],
+        is_active=True
+    ).first()
+
+    if not staff and clinic.created_by_user_id != session['user_id']:
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    data = request.get_json()
+    new_status = data.get('status')
+    notes = data.get('notes')
+
+    valid_statuses = ['booked', 'confirmed', 'checked_in', 'in_progress', 'completed', 'no_show', 'cancelled']
+    if new_status not in valid_statuses:
+        return jsonify({'success': False, 'error': 'Invalid status'}), 400
+
+    try:
+        appointment.status = new_status
+        if notes:
+            appointment.notes = notes
+
+        # Track timestamps
+        now = datetime.utcnow()
+        if new_status == 'checked_in':
+            appointment.checked_in_at = now
+        elif new_status == 'completed':
+            appointment.completed_at = now
+        elif new_status == 'cancelled':
+            appointment.cancelled_at = now
+            appointment.cancellation_reason = data.get('reason', '')
+        elif new_status == 'no_show':
+            # Record no-show
+            no_show = PatientNoShowRecord(
+                patient_phone=appointment.patient_phone,
+                patient_user_id=appointment.patient_user_id,
+                appointment_id=appointment.id,
+                no_show_date=appointment.appointment_date
+            )
+            db.session.add(no_show)
+
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'status': new_status,
+            'status_display': appointment.get_status_display()
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# --- Doctor's Clinic Invitation Management ---
+
+@app.route('/doctor/clinic-invitations')
+@login_required
+def doctor_clinic_invitations():
+    """View pending clinic invitations for a doctor"""
+    from models import Doctor, ClinicDoctor
+
+    if session.get('role') != 'doctor':
+        flash('This page is for verified doctors only.', 'warning')
+        return redirect(url_for('index'))
+
+    user = User.query.get(session['user_id'])
+    if not user.doctor_id:
+        flash('You need to be a verified doctor to view clinic invitations.', 'warning')
+        return redirect(url_for('index'))
+
+    # Get pending invitations
+    pending_invitations = ClinicDoctor.query.filter_by(
+        doctor_id=user.doctor_id,
+        status='pending'
+    ).all()
+
+    # Get current clinic affiliations
+    active_affiliations = ClinicDoctor.query.filter_by(
+        doctor_id=user.doctor_id,
+        status='approved',
+        is_active=True
+    ).all()
+
+    return render_template('clinic/doctor_invitations.html',
+                          pending_invitations=pending_invitations,
+                          active_affiliations=active_affiliations)
+
+
+@app.route('/api/doctor/clinic-invitation/<int:invitation_id>', methods=['POST'])
+@login_required
+def api_respond_clinic_invitation(invitation_id):
+    """Accept or reject a clinic invitation"""
+    from models import ClinicDoctor
+    from datetime import datetime
+
+    if session.get('role') != 'doctor':
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    user = User.query.get(session['user_id'])
+    if not user.doctor_id:
+        return jsonify({'success': False, 'error': 'Not a verified doctor'}), 403
+
+    invitation = ClinicDoctor.query.get_or_404(invitation_id)
+
+    # Verify this invitation is for this doctor
+    if invitation.doctor_id != user.doctor_id:
+        return jsonify({'success': False, 'error': 'Invalid invitation'}), 403
+
+    data = request.get_json()
+    action = data.get('action')  # 'accept' or 'reject'
+
+    if action not in ['accept', 'reject']:
+        return jsonify({'success': False, 'error': 'Invalid action'}), 400
+
+    try:
+        if action == 'accept':
+            invitation.status = 'approved'
+        else:
+            invitation.status = 'rejected'
+            invitation.rejection_reason = data.get('reason', '')
+
+        invitation.responded_at = datetime.utcnow()
+        db.session.commit()
+
+        response_data = {
+            'success': True,
+            'status': invitation.status,
+            'message': f'Invitation {"accepted" if action == "accept" else "rejected"}'
+        }
+
+        # Include schedule URL for accepted invitations
+        if action == 'accept':
+            response_data['schedule_url'] = url_for('doctor_clinic_schedule', clinic_doctor_id=invitation.id)
+
+        return jsonify(response_data)
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/doctor/schedule-exception', methods=['POST'])
+@login_required
+def api_add_schedule_exception():
+    """Add schedule exception (mark dates as unavailable)"""
+    from models import ClinicDoctor, ScheduleException
+    from datetime import datetime, timedelta
+
+    if session.get('role') != 'doctor':
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    user = User.query.get(session['user_id'])
+    if not user.doctor_id:
+        return jsonify({'success': False, 'error': 'Not a verified doctor'}), 403
+
+    data = request.get_json()
+    clinic_doctor_id = data.get('clinic_doctor_id')
+    from_date_str = data.get('from_date')
+    to_date_str = data.get('to_date')
+    reason = data.get('reason', 'personal')
+    notes = data.get('notes', '')
+
+    if not all([clinic_doctor_id, from_date_str, to_date_str]):
+        return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+    # Verify the clinic_doctor belongs to this doctor
+    clinic_doctor = ClinicDoctor.query.get(clinic_doctor_id)
+    if not clinic_doctor or clinic_doctor.doctor_id != user.doctor_id:
+        return jsonify({'success': False, 'error': 'Invalid clinic affiliation'}), 403
+
+    try:
+        from_date = datetime.strptime(from_date_str, '%Y-%m-%d').date()
+        to_date = datetime.strptime(to_date_str, '%Y-%m-%d').date()
+
+        if from_date > to_date:
+            return jsonify({'success': False, 'error': 'End date must be after start date'}), 400
+
+        # Create exception for each day in the range
+        current_date = from_date
+        days_added = 0
+        while current_date <= to_date:
+            # Check if exception already exists for this date
+            existing = ScheduleException.query.filter_by(
+                clinic_doctor_id=clinic_doctor_id,
+                exception_date=current_date
+            ).first()
+
+            if not existing:
+                exception = ScheduleException(
+                    clinic_doctor_id=clinic_doctor_id,
+                    exception_date=current_date,
+                    exception_type='closed',
+                    reason=f"{reason}: {notes}" if notes else reason
+                )
+                db.session.add(exception)
+                days_added += 1
+
+            current_date += timedelta(days=1)
+
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': f'Marked {days_added} day(s) as unavailable',
+            'days_added': days_added
+        })
+
+    except ValueError as e:
+        return jsonify({'success': False, 'error': 'Invalid date format'}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/doctor/clinic/<int:clinic_doctor_id>/schedule', methods=['GET', 'POST'])
+@login_required
+def doctor_clinic_schedule(clinic_doctor_id):
+    """Set schedule for a clinic affiliation"""
+    from models import ClinicDoctor, ClinicSchedule
+    from datetime import time
+
+    if session.get('role') != 'doctor':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('index'))
+
+    user = User.query.get(session['user_id'])
+    clinic_doctor = ClinicDoctor.query.get_or_404(clinic_doctor_id)
+
+    if clinic_doctor.doctor_id != user.doctor_id:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        # Clear existing schedules
+        ClinicSchedule.query.filter_by(clinic_doctor_id=clinic_doctor_id).delete()
+
+        # Add new schedules
+        days = request.form.getlist('days[]')
+        for day in days:
+            day_num = int(day)
+            start_time_str = request.form.get(f'start_time_{day}')
+            end_time_str = request.form.get(f'end_time_{day}')
+            max_appointments = request.form.get(f'max_appointments_{day}', 20)
+
+            if start_time_str and end_time_str:
+                try:
+                    start_time = time.fromisoformat(start_time_str)
+                    end_time = time.fromisoformat(end_time_str)
+
+                    schedule = ClinicSchedule(
+                        clinic_doctor_id=clinic_doctor_id,
+                        day_of_week=day_num,
+                        start_time=start_time,
+                        end_time=end_time,
+                        max_appointments=int(max_appointments)
+                    )
+                    db.session.add(schedule)
+                except:
+                    continue
+
+        # Update slot duration
+        slot_duration = request.form.get('slot_duration', 15)
+        clinic_doctor.slot_duration_minutes = int(slot_duration)
+
+        db.session.commit()
+        flash('Schedule updated successfully!', 'success')
+        return redirect(url_for('doctor_clinic_invitations'))
+
+    # Get existing schedules
+    schedules = {s.day_of_week: s for s in clinic_doctor.schedules}
+
+    return render_template('clinic/doctor_schedule.html',
+                          clinic_doctor=clinic_doctor,
+                          schedules=schedules)
+
+
+# --- Patient Booking Routes ---
+
+@app.route('/book/<clinic_slug>/<int:doctor_id>')
+def clinic_book_appointment(clinic_slug, doctor_id):
+    """Patient appointment booking page via clinic portal"""
+    from models import Clinic, ClinicDoctor, ClinicSchedule, Appointment, ScheduleException
+    from datetime import date, datetime, timedelta
+
+    clinic = Clinic.query.filter_by(slug=clinic_slug, is_active=True).first_or_404()
+
+    clinic_doctor = ClinicDoctor.query.filter_by(
+        clinic_id=clinic.id,
+        doctor_id=doctor_id,
+        status='approved',
+        is_active=True,
+        accepts_online_booking=True
+    ).first_or_404()
+
+    # Get schedules
+    schedules = clinic_doctor.get_schedules()
+
+    # Generate available dates for next 14 days
+    available_dates = []
+    today = date.today()
+
+    for i in range(14):
+        check_date = today + timedelta(days=i)
+        day_of_week = (check_date.weekday() + 1) % 7  # Convert to Sunday=0 format
+
+        # Check if doctor works on this day
+        day_schedule = next((s for s in schedules if s.day_of_week == day_of_week), None)
+        if not day_schedule:
+            continue
+
+        # Check for exceptions (holidays)
+        exception = ScheduleException.query.filter_by(
+            clinic_doctor_id=clinic_doctor.id,
+            exception_date=check_date
+        ).first()
+
+        if exception and exception.exception_type == 'closed':
+            continue
+
+        # Count existing appointments
+        booked_count = Appointment.query.filter(
+            Appointment.clinic_doctor_id == clinic_doctor.id,
+            Appointment.appointment_date == check_date,
+            Appointment.status.notin_(['cancelled', 'no_show'])
+        ).count()
+
+        if booked_count < day_schedule.max_appointments:
+            available_dates.append({
+                'date': check_date,
+                'day_name': check_date.strftime('%A'),
+                'formatted': check_date.strftime('%b %d'),
+                'schedule': day_schedule,
+                'slots_left': day_schedule.max_appointments - booked_count
+            })
+
+    return render_template('clinic/book_appointment.html',
+                          clinic=clinic,
+                          clinic_doctor=clinic_doctor,
+                          doctor=clinic_doctor.doctor,
+                          available_dates=available_dates)
+
+
+@app.route('/api/booking/slots')
+def api_get_available_slots():
+    """Get available time slots for a specific date"""
+    from models import ClinicDoctor, ClinicSchedule, Appointment, ScheduleException
+    from datetime import date, datetime, time, timedelta
+
+    clinic_doctor_id = request.args.get('clinic_doctor_id')
+    date_str = request.args.get('date')
+
+    if not clinic_doctor_id or not date_str:
+        return jsonify({'success': False, 'error': 'Missing parameters'}), 400
+
+    try:
+        selected_date = date.fromisoformat(date_str)
+    except:
+        return jsonify({'success': False, 'error': 'Invalid date'}), 400
+
+    clinic_doctor = ClinicDoctor.query.get(clinic_doctor_id)
+    if not clinic_doctor:
+        return jsonify({'success': False, 'error': 'Doctor not found'}), 404
+
+    day_of_week = (selected_date.weekday() + 1) % 7  # Sunday = 0
+
+    # Get schedule for this day
+    schedule = ClinicSchedule.query.filter_by(
+        clinic_doctor_id=clinic_doctor_id,
+        day_of_week=day_of_week,
+        is_active=True
+    ).first()
+
+    if not schedule:
+        return jsonify({'success': True, 'slots': [], 'message': 'No schedule for this day'})
+
+    # Check for exceptions
+    exception = ScheduleException.query.filter_by(
+        clinic_doctor_id=clinic_doctor_id,
+        exception_date=selected_date
+    ).first()
+
+    if exception and exception.exception_type == 'closed':
+        return jsonify({'success': True, 'slots': [], 'message': 'Closed on this day'})
+
+    # Use exception times if modified
+    start_time = exception.start_time if exception and exception.start_time else schedule.start_time
+    end_time = exception.end_time if exception and exception.end_time else schedule.end_time
+
+    # Generate slots
+    slot_duration = clinic_doctor.slot_duration_minutes or 15
+    slots = []
+
+    current = datetime.combine(selected_date, start_time)
+    end = datetime.combine(selected_date, end_time)
+    now = datetime.now()
+
+    # Get booked slots
+    booked_appointments = Appointment.query.filter(
+        Appointment.clinic_doctor_id == clinic_doctor_id,
+        Appointment.appointment_date == selected_date,
+        Appointment.status.notin_(['cancelled', 'no_show'])
+    ).all()
+
+    booked_times = {a.appointment_time for a in booked_appointments}
+
+    while current < end:
+        slot_time = current.time()
+
+        # Skip past times for today
+        if selected_date == date.today() and current <= now:
+            current += timedelta(minutes=slot_duration)
+            continue
+
+        # Check booking notice
+        min_booking_time = now + timedelta(hours=clinic_doctor.booking_notice_hours or 2)
+        if current < min_booking_time:
+            current += timedelta(minutes=slot_duration)
+            continue
+
+        is_available = slot_time not in booked_times
+
+        slots.append({
+            'time': slot_time.strftime('%H:%M'),
+            'display': slot_time.strftime('%I:%M %p'),
+            'available': is_available
+        })
+
+        current += timedelta(minutes=slot_duration)
+
+    return jsonify({'success': True, 'slots': slots})
+
+
+@app.route('/api/booking/create', methods=['POST'])
+def api_create_booking():
+    """Create a new appointment booking"""
+    from models import Clinic, ClinicDoctor, Appointment
+    from datetime import date, time, datetime
+
+    data = request.get_json()
+
+    clinic_doctor_id = data.get('clinic_doctor_id')
+    date_str = data.get('date')
+    time_str = data.get('time')
+    patient_name = data.get('patient_name', '').strip()
+    patient_phone = data.get('patient_phone', '').strip()
+    patient_email = data.get('patient_email', '').strip()
+    reason = data.get('reason', '').strip()
+
+    # Validation
+    if not all([clinic_doctor_id, date_str, time_str, patient_name, patient_phone]):
+        return jsonify({'success': False, 'error': 'All fields are required'}), 400
+
+    if len(patient_phone) < 10:
+        return jsonify({'success': False, 'error': 'Invalid phone number'}), 400
+
+    try:
+        appointment_date = date.fromisoformat(date_str)
+        appointment_time = time.fromisoformat(time_str)
+    except:
+        return jsonify({'success': False, 'error': 'Invalid date or time'}), 400
+
+    clinic_doctor = ClinicDoctor.query.get(clinic_doctor_id)
+    if not clinic_doctor or clinic_doctor.status != 'approved':
+        return jsonify({'success': False, 'error': 'Doctor not available'}), 400
+
+    # Check if slot is still available
+    existing = Appointment.query.filter(
+        Appointment.clinic_doctor_id == clinic_doctor_id,
+        Appointment.appointment_date == appointment_date,
+        Appointment.appointment_time == appointment_time,
+        Appointment.status.notin_(['cancelled', 'no_show'])
+    ).first()
+
+    if existing:
+        return jsonify({'success': False, 'error': 'This slot is no longer available'}), 400
+
+    try:
+        # Generate booking code
+        booking_code = Appointment.generate_booking_code()
+
+        # Calculate queue position
+        day_appointments = Appointment.query.filter(
+            Appointment.clinic_doctor_id == clinic_doctor_id,
+            Appointment.appointment_date == appointment_date,
+            Appointment.status.notin_(['cancelled', 'no_show'])
+        ).count()
+
+        # Get user_id - use logged in user or fallback to a guest placeholder
+        current_user_id = session.get('user_id')
+
+        appointment = Appointment(
+            doctor_id=clinic_doctor.doctor_id,  # Required for legacy compatibility
+            user_id=current_user_id if current_user_id else 1,  # Legacy field - use current user or guest placeholder
+            clinic_doctor_id=clinic_doctor_id,
+            appointment_date=appointment_date,
+            appointment_time=appointment_time,
+            patient_name=patient_name,
+            patient_phone=patient_phone,
+            patient_email=patient_email,
+            patient_user_id=current_user_id,
+            reason=reason,
+            booking_code=booking_code,
+            queue_position=day_appointments + 1,
+            status='booked'
+        )
+
+        db.session.add(appointment)
+        db.session.commit()
+
+        # TODO: Send confirmation email if patient_email provided
+
+        return jsonify({
+            'success': True,
+            'booking_code': booking_code,
+            'appointment': appointment.to_dict()
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/appointment/<booking_code>')
+def appointment_status(booking_code):
+    """Check appointment status page"""
+    from models import Appointment
+
+    appointment = Appointment.query.filter_by(booking_code=booking_code.upper()).first()
+
+    if not appointment:
+        flash('Appointment not found. Please check your booking code.', 'danger')
+        return redirect(url_for('check_appointment'))
+
+    # Calculate queue position
+    if appointment.status in ['booked', 'confirmed', 'checked_in']:
+        ahead_count = Appointment.query.filter(
+            Appointment.clinic_doctor_id == appointment.clinic_doctor_id,
+            Appointment.appointment_date == appointment.appointment_date,
+            Appointment.appointment_time < appointment.appointment_time,
+            Appointment.status.in_(['booked', 'confirmed', 'checked_in', 'in_progress'])
+        ).count()
+    else:
+        ahead_count = None
+
+    return render_template('clinic/appointment_status.html',
+                          appointment=appointment,
+                          ahead_count=ahead_count)
+
+
+@app.route('/check-appointment', methods=['GET', 'POST'])
+def check_appointment():
+    """Page to enter booking code and check status"""
+    if request.method == 'POST':
+        booking_code = request.form.get('booking_code', '').strip().upper()
+        if booking_code:
+            return redirect(url_for('appointment_status', booking_code=booking_code))
+        flash('Please enter a booking code.', 'warning')
+
+    return render_template('clinic/check_appointment.html')
+
+
+@app.route('/my-appointments')
+@login_required
+def my_appointments():
+    """View all appointments for logged-in user"""
+    from models import Appointment
+    from datetime import date
+
+    appointments = Appointment.query.filter_by(
+        patient_user_id=session['user_id']
+    ).order_by(Appointment.appointment_date.desc(), Appointment.appointment_time.desc()).all()
+
+    # Separate into upcoming and past
+    today = date.today()
+    upcoming = [a for a in appointments if a.appointment_date >= today and a.status not in ['completed', 'cancelled', 'no_show']]
+    past = [a for a in appointments if a.appointment_date < today or a.status in ['completed', 'cancelled', 'no_show']]
+
+    return render_template('clinic/my_appointments.html',
+                          upcoming=upcoming,
+                          past=past)
+
+
+@app.route('/api/doctor/appointment/<int:appointment_id>/cancel', methods=['POST'])
+@doctor_required
+def doctor_cancel_appointment(appointment_id):
+    """Cancel an appointment (by doctor)"""
+    from models import Appointment
+    from datetime import datetime
+
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    appointment = Appointment.query.get_or_404(appointment_id)
+
+    # Verify the doctor owns this appointment
+    if appointment.doctor_id != doctor.id:
+        # Also check clinic_doctor relationship
+        if appointment.clinic_doctor and appointment.clinic_doctor.doctor_id != doctor.id:
+            return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    if appointment.status in ['cancelled', 'completed', 'no_show']:
+        return jsonify({'success': False, 'error': 'This appointment cannot be cancelled'}), 400
+
+    try:
+        data = request.get_json() or {}
+        reason = data.get('reason', '').strip()
+
+        if not reason:
+            return jsonify({'success': False, 'error': 'Please provide a reason for cancellation'}), 400
+
+        appointment.status = 'cancelled'
+        appointment.cancelled_at = datetime.utcnow()
+        appointment.cancellation_reason = f"Cancelled by doctor: {reason}"
+
+        db.session.commit()
+
+        # Send notification to patient
+        send_appointment_cancellation_email(appointment, doctor, reason)
+
+        return jsonify({'success': True, 'message': 'Appointment cancelled and patient notified'})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+def send_appointment_cancellation_email(appointment, doctor, reason):
+    """Send email notification to patient when doctor cancels appointment"""
+    patient_email = appointment.patient_email
+    if not patient_email:
+        return False
+
+    if not resend_key:
+        print(f"[DEV] Would send cancellation email to {patient_email}")
+        return False
+
+    patient_name = appointment.patient_name or 'Patient'
+    appointment_date = appointment.appointment_date.strftime('%B %d, %Y') if appointment.appointment_date else 'N/A'
+    appointment_time = appointment.appointment_time.strftime('%I:%M %p') if appointment.appointment_time else 'N/A'
+
+    subject = f"Appointment Cancelled - Dr. {doctor.name}"
+    html = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 520px;">
+          <h2 style="color: #dc2626;">Appointment Cancelled</h2>
+          <p>Hi {patient_name},</p>
+          <p>We're sorry to inform you that your appointment has been cancelled:</p>
+          <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin: 16px 0;">
+            <p style="margin: 4px 0;"><strong>Doctor:</strong> {doctor.name}</p>
+            <p style="margin: 4px 0;"><strong>Date:</strong> {appointment_date}</p>
+            <p style="margin: 4px 0;"><strong>Time:</strong> {appointment_time}</p>
+          </div>
+          <p><strong>Reason for cancellation:</strong></p>
+          <p style="background: #fef2f2; padding: 12px; border-radius: 6px; color: #991b1b;">{reason}</p>
+          <p>We apologize for any inconvenience. Please visit RankSewa to book a new appointment or find another doctor.</p>
+          <p style="margin-top: 24px;">
+            <a href="https://ranksewa.com" style="display:inline-block; padding:12px 24px; background:#0D8ABC; color:#fff; text-decoration:none; border-radius:6px;">Find Another Doctor</a>
+          </p>
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+          <p style="font-size: 12px; color:#9ca3af;">RankSewa - Find Doctors in Nepal</p>
+        </div>
+    """
+    params = {
+        "from": "RankSewa <support@ranksewa.com>",
+        "to": [patient_email],
+        "subject": subject,
+        "html": html
+    }
+    try:
+        resend.Emails.send(params)
+        print(f"✅ Cancellation email sent to {patient_email}")
+        return True
+    except Exception as e:
+        print(f"❌ Failed to send cancellation email: {e}")
+        return False
+
+
+@app.route('/api/appointment/<int:appointment_id>/cancel', methods=['POST'])
+def api_cancel_appointment(appointment_id):
+    """Cancel an appointment (by patient)"""
+    from models import Appointment
+    from datetime import datetime
+
+    appointment = Appointment.query.get_or_404(appointment_id)
+
+    # Verify ownership
+    if appointment.patient_user_id:
+        if not session.get('user_id') or appointment.patient_user_id != session['user_id']:
+            return jsonify({'success': False, 'error': 'Access denied'}), 403
+    else:
+        # For guest bookings, verify by phone (would need additional verification)
+        return jsonify({'success': False, 'error': 'Please contact the clinic to cancel'}), 400
+
+    if not appointment.can_cancel():
+        return jsonify({'success': False, 'error': 'This appointment cannot be cancelled'}), 400
+
+    try:
+        data = request.get_json() or {}
+        appointment.status = 'cancelled'
+        appointment.cancelled_at = datetime.utcnow()
+        appointment.cancellation_reason = data.get('reason', 'Cancelled by patient')
+
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': 'Appointment cancelled'})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 if __name__ == '__main__':
