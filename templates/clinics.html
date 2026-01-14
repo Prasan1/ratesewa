@@ -66,30 +66,102 @@
 <div class="row g-4">
     {% for clinic in clinics %}
     <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex align-items-start justify-content-between mb-2">
-                    <h5 class="mb-0">{{ clinic.name }}</h5>
-                    {% if clinic.is_featured %}
-                    <span class="badge bg-warning text-dark">Featured</span>
+        <div class="card h-100 clinic-card" style="border-radius: 16px; border: none; overflow: hidden; transition: all 0.2s;">
+            <!-- Colored header strip based on clinic type -->
+            <div class="clinic-header" style="height: 6px; background: {% if clinic.clinic_type == 'hospital' %}linear-gradient(90deg, #dc3545, #fd7e14){% elif clinic.clinic_type == 'polyclinic' %}linear-gradient(90deg, #6f42c1, #e83e8c){% else %}linear-gradient(90deg, var(--brand), #20c997){% endif %};"></div>
+
+            <div class="card-body p-4">
+                <!-- Logo + Name Row -->
+                <div class="d-flex align-items-start mb-3">
+                    {% if clinic.logo_url %}
+                    <img src="{% if clinic.logo_url.startswith('http') %}{{ clinic.logo_url }}{% else %}{{ url_for('serve_clinic_logo', filename=clinic.logo_url.replace('clinic_logos/', '')) }}{% endif %}"
+                         alt="{{ clinic.name }}"
+                         class="clinic-logo me-3"
+                         style="width: 56px; height: 56px; object-fit: contain; border-radius: 12px; background: #f8f9fa; padding: 4px;">
+                    {% else %}
+                    {% set name_parts = clinic.name.split() %}
+                    {% set initials = name_parts[0][:1] ~ (name_parts[1][:1] if name_parts|length > 1 else '') %}
+                    <div class="clinic-logo me-3 d-flex align-items-center justify-content-center"
+                         style="width: 56px; height: 56px; border-radius: 12px; background: {% if clinic.clinic_type == 'hospital' %}#fee2e2{% elif clinic.clinic_type == 'polyclinic' %}#f3e8ff{% else %}var(--brand-soft){% endif %}; color: {% if clinic.clinic_type == 'hospital' %}#dc3545{% elif clinic.clinic_type == 'polyclinic' %}#6f42c1{% else %}var(--brand){% endif %}; font-weight: 700; font-size: 1.25rem;">
+                        {{ initials|upper }}
+                    </div>
                     {% endif %}
+
+                    <div class="flex-grow-1 min-width-0">
+                        <h5 class="mb-1 text-truncate" title="{{ clinic.name }}">{{ clinic.name }}</h5>
+                        <div class="d-flex align-items-center flex-wrap gap-1">
+                            <span class="badge" style="background: {% if clinic.clinic_type == 'hospital' %}#fee2e2; color: #dc3545{% elif clinic.clinic_type == 'polyclinic' %}#f3e8ff; color: #6f42c1{% else %}var(--brand-soft); color: var(--brand){% endif %}; font-weight: 500;">
+                                {{ clinic.clinic_type|title }}
+                            </span>
+                            {% if clinic.is_verified %}
+                            <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Verified</span>
+                            {% endif %}
+                            {% if clinic.is_featured %}
+                            <span class="badge bg-warning text-dark"><i class="fas fa-star me-1"></i>Featured</span>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-                <p class="text-muted small mb-2">
-                    <i class="fas fa-map-marker-alt me-1"></i>{{ clinic.city or clinic.address or 'Location not specified' }}
-                </p>
+
+                <!-- Info Grid -->
+                <div class="clinic-info mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-map-marker-alt me-2" style="color: var(--brand); width: 16px;"></i>
+                        <span class="text-muted small text-truncate">{{ clinic.address or clinic.city or 'Location not specified' }}</span>
+                    </div>
+                    {% if clinic.phone or clinic.phone_number %}
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-phone me-2" style="color: var(--brand); width: 16px;"></i>
+                        <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="text-muted small text-decoration-none">{{ clinic.phone or clinic.phone_number }}</a>
+                    </div>
+                    {% endif %}
+                    {% set doctor_count = clinic.get_active_doctors()|length if clinic.get_active_doctors else 0 %}
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user-md me-2" style="color: var(--brand); width: 16px;"></i>
+                        <span class="text-muted small">{{ doctor_count }} Doctor{{ 's' if doctor_count != 1 else '' }} Available</span>
+                    </div>
+                </div>
+
+                <!-- Description (truncated) -->
                 {% if clinic.description %}
-                <p class="text-muted small mb-3">{{ clinic.description }}</p>
+                <p class="text-muted small mb-3 clinic-desc" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;">
+                    {{ clinic.description }}
+                </p>
                 {% endif %}
-                <a href="{{ url_for('clinic_public_page', clinic_slug=clinic.slug) }}" class="btn btn-outline-primary btn-sm">View clinic</a>
+
+                <!-- Action Button -->
+                <a href="{{ url_for('clinic_public_page', clinic_slug=clinic.slug) }}" class="btn btn-primary w-100" style="border-radius: 10px;">
+                    View Clinic <i class="fas fa-arrow-right ms-2"></i>
+                </a>
             </div>
         </div>
     </div>
     {% else %}
     <div class="col-12">
-        <div class="alert alert-info">No clinics available yet.</div>
+        <div class="text-center py-5">
+            <i class="fas fa-hospital fa-4x mb-3" style="color: var(--brand-soft);"></i>
+            <h4>No Clinics Yet</h4>
+            <p class="text-muted">Be the first to register your clinic on RankSewa.</p>
+            <a href="{{ url_for('clinic_register') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Register Your Clinic
+            </a>
+        </div>
     </div>
     {% endfor %}
 </div>
+
+<style>
+.clinic-card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.clinic-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    transform: translateY(-4px);
+}
+.min-width-0 {
+    min-width: 0;
+}
+</style>
 {% endblock %}
 
 {% block scripts %}
