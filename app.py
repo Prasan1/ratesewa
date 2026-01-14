@@ -135,6 +135,17 @@ stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
+# Initialize Rate Limiter (protection against brute force attacks)
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+limiter = Limiter(
+    key_func=get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://",
+)
+
 # --- Authentication Decorators ---
 def login_required(f):
     from functools import wraps
@@ -1013,6 +1024,7 @@ def optimize_and_save_article_image(image_file):
 
 # --- Authentication Routes ---
 @app.route('/register', methods=['GET', 'POST'])
+@limiter.limit("5 per minute", methods=["POST"])  # Prevent registration spam
 def register():
     next_url = request.args.get('next', '')
     if request.method == 'POST':
@@ -1063,6 +1075,7 @@ def register():
     return render_template('register.html', next_url=next_url)
 
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("10 per minute", methods=["POST"])  # Prevent brute force attacks
 def login():
     if request.method == 'POST':
         email = request.form['email']
@@ -1103,6 +1116,7 @@ def login():
 
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
+@limiter.limit("3 per minute", methods=["POST"])  # Prevent email enumeration
 def forgot_password():
     """Handle forgot password requests"""
     if session.get('user_id'):
@@ -2253,6 +2267,16 @@ def inject_global_functions():
         is_promotion_active=promo_config.is_promotion_active,
         now=datetime.utcnow  # For license expiry checks in templates
     )
+
+# --- Error Handlers ---
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()  # Roll back any failed transactions
+    return render_template('500.html'), 500
 
 # --- Main App Routes ---
 @app.route('/')
@@ -3620,7 +3644,9 @@ def add_workplace_field():
 @app.route('/admin/debug-doctor/<int:doctor_id>')
 @admin_required
 def debug_doctor(doctor_id):
-    """Debug a specific doctor's data"""
+    """Debug a specific doctor's data - disabled in production"""
+    if is_production:
+        abort(404)
     doctor = Doctor.query.get_or_404(doctor_id)
 
     debug_info = {
@@ -5272,7 +5298,9 @@ def change_password():
 @login_required
 @admin_required
 def debug_r2_config():
-    """Debug route to check R2 configuration (admin only)"""
+    """Debug route to check R2 configuration - disabled in production"""
+    if is_production:
+        abort(404)
     import os
 
     def mask_value(value, show_chars=4):
@@ -5363,7 +5391,9 @@ def debug_r2_config():
 @login_required
 @doctor_required
 def debug_my_photo():
-    """Debug route to check doctor's photo status"""
+    """Debug route to check doctor's photo status - disabled in production"""
+    if is_production:
+        abort(404)
     user = User.query.get(session['user_id'])
     doctor = user.doctor_profile
 
@@ -5423,7 +5453,9 @@ def debug_my_photo():
 @login_required
 @admin_required
 def test_r2_upload():
-    """Test R2 upload with a small test file (admin only)"""
+    """Test R2 upload with a small test file - disabled in production"""
+    if is_production:
+        abort(404)
     import io
     from r2_storage import R2Storage
 
