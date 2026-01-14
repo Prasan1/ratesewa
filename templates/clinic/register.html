@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Register Your Clinic - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm" style="border-radius: 16px; border: none;">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <i class="fas fa-hospital fa-3x" style="color: var(--brand);"></i>
+                        </div>
+                        <h2 class="fw-bold">Register Your Clinic</h2>
+                        <p class="text-muted mb-2">Join RankSewa's <strong>Availability & Flow Engine</strong> to streamline patient scheduling and reduce wait times.</p>
+                        <span class="badge bg-success"><i class="fas fa-check me-1"></i>Free to get started</span>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('clinic_register') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Clinic Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-lg" name="name" required
+                                       placeholder="e.g., Nepal Mediciti, Bir Hospital" minlength="3">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Clinic Type</label>
+                                <select class="form-select form-select-lg" name="clinic_type">
+                                    <option value="clinic">Clinic</option>
+                                    <option value="hospital">Hospital</option>
+                                    <option value="polyclinic">Polyclinic</option>
+                                    <option value="nursing_home">Nursing Home</option>
+                                    <option value="private_practice">Private Practice</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">City <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-lg" name="city" required
+                                       placeholder="e.g., Kathmandu">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Full Address <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="address" rows="2" required
+                                          placeholder="e.g., Gwarko, Lalitpur-15"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Phone Number</label>
+                                <input type="tel" class="form-control form-control-lg" name="phone"
+                                       placeholder="e.g., 01-5555555">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Email</label>
+                                <input type="email" class="form-control form-control-lg" name="email"
+                                       placeholder="e.g., info@clinic.com">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Description (Optional)</label>
+                                <textarea class="form-control" name="description" rows="3"
+                                          placeholder="Brief description of your clinic, services offered, etc."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-4 mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>What happens next?</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Your clinic dashboard will be created instantly</li>
+                                <li>You can add verified RankSewa doctors to your clinic</li>
+                                <li>Doctors must approve before they appear on your page</li>
+                                <li>Patients can then book appointments online</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus-circle me-2"></i>Register Clinic
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

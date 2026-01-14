@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Set Schedule - {{ clinic_doctor.clinic.name }} - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <a href="{{ url_for('doctor_clinic_invitations') }}" class="btn btn-outline-secondary mb-4">
+                <i class="fas fa-arrow-left me-1"></i> Back to Affiliations
+            </a>
+
+            <div class="card shadow-sm" style="border-radius: 16px; border: none;">
+                <div class="card-body p-4">
+                    <h3 class="mb-1">
+                        <i class="fas fa-calendar-alt me-2" style="color: var(--brand);"></i>Set Your Schedule
+                    </h3>
+                    <p class="text-muted mb-4">{{ clinic_doctor.clinic.name }}</p>
+
+                    <form method="POST" action="{{ url_for('doctor_clinic_schedule', clinic_doctor_id=clinic_doctor.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <!-- Slot Duration -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Appointment Duration</label>
+                            <select class="form-select" name="slot_duration">
+                                <option value="10" {{ 'selected' if clinic_doctor.slot_duration_minutes == 10 }}>10 minutes</option>
+                                <option value="15" {{ 'selected' if clinic_doctor.slot_duration_minutes == 15 or not clinic_doctor.slot_duration_minutes }}>15 minutes</option>
+                                <option value="20" {{ 'selected' if clinic_doctor.slot_duration_minutes == 20 }}>20 minutes</option>
+                                <option value="30" {{ 'selected' if clinic_doctor.slot_duration_minutes == 30 }}>30 minutes</option>
+                                <option value="45" {{ 'selected' if clinic_doctor.slot_duration_minutes == 45 }}>45 minutes</option>
+                                <option value="60" {{ 'selected' if clinic_doctor.slot_duration_minutes == 60 }}>60 minutes</option>
+                            </select>
+                        </div>
+
+                        <!-- Weekly Schedule -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Weekly Schedule</label>
+                            <p class="text-muted small">Select the days and times you're available at this clinic.</p>
+
+                            {% set days = [('0', 'Sunday'), ('1', 'Monday'), ('2', 'Tuesday'), ('3', 'Wednesday'), ('4', 'Thursday'), ('5', 'Friday'), ('6', 'Saturday')] %}
+
+                            {% for day_num, day_name in days %}
+                            {% set existing = schedules.get(day_num|int) %}
+                            <div class="card mb-2" style="border-radius: 8px;">
+                                <div class="card-body py-2">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="days[]" value="{{ day_num }}"
+                                                       id="day{{ day_num }}" {{ 'checked' if existing }}
+                                                       onchange="toggleDayInputs({{ day_num }})">
+                                                <label class="form-check-label fw-semibold" for="day{{ day_num }}">
+                                                    {{ day_name }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="time" class="form-control form-control-sm" name="start_time_{{ day_num }}"
+                                                   id="start_{{ day_num }}" value="{{ existing.start_time.strftime('%H:%M') if existing else '09:00' }}"
+                                                   {{ '' if existing else 'disabled' }}>
+                                        </div>
+                                        <div class="col-md-1 text-center">to</div>
+                                        <div class="col-md-3">
+                                            <input type="time" class="form-control form-control-sm" name="end_time_{{ day_num }}"
+                                                   id="end_{{ day_num }}" value="{{ existing.end_time.strftime('%H:%M') if existing else '17:00' }}"
+                                                   {{ '' if existing else 'disabled' }}>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="number" class="form-control form-control-sm" name="max_appointments_{{ day_num }}"
+                                                   id="max_{{ day_num }}" value="{{ existing.max_appointments if existing else 20 }}"
+                                                   placeholder="Max" min="1" max="100" {{ '' if existing else 'disabled' }}>
+                                            <small class="text-muted">max patients</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Once you set your schedule, patients will be able to book appointments at {{ clinic_doctor.clinic.name }}.
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Save Schedule
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleDayInputs(dayNum) {
+    const checkbox = document.getElementById('day' + dayNum);
+    const startInput = document.getElementById('start_' + dayNum);
+    const endInput = document.getElementById('end_' + dayNum);
+    const maxInput = document.getElementById('max_' + dayNum);
+
+    startInput.disabled = !checkbox.checked;
+    endInput.disabled = !checkbox.checked;
+    maxInput.disabled = !checkbox.checked;
+}
+</script>
+{% endblock %}

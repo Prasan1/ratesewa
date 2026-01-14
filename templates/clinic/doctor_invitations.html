@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block title %}Clinic Invitations - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-hospital me-2" style="color: var(--brand);"></i>My Clinic Affiliations
+        </h1>
+        <span class="badge bg-light text-secondary" style="font-weight: 500;">
+            <i class="fas fa-bolt me-1"></i>Availability & Flow Engine
+        </span>
+    </div>
+
+    <!-- Pending Invitations -->
+    {% if pending_invitations %}
+    <div class="card mb-4" style="border-radius: 12px; border: 2px solid #f59e0b;">
+        <div class="card-header bg-warning bg-opacity-10 border-0">
+            <h5 class="mb-0"><i class="fas fa-bell me-2"></i>Pending Invitations ({{ pending_invitations|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% for inv in pending_invitations %}
+            <div class="d-flex justify-content-between align-items-center p-3 mb-2" style="background: #fef3c7; border-radius: 8px;" id="invitation-{{ inv.id }}">
+                <div>
+                    <h6 class="mb-1">{{ inv.clinic.name }}</h6>
+                    <small class="text-muted">
+                        <i class="fas fa-map-marker-alt me-1"></i>{{ inv.clinic.address }}, {{ inv.clinic.city }}
+                    </small>
+                    <br>
+                    <small class="text-muted">Role: <strong>{{ inv.role|title }}</strong></small>
+                    {% if inv.consultation_fee %}
+                    <small class="text-muted ms-2">| Fee: NPR {{ inv.consultation_fee }}</small>
+                    {% endif %}
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success" onclick="respondInvitation({{ inv.id }}, 'accept', '{{ inv.clinic.name }}')">
+                        <i class="fas fa-check me-1"></i>Accept
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="showDeclineModal({{ inv.id }}, '{{ inv.clinic.name }}')">
+                        <i class="fas fa-times me-1"></i>Decline
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Active Affiliations -->
+    <div class="card" style="border-radius: 12px; border: 1px solid var(--border);">
+        <div class="card-header bg-transparent border-0">
+            <h5 class="mb-0"><i class="fas fa-check-circle text-success me-2"></i>Active Clinic Affiliations</h5>
+        </div>
+        <div class="card-body">
+            {% if active_affiliations %}
+            <div class="row g-3">
+                {% for aff in active_affiliations %}
+                <div class="col-md-6">
+                    <div class="card h-100" style="border-radius: 12px; border: 1px solid var(--border);">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">{{ aff.clinic.name }}</h6>
+                                    <small class="text-muted d-block mb-2">
+                                        <i class="fas fa-map-marker-alt me-1"></i>{{ aff.clinic.city }}
+                                    </small>
+                                </div>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+
+                            <div class="mb-3">
+                                <small class="text-muted">Role: {{ aff.role|title }}</small>
+                                {% if aff.consultation_fee %}
+                                <small class="text-muted ms-2">| Fee: NPR {{ aff.consultation_fee }}</small>
+                                {% endif %}
+                            </div>
+
+                            <!-- Schedule Summary -->
+                            {% set schedules = aff.get_schedules() %}
+                            {% if schedules %}
+                            <div class="mb-3">
+                                <small class="fw-semibold">Schedule:</small>
+                                <div class="d-flex flex-wrap gap-1 mt-1">
+                                    {% for s in schedules %}
+                                    <span class="badge bg-light text-dark">
+                                        {{ ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][s.day_of_week] }}
+                                        {{ s.start_time.strftime('%I:%M %p') }}-{{ s.end_time.strftime('%I:%M %p') }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-warning py-2 mb-3">
+                                <small><i class="fas fa-exclamation-triangle me-1"></i>No schedule set. Patients cannot book yet.</small>
+                            </div>
+                            {% endif %}
+
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('doctor_clinic_schedule', clinic_doctor_id=aff.id) }}" class="btn btn-outline-primary btn-sm flex-grow-1">
+                                    <i class="fas fa-calendar-alt me-1"></i>{{ 'Edit' if schedules else 'Set' }} Schedule
+                                </a>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="showUnavailableModal({{ aff.id }}, '{{ aff.clinic.name }}')">
+                                    <i class="fas fa-calendar-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-hospital fa-3x mb-3" style="color: #ccc;"></i>
+                <h5 class="text-muted">No Active Affiliations</h5>
+                <p class="text-muted">When clinics add you, their invitations will appear here.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none;">
+            <div class="modal-body text-center p-5">
+                <div class="mb-4">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-check fa-2x text-white"></i>
+                    </div>
+                </div>
+                <h4 class="mb-2">Invitation Accepted!</h4>
+                <p class="text-muted mb-4" id="successClinicName">You've joined the clinic.</p>
+                <p class="mb-4" style="color: var(--brand);">
+                    <i class="fas fa-calendar-alt me-2"></i>Please set your schedule so patients can book appointments.
+                </p>
+                <div class="d-grid gap-2">
+                    <a href="#" id="setScheduleBtn" class="btn btn-primary btn-lg">
+                        <i class="fas fa-calendar-plus me-2"></i>Set Schedule Now
+                    </a>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        I'll do it later
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Decline Confirmation Modal -->
+<div class="modal fade" id="declineModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none;">
+            <div class="modal-body text-center p-5">
+                <div class="mb-4">
+                    <div style="width: 80px; height: 80px; background: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-times fa-2x text-danger"></i>
+                    </div>
+                </div>
+                <h4 class="mb-2">Decline Invitation?</h4>
+                <p class="text-muted mb-4" id="declineClinicName">Are you sure you want to decline this invitation?</p>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-danger btn-lg" id="confirmDeclineBtn">
+                        <i class="fas fa-times me-2"></i>Yes, Decline
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none;">
+            <div class="modal-body text-center p-5">
+                <div class="mb-4">
+                    <div style="width: 80px; height: 80px; background: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                    </div>
+                </div>
+                <h4 class="mb-2">Oops!</h4>
+                <p class="text-muted mb-4" id="errorMessage">Something went wrong. Please try again.</p>
+                <div class="d-grid">
+                    <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mark Unavailable Modal -->
+<div class="modal fade" id="unavailableModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title"><i class="fas fa-calendar-times me-2 text-warning"></i>Mark Unavailable</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3" id="unavailableClinicName">Block dates at this clinic</p>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Date Range</label>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label small text-muted">From</label>
+                            <input type="date" class="form-control" id="unavailableFrom">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small text-muted">To</label>
+                            <input type="date" class="form-control" id="unavailableTo">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Reason</label>
+                    <select class="form-select" id="unavailableReason">
+                        <option value="vacation">Vacation / Leave</option>
+                        <option value="conference">Conference / Training</option>
+                        <option value="personal">Personal</option>
+                        <option value="sick">Sick Leave</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Notes (optional)</label>
+                    <input type="text" class="form-control" id="unavailableNotes" placeholder="e.g., Will be back on Monday">
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" id="confirmUnavailableBtn">
+                    <i class="fas fa-calendar-times me-1"></i>Mark Unavailable
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let pendingDeclineId = null;
+let pendingScheduleUrl = null;
+
+function showDeclineModal(invitationId, clinicName) {
+    pendingDeclineId = invitationId;
+    document.getElementById('declineClinicName').textContent = 'Are you sure you want to decline the invitation from ' + clinicName + '?';
+    new bootstrap.Modal(document.getElementById('declineModal')).show();
+}
+
+document.getElementById('confirmDeclineBtn').addEventListener('click', function() {
+    if (pendingDeclineId) {
+        bootstrap.Modal.getInstance(document.getElementById('declineModal')).hide();
+        respondInvitation(pendingDeclineId, 'reject', '');
+    }
+});
+
+function respondInvitation(invitationId, action, clinicName) {
+    fetch('/api/doctor/clinic-invitation/' + invitationId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ action: action })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            if (action === 'accept') {
+                document.getElementById('successClinicName').textContent = "You've joined " + clinicName + "!";
+                if (result.schedule_url) {
+                    document.getElementById('setScheduleBtn').href = result.schedule_url;
+                }
+                const modal = new bootstrap.Modal(document.getElementById('successModal'));
+                modal.show();
+                document.getElementById('successModal').addEventListener('hidden.bs.modal', function() {
+                    location.reload();
+                }, { once: true });
+            } else {
+                location.reload();
+            }
+        } else {
+            showError(result.error || 'Failed to respond to invitation');
+        }
+    })
+    .catch(function() {
+        showError('Network error. Please try again.');
+    });
+}
+
+function showError(message) {
+    document.getElementById('errorMessage').textContent = message;
+    new bootstrap.Modal(document.getElementById('errorModal')).show();
+}
+
+// Unavailable functionality
+let pendingUnavailableClinicDoctorId = null;
+
+function showUnavailableModal(clinicDoctorId, clinicName) {
+    pendingUnavailableClinicDoctorId = clinicDoctorId;
+    document.getElementById('unavailableClinicName').textContent = 'Block dates at ' + clinicName;
+
+    // Set default dates (today and tomorrow)
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    document.getElementById('unavailableFrom').value = today.toISOString().split('T')[0];
+    document.getElementById('unavailableTo').value = tomorrow.toISOString().split('T')[0];
+    document.getElementById('unavailableReason').value = 'vacation';
+    document.getElementById('unavailableNotes').value = '';
+
+    new bootstrap.Modal(document.getElementById('unavailableModal')).show();
+}
+
+document.getElementById('confirmUnavailableBtn').addEventListener('click', function() {
+    const fromDate = document.getElementById('unavailableFrom').value;
+    const toDate = document.getElementById('unavailableTo').value;
+    const reason = document.getElementById('unavailableReason').value;
+    const notes = document.getElementById('unavailableNotes').value;
+
+    if (!fromDate || !toDate) {
+        showError('Please select both start and end dates.');
+        return;
+    }
+
+    if (new Date(fromDate) > new Date(toDate)) {
+        showError('End date must be after start date.');
+        return;
+    }
+
+    fetch('/api/doctor/schedule-exception', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            clinic_doctor_id: pendingUnavailableClinicDoctorId,
+            from_date: fromDate,
+            to_date: toDate,
+            reason: reason,
+            notes: notes
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        bootstrap.Modal.getInstance(document.getElementById('unavailableModal')).hide();
+        if (result.success) {
+            // Show success
+            document.getElementById('successClinicName').textContent = result.message || 'Dates marked as unavailable!';
+            document.getElementById('setScheduleBtn').style.display = 'none';
+            document.querySelector('#successModal h4').textContent = 'Done!';
+            document.querySelector('#successModal .btn-outline-secondary').textContent = 'Close';
+            new bootstrap.Modal(document.getElementById('successModal')).show();
+        } else {
+            showError(result.error || 'Failed to mark unavailable');
+        }
+    })
+    .catch(function() {
+        bootstrap.Modal.getInstance(document.getElementById('unavailableModal')).hide();
+        showError('Network error. Please try again.');
+    });
+});
+</script>
+{% endblock %}

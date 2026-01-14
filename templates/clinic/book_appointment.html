@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block title %}Book Appointment - {{ doctor.name }} - {{ clinic.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Doctor Info Sidebar -->
+        <div class="col-lg-4 mb-4">
+            <div class="card sticky-top" style="border-radius: 16px; border: none; top: 20px;">
+                <div class="card-body text-center p-4">
+                    {% if doctor.photo_url %}
+                    <img src="{{ doctor.photo_url }}" alt="{{ doctor.name }}"
+                         class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                    {% else %}
+                    <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width: 100px; height: 100px; background: var(--brand-soft); color: var(--brand); font-weight: bold; font-size: 2.5rem;">
+                        {{ doctor.name[:1] }}
+                    </div>
+                    {% endif %}
+
+                    <h4 class="mb-1">{{ doctor.name }}</h4>
+                    <p class="text-muted mb-2">{{ doctor.specialty.name if doctor.specialty else 'General Physician' }}</p>
+
+                    {% if doctor.is_verified %}
+                    <span class="badge bg-success mb-3"><i class="fas fa-check-circle me-1"></i>Verified Doctor</span>
+                    {% endif %}
+
+                    <hr>
+
+                    <div class="text-start">
+                        <p class="mb-2">
+                            <i class="fas fa-hospital me-2" style="color: var(--brand);"></i>
+                            <strong>{{ clinic.name }}</strong>
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2" style="color: var(--brand);"></i>
+                            {{ clinic.address }}, {{ clinic.city }}
+                        </p>
+                        {% if clinic_doctor.consultation_fee %}
+                        <p class="mb-0">
+                            <i class="fas fa-money-bill me-2" style="color: var(--brand);"></i>
+                            Consultation: <strong>NPR {{ clinic_doctor.consultation_fee }}</strong>
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Form -->
+        <div class="col-lg-8">
+            <div class="card" style="border-radius: 16px; border: none;">
+                <div class="card-body p-4">
+                    <h3 class="mb-4">
+                        <i class="fas fa-calendar-plus me-2" style="color: var(--brand);"></i>Book Your Appointment
+                    </h3>
+
+                    <!-- Step 1: Select Date -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">1. Select Date</h5>
+                        {% if available_dates %}
+                        <div class="d-flex flex-wrap gap-2" id="dateSelection">
+                            {% for d in available_dates %}
+                            <button type="button" class="btn btn-outline-primary date-btn" data-date="{{ d.date.isoformat() }}">
+                                <div class="fw-bold">{{ d.formatted }}</div>
+                                <small class="text-muted">{{ d.day_name[:3] }}</small>
+                                <br><small class="text-success">{{ d.slots_left }} slots</small>
+                            </button>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            No available dates in the next 14 days. Please contact the clinic directly.
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Step 2: Select Time -->
+                    <div class="mb-4" id="timeSection" style="display: none;">
+                        <h5 class="mb-3">2. Select Time</h5>
+                        <div id="timeSlots" class="d-flex flex-wrap gap-2">
+                            <!-- Slots loaded via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Your Details -->
+                    <div class="mb-4" id="detailsSection" style="display: none;">
+                        <h5 class="mb-3">3. Your Details</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="patientName" required placeholder="Your full name">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="patientPhone" required placeholder="98XXXXXXXX">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Email (Optional)</label>
+                                <input type="email" class="form-control" id="patientEmail" placeholder="For confirmation email">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Reason for Visit (Optional)</label>
+                                <textarea class="form-control" id="reason" rows="2" placeholder="Brief description of your concern"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Booking Summary -->
+                    <div class="mb-4" id="summarySection" style="display: none;">
+                        <h5 class="mb-3">4. Confirm Booking</h5>
+                        <div class="card" style="background: var(--brand-soft); border-radius: 12px; border: none;">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small class="text-muted">Date</small>
+                                        <p class="mb-2 fw-bold" id="summaryDate"></p>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Time</small>
+                                        <p class="mb-2 fw-bold" id="summaryTime"></p>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Doctor</small>
+                                        <p class="mb-0 fw-bold">{{ doctor.name }}</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Clinic</small>
+                                        <p class="mb-0 fw-bold">{{ clinic.name }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid" id="submitSection" style="display: none;">
+                        <button type="button" class="btn btn-primary btn-lg" id="bookBtn" onclick="submitBooking()">
+                            <i class="fas fa-check-circle me-2"></i>Confirm Booking
+                        </button>
+                        <p class="text-muted small mt-3 mb-0 text-center">
+                            <i class="fas fa-info-circle me-1"></i>
+                            By booking, you acknowledge that appointment times are subject to availability and may be affected by walk-in patients or emergencies at the clinic.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px;">
+            <div class="modal-body text-center p-5">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle fa-4x text-success"></i>
+                </div>
+                <h3 class="mb-3">Booking Confirmed!</h3>
+                <p class="text-muted mb-4">Your appointment has been booked successfully.</p>
+
+                <div class="card mb-4" style="background: var(--brand-soft); border-radius: 12px; border: none;">
+                    <div class="card-body">
+                        <p class="mb-1">Your Booking Code:</p>
+                        <h2 class="mb-0" id="bookingCode" style="color: var(--brand); letter-spacing: 2px;"></h2>
+                    </div>
+                </div>
+
+                <p class="text-muted small mb-3">
+                    Save this code to check your appointment status at any time.
+                </p>
+
+                <div class="alert alert-light text-start mb-4" style="border-radius: 8px; font-size: 0.8rem;">
+                    <i class="fas fa-exclamation-circle text-warning me-1"></i>
+                    <strong>Please note:</strong> Actual wait times may vary due to walk-in patients or medical emergencies. We recommend arriving 10-15 minutes early. RankSewa provides this booking platform as a service and is not responsible for delays or scheduling conflicts at the clinic.
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="#" id="statusLink" class="btn btn-primary">
+                        <i class="fas fa-eye me-2"></i>View Appointment Status
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.date-btn {
+    min-width: 90px;
+    padding: 12px;
+}
+.date-btn.active {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: white;
+}
+.date-btn.active small {
+    color: rgba(255,255,255,0.8) !important;
+}
+.time-btn {
+    min-width: 100px;
+}
+.time-btn.active {
+    background: var(--brand);
+    border-color: var(--brand);
+}
+.time-btn:disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+}
+</style>
+
+<script>
+let selectedDate = null;
+let selectedTime = null;
+
+// Date selection
+document.querySelectorAll('.date-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.date-btn').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+        selectedDate = this.dataset.date;
+        loadTimeSlots(selectedDate);
+    });
+});
+
+function loadTimeSlots(date) {
+    document.getElementById('timeSection').style.display = 'block';
+    document.getElementById('timeSlots').innerHTML = '<p class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i>Loading available times...</p>';
+
+    fetch('/api/booking/slots?clinic_doctor_id={{ clinic_doctor.id }}&date=' + date)
+        .then(response => response.json())
+        .then(result => {
+            const container = document.getElementById('timeSlots');
+            if (result.success && result.slots.length > 0) {
+                let html = '';
+                result.slots.forEach(function(slot) {
+                    if (slot.available) {
+                        html += `<button type="button" class="btn btn-outline-primary time-btn" data-time="${slot.time}" onclick="selectTime(this, '${slot.time}', '${slot.display}')">${slot.display}</button>`;
+                    } else {
+                        html += `<button type="button" class="btn btn-outline-secondary time-btn" disabled>${slot.display}</button>`;
+                    }
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<p class="text-muted">No available slots for this day.</p>';
+            }
+        })
+        .catch(function() {
+            document.getElementById('timeSlots').innerHTML = '<p class="text-danger">Error loading slots. Please try again.</p>';
+        });
+}
+
+function selectTime(btn, time, display) {
+    document.querySelectorAll('.time-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    selectedTime = time;
+
+    document.getElementById('detailsSection').style.display = 'block';
+    document.getElementById('summarySection').style.display = 'block';
+    document.getElementById('submitSection').style.display = 'block';
+
+    // Update summary
+    const dateBtn = document.querySelector('.date-btn.active');
+    document.getElementById('summaryDate').textContent = dateBtn.querySelector('.fw-bold').textContent + ', ' + dateBtn.querySelector('small.text-muted').textContent;
+    document.getElementById('summaryTime').textContent = display;
+}
+
+function submitBooking() {
+    const patientName = document.getElementById('patientName').value.trim();
+    const patientPhone = document.getElementById('patientPhone').value.trim();
+    const patientEmail = document.getElementById('patientEmail').value.trim();
+    const reason = document.getElementById('reason').value.trim();
+
+    if (!patientName || !patientPhone) {
+        showAlert('Please fill in your name and phone number.', 'warning');
+        return;
+    }
+
+    if (patientPhone.length < 10) {
+        showAlert('Please enter a valid phone number.', 'warning');
+        return;
+    }
+
+    const btn = document.getElementById('bookBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Booking...';
+
+    fetch('/api/booking/create', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            clinic_doctor_id: {{ clinic_doctor.id }},
+            date: selectedDate,
+            time: selectedTime,
+            patient_name: patientName,
+            patient_phone: patientPhone,
+            patient_email: patientEmail,
+            reason: reason
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            document.getElementById('bookingCode').textContent = result.booking_code;
+            document.getElementById('statusLink').href = '/appointment/' + result.booking_code;
+            new bootstrap.Modal(document.getElementById('successModal')).show();
+        } else {
+            showAlert(result.error || 'Failed to book appointment', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Confirm Booking';
+        }
+    })
+    .catch(function() {
+        showAlert('Network error. Please try again.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Confirm Booking';
+    });
+}
+</script>
+{% endblock %}

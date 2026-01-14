@@ -1,0 +1,725 @@
+{% extends "base.html" %}
+
+{% block title %}My Health - RankSewa{% endblock %}
+
+{% block content %}
+{% if needs_consent %}
+<!-- Health Terms Consent Overlay -->
+<div id="consentOverlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+    <div class="card" style="max-width: 600px; margin: 20px; border-radius: 16px; max-height: 90vh; overflow-y: auto;">
+        <div class="card-body p-4">
+            <div class="text-center mb-4">
+                <i class="fas fa-shield-alt fa-3x" style="color: var(--brand);"></i>
+                <h4 class="mt-3">Health Tracking Terms</h4>
+                <p class="text-muted">Please review and accept our health data terms before continuing</p>
+            </div>
+
+            <div class="p-3 mb-4" style="background: var(--brand-soft); border-radius: 12px; max-height: 300px; overflow-y: auto;">
+                <h6>Your Health Data Privacy</h6>
+                <p class="small">By using Ranksewa Health Tracking, you agree to the following:</p>
+
+                <h6 class="mt-3"><i class="fas fa-lock me-2" style="color: var(--brand);"></i>Your Data Ownership</h6>
+                <ul class="small">
+                    <li>Your health data belongs to you</li>
+                    <li>Only you can view your health information</li>
+                    <li>You control who can access your data</li>
+                </ul>
+
+                <h6 class="mt-3"><i class="fas fa-user-shield me-2" style="color: var(--brand);"></i>Data Storage & Security</h6>
+                <ul class="small">
+                    <li>Your data is stored securely on Ranksewa servers</li>
+                    <li>We use encryption to protect your information</li>
+                    <li>We do not sell or share your data with third parties</li>
+                </ul>
+
+                <h6 class="mt-3"><i class="fas fa-info-circle me-2" style="color: var(--brand);"></i>Important Notes</h6>
+                <ul class="small mb-0">
+                    <li>This is a personal health tracking tool, not a medical device</li>
+                    <li>Always consult your doctor for medical advice</li>
+                    <li>You can delete your health data at any time</li>
+                </ul>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="acceptTermsCheck">
+                <label class="form-check-label" for="acceptTermsCheck">
+                    I have read and agree to the Health Tracking Terms
+                </label>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-lg" id="acceptTermsBtn" disabled onclick="acceptHealthTerms()">
+                    <i class="fas fa-check me-2"></i>Accept & Continue
+                </button>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Go Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('acceptTermsCheck').addEventListener('change', function() {
+    document.getElementById('acceptTermsBtn').disabled = !this.checked;
+});
+
+async function acceptHealthTerms() {
+    const btn = document.getElementById('acceptTermsBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+
+    try {
+        const response = await fetch('/api/health/consent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ terms_version: '{{ terms_version }}' })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            document.getElementById('consentOverlay').style.display = 'none';
+        } else {
+            showAlert(result.error || 'Failed to accept terms. Please try again.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check me-2"></i>Accept & Continue';
+        }
+    } catch (error) {
+        showAlert('An error occurred. Please try again.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check me-2"></i>Accept & Continue';
+    }
+}
+</script>
+{% endif %}
+<div class="container py-4">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('user_profile') }}" style="color: var(--brand);">My Profile</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Health Dashboard</li>
+        </ol>
+    </nav>
+
+    <!-- Health Navigation -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <h1 class="h3 mb-0" style="color: var(--ink);">
+            <i class="fas fa-heartbeat me-2" style="color: var(--brand);"></i>My Health
+        </h1>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <a href="{{ url_for('user_profile') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Back to Profile
+            </a>
+            <div class="btn-group btn-group-sm btn-group-md">
+                <a href="{{ url_for('health_dashboard') }}" class="btn btn-primary">
+                    <i class="fas fa-tachometer-alt me-1"></i><span class="d-none d-sm-inline"> Dashboard</span>
+                </a>
+                <a href="{{ url_for('health_vitals') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-chart-line me-1"></i><span class="d-none d-sm-inline"> Vitals</span>
+                </a>
+                <a href="{{ url_for('health_medications') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-pills me-1"></i><span class="d-none d-sm-inline"> Medications</span>
+                </a>
+            </div>
+            <a href="{{ url_for('export_health_pdf') }}" class="btn btn-success btn-sm" title="Download PDF report to share with your doctor">
+                <i class="fas fa-file-pdf me-1"></i><span class="d-none d-sm-inline"> Download PDF</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Encourage Reviews -->
+    <div class="alert border-0 mb-4" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 12px;">
+        <div class="d-flex align-items-start">
+            <i class="fas fa-star me-3 mt-1" style="color: #f59e0b; font-size: 1.5rem;"></i>
+            <div>
+                <h6 class="mb-1" style="color: var(--ink);">Help Others Find Good Healthcare</h6>
+                <p class="mb-2 small text-muted">
+                    Your experience matters! Share honest reviews of doctors you've visited. Reviews don't have to be
+                    good or bad - constructive feedback helps doctors improve their services and helps other patients
+                    make informed decisions.
+                </p>
+                <a href="{{ url_for('index') }}" class="btn btn-sm" style="background: var(--brand); color: white;">
+                    <i class="fas fa-search me-1"></i> Find a Doctor to Review
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <!-- Blood Pressure Card -->
+        <div class="col-md-4">
+            <div class="card h-100" style="border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-muted mb-0">Blood Pressure</h6>
+                        <i class="fas fa-heart" style="color: #ef4444; font-size: 1.2rem;"></i>
+                    </div>
+                    {% if latest_bp %}
+                    <h2 class="mb-1" style="color: var(--ink);">{{ latest_bp.systolic }}/{{ latest_bp.diastolic }}</h2>
+                    <small class="text-muted">mmHg</small>
+                    <div class="mt-2">
+                        <small class="text-muted">{{ latest_bp.timestamp.strftime('%b %d, %I:%M %p') }}</small>
+                    </div>
+                    {% else %}
+                    <h2 class="mb-1 text-muted">--/--</h2>
+                    <small class="text-muted">No readings yet</small>
+                    {% endif %}
+                    <button class="btn btn-sm btn-outline-primary mt-3 w-100" data-bs-toggle="modal" data-bs-target="#addBPModal">
+                        <i class="fas fa-plus me-1"></i> Log BP
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blood Sugar Card -->
+        <div class="col-md-4">
+            <div class="card h-100" style="border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-muted mb-0">Blood Sugar</h6>
+                        <i class="fas fa-tint" style="color: #f59e0b; font-size: 1.2rem;"></i>
+                    </div>
+                    {% if latest_sugar %}
+                    <h2 class="mb-1" style="color: var(--ink);">{{ latest_sugar.value }}</h2>
+                    <small class="text-muted">mg/dL</small>
+                    <div class="mt-2">
+                        <small class="text-muted">{{ latest_sugar.timestamp.strftime('%b %d, %I:%M %p') }}</small>
+                    </div>
+                    {% else %}
+                    <h2 class="mb-1 text-muted">--</h2>
+                    <small class="text-muted">No readings yet</small>
+                    {% endif %}
+                    <button class="btn btn-sm btn-outline-primary mt-3 w-100" data-bs-toggle="modal" data-bs-target="#addSugarModal">
+                        <i class="fas fa-plus me-1"></i> Log Sugar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medications Card -->
+        <div class="col-md-4">
+            <div class="card h-100" style="border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-muted mb-0">Active Medications</h6>
+                        <i class="fas fa-pills" style="color: var(--brand); font-size: 1.2rem;"></i>
+                    </div>
+                    <h2 class="mb-1" style="color: var(--ink);">{{ medications|length }}</h2>
+                    <small class="text-muted">medications</small>
+                    <button class="btn btn-sm btn-outline-primary mt-3 w-100" data-bs-toggle="modal" data-bs-target="#addMedModal">
+                        <i class="fas fa-plus me-1"></i> Add Medication
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent BP Readings -->
+        <div class="col-lg-6">
+            <div class="card" style="border-radius: 12px; border: 1px solid var(--border);">
+                <div class="card-header bg-transparent border-0 pt-3">
+                    <h5 class="mb-0"><i class="fas fa-heart me-2" style="color: #ef4444;"></i>Recent BP Readings</h5>
+                </div>
+                <div class="card-body pt-0">
+                    {% if recent_bp %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Reading</th>
+                                    <th>Pulse</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bp in recent_bp %}
+                                <tr>
+                                    <td>{{ bp.timestamp.strftime('%b %d, %I:%M %p') }}</td>
+                                    <td><strong>{{ bp.systolic }}/{{ bp.diastolic }}</strong></td>
+                                    <td>{{ bp.pulse or '-' }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-link text-danger p-0" onclick="deleteBP({{ bp.id }})">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No BP readings yet. Start tracking!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Sugar Readings -->
+        <div class="col-lg-6">
+            <div class="card" style="border-radius: 12px; border: 1px solid var(--border);">
+                <div class="card-header bg-transparent border-0 pt-3">
+                    <h5 class="mb-0"><i class="fas fa-tint me-2" style="color: #f59e0b;"></i>Recent Sugar Readings</h5>
+                </div>
+                <div class="card-body pt-0">
+                    {% if recent_sugar %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Value</th>
+                                    <th>Notes</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sugar in recent_sugar %}
+                                <tr>
+                                    <td>{{ sugar.timestamp.strftime('%b %d, %I:%M %p') }}</td>
+                                    <td><strong>{{ sugar.value }}</strong> mg/dL</td>
+                                    <td>{{ sugar.notes[:20] if sugar.notes else '-' }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-link text-danger p-0" onclick="deleteSugar({{ sugar.id }})">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No sugar readings yet. Start tracking!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medications List -->
+    {% if medications %}
+    <div class="card mt-4" style="border-radius: 12px; border: 1px solid var(--border);">
+        <div class="card-header bg-transparent border-0 pt-3">
+            <h5 class="mb-0"><i class="fas fa-pills me-2" style="color: var(--brand);"></i>My Medications</h5>
+        </div>
+        <div class="card-body pt-0">
+            <div class="row g-3">
+                {% for med in medications %}
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-between align-items-start p-3" style="background: var(--brand-soft); border-radius: 8px;">
+                        <div>
+                            <h6 class="mb-1">{{ med.name }}</h6>
+                            <small class="text-muted">{{ med.dosage }} - {{ med.frequency }}</small>
+                            {% if med.instructions %}
+                            <br><small class="text-muted">{{ med.instructions }}</small>
+                            {% endif %}
+                        </div>
+                        <button class="btn btn-sm btn-link text-danger" onclick="deleteMedication({{ med.id }})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- Add BP Modal -->
+<div class="modal fade" id="addBPModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 12px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title"><i class="fas fa-heart me-2" style="color: #ef4444;"></i>Log Blood Pressure</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">Systolic (Top)</label>
+                        <input type="number" class="form-control" id="bpSystolic" placeholder="120" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Diastolic (Bottom)</label>
+                        <input type="number" class="form-control" id="bpDiastolic" placeholder="80" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Pulse (optional)</label>
+                        <input type="number" class="form-control" id="bpPulse" placeholder="72">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">When</label>
+                        <input type="datetime-local" class="form-control" id="bpTimestamp">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Notes (optional)</label>
+                        <input type="text" class="form-control" id="bpNotes" placeholder="e.g., After exercise">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveBP()">
+                    <i class="fas fa-save me-1"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Sugar Modal -->
+<div class="modal fade" id="addSugarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 12px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title"><i class="fas fa-tint me-2" style="color: #f59e0b;"></i>Log Blood Sugar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">Reading (mg/dL)</label>
+                        <input type="number" class="form-control" id="sugarValue" placeholder="120" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">When</label>
+                        <input type="datetime-local" class="form-control" id="sugarTimestamp">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Notes (optional)</label>
+                        <input type="text" class="form-control" id="sugarNotes" placeholder="e.g., Fasting, After meal">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveSugar()">
+                    <i class="fas fa-save me-1"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Medication Modal -->
+<div class="modal fade" id="addMedModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 12px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title"><i class="fas fa-pills me-2" style="color: var(--brand);"></i>Add Medication</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Medication Name</label>
+                        <input type="text" class="form-control" id="medName" placeholder="e.g., Metformin" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Dosage</label>
+                        <input type="text" class="form-control" id="medDosage" placeholder="e.g., 500mg" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Frequency</label>
+                        <select class="form-control" id="medFrequency" required>
+                            <option value="">Select...</option>
+                            <option value="Once daily">Once daily</option>
+                            <option value="Twice daily">Twice daily</option>
+                            <option value="Three times daily">Three times daily</option>
+                            <option value="Before meals">Before meals</option>
+                            <option value="After meals">After meals</option>
+                            <option value="Before sleep">Before sleep</option>
+                            <option value="As needed">As needed</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Instructions (optional)</label>
+                        <input type="text" class="form-control" id="medInstructions" placeholder="e.g., Take with water">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveMedication()">
+                    <i class="fas fa-save me-1"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="healthToast" class="toast" role="alert">
+        <div class="toast-header">
+            <i class="fas fa-check-circle text-success me-2"></i>
+            <strong class="me-auto">Success</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage"></div>
+    </div>
+</div>
+
+<!-- Custom Alert/Confirm Modal -->
+<div class="modal fade" id="customAlertModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="customAlertTitle">
+                    <i class="fas fa-info-circle me-2" id="customAlertIcon" style="color: var(--brand);"></i>
+                    <span id="customAlertTitleText">Alert</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="customAlertBody">
+                Message here
+            </div>
+            <div class="modal-footer border-0 pt-0" id="customAlertFooter">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="customAlertCancel" style="display: none;">Cancel</button>
+                <button type="button" class="btn btn-primary" id="customAlertOk">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block head %}
+<style>
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/health-tracker.js') }}"></script>
+<script>
+    // Set default timestamp to now
+    document.addEventListener('DOMContentLoaded', function() {
+        const now = new Date();
+        const localISOTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        document.getElementById('bpTimestamp').value = localISOTime;
+        document.getElementById('sugarTimestamp').value = localISOTime;
+    });
+
+    // Custom alert/confirm functions
+    var customAlertModal = null;
+
+    function getAlertModal() {
+        if (!customAlertModal) {
+            customAlertModal = new bootstrap.Modal(document.getElementById('customAlertModal'));
+        }
+        return customAlertModal;
+    }
+
+    function showAlert(message, type) {
+        type = type || 'info';
+        var icon = document.getElementById('customAlertIcon');
+        var titleText = document.getElementById('customAlertTitleText');
+        var body = document.getElementById('customAlertBody');
+        var cancelBtn = document.getElementById('customAlertCancel');
+        var okBtn = document.getElementById('customAlertOk');
+
+        // Set icon and title based on type
+        if (type === 'error') {
+            icon.className = 'fas fa-exclamation-circle me-2';
+            icon.style.color = '#dc3545';
+            titleText.textContent = 'Error';
+        } else if (type === 'success') {
+            icon.className = 'fas fa-check-circle me-2';
+            icon.style.color = '#198754';
+            titleText.textContent = 'Success';
+        } else if (type === 'warning') {
+            icon.className = 'fas fa-exclamation-triangle me-2';
+            icon.style.color = '#ffc107';
+            titleText.textContent = 'Warning';
+        } else {
+            icon.className = 'fas fa-info-circle me-2';
+            icon.style.color = 'var(--brand)';
+            titleText.textContent = 'Info';
+        }
+
+        body.textContent = message;
+        cancelBtn.style.display = 'none';
+        okBtn.textContent = 'OK';
+        okBtn.className = 'btn btn-primary';
+        okBtn.onclick = function() {
+            getAlertModal().hide();
+        };
+
+        getAlertModal().show();
+    }
+
+    function showConfirm(message, callback) {
+        var icon = document.getElementById('customAlertIcon');
+        var titleText = document.getElementById('customAlertTitleText');
+        var body = document.getElementById('customAlertBody');
+        var cancelBtn = document.getElementById('customAlertCancel');
+        var okBtn = document.getElementById('customAlertOk');
+
+        icon.className = 'fas fa-question-circle me-2';
+        icon.style.color = 'var(--brand)';
+        titleText.textContent = 'Confirm';
+        body.textContent = message;
+        cancelBtn.style.display = 'inline-block';
+        okBtn.textContent = 'Yes';
+        okBtn.className = 'btn btn-danger';
+
+        okBtn.onclick = function() {
+            getAlertModal().hide();
+            if (callback) callback();
+        };
+
+        getAlertModal().show();
+    }
+
+    // Select doctor from search results
+    function selectDoctor(id, name, specialty, city) {
+        document.getElementById('selectedDoctorId').value = id;
+        document.getElementById('selectedDoctorName').textContent = name;
+        document.getElementById('selectedDoctorInfo').textContent = specialty + (city ? ' - ' + city : '');
+        document.getElementById('selectedDoctor').classList.remove('d-none');
+        document.getElementById('doctorSearchResults').innerHTML = '';
+        document.getElementById('doctorSearch').value = '';
+        document.getElementById('addDoctorBtn').disabled = false;
+    }
+
+    function clearSelectedDoctor() {
+        document.getElementById('selectedDoctorId').value = '';
+        document.getElementById('selectedDoctor').classList.add('d-none');
+        document.getElementById('addDoctorBtn').disabled = true;
+    }
+
+    // Add doctor to network
+    function addDoctorToNetwork() {
+        var doctorId = document.getElementById('selectedDoctorId').value;
+        var notes = document.getElementById('doctorNotes').value;
+        var btn = document.getElementById('addDoctorBtn');
+
+        if (!doctorId) {
+            showAlert('Please select a doctor first', 'warning');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Adding...';
+
+        fetch('/api/health/network', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ doctor_id: parseInt(doctorId), notes: notes })
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(result) {
+            if (result.success) {
+                bootstrap.Modal.getInstance(document.getElementById('addDoctorModal')).hide();
+                location.reload();
+            } else {
+                showAlert(result.error || 'Failed to add doctor', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus me-1"></i> Add to Network';
+            }
+        })
+        .catch(function(error) {
+            showAlert('Network error. Please try again.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-plus me-1"></i> Add to Network';
+        });
+    }
+
+    // Remove doctor from network
+    function removeFromNetwork(linkId) {
+        showConfirm('Remove this doctor from your network?', function() {
+            fetch('/api/health/network/' + linkId, {
+                method: 'DELETE',
+                credentials: 'same-origin',
+                headers: { 'X-CSRFToken': '{{ csrf_token() }}' }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                if (result.success) {
+                    var element = document.getElementById('doctor-link-' + linkId);
+                    if (element) element.remove();
+                    // Reload if no doctors left
+                    if (document.querySelectorAll('[id^="doctor-link-"]').length === 0) {
+                        location.reload();
+                    }
+                } else {
+                    showAlert(result.error || 'Failed to remove doctor', 'error');
+                }
+            })
+            .catch(function(error) {
+                showAlert('Network error. Please try again.', 'error');
+            });
+        });
+    }
+
+    // Doctor search function
+    let doctorSearchTimeout = null;
+    function searchDoctors(query) {
+        query = query.trim();
+        const resultsDiv = document.getElementById('doctorSearchResults');
+
+        if (doctorSearchTimeout) clearTimeout(doctorSearchTimeout);
+
+        if (query.length < 2) {
+            resultsDiv.innerHTML = '';
+            return;
+        }
+
+        resultsDiv.innerHTML = '<p class="text-muted small p-2"><i class="fas fa-spinner fa-spin me-1"></i>Searching...</p>';
+
+        doctorSearchTimeout = setTimeout(function() {
+            fetch('/api/health/network/search?q=' + encodeURIComponent(query), {
+                credentials: 'same-origin',
+                headers: { 'X-CSRFToken': '{{ csrf_token() }}' }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                if (result.success && result.data && result.data.length > 0) {
+                    var html = '';
+                    for (var i = 0; i < result.data.length; i++) {
+                        var doc = result.data[i];
+                        html += '<div class="p-2 border-bottom" style="cursor: pointer; background: #f8f9fa;" ';
+                        html += 'onmouseover="this.style.background=\'#e9ecef\'" ';
+                        html += 'onmouseout="this.style.background=\'#f8f9fa\'" ';
+                        html += 'onclick="selectDoctor(' + doc.id + ', \'' + doc.name.replace(/'/g, "\\'") + '\', \'' + (doc.specialty || 'Doctor').replace(/'/g, "\\'") + '\', \'' + (doc.city || '').replace(/'/g, "\\'") + '\')">';
+                        html += '<strong>' + doc.name + '</strong>';
+                        html += '<br><small class="text-muted">' + (doc.specialty || 'Doctor') + (doc.city ? ' - ' + doc.city : '') + '</small>';
+                        html += '</div>';
+                    }
+                    resultsDiv.innerHTML = html;
+                } else if (result.success) {
+                    resultsDiv.innerHTML = '<p class="text-muted small p-2">No verified doctors found.</p>';
+                } else {
+                    resultsDiv.innerHTML = '<p class="text-danger small p-2">Error: ' + (result.error || 'Search failed') + '</p>';
+                }
+            })
+            .catch(function(error) {
+                console.error('Search error:', error);
+                resultsDiv.innerHTML = '<p class="text-danger small p-2">Network error. Please try again.</p>';
+            });
+        }, 300);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Appointment Status - {{ appointment.booking_code }} - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card" style="border-radius: 16px; border: none; overflow: hidden;">
+                <!-- Status Header -->
+                <div class="p-4 text-center text-white
+                    {% if appointment.status == 'completed' %}bg-success
+                    {% elif appointment.status in ['booked', 'confirmed'] %}bg-primary
+                    {% elif appointment.status == 'checked_in' %}bg-warning
+                    {% elif appointment.status == 'in_progress' %}bg-info
+                    {% elif appointment.status == 'cancelled' %}bg-secondary
+                    {% elif appointment.status == 'no_show' %}bg-danger
+                    {% else %}bg-secondary{% endif %}">
+
+                    {% if appointment.status == 'completed' %}
+                    <i class="fas fa-check-circle fa-3x mb-3"></i>
+                    <h3>Appointment Completed</h3>
+                    {% elif appointment.status == 'in_progress' %}
+                    <i class="fas fa-user-md fa-3x mb-3"></i>
+                    <h3>With Doctor Now</h3>
+                    {% elif appointment.status == 'checked_in' %}
+                    <i class="fas fa-clock fa-3x mb-3"></i>
+                    <h3>Checked In - Waiting</h3>
+                    {% elif appointment.status in ['booked', 'confirmed'] %}
+                    <i class="fas fa-calendar-check fa-3x mb-3"></i>
+                    <h3>Appointment Confirmed</h3>
+                    {% elif appointment.status == 'cancelled' %}
+                    <i class="fas fa-times-circle fa-3x mb-3"></i>
+                    <h3>Appointment Cancelled</h3>
+                    {% elif appointment.status == 'no_show' %}
+                    <i class="fas fa-user-slash fa-3x mb-3"></i>
+                    <h3>Marked as No Show</h3>
+                    {% endif %}
+
+                    <p class="mb-0 opacity-75">Booking Code: <strong>{{ appointment.booking_code }}</strong></p>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Queue Position -->
+                    {% if ahead_count is not none and appointment.status in ['booked', 'confirmed', 'checked_in'] %}
+                    <div class="alert mb-4 text-center" style="background: var(--brand-soft); border-radius: 12px; border: none;">
+                        {% if ahead_count == 0 %}
+                        <h4 class="mb-1" style="color: var(--brand);">You're Next!</h4>
+                        <p class="mb-0 text-muted">Please be ready</p>
+                        {% else %}
+                        <h4 class="mb-1" style="color: var(--brand);">{{ ahead_count }} patient(s) ahead</h4>
+                        <p class="mb-0 text-muted">Estimated wait: ~{{ ahead_count * 15 }} minutes</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Appointment Details -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Date</small>
+                            <strong>{{ appointment.appointment_date.strftime('%B %d, %Y') }}</strong>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Time</small>
+                            <strong>{{ appointment.appointment_time.strftime('%I:%M %p') }}</strong>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Doctor</small>
+                            <strong>{{ appointment.clinic_doctor.doctor.name }}</strong>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Specialty</small>
+                            <strong>{{ appointment.clinic_doctor.doctor.specialty.name if appointment.clinic_doctor.doctor.specialty else 'General' }}</strong>
+                        </div>
+                        <div class="col-12">
+                            <small class="text-muted d-block">Clinic</small>
+                            <strong>{{ appointment.clinic_doctor.clinic.name }}</strong>
+                            <br><small class="text-muted">{{ appointment.clinic_doctor.clinic.address }}, {{ appointment.clinic_doctor.clinic.city }}</small>
+                        </div>
+                    </div>
+
+                    {% if appointment.clinic_doctor.clinic.phone %}
+                    <a href="tel:{{ appointment.clinic_doctor.clinic.phone }}" class="btn btn-outline-primary w-100 mb-3">
+                        <i class="fas fa-phone me-2"></i>Call Clinic: {{ appointment.clinic_doctor.clinic.phone }}
+                    </a>
+                    {% endif %}
+
+                    {% if appointment.can_cancel() %}
+                    <button class="btn btn-outline-danger w-100" onclick="cancelAppointment()">
+                        <i class="fas fa-times me-2"></i>Cancel Appointment
+                    </button>
+                    {% endif %}
+
+                    <hr class="my-4">
+
+                    <div class="text-center">
+                        <a href="{{ url_for('check_appointment') }}" class="btn btn-link">
+                            <i class="fas fa-search me-1"></i>Check Another Appointment
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Refresh Reminder -->
+            {% if appointment.status in ['booked', 'confirmed', 'checked_in'] %}
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    <i class="fas fa-sync-alt me-1"></i>Refresh this page to see live updates
+                </small>
+            </div>
+            {% endif %}
+
+            <!-- Disclaimer -->
+            <div class="text-center mt-4 pt-3 border-top">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Wait times may vary due to walk-ins or emergencies. Please arrive 10-15 minutes early.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if appointment.can_cancel() %}
+<script>
+function cancelAppointment() {
+    if (!confirm('Are you sure you want to cancel this appointment?')) {
+        return;
+    }
+
+    fetch('/api/appointment/{{ appointment.id }}/cancel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ reason: 'Cancelled by patient' })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            showAlert('Appointment cancelled successfully.', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showAlert(result.error || 'Failed to cancel', 'error');
+        }
+    })
+    .catch(function() {
+        showAlert('Network error. Please try again.', 'error');
+    });
+}
+</script>
+{% endif %}
+{% endblock %}

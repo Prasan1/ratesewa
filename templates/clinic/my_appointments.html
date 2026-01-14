@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}My Appointments - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-calendar-check me-2" style="color: var(--brand);"></i>My Appointments
+                </h2>
+                <a href="{{ url_for('check_appointment') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-search me-1"></i>Check by Code
+                </a>
+            </div>
+
+            <!-- Upcoming Appointments -->
+            <div class="mb-5">
+                <h4 class="mb-3">
+                    <i class="fas fa-clock me-2 text-primary"></i>Upcoming Appointments
+                </h4>
+
+                {% if upcoming %}
+                <div class="row g-3">
+                    {% for apt in upcoming %}
+                    <div class="col-md-6">
+                        <div class="card h-100" style="border-radius: 12px; border-left: 4px solid
+                            {% if apt.status == 'in_progress' %}var(--bs-info)
+                            {% elif apt.status == 'checked_in' %}var(--bs-warning)
+                            {% else %}var(--brand){% endif %};">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h5 class="mb-1">{{ apt.clinic_doctor.doctor.name }}</h5>
+                                        <small class="text-muted">{{ apt.clinic_doctor.doctor.specialty.name if apt.clinic_doctor.doctor.specialty else 'General' }}</small>
+                                    </div>
+                                    <span class="badge
+                                        {% if apt.status == 'in_progress' %}bg-info
+                                        {% elif apt.status == 'checked_in' %}bg-warning
+                                        {% elif apt.status == 'confirmed' %}bg-success
+                                        {% else %}bg-primary{% endif %}">
+                                        {% if apt.status == 'in_progress' %}With Doctor
+                                        {% elif apt.status == 'checked_in' %}Checked In
+                                        {% elif apt.status == 'confirmed' %}Confirmed
+                                        {% else %}Booked{% endif %}
+                                    </span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <p class="mb-1">
+                                        <i class="fas fa-calendar me-2 text-muted"></i>
+                                        <strong>{{ apt.appointment_date.strftime('%B %d, %Y') }}</strong>
+                                    </p>
+                                    <p class="mb-1">
+                                        <i class="fas fa-clock me-2 text-muted"></i>
+                                        {{ apt.appointment_time.strftime('%I:%M %p') }}
+                                    </p>
+                                    <p class="mb-0">
+                                        <i class="fas fa-hospital me-2 text-muted"></i>
+                                        {{ apt.clinic_doctor.clinic.name }}
+                                    </p>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('appointment_status', booking_code=apt.booking_code) }}"
+                                       class="btn btn-sm btn-outline-primary flex-grow-1">
+                                        <i class="fas fa-eye me-1"></i>View Status
+                                    </a>
+                                    {% if apt.can_cancel() %}
+                                    <button class="btn btn-sm btn-outline-danger"
+                                            onclick="cancelAppointment({{ apt.id }}, '{{ apt.booking_code }}')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mt-2">
+                                    <small class="text-muted">Code: <strong>{{ apt.booking_code }}</strong></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="card" style="border-radius: 12px; border: none; background: var(--brand-soft);">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-calendar-plus fa-3x mb-3" style="color: var(--brand);"></i>
+                        <h5>No Upcoming Appointments</h5>
+                        <p class="text-muted mb-3">You don't have any scheduled appointments.</p>
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>Find a Doctor
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Past Appointments -->
+            <div>
+                <h4 class="mb-3">
+                    <i class="fas fa-history me-2 text-secondary"></i>Past Appointments
+                </h4>
+
+                {% if past %}
+                <div class="table-responsive">
+                    <table class="table table-hover" style="border-radius: 12px; overflow: hidden;">
+                        <thead style="background: var(--bg-soft);">
+                            <tr>
+                                <th>Date</th>
+                                <th>Doctor</th>
+                                <th>Clinic</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for apt in past %}
+                            <tr>
+                                <td>
+                                    <strong>{{ apt.appointment_date.strftime('%b %d, %Y') }}</strong>
+                                    <br><small class="text-muted">{{ apt.appointment_time.strftime('%I:%M %p') }}</small>
+                                </td>
+                                <td>
+                                    {{ apt.clinic_doctor.doctor.name }}
+                                    <br><small class="text-muted">{{ apt.clinic_doctor.doctor.specialty.name if apt.clinic_doctor.doctor.specialty else 'General' }}</small>
+                                </td>
+                                <td>{{ apt.clinic_doctor.clinic.name }}</td>
+                                <td>
+                                    <span class="badge
+                                        {% if apt.status == 'completed' %}bg-success
+                                        {% elif apt.status == 'cancelled' %}bg-secondary
+                                        {% elif apt.status == 'no_show' %}bg-danger
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ apt.status|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if apt.status == 'completed' and apt.clinic_doctor.doctor %}
+                                    <a href="{{ url_for('doctor_profile', slug=apt.clinic_doctor.doctor.slug) }}#reviews"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-star me-1"></i>Review
+                                    </a>
+                                    {% else %}
+                                    <a href="{{ url_for('appointment_status', booking_code=apt.booking_code) }}"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-eye me-1"></i>View
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-secondary text-center py-4" style="border-radius: 12px;">
+                    <i class="fas fa-history fa-2x mb-2 text-muted"></i>
+                    <p class="mb-0 text-muted">No past appointments to show.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function cancelAppointment(appointmentId, bookingCode) {
+    if (!confirm('Are you sure you want to cancel this appointment?')) {
+        return;
+    }
+
+    fetch('/api/appointment/' + appointmentId + '/cancel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ reason: 'Cancelled by patient' })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            showAlert('Appointment cancelled successfully.', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showAlert(result.error || 'Failed to cancel', 'error');
+        }
+    })
+    .catch(function() {
+        showAlert('Network error. Please try again.', 'error');
+    });
+}
+</script>
+{% endblock %}

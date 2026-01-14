@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Check Appointment Status - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card" style="border-radius: 16px; border: none;">
+                <div class="card-body p-4 p-md-5 text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-search fa-3x" style="color: var(--brand);"></i>
+                    </div>
+
+                    <h2 class="mb-2">Check Your Appointment</h2>
+                    <p class="text-muted mb-4">Enter your booking code to see your appointment status and queue position.</p>
+
+                    <form method="POST" action="{{ url_for('check_appointment') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="mb-4">
+                            <input type="text" class="form-control form-control-lg text-center"
+                                   name="booking_code" placeholder="Enter Booking Code"
+                                   style="font-size: 1.5rem; letter-spacing: 3px; text-transform: uppercase;"
+                                   maxlength="10" required autocomplete="off">
+                            <small class="text-muted">e.g., ABCD1234</small>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-search me-2"></i>Check Status
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <p class="text-muted small mb-3">Don't have a booking code?</p>
+
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-calendar-plus me-2"></i>Book New Appointment
+                        </a>
+                        {% if session.get('user_id') %}
+                        <a href="{{ url_for('my_appointments') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-list me-2"></i>View My Appointments
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

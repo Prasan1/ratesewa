@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}{{ clinic.name }} - Book Appointment - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Clinic Header -->
+    <div class="card mb-4" style="border-radius: 16px; border: none; background: linear-gradient(135deg, var(--brand-soft) 0%, #e0f2f1 100%);">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center mb-3">
+                        {% if clinic.logo_url %}
+                        <img src="{{ clinic.logo_url }}" alt="{{ clinic.name }}" class="me-3" style="width: 80px; height: 80px; object-fit: contain; border-radius: 12px; background: white; padding: 8px;">
+                        {% else %}
+                        <div class="me-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background: var(--brand); color: white; border-radius: 12px; font-size: 2rem; font-weight: bold;">
+                            {{ clinic.name[:1] }}
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h1 class="h2 mb-1">{{ clinic.name }}</h1>
+                            <p class="text-muted mb-0">
+                                <span class="badge bg-secondary me-2">{{ clinic.clinic_type|title }}</span>
+                                {% if clinic.is_verified %}
+                                <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Verified</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <p class="mb-2">
+                        <i class="fas fa-map-marker-alt me-2" style="color: var(--brand);"></i>
+                        {{ clinic.address }}, {{ clinic.city }}
+                    </p>
+                    {% if clinic.phone %}
+                    <p class="mb-2">
+                        <i class="fas fa-phone me-2" style="color: var(--brand);"></i>
+                        <a href="tel:{{ clinic.phone }}" class="text-decoration-none">{{ clinic.phone }}</a>
+                    </p>
+                    {% endif %}
+                    {% if clinic.description %}
+                    <p class="text-muted mb-0">{{ clinic.description }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <div class="h4 mb-1" style="color: var(--brand);">{{ clinic_doctors|length }}</div>
+                    <p class="text-muted mb-0">Doctors Available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctors Grid -->
+    <h3 class="mb-3"><i class="fas fa-user-md me-2" style="color: var(--brand);"></i>Our Doctors</h3>
+
+    {% if clinic_doctors %}
+    <div class="row g-4">
+        {% for cd in clinic_doctors %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100" style="border-radius: 12px; border: 1px solid var(--border); transition: all 0.2s;">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        {% if cd.doctor.photo_url %}
+                        <img src="{{ cd.doctor.photo_url }}" alt="{{ cd.doctor.name }}"
+                             class="rounded-circle me-3" style="width: 70px; height: 70px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle me-3 d-flex align-items-center justify-content-center"
+                             style="width: 70px; height: 70px; background: var(--brand-soft); color: var(--brand); font-weight: bold; font-size: 1.5rem;">
+                            {{ cd.doctor.name[:1] }}
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-0">{{ cd.doctor.name }}</h5>
+                            <small class="text-muted">{{ cd.doctor.specialty.name if cd.doctor.specialty else 'General Physician' }}</small>
+                            {% if cd.doctor.is_verified %}
+                            <br><small class="text-success"><i class="fas fa-check-circle me-1"></i>Verified</small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if cd.consultation_fee %}
+                    <p class="mb-2">
+                        <i class="fas fa-money-bill-wave me-2 text-muted"></i>
+                        <strong>NPR {{ cd.consultation_fee }}</strong>
+                    </p>
+                    {% endif %}
+
+                    <!-- Schedule -->
+                    {% set schedules = cd.get_schedules() %}
+                    {% if schedules %}
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1"><i class="fas fa-clock me-1"></i>Schedule:</small>
+                        <div class="d-flex flex-wrap gap-1">
+                            {% for s in schedules %}
+                            <span class="badge" style="background: var(--brand-soft); color: var(--brand);">
+                                {{ ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][s.day_of_week] }}
+                                {{ s.start_time.strftime('%I:%M %p') }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if cd.accepts_online_booking %}
+                    <a href="{{ url_for('clinic_book_appointment', clinic_slug=clinic.slug, doctor_id=cd.doctor.id) }}"
+                       class="btn btn-primary w-100">
+                        <i class="fas fa-calendar-plus me-1"></i> Book Appointment
+                    </a>
+                    {% else %}
+                    <button class="btn btn-secondary w-100" disabled>
+                        <i class="fas fa-phone me-1"></i> Call to Book
+                    </button>
+                    {% endif %}
+                    {% else %}
+                    <div class="alert alert-secondary mb-0 py-2">
+                        <small><i class="fas fa-info-circle me-1"></i>Schedule not available</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center py-5" style="border-radius: 12px;">
+        <i class="fas fa-user-md fa-3x mb-3" style="color: var(--brand);"></i>
+        <h5>No Doctors Available</h5>
+        <p class="text-muted mb-0">This clinic hasn't added any doctors yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+</style>
+{% endblock %}

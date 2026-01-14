@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Queue - {{ clinic_doctor.doctor.name }} - {{ clinic.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <div>
+            <a href="{{ url_for('clinic_dashboard', clinic_slug=clinic.slug) }}" class="text-muted text-decoration-none mb-2 d-block">
+                <i class="fas fa-arrow-left me-1"></i> Back to {{ clinic.name }}
+            </a>
+            <h1 class="h3 mb-1">
+                <i class="fas fa-list-ol me-2" style="color: var(--brand);"></i>{{ clinic_doctor.doctor.name }}'s Queue
+            </h1>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <input type="date" class="form-control" id="dateSelector" value="{{ selected_date.isoformat() }}"
+                   onchange="window.location.href='?date=' + this.value">
+        </div>
+    </div>
+
+    <!-- Date Display -->
+    <div class="alert mb-4" style="background: var(--brand-soft); border-radius: 12px; border: none;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="mb-0">{{ selected_date.strftime('%A, %B %d, %Y') }}</h5>
+                <span class="text-muted">{{ appointments|length }} appointment(s)</span>
+            </div>
+            <div class="d-flex gap-2">
+                <span class="badge bg-success">{{ appointments|selectattr('status', 'equalto', 'completed')|list|length }} Done</span>
+                <span class="badge bg-primary">{{ appointments|selectattr('status', 'equalto', 'in_progress')|list|length }} Current</span>
+                <span class="badge bg-warning text-dark">{{ appointments|selectattr('status', 'in', ['booked', 'confirmed', 'checked_in'])|list|length }} Waiting</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Queue Table -->
+    {% if appointments %}
+    <div class="card" style="border-radius: 12px; border: 1px solid var(--border);">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background: var(--brand-soft);">
+                    <tr>
+                        <th class="ps-4">#</th>
+                        <th>Time</th>
+                        <th>Patient</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in appointments %}
+                    <tr id="appt-{{ appt.id }}" class="{% if appt.status == 'in_progress' %}table-primary{% elif appt.status == 'completed' %}table-success{% elif appt.status == 'no_show' %}table-danger{% elif appt.status == 'cancelled' %}table-secondary{% endif %}">
+                        <td class="ps-4 fw-bold">{{ loop.index }}</td>
+                        <td>{{ appt.appointment_time.strftime('%I:%M %p') }}</td>
+                        <td>
+                            <strong>{{ appt.patient_name }}</strong>
+                            {% if appt.reason %}
+                            <br><small class="text-muted">{{ appt.reason[:50] }}{{ '...' if appt.reason|length > 50 }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="tel:{{ appt.patient_phone }}" class="text-decoration-none">
+                                {{ appt.patient_phone }}
+                            </a>
+                            <button class="btn btn-sm btn-link p-0 ms-1" onclick="sendWhatsApp('{{ appt.patient_phone }}', '{{ appt.patient_name }}', '{{ clinic_doctor.doctor.name }}', '{{ appt.appointment_time.strftime('%I:%M %p') }}')" title="Send WhatsApp">
+                                <i class="fab fa-whatsapp text-success"></i>
+                            </button>
+                        </td>
+                        <td>
+                            <span class="badge status-badge-{{ appt.status }}" id="status-{{ appt.id }}">
+                                {{ appt.get_status_display() }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if appt.status in ['booked', 'confirmed'] %}
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="updateStatus({{ appt.id }}, 'checked_in')">
+                                <i class="fas fa-check"></i> Check In
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="updateStatus({{ appt.id }}, 'no_show')">
+                                <i class="fas fa-user-slash"></i> No Show
+                            </button>
+                            {% elif appt.status == 'checked_in' %}
+                            <button class="btn btn-sm btn-primary me-1" onclick="updateStatus({{ appt.id }}, 'in_progress')">
+                                <i class="fas fa-play"></i> Start
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="updateStatus({{ appt.id }}, 'no_show')">
+                                No Show
+                            </button>
+                            {% elif appt.status == 'in_progress' %}
+                            <button class="btn btn-sm btn-success" onclick="updateStatus({{ appt.id }}, 'completed')">
+                                <i class="fas fa-check-circle"></i> Complete
+                            </button>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center py-5" style="border-radius: 12px;">
+        <i class="fas fa-calendar-times fa-3x mb-3" style="color: var(--brand);"></i>
+        <h5>No Appointments</h5>
+        <p class="text-muted mb-0">No appointments scheduled for {{ selected_date.strftime('%B %d, %Y') }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.status-badge-booked { background-color: #6b7280; }
+.status-badge-confirmed { background-color: #3b82f6; }
+.status-badge-checked_in { background-color: #f59e0b; color: #000; }
+.status-badge-in_progress { background-color: #8b5cf6; }
+.status-badge-completed { background-color: #10b981; }
+.status-badge-no_show { background-color: #ef4444; }
+.status-badge-cancelled { background-color: #9ca3af; }
+</style>
+
+<script>
+function updateStatus(appointmentId, newStatus) {
+    if (newStatus === 'no_show' && !confirm('Mark this patient as No Show?')) {
+        return;
+    }
+
+    fetch('/api/clinic/appointment/' + appointmentId + '/status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            location.reload();
+        } else {
+            showAlert(result.error || 'Failed to update status', 'error');
+        }
+    })
+    .catch(function() {
+        showAlert('Network error. Please try again.', 'error');
+    });
+}
+
+function sendWhatsApp(phone, patientName, doctorName, time) {
+    // Remove any non-digit characters and ensure Nepal code
+    phone = phone.replace(/\D/g, '');
+    if (!phone.startsWith('977')) {
+        phone = '977' + phone;
+    }
+
+    const message = `Namaste ${patientName}! Your appointment with Dr. ${doctorName} is coming up at ${time}. Please be ready. - ${{{ clinic.name | tojson }}}`;
+    window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(message), '_blank');
+}
+</script>
+{% endblock %}

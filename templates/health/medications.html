@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}My Medications - My Health - RankSewa{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Health Navigation -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <h1 class="h3 mb-0" style="color: var(--ink);">
+            <i class="fas fa-pills me-2" style="color: var(--brand);"></i>My Medications
+        </h1>
+        <div class="btn-group btn-group-sm btn-group-md">
+            <a href="{{ url_for('health_dashboard') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-tachometer-alt me-1"></i><span class="d-none d-sm-inline"> Dashboard</span>
+            </a>
+            <a href="{{ url_for('health_vitals') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-chart-line me-1"></i><span class="d-none d-sm-inline"> Vitals</span>
+            </a>
+            <a href="{{ url_for('health_medications') }}" class="btn btn-primary">
+                <i class="fas fa-pills me-1"></i><span class="d-none d-sm-inline"> Medications</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="card" style="border-radius: 12px; border: 1px solid var(--border);">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Active Medications</h5>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMedModal">
+                <i class="fas fa-plus me-1"></i> Add Medication
+            </button>
+        </div>
+        <div class="card-body">
+            {% set active_meds = medications|selectattr('is_active')|list %}
+            {% if active_meds %}
+            <div class="row g-3">
+                {% for med in active_meds %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="p-3 h-100" style="background: var(--brand-soft); border-radius: 12px; border: 1px solid var(--border);">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="mb-1" style="color: var(--ink);">{{ med.name }}</h5>
+                                <p class="mb-2">
+                                    <span class="badge" style="background: var(--brand); color: white;">{{ med.dosage }}</span>
+                                    <span class="badge bg-secondary">{{ med.frequency }}</span>
+                                </p>
+                                {% if med.instructions %}
+                                <small class="text-muted"><i class="fas fa-info-circle me-1"></i>{{ med.instructions }}</small>
+                                {% endif %}
+                            </div>
+                            <button class="btn btn-sm btn-link text-danger" onclick="deleteMedication({{ med.id }})" title="Stop tracking">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">Added {{ med.created_at.strftime('%b %d, %Y') }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-pills fa-3x text-muted mb-3" style="opacity: 0.3;"></i>
+                <p class="text-muted">No active medications.</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMedModal">
+                    <i class="fas fa-plus me-1"></i> Add Your First Medication
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Inactive/Past Medications -->
+    {% set inactive_meds = medications|rejectattr('is_active')|list %}
+    {% if inactive_meds %}
+    <div class="card mt-4" style="border-radius: 12px; border: 1px solid var(--border);">
+        <div class="card-header bg-transparent">
+            <h5 class="mb-0 text-muted">
+                <i class="fas fa-history me-2"></i>Past Medications
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Dosage</th>
+                            <th>Frequency</th>
+                            <th>Added</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for med in inactive_meds %}
+                        <tr class="text-muted">
+                            <td>{{ med.name }}</td>
+                            <td>{{ med.dosage }}</td>
+                            <td>{{ med.frequency }}</td>
+                            <td>{{ med.created_at.strftime('%b %d, %Y') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Info Card -->
+    <div class="card mt-4" style="border-radius: 12px; border: 1px solid var(--border); background: linear-gradient(135deg, var(--brand-soft) 0%, var(--surface) 100%);">
+        <div class="card-body">
+            <h6><i class="fas fa-lightbulb me-2" style="color: var(--brand);"></i>Medication Tips</h6>
+            <ul class="mb-0 small text-muted">
+                <li>Track all your regular medications to share with your doctor</li>
+                <li>Include dosage and frequency for accurate records</li>
+                <li>Add special instructions like "take with food" or "before sleep"</li>
+                <li>Remove medications you've stopped taking to keep your list current</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Add Medication Modal -->
+<div class="modal fade" id="addMedModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 12px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title"><i class="fas fa-pills me-2" style="color: var(--brand);"></i>Add Medication</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Medication Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="medName" placeholder="e.g., Metformin" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Dosage <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="medDosage" placeholder="e.g., 500mg" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Frequency <span class="text-danger">*</span></label>
+                        <select class="form-control" id="medFrequency" required>
+                            <option value="">Select...</option>
+                            <option value="Once daily">Once daily</option>
+                            <option value="Twice daily">Twice daily</option>
+                            <option value="Three times daily">Three times daily</option>
+                            <option value="Four times daily">Four times daily</option>
+                            <option value="Every morning">Every morning</option>
+                            <option value="Every night">Every night</option>
+                            <option value="Before meals">Before meals</option>
+                            <option value="After meals">After meals</option>
+                            <option value="Before sleep">Before sleep</option>
+                            <option value="Weekly">Weekly</option>
+                            <option value="As needed">As needed</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Special Instructions</label>
+                        <input type="text" class="form-control" id="medInstructions" placeholder="e.g., Take with food, avoid alcohol">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveMedication()">
+                    <i class="fas fa-save me-1"></i> Save Medication
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="healthToast" class="toast" role="alert">
+        <div class="toast-header">
+            <i class="fas fa-check-circle text-success me-2"></i>
+            <strong class="me-auto">Success</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/health-tracker.js') }}"></script>
+{% endblock %}
