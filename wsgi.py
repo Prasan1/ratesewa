@@ -19,7 +19,21 @@ if os.environ.get('DATABASE_URL') is None:
         except Exception as e:
             print(f"⚠️  Database setup: {e}")
 else:
-    print("Production mode - skipping db.create_all(), use migrations instead")
+    # Production: Run migrations for missing tables
+    print("Production mode - running table migrations...")
+    try:
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, 'fix_clinic_tables.py'],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        print(result.stdout)
+        if result.returncode != 0:
+            print(f"Migration warning: {result.stderr}")
+    except Exception as e:
+        print(f"Migration error (non-fatal): {e}")
 
 # Expose the app for gunicorn
 application = app
