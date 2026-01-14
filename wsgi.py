@@ -172,6 +172,44 @@ else:
             else:
                 print("✅ All tables exist")
 
+            # Clean up duplicate cities
+            import re
+            with engine.connect() as conn_cities:
+                result = conn_cities.execute(text("SELECT id, name FROM cities ORDER BY name"))
+                all_cities = list(result.fetchall())
+
+            CITY_MERGES = {
+                'Butwal': ['Butwal;', 'Butwal Bazar', 'Butwal,'],
+                'Kathmandu': ['Kathmandu;', 'Kathmandu,'],
+                'Pokhara': ['Pokhara;', 'Pokhara,'],
+                'Lalitpur': ['Lalitpur;', 'Patan'],
+                'Nepalgunj': ['Nepalgunj;', 'Nepalganj'],
+            }
+
+            cities_dict = {row[1]: row[0] for row in all_cities}
+            merged = 0
+
+            for canonical, variants in CITY_MERGES.items():
+                canonical_id = cities_dict.get(canonical)
+                if not canonical_id:
+                    continue
+                for variant in variants:
+                    variant_id = cities_dict.get(variant)
+                    if variant_id and variant_id != canonical_id:
+                        try:
+                            with engine.connect() as c:
+                                c.execute(text("UPDATE doctors SET city_id = :cid WHERE city_id = :vid"),
+                                         {"cid": canonical_id, "vid": variant_id})
+                                c.execute(text("DELETE FROM cities WHERE id = :vid"), {"vid": variant_id})
+                                c.commit()
+                            print(f"  Merged city: {variant} -> {canonical}")
+                            merged += 1
+                        except:
+                            pass
+
+            if merged > 0:
+                print(f"✅ Merged {merged} duplicate cities")
+
     except Exception as e:
         print(f"⚠️ Migration check (non-fatal): {e}")
 
