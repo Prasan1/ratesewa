@@ -4948,6 +4948,138 @@ def doctor_update_working_hours():
     return redirect(url_for('doctor_dashboard'))
 
 
+# --- Doctor Workplace Management API ---
+@app.route('/api/doctor/workplaces', methods=['GET', 'POST'])
+@login_required
+@doctor_required
+def api_doctor_workplaces():
+    """List or add doctor workplaces"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    if request.method == 'GET':
+        workplaces = [wp.to_dict() for wp in doctor.workplaces]
+        return jsonify({'workplaces': workplaces})
+
+    # POST - Add new workplace
+    data = request.get_json() or request.form.to_dict()
+
+    name = data.get('name', '').strip()
+    if not name:
+        return jsonify({'error': 'Workplace name is required'}), 400
+
+    # Check for city match
+    city_id = data.get('city_id')
+    city_name = data.get('city_name', '').strip()
+
+    if city_id:
+        try:
+            city_id = int(city_id)
+            city = City.query.get(city_id)
+            if not city:
+                city_id = None
+        except (ValueError, TypeError):
+            city_id = None
+
+    # Check for clinic match
+    clinic_id = data.get('clinic_id')
+    if clinic_id:
+        try:
+            clinic_id = int(clinic_id)
+            clinic = Clinic.query.get(clinic_id)
+            if not clinic or not clinic.is_active:
+                clinic_id = None
+        except (ValueError, TypeError):
+            clinic_id = None
+
+    # Get next display order
+    max_order = db.session.query(db.func.max(DoctorWorkplace.display_order)).filter_by(doctor_id=doctor.id).scalar() or 0
+
+    workplace = DoctorWorkplace(
+        doctor_id=doctor.id,
+        name=name,
+        address=data.get('address', '').strip() or None,
+        city_id=city_id,
+        city_name=city_name if not city_id else None,
+        phone=data.get('phone', '').strip() or None,
+        display_order=max_order + 1,
+        is_primary=max_order == 0,  # First one is primary
+        clinic_id=clinic_id
+    )
+
+    db.session.add(workplace)
+    db.session.commit()
+
+    return jsonify({'workplace': workplace.to_dict(), 'message': 'Workplace added successfully'})
+
+
+@app.route('/api/doctor/workplaces/<int:workplace_id>', methods=['PUT', 'DELETE'])
+@login_required
+@doctor_required
+def api_doctor_workplace_detail(workplace_id):
+    """Update or delete a doctor workplace"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    workplace = DoctorWorkplace.query.filter_by(id=workplace_id, doctor_id=doctor.id).first()
+    if not workplace:
+        return jsonify({'error': 'Workplace not found'}), 404
+
+    if request.method == 'DELETE':
+        db.session.delete(workplace)
+        db.session.commit()
+        return jsonify({'message': 'Workplace deleted successfully'})
+
+    # PUT - Update workplace
+    data = request.get_json() or request.form.to_dict()
+
+    if 'name' in data:
+        name = data['name'].strip()
+        if not name:
+            return jsonify({'error': 'Workplace name cannot be empty'}), 400
+        workplace.name = name
+
+    if 'address' in data:
+        workplace.address = data['address'].strip() or None
+
+    if 'city_id' in data:
+        city_id = data['city_id']
+        if city_id:
+            try:
+                city_id = int(city_id)
+                city = City.query.get(city_id)
+                if city:
+                    workplace.city_id = city_id
+                    workplace.city_name = None
+            except (ValueError, TypeError):
+                pass
+        else:
+            workplace.city_id = None
+
+    if 'city_name' in data and not workplace.city_id:
+        workplace.city_name = data['city_name'].strip() or None
+
+    if 'phone' in data:
+        workplace.phone = data['phone'].strip() or None
+
+    if 'clinic_id' in data:
+        clinic_id = data['clinic_id']
+        if clinic_id:
+            try:
+                clinic_id = int(clinic_id)
+                clinic = Clinic.query.get(clinic_id)
+                if clinic and clinic.is_active:
+                    workplace.clinic_id = clinic_id
+            except (ValueError, TypeError):
+                pass
+        else:
+            workplace.clinic_id = None
+
+    db.session.commit()
+
+    return jsonify({'workplace': workplace.to_dict(), 'message': 'Workplace updated successfully'})
+
+
 @app.route('/doctor/reviews')
 @doctor_required
 def doctor_reviews():
