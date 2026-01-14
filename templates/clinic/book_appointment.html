@@ -12,16 +12,13 @@
                     {% if doctor.photo_url %}
                     {% set photo_path = doctor.photo_url.replace('photos/', '') %}
                     <img src="{{ url_for('serve_photo', filename=photo_path) }}" alt="{{ doctor.name }}"
-                         class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
-                         style="width: 100px; height: 100px; background: var(--brand-soft); color: var(--brand); font-weight: bold; font-size: 2.5rem; display: none;">
-                        {{ doctor.name[:1] }}
-                    </div>
+                         class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
                     {% else %}
+                    {% set name_parts = doctor.name.replace('Dr. ', '').replace('Dr.', '').split() %}
+                    {% set initials = name_parts[0][:1] ~ (name_parts[-1][:1] if name_parts|length > 1 else '') %}
                     <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
                          style="width: 100px; height: 100px; background: var(--brand-soft); color: var(--brand); font-weight: bold; font-size: 2.5rem;">
-                        {{ doctor.name[:1] }}
+                        {{ initials|upper }}
                     </div>
                     {% endif %}
 

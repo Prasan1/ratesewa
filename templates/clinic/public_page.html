@@ -73,16 +73,13 @@
                         {% if cd.doctor.photo_url %}
                         {% set photo_path = cd.doctor.photo_url.replace('photos/', '') %}
                         <img src="{{ url_for('serve_photo', filename=photo_path) }}" alt="{{ cd.doctor.name }}"
-                             class="rounded-circle me-3" style="width: 70px; height: 70px; object-fit: cover;"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="rounded-circle me-3 d-flex align-items-center justify-content-center"
-                             style="width: 70px; height: 70px; background: var(--brand-soft); color: var(--brand); font-weight: bold; font-size: 1.5rem; display: none;">
-                            {{ cd.doctor.name[:1] }}
-                        </div>
+                             class="rounded-circle me-3" style="width: 70px; height: 70px; object-fit: cover;">
                         {% else %}
+                        {% set name_parts = cd.doctor.name.replace('Dr. ', '').replace('Dr.', '').split() %}
+                        {% set initials = name_parts[0][:1] ~ (name_parts[-1][:1] if name_parts|length > 1 else '') %}
                         <div class="rounded-circle me-3 d-flex align-items-center justify-content-center"
                              style="width: 70px; height: 70px; background: var(--brand-soft); color: var(--brand); font-weight: bold; font-size: 1.5rem;">
-                            {{ cd.doctor.name[:1] }}
+                            {{ initials|upper }}
                         </div>
                         {% endif %}
                         <div>
