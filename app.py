@@ -2361,6 +2361,17 @@ def service_worker():
     response.headers['Content-Type'] = 'application/javascript'
     return response
 
+
+@app.route('/track-human', methods=['POST'])
+def track_human():
+    """
+    Anti-bot endpoint - only real browsers executing JS will hit this.
+    Sets a session flag to mark this visit as human for analytics.
+    """
+    session['is_human'] = True
+    return '', 204  # No Content response
+
+
 @app.route('/doctors')
 def get_doctors():
     clear_expired_subscriptions()

@@ -374,6 +374,11 @@
             console.log('RankSewa PWA: Install prompt available');
             deferredPrompt = e;
         });
+
+        // Anti-bot: Track human visitors (bots don't execute JS)
+        window.addEventListener('load', () => {
+            fetch('/track-human', { method: 'POST' }).catch(() => {});
+        });
     </script>
     {% block scripts %}{% endblock %}
 </body>
