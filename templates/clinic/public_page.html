@@ -4,6 +4,13 @@
 
 {% block content %}
 <div class="container py-4">
+    <!-- Back Navigation -->
+    <nav class="mb-3">
+        <a href="{{ url_for('clinics') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>All Clinics
+        </a>
+    </nav>
+
     <!-- Clinic Header -->
     <div class="card mb-4" style="border-radius: 16px; border: none; background: linear-gradient(135deg, var(--brand-soft) 0%, #e0f2f1 100%);">
         <div class="card-body p-4">

@@ -4,6 +4,13 @@
 
 {% block content %}
 <div class="container py-4">
+    <!-- Back Navigation -->
+    <nav class="mb-3">
+        <a href="{{ url_for('clinic_public_page', clinic_slug=clinic.slug) }}" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to {{ clinic.name }}
+        </a>
+    </nav>
+
     <div class="row">
         <!-- Doctor Info Sidebar -->
         <div class="col-lg-4 mb-4">

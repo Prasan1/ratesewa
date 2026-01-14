@@ -184,6 +184,9 @@ class User(db.Model):
     # Gamification
     points = db.Column(db.Integer, default=0)
 
+    # Activity tracking
+    last_login_at = db.Column(db.DateTime, nullable=True)
+
     # Relationships
     ratings = db.relationship('Rating', backref='user', lazy=True)
     appointments = db.relationship('Appointment', foreign_keys='Appointment.user_id', backref='user', lazy=True)

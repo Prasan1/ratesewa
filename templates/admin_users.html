@@ -27,9 +27,9 @@
             <tr>
                 <th>User</th>
                 <th>Role</th>
-                <th>Email Verified</th>
                 <th>Status</th>
-                <th>Created</th>
+                <th>Last Active</th>
+                <th>Joined</th>
                 <th class="text-end">Actions</th>
             </tr>
         </thead>
@@ -39,21 +39,19 @@
                 <td>
                     <div class="fw-semibold">{{ user.name }}</div>
                     <div class="text-muted small">{{ user.email }}</div>
-                </td>
-                <td>
-                    {% if user.is_admin %}
-                        <span class="badge bg-success">Admin</span>
-                    {% elif user.role == 'doctor' %}
-                        <span class="badge bg-primary">Doctor</span>
-                    {% else %}
-                        <span class="badge bg-warning">User</span>
+                    {% if not user.email_verified %}
+                    <span class="badge bg-secondary" style="font-size: 0.65rem;">Email not verified</span>
                     {% endif %}
                 </td>
                 <td>
-                    {% if user.email_verified %}
-                        <span class="badge bg-success">Verified</span>
+                    {% if user.is_admin %}
+                        <span class="badge bg-danger"><i class="fas fa-shield-alt me-1"></i>Admin</span>
+                    {% elif user.role == 'doctor' %}
+                        <span class="badge bg-primary"><i class="fas fa-user-md me-1"></i>Doctor</span>
+                    {% elif user.role == 'clinic_manager' %}
+                        <span class="badge bg-info"><i class="fas fa-hospital me-1"></i>Clinic Mgr</span>
                     {% else %}
-                        <span class="badge bg-secondary">Unverified</span>
+                        <span class="badge bg-secondary"><i class="fas fa-user me-1"></i>User</span>
                     {% endif %}
                 </td>
                 <td>
@@ -61,6 +59,24 @@
                         <span class="badge bg-success">Active</span>
                     {% else %}
                         <span class="badge bg-danger">Inactive</span>
+                    {% endif %}
+                </td>
+                <td class="small">
+                    {% if user.last_login_at %}
+                        {% set diff = (now - user.last_login_at).total_seconds() %}
+                        {% if diff < 3600 %}
+                            <span class="text-success fw-semibold"><i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>{{ (diff / 60)|int }} min ago</span>
+                        {% elif diff < 86400 %}
+                            <span class="text-success"><i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>{{ (diff / 3600)|int }} hrs ago</span>
+                        {% elif diff < 604800 %}
+                            <span class="text-primary">{{ (diff / 86400)|int }} days ago</span>
+                        {% elif diff < 2592000 %}
+                            <span class="text-muted">{{ (diff / 604800)|int }} weeks ago</span>
+                        {% else %}
+                            <span class="text-muted">{{ user.last_login_at.strftime('%b %d') }}</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-muted">Never</span>
                     {% endif %}
                 </td>
                 <td class="text-muted small">
@@ -72,22 +88,22 @@
                 </td>
                 <td class="text-end">
                     {% if session.get('user_id') != user.id %}
-                    <div class="btn-group" role="group">
+                    <div class="d-flex gap-1 justify-content-end flex-wrap">
                         <!-- View Reviews -->
                         <a href="{{ url_for('admin_user_reviews', user_id=user.id) }}" class="btn btn-sm btn-outline-info" title="View reviews by this user">
                             <i class="fas fa-star"></i>
                         </a>
 
                         <!-- Toggle Admin Status -->
-                        <form method="post" action="{{ url_for('admin_user_toggle_admin', user_id=user.id) }}" class="d-inline">
+                        <form method="post" action="{{ url_for('admin_user_toggle_admin', user_id=user.id) }}" class="d-inline js-admin-toggle" data-name="{{ user.name }}" data-is-admin="{{ 'true' if user.is_admin else 'false' }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             {% if user.is_admin %}
-                            <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('Remove admin privileges from {{ user.name }}?');">
-                                <i class="fas fa-shield-alt"></i> Remove Admin
+                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Remove admin privileges">
+                                <i class="fas fa-user-minus"></i>
                             </button>
                             {% else %}
-                            <button type="submit" class="btn btn-sm btn-outline-success">
-                                <i class="fas fa-shield-alt"></i> Make Admin
+                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Make admin">
+                                <i class="fas fa-user-shield"></i>
                             </button>
                             {% endif %}
                         </form>
@@ -97,25 +113,25 @@
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             {% if user.is_active %}
                             <input type="hidden" name="action" value="deactivate"/>
-                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                Deactivate
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Deactivate user">
+                                <i class="fas fa-ban"></i>
                             </button>
                             {% else %}
                             <input type="hidden" name="action" value="activate"/>
-                            <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Reactivate {{ user.name }}? They will be able to log in again.');">
-                                <i class="fas fa-check-circle me-1"></i>Reactivate
+                            <button type="submit" class="btn btn-sm btn-success" title="Reactivate user">
+                                <i class="fas fa-check-circle"></i>
                             </button>
                             {% endif %}
                         </form>
                     </div>
                     {% else %}
-                    <span class="text-muted small"><i class="fas fa-user-shield me-1"></i>You (Current Admin)</span>
+                    <span class="badge bg-info"><i class="fas fa-user-shield me-1"></i>You</span>
                     {% endif %}
                 </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="5" class="text-center text-muted py-4">No users found.</td>
+                <td colspan="6" class="text-center text-muted py-4">No users found.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -174,6 +190,7 @@
 {% block scripts %}
 {{ super() }}
 <script>
+// Deactivate user requires typing email
 document.querySelectorAll('.js-user-status').forEach(function(form) {
     form.addEventListener('submit', function(event) {
         const action = form.querySelector('input[name="action"]');
@@ -185,6 +202,28 @@ document.querySelectorAll('.js-user-status').forEach(function(form) {
         if (!typed || typed.trim().toLowerCase() !== email.toLowerCase()) {
             event.preventDefault();
             alert('Deactivation cancelled.');
+        }
+    });
+});
+
+// Admin toggle requires confirmation with typing
+document.querySelectorAll('.js-admin-toggle').forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+        const name = form.dataset.name || 'this user';
+        const isAdmin = form.dataset.isAdmin === 'true';
+
+        if (isAdmin) {
+            // Removing admin - simple confirm
+            if (!confirm(`Remove admin privileges from ${name}?`)) {
+                event.preventDefault();
+            }
+        } else {
+            // Making admin - require typing "ADMIN"
+            const typed = prompt(`This grants full admin access to ${name}.\n\nType "ADMIN" to confirm:`);
+            if (!typed || typed.trim().toUpperCase() !== 'ADMIN') {
+                event.preventDefault();
+                alert('Admin grant cancelled.');
+            }
         }
     });
 });

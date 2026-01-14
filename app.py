@@ -1100,7 +1100,9 @@ def login():
                 return redirect(url_for('login'))
             if is_admin_email(user.email) and not user.is_admin:
                 user.is_admin = True
-                db.session.commit()
+            # Track last login
+            user.last_login_at = datetime.utcnow()
+            db.session.commit()
             session['user_id'] = user.id
             session['user_name'] = user.name
             session['is_admin'] = user.is_admin
@@ -1242,7 +1244,9 @@ def facebook_callback():
     # Ensure user has a role (fix for users created before migration)
     if not user.role:
         user.role = 'patient'
-        db.session.commit()
+    # Track last login
+    user.last_login_at = datetime.utcnow()
+    db.session.commit()
 
     session['user_id'] = user.id
     session['user_name'] = user.name
@@ -1312,12 +1316,15 @@ def google_authorized():
     # Check if user is admin
     if is_admin_email(user.email) and not user.is_admin:
         user.is_admin = True
-        db.session.commit()
 
     # Check if user is active
     if not user.is_active:
         flash('Your account has been deactivated. Please contact support.', 'danger')
         return redirect(url_for('login'))
+
+    # Track last login
+    user.last_login_at = datetime.utcnow()
+    db.session.commit()
 
     # Log user in
     session['user_id'] = user.id
@@ -3423,7 +3430,11 @@ def admin_users():
         )
         query = query.filter(~test_filters)
 
-    pagination = query.order_by(User.name.asc()).paginate(
+    # Order by last login (most recent first), with nulls last
+    pagination = query.order_by(
+        User.last_login_at.desc().nullslast(),
+        User.created_at.desc()
+    ).paginate(
         page=page,
         per_page=per_page,
         error_out=False
@@ -3432,7 +3443,8 @@ def admin_users():
     return render_template('admin_users.html',
                          users=pagination.items,
                          pagination=pagination,
-                         show_tests=show_tests)
+                         show_tests=show_tests,
+                         now=datetime.utcnow())
 
 @app.route('/admin/users/<int:user_id>/status', methods=['POST'])
 @admin_required
