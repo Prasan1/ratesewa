@@ -469,6 +469,75 @@
         font-size: 0.8rem;
     }
 
+    /* Practice Cards - Healthgrades style */
+    .practice-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+    }
+    .practice-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px;
+        background: #f9fafb;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+    .practice-card:hover {
+        border-color: var(--brand);
+        box-shadow: 0 4px 12px rgba(13, 148, 136, 0.1);
+    }
+    .practice-card-marker {
+        flex-shrink: 0;
+    }
+    .marker-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        color: white;
+        border-radius: 50%;
+        font-size: 14px;
+        font-weight: 700;
+    }
+    .practice-card-content {
+        flex: 1;
+        min-width: 0;
+    }
+    .practice-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 4px;
+    }
+    .practice-address {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+    .practice-card-action {
+        flex-shrink: 0;
+    }
+    .practice-card-action .btn {
+        white-space: nowrap;
+    }
+    @media (max-width: 576px) {
+        .practice-card {
+            flex-direction: column;
+            gap: 12px;
+        }
+        .practice-card-action {
+            width: 100%;
+        }
+        .practice-card-action .btn {
+            width: 100%;
+        }
+    }
+
     .review-item {
         border-bottom: 1px solid var(--border-color);
         padding: 24px 0;
@@ -1076,25 +1145,43 @@ function handleBackClick(e) {
             <div class="fact-value">{{ doctor.experience }} years</div>
           </div>
 
-          <div class="fact-item{% if doctor.workplace and ('.' in doctor.workplace or doctor.workplace.count(',') > 2) %} full{% endif %}">
-            <div class="fact-label"><i class="fas fa-hospital text-brand"></i>Works at</div>
-            <div class="fact-value">
-              {% if doctor.workplace %}
-                {% set locations = doctor.workplace.replace('. ', '.|').replace(', ', ',|').split('|') %}
-                {% if locations|length > 1 %}
-                  <ul class="practice-locations mb-0 ps-3">
-                    {% for loc in locations if loc.strip() %}
-                    <li>{{ loc.strip().rstrip(',.') }}</li>
-                    {% endfor %}
-                  </ul>
-                {% else %}
-                  {{ doctor.workplace }}
-                {% endif %}
-              {% else %}
-                Not provided
-              {% endif %}
+          <!-- Practice Locations - Full Width Card Style -->
+          {% if doctor.workplace %}
+          <div class="fact-item full" style="grid-column: 1 / -1;">
+            <div class="fact-label mb-3"><i class="fas fa-hospital text-brand"></i>Practice Locations</div>
+            <div class="practice-cards">
+              {% set locations = doctor.workplace.split('.') %}
+              {% for loc in locations if loc.strip() %}
+                {% set parts = loc.strip().rstrip(',.').split(',') %}
+                {% set clinic_name = parts[0].strip() if parts else loc.strip() %}
+                {% set address_parts = parts[1:] if parts|length > 1 else [] %}
+                <div class="practice-card">
+                  <div class="practice-card-marker">
+                    <span class="marker-number">{{ loop.index }}</span>
+                  </div>
+                  <div class="practice-card-content">
+                    <div class="practice-name">{{ clinic_name }}</div>
+                    {% if address_parts %}
+                      <div class="practice-address">
+                        <i class="fas fa-map-marker-alt me-1"></i>{{ address_parts|join(', ') | trim }}
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="practice-card-action">
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ loc.strip()|urlencode }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">
+                      <i class="fas fa-directions me-1"></i>Directions
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
             </div>
           </div>
+          {% else %}
+          <div class="fact-item">
+            <div class="fact-label"><i class="fas fa-hospital text-brand"></i>Works at</div>
+            <div class="fact-value">Not provided</div>
+          </div>
+          {% endif %}
 
           <div class="fact-item">
             <div class="fact-label"><i class="fas fa-graduation-cap text-brand"></i>Education</div>
