@@ -17,7 +17,7 @@
                         <span class="badge bg-success"><i class="fas fa-check me-1"></i>Free to get started</span>
                     </div>
 
-                    <form method="POST" action="{{ url_for('clinic_register') }}">
+                    <form method="POST" action="{{ url_for('clinic_register') }}" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                         <div class="row g-3">
@@ -25,6 +25,12 @@
                                 <label class="form-label fw-semibold">Clinic Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control form-control-lg" name="name" required
                                        placeholder="e.g., Nepal Mediciti, Bir Hospital" minlength="3">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Clinic Logo (Optional)</label>
+                                <input type="file" class="form-control" name="logo" accept="image/jpeg,image/png,image/jpg">
+                                <small class="text-muted">Upload your clinic logo (JPG/PNG, max 5MB)</small>
                             </div>
 
                             <div class="col-md-6">

@@ -11,7 +11,7 @@
                 <div class="col-md-8">
                     <div class="d-flex align-items-center mb-3">
                         {% if clinic.logo_url %}
-                        <img src="{{ clinic.logo_url }}" alt="{{ clinic.name }}" class="me-3" style="width: 80px; height: 80px; object-fit: contain; border-radius: 12px; background: white; padding: 8px;">
+                        <img src="{% if clinic.logo_url.startswith('http') %}{{ clinic.logo_url }}{% else %}{{ url_for('serve_clinic_logo', filename=clinic.logo_url.replace('clinic_logos/', '')) }}{% endif %}" alt="{{ clinic.name }}" class="me-3" style="width: 80px; height: 80px; object-fit: contain; border-radius: 12px; background: white; padding: 8px;">
                         {% else %}
                         <div class="me-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background: var(--brand); color: white; border-radius: 12px; font-size: 2rem; font-weight: bold;">
                             {{ clinic.name[:1] }}

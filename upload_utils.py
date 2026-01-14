@@ -337,6 +337,104 @@ def save_profile_photo(file, upload_folder, doctor_id, max_size_mb=5):
         raise ValueError(f"Error processing image: {str(e)}")
 
 
+def save_clinic_logo(file, upload_folder, clinic_id, max_size_mb=5):
+    """
+    Save and optimize a clinic's logo
+
+    Args:
+        file: FileStorage object from request.files
+        upload_folder: Base upload folder path
+        clinic_id: ID of the clinic
+        max_size_mb: Maximum file size in MB (default 5MB)
+
+    Returns:
+        Relative path to saved logo, or None if save failed
+    """
+    if not file or file.filename == '':
+        return None
+
+    # Validate file type - only images allowed
+    if not allowed_file(file.filename, 'image'):
+        raise ValueError(f"Invalid file type. Allowed: {', '.join(ALLOWED_EXTENSIONS['image'])}")
+
+    # Validate file size
+    if not validate_file_size(file, max_mb=max_size_mb):
+        raise ValueError(f"File too large. Maximum size: {max_size_mb}MB")
+
+    # Validate image dimensions
+    is_valid, message = validate_image_dimensions(file, min_width=50, min_height=50)
+    if not is_valid:
+        raise ValueError(message)
+
+    # Create clinic logos directory
+    logos_folder = os.path.join(upload_folder, 'clinic_logos')
+    os.makedirs(logos_folder, exist_ok=True)
+
+    # Generate unique filename
+    unique_filename = f"clinic_{clinic_id}_{generate_unique_filename(file.filename)}"
+
+    # Save and optimize image
+    filepath = os.path.join(logos_folder, unique_filename)
+
+    try:
+        # Open and process image
+        img = Image.open(file)
+
+        # Convert RGBA to RGB if necessary (for PNG with transparency)
+        if img.mode in ('RGBA', 'LA', 'P'):
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+            background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+            img = background
+
+        # Resize if image is too large (max 400x400 for logos)
+        max_dimension = 400
+        if img.width > max_dimension or img.height > max_dimension:
+            img.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
+
+        # Save optimized image
+        img.save(filepath, 'JPEG', quality=90, optimize=True)
+
+        # Return relative path
+        relative_path = os.path.join('clinic_logos', unique_filename)
+        print(f"[Local] Clinic logo saved: {relative_path}")
+        return relative_path
+
+    except Exception as e:
+        # If save fails, clean up and raise error
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        raise ValueError(f"Error processing image: {str(e)}")
+
+
+def delete_clinic_logo(upload_folder, relative_path):
+    """
+    Delete a clinic logo from filesystem
+
+    Args:
+        upload_folder: Base upload folder path
+        relative_path: Relative path to the logo
+
+    Returns:
+        Boolean indicating if deletion was successful
+    """
+    if not relative_path:
+        return False
+
+    full_path = os.path.join(upload_folder, relative_path)
+
+    try:
+        if os.path.exists(full_path):
+            os.remove(full_path)
+            print(f"[Local] Clinic logo deleted: {relative_path}")
+            return True
+        return False
+    except Exception as e:
+        print(f"Error deleting clinic logo {full_path}: {e}")
+        return False
+
+
 def delete_profile_photo(upload_folder, relative_path):
     """
     Delete a profile photo from R2 or local filesystem

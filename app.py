@@ -4558,6 +4558,80 @@ def serve_photo(filename):
     abort(404)
 
 
+@app.route('/uploads/clinic_logos/<path:filename>')
+def serve_clinic_logo(filename):
+    """Serve clinic logos from local storage"""
+    from flask import send_from_directory, make_response
+    import os
+
+    # Security: Prevent directory traversal
+    if '..' in filename or filename.startswith('/'):
+        abort(404)
+
+    logos_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'clinic_logos')
+    local_path = os.path.join(logos_folder, filename)
+
+    if os.path.exists(local_path):
+        response = make_response(send_from_directory(logos_folder, filename))
+        response.headers['Cache-Control'] = 'public, max-age=604800, immutable'
+        return response
+
+    abort(404)
+
+
+@app.route('/clinic/<clinic_slug>/settings', methods=['GET', 'POST'])
+@login_required
+def clinic_settings(clinic_slug):
+    """Clinic settings - update logo and basic info"""
+    from models import Clinic, ClinicStaff
+
+    clinic = Clinic.query.filter_by(slug=clinic_slug).first_or_404()
+
+    # Check if user is admin of this clinic
+    staff = ClinicStaff.query.filter_by(
+        clinic_id=clinic.id,
+        user_id=session['user_id'],
+        role='admin',
+        is_active=True
+    ).first()
+
+    if not staff:
+        flash('You do not have permission to edit this clinic.', 'danger')
+        return redirect(url_for('clinic_dashboard', clinic_slug=clinic_slug))
+
+    if request.method == 'POST':
+        # Update basic info
+        clinic.description = request.form.get('description', '').strip()
+        clinic.phone = request.form.get('phone', '').strip()
+        clinic.email = request.form.get('email', '').strip()
+        clinic.address = request.form.get('address', '').strip()
+
+        # Handle logo upload
+        logo_file = request.files.get('logo')
+        if logo_file and logo_file.filename:
+            try:
+                # Delete old logo if exists
+                if clinic.logo_url:
+                    upload_utils.delete_clinic_logo(app.config['UPLOAD_FOLDER'], clinic.logo_url)
+
+                logo_path = upload_utils.save_clinic_logo(
+                    logo_file,
+                    app.config['UPLOAD_FOLDER'],
+                    clinic.id
+                )
+                if logo_path:
+                    clinic.logo_url = logo_path
+                    flash('Logo updated successfully!', 'success')
+            except Exception as e:
+                flash(f'Error uploading logo: {str(e)}', 'danger')
+
+        db.session.commit()
+        flash('Clinic settings updated.', 'success')
+        return redirect(url_for('clinic_dashboard', clinic_slug=clinic_slug))
+
+    return render_template('clinic/settings.html', clinic=clinic)
+
+
 # --- Doctor Dashboard Routes ---
 @app.route('/doctor/dashboard')
 @doctor_required
@@ -6475,6 +6549,20 @@ def clinic_register():
             )
             db.session.add(clinic)
             db.session.flush()  # Get the clinic ID
+
+            # Handle logo upload
+            logo_file = request.files.get('logo')
+            if logo_file and logo_file.filename:
+                try:
+                    logo_path = upload_utils.save_clinic_logo(
+                        logo_file,
+                        app.config['UPLOAD_FOLDER'],
+                        clinic.id
+                    )
+                    if logo_path:
+                        clinic.logo_url = logo_path
+                except Exception as e:
+                    flash(f'Error uploading logo: {str(e)}', 'warning')
 
             # Add creator as admin staff
             staff = ClinicStaff(
