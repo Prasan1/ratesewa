@@ -151,6 +151,22 @@ else:
                         no_show_date DATE NOT NULL,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
+                """,
+                'doctor_workplaces': """
+                    CREATE TABLE IF NOT EXISTS doctor_workplaces (
+                        id SERIAL PRIMARY KEY,
+                        doctor_id INTEGER NOT NULL,
+                        name VARCHAR(200) NOT NULL,
+                        address VARCHAR(300),
+                        city_id INTEGER,
+                        city_name VARCHAR(100),
+                        phone VARCHAR(20),
+                        display_order INTEGER DEFAULT 1,
+                        is_primary BOOLEAN DEFAULT FALSE,
+                        clinic_id INTEGER,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
                 """
             }
 

@@ -818,6 +818,62 @@ class DoctorContact(db.Model):
         return f'<DoctorContact doctor_id={self.doctor_id}>'
 
 
+class DoctorWorkplace(db.Model):
+    """Structured workplace/practice locations for doctors"""
+    __tablename__ = 'doctor_workplaces'
+
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False, index=True)
+
+    # Workplace details
+    name = db.Column(db.String(200), nullable=False)  # Clinic/Hospital name
+    address = db.Column(db.String(300), nullable=True)  # Street address
+    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=True)  # Link to cities table
+    city_name = db.Column(db.String(100), nullable=True)  # Fallback if city not in list
+    phone = db.Column(db.String(20), nullable=True)
+
+    # Display order (1 = primary workplace)
+    display_order = db.Column(db.Integer, default=1)
+    is_primary = db.Column(db.Boolean, default=False)
+
+    # Optional link to registered clinic
+    clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'), nullable=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    doctor = db.relationship('Doctor', backref=db.backref('workplaces', lazy='select', order_by='DoctorWorkplace.display_order'))
+    city = db.relationship('City', backref=db.backref('doctor_workplaces', lazy=True))
+    clinic = db.relationship('Clinic', backref=db.backref('workplace_listings', lazy=True))
+
+    def __repr__(self):
+        return f'<DoctorWorkplace {self.name} for doctor_id={self.doctor_id}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'address': self.address,
+            'city': self.city.name if self.city else self.city_name,
+            'city_id': self.city_id,
+            'phone': self.phone,
+            'display_order': self.display_order,
+            'is_primary': self.is_primary
+        }
+
+    @property
+    def full_address(self):
+        """Get full formatted address"""
+        parts = [self.name]
+        if self.address:
+            parts.append(self.address)
+        city = self.city.name if self.city else self.city_name
+        if city:
+            parts.append(city)
+        return ', '.join(parts)
+
+
 class DoctorSubscription(db.Model):
     """Subscription and billing information for doctors"""
     __tablename__ = 'doctor_subscription'

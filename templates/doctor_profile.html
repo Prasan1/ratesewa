@@ -519,6 +519,10 @@
         font-size: 0.9rem;
         color: var(--text-muted);
     }
+    .practice-phone {
+        font-size: 0.85rem;
+        color: var(--brand);
+    }
     .practice-card-action {
         flex-shrink: 0;
     }
@@ -1146,7 +1150,50 @@ function handleBackClick(e) {
           </div>
 
           <!-- Practice Locations - Full Width Card Style -->
-          {% if doctor.workplace %}
+          {% if doctor.workplaces and doctor.workplaces|length > 0 %}
+          {# New structured workplace data #}
+          <div class="fact-item full" style="grid-column: 1 / -1;">
+            <div class="fact-label mb-3"><i class="fas fa-hospital text-brand"></i>Practice Locations</div>
+            <div class="practice-cards">
+              {% for workplace in doctor.workplaces %}
+                <div class="practice-card">
+                  <div class="practice-card-marker">
+                    <span class="marker-number">{{ loop.index }}</span>
+                  </div>
+                  <div class="practice-card-content">
+                    <div class="practice-name">{{ workplace.name }}</div>
+                    <div class="practice-address">
+                      {% if workplace.address %}
+                        <i class="fas fa-map-marker-alt me-1"></i>{{ workplace.address }}{% if workplace.city or workplace.city_name %}, {% endif %}
+                      {% endif %}
+                      {% if workplace.city %}
+                        {{ workplace.city.name }}
+                      {% elif workplace.city_name %}
+                        {{ workplace.city_name }}
+                      {% endif %}
+                    </div>
+                    {% if workplace.phone %}
+                      <div class="practice-phone mt-1">
+                        <i class="fas fa-phone me-1"></i>{{ workplace.phone }}
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="practice-card-action d-flex flex-column gap-2">
+                    {% if workplace.clinic %}
+                      <a href="{{ url_for('clinic_public_page', clinic_slug=workplace.clinic.slug) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-hospital me-1"></i>View Clinic
+                      </a>
+                    {% endif %}
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ workplace.full_address|urlencode }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">
+                      <i class="fas fa-directions me-1"></i>Directions
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% elif doctor.workplace %}
+          {# Fallback to old text-based workplace data #}
           <div class="fact-item full" style="grid-column: 1 / -1;">
             <div class="fact-label mb-3"><i class="fas fa-hospital text-brand"></i>Practice Locations</div>
             <div class="practice-cards">
