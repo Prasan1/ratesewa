@@ -9,15 +9,26 @@
         <p class="text-muted mb-0">Browse clinics and book appointments with doctors.</p>
     </div>
     <div class="d-flex gap-2 align-items-center flex-wrap">
-        <form method="GET" action="{{ url_for('clinics') }}" class="d-flex gap-2">
-            <select name="city_id" class="form-select" style="min-width: 180px;" onchange="this.form.submit()">
-                <option value="">All Cities</option>
-                {% for city in cities %}
-                <option value="{{ city.id }}" {% if selected_city_id|string == city.id|string %}selected{% endif %}>
-                    {{ city.name }}
-                </option>
-                {% endfor %}
-            </select>
+        <form method="GET" action="{{ url_for('clinics') }}" class="d-flex gap-2" id="cityFilterForm">
+            <div class="searchable-select" style="min-width: 200px; position: relative;">
+                <input type="text"
+                       id="citySearch"
+                       class="form-control"
+                       placeholder="Search city..."
+                       autocomplete="off"
+                       value="{% if selected_city_id %}{% for city in cities %}{% if city.id|string == selected_city_id|string %}{{ city.name }}{% endif %}{% endfor %}{% endif %}">
+                <input type="hidden" name="city_id" id="cityIdInput" value="{{ selected_city_id or '' }}">
+                <div id="cityDropdown" class="searchable-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 250px; overflow-y: auto; background: white; border: 1px solid #dee2e6; border-top: none; border-radius: 0 0 8px 8px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <div class="dropdown-item city-option" data-id="" style="padding: 10px 16px; cursor: pointer;">
+                        <span style="color: #6c757d;">All Cities</span>
+                    </div>
+                    {% for city in cities %}
+                    <div class="dropdown-item city-option" data-id="{{ city.id }}" data-name="{{ city.name }}" style="padding: 10px 16px; cursor: pointer;">
+                        {{ city.name }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </form>
         {% if 'user_id' in session %}
         <a href="{{ url_for('clinic_register') }}" class="btn btn-primary">
@@ -79,4 +90,117 @@
     </div>
     {% endfor %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('citySearch');
+    const hiddenInput = document.getElementById('cityIdInput');
+    const dropdown = document.getElementById('cityDropdown');
+    const form = document.getElementById('cityFilterForm');
+    const options = dropdown.querySelectorAll('.city-option');
+
+    // Show dropdown on focus
+    searchInput.addEventListener('focus', function() {
+        dropdown.style.display = 'block';
+        filterOptions();
+    });
+
+    // Filter options on typing
+    searchInput.addEventListener('input', function() {
+        dropdown.style.display = 'block';
+        filterOptions();
+    });
+
+    // Filter function
+    function filterOptions() {
+        const filter = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        options.forEach(function(option) {
+            const name = (option.dataset.name || 'All Cities').toLowerCase();
+            if (filter === '' || name.includes(filter)) {
+                option.style.display = 'block';
+                visibleCount++;
+            } else {
+                option.style.display = 'none';
+            }
+        });
+    }
+
+    // Select option on click
+    options.forEach(function(option) {
+        option.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const name = this.dataset.name || '';
+
+            hiddenInput.value = id;
+            searchInput.value = name;
+            dropdown.style.display = 'none';
+
+            // Submit form
+            form.submit();
+        });
+
+        // Hover effect
+        option.addEventListener('mouseenter', function() {
+            this.style.background = '#f8f9fa';
+        });
+        option.addEventListener('mouseleave', function() {
+            this.style.background = 'white';
+        });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    // Clear on escape
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            dropdown.style.display = 'none';
+            searchInput.blur();
+        }
+        // Navigate with arrow keys
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            const visible = Array.from(options).filter(o => o.style.display !== 'none');
+            if (visible.length === 0) return;
+
+            const current = dropdown.querySelector('.city-option.highlighted');
+            let idx = current ? visible.indexOf(current) : -1;
+
+            if (current) current.classList.remove('highlighted');
+            current && (current.style.background = 'white');
+
+            if (e.key === 'ArrowDown') {
+                idx = (idx + 1) % visible.length;
+            } else {
+                idx = (idx - 1 + visible.length) % visible.length;
+            }
+
+            visible[idx].classList.add('highlighted');
+            visible[idx].style.background = '#f8f9fa';
+            visible[idx].scrollIntoView({ block: 'nearest' });
+        }
+        // Select on enter
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const highlighted = dropdown.querySelector('.city-option.highlighted');
+            if (highlighted) {
+                highlighted.click();
+            } else {
+                const visible = Array.from(options).filter(o => o.style.display !== 'none');
+                if (visible.length > 0) {
+                    visible[0].click();
+                }
+            }
+        }
+    });
+});
+</script>
 {% endblock %}

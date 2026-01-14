@@ -357,15 +357,22 @@
         // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/static/service-worker.js', { scope: '/' })
+                navigator.serviceWorker.register('/sw.js', { scope: '/' })
                     .then((registration) => {
-                        console.log('RankSewa PWA: Service Worker registered');
+                        console.log('RankSewa PWA: Service Worker registered with scope:', registration.scope);
                     })
                     .catch((error) => {
-                        console.log('RankSewa PWA: Service Worker registration failed');
+                        console.log('RankSewa PWA: Service Worker registration failed:', error);
                     });
             });
         }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('RankSewa PWA: Install prompt available');
+            deferredPrompt = e;
+        });
     </script>
     {% block scripts %}{% endblock %}
 </body>

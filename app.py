@@ -2348,8 +2348,10 @@ def clinics():
 
 @app.route('/sw.js')
 def service_worker():
-    response = make_response(send_from_directory(app.static_folder, 'sw.js'))
+    response = make_response(send_from_directory(app.static_folder, 'service-worker.js'))
     response.headers['Cache-Control'] = 'no-cache'
+    response.headers['Service-Worker-Allowed'] = '/'
+    response.headers['Content-Type'] = 'application/javascript'
     return response
 
 @app.route('/doctors')
