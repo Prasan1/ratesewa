@@ -6586,7 +6586,7 @@ def clinic_register():
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         address = request.form.get('address', '').strip()
-        city = request.form.get('city', '').strip()
+        city_id = request.form.get('city_id', type=int)
         phone = request.form.get('phone', '').strip()
         email = request.form.get('email', '').strip()
         clinic_type = request.form.get('clinic_type', 'clinic')
@@ -6598,13 +6598,13 @@ def clinic_register():
             errors.append('Clinic name must be at least 3 characters')
         if not address:
             errors.append('Address is required')
-        if not city:
+        if not city_id:
             errors.append('City is required')
 
         if errors:
             for error in errors:
                 flash(error, 'danger')
-            return render_template('clinic/register.html')
+            return render_template('clinic/register.html', cities=City.query.order_by(City.name).all())
 
         # Generate unique slug
         base_slug = slugify(name)
@@ -6614,9 +6614,9 @@ def clinic_register():
             slug = f"{base_slug}-{counter}"
             counter += 1
 
-        # Look up city_id from city name (case-insensitive)
-        city_record = City.query.filter(City.name.ilike(city)).first()
-        city_id = city_record.id if city_record else 1  # Default to Kathmandu (id=1) if not found
+        # Get city name from city_id
+        city_record = City.query.get(city_id)
+        city = city_record.name if city_record else 'Kathmandu'
 
         try:
             # Create clinic (active immediately - payment will gate premium features later)
@@ -6665,9 +6665,9 @@ def clinic_register():
         except Exception as e:
             db.session.rollback()
             flash(f'Error registering clinic: {str(e)}', 'danger')
-            return render_template('clinic/register.html')
+            return render_template('clinic/register.html', cities=City.query.order_by(City.name).all())
 
-    return render_template('clinic/register.html')
+    return render_template('clinic/register.html', cities=City.query.order_by(City.name).all())
 
 
 @app.route('/clinic/<clinic_slug>')

@@ -46,8 +46,12 @@
 
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">City <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-lg" name="city" required
-                                       placeholder="e.g., Kathmandu">
+                                <select class="form-select form-select-lg" name="city_id" required>
+                                    <option value="">Select city...</option>
+                                    {% for city in cities %}
+                                    <option value="{{ city.id }}">{{ city.name }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
 
                             <div class="col-12">

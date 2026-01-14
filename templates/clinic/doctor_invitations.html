@@ -4,6 +4,13 @@
 
 {% block content %}
 <div class="container py-4">
+    <!-- Back Navigation -->
+    <nav class="mb-3">
+        <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>My Dashboard
+        </a>
+    </nav>
+
     <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
         <h1 class="h3 mb-0">
             <i class="fas fa-hospital me-2" style="color: var(--brand);"></i>My Clinic Affiliations
@@ -30,7 +37,7 @@
                     <br>
                     <small class="text-muted">Role: <strong>{{ inv.role|title }}</strong></small>
                     {% if inv.consultation_fee %}
-                    <small class="text-muted ms-2">| Fee: NPR {{ inv.consultation_fee }}</small>
+                    <small class="text-muted ms-2">| Consultation: NPR {{ inv.consultation_fee }}</small>
                     {% endif %}
                 </div>
                 <div class="d-flex gap-2">
@@ -72,7 +79,7 @@
                             <div class="mb-3">
                                 <small class="text-muted">Role: {{ aff.role|title }}</small>
                                 {% if aff.consultation_fee %}
-                                <small class="text-muted ms-2">| Fee: NPR {{ aff.consultation_fee }}</small>
+                                <small class="text-muted ms-2">| Consultation: NPR {{ aff.consultation_fee }}</small>
                                 {% endif %}
                             </div>
 
