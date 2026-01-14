@@ -366,12 +366,12 @@ def save_clinic_logo(file, upload_folder, clinic_id, max_size_mb=5):
     if not is_valid:
         raise ValueError(message)
 
-    # Create clinic logos directory
-    logos_folder = os.path.join(upload_folder, 'clinic_logos')
-    os.makedirs(logos_folder, exist_ok=True)
-
     # Generate unique filename
     unique_filename = f"clinic_{clinic_id}_{generate_unique_filename(file.filename)}"
+
+    # Create clinic logos directory for local fallback
+    logos_folder = os.path.join(upload_folder, 'clinic_logos')
+    os.makedirs(logos_folder, exist_ok=True)
 
     # Save and optimize image
     filepath = os.path.join(logos_folder, unique_filename)
@@ -393,12 +393,36 @@ def save_clinic_logo(file, upload_folder, clinic_id, max_size_mb=5):
         if img.width > max_dimension or img.height > max_dimension:
             img.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
 
-        # Save optimized image
-        img.save(filepath, 'JPEG', quality=90, optimize=True)
+        # Save optimized image to BytesIO first (for R2 upload)
+        from io import BytesIO
+        img_bytes = BytesIO()
+        img.save(img_bytes, 'JPEG', quality=90, optimize=True)
 
-        # Return relative path
+        # Try to upload to R2 first
+        import r2_storage
+        r2_path = None
+        try:
+            r2_path = r2_storage.save_clinic_logo(img_bytes, clinic_id, unique_filename)
+        except Exception as e:
+            print(f"[R2] Clinic logo upload failed, falling back to local storage: {e}")
+
+        # If R2 upload succeeded, return R2 path
+        if r2_path:
+            print(f"[R2] Clinic logo uploaded successfully to R2: {r2_path}")
+            return r2_path
+
+        # Fallback: Save to local storage
+        try:
+            img_bytes.seek(0)
+        except Exception:
+            pass
+
+        with open(filepath, 'wb') as f:
+            f.write(img_bytes.getvalue())
+
+        # Return relative path for local storage
         relative_path = os.path.join('clinic_logos', unique_filename)
-        print(f"[Local] Clinic logo saved: {relative_path}")
+        print(f"[Local] Clinic logo saved to local storage: {relative_path}")
         return relative_path
 
     except Exception as e:
@@ -410,11 +434,11 @@ def save_clinic_logo(file, upload_folder, clinic_id, max_size_mb=5):
 
 def delete_clinic_logo(upload_folder, relative_path):
     """
-    Delete a clinic logo from filesystem
+    Delete a clinic logo from R2 or local filesystem
 
     Args:
         upload_folder: Base upload folder path
-        relative_path: Relative path to the logo
+        relative_path: Relative path to the logo (R2 or local)
 
     Returns:
         Boolean indicating if deletion was successful
@@ -422,12 +446,26 @@ def delete_clinic_logo(upload_folder, relative_path):
     if not relative_path:
         return False
 
+    # Check if this is an R2 path (format: clinic_logos/{clinic_id}/{filename})
+    import r2_storage
+
+    if relative_path.count('/') > 1:  # R2 path has multiple slashes
+        # Try to delete from R2
+        try:
+            result = r2_storage.delete_clinic_logo(relative_path)
+            if result:
+                print(f"[R2] Clinic logo deleted from R2: {relative_path}")
+                return True
+        except Exception as e:
+            print(f"[R2] Error deleting from R2, trying local: {e}")
+
+    # Try local storage (fallback or for old logos)
     full_path = os.path.join(upload_folder, relative_path)
 
     try:
         if os.path.exists(full_path):
             os.remove(full_path)
-            print(f"[Local] Clinic logo deleted: {relative_path}")
+            print(f"[Local] Clinic logo deleted from local storage: {relative_path}")
             return True
         return False
     except Exception as e:

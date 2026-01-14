@@ -384,3 +384,110 @@ def delete_profile_photo(object_name):
     except Exception as e:
         print(f"[R2] Error deleting photo: {e}")
         return False
+
+
+def save_clinic_logo(file_obj, clinic_id, filename):
+    """
+    Save clinic logo to R2
+
+    Args:
+        file_obj: File object (can be BytesIO from PIL or file from request.files)
+        clinic_id: Clinic ID
+        filename: Filename to use
+
+    Returns:
+        str: R2 object path if successful, None otherwise
+    """
+    # Get R2 credentials from environment
+    access_key_id = os.getenv('R2_ACCESS_KEY_ID', '').strip()
+    secret_access_key = os.getenv('R2_SECRET_ACCESS_KEY', '').strip()
+    endpoint_url = os.getenv('R2_ENDPOINT_URL', '').strip()
+    bucket_name = os.getenv('R2_BUCKET_NAME', 'ranksewa-documents').strip()
+
+    # Check if R2 is configured
+    if not all([access_key_id, secret_access_key, endpoint_url]):
+        print("[R2] Credentials not configured for clinic logo upload, falling back to local storage")
+        return None
+
+    print(f"[R2] Initializing for clinic logo upload: {filename}")
+
+    # Initialize R2 client
+    try:
+        r2 = R2Storage(access_key_id, secret_access_key, endpoint_url, bucket_name)
+    except Exception as e:
+        print(f"[R2] Failed to initialize R2Storage for clinic logo: {type(e).__name__}: {e}")
+        return None
+
+    # Create R2 object path: clinic_logos/{clinic_id}/{filename}
+    object_name = f"clinic_logos/{clinic_id}/{filename}"
+
+    # Reset file pointer to beginning
+    try:
+        file_obj.seek(0)
+    except Exception:
+        pass
+
+    # Upload to R2
+    result = r2.upload_file(file_obj, object_name, 'image/jpeg')
+
+    if result:
+        return object_name
+    return None
+
+
+def delete_clinic_logo(object_name):
+    """
+    Delete clinic logo from R2
+
+    Args:
+        object_name: R2 object path
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    # Get R2 credentials from environment
+    access_key_id = os.getenv('R2_ACCESS_KEY_ID', '').strip()
+    secret_access_key = os.getenv('R2_SECRET_ACCESS_KEY', '').strip()
+    endpoint_url = os.getenv('R2_ENDPOINT_URL', '').strip()
+    bucket_name = os.getenv('R2_BUCKET_NAME', 'ranksewa-documents').strip()
+
+    # Check if R2 is configured
+    if not all([access_key_id, secret_access_key, endpoint_url]):
+        return False
+
+    # Initialize R2 client
+    try:
+        r2 = R2Storage(access_key_id, secret_access_key, endpoint_url, bucket_name)
+        return r2.delete_file(object_name)
+    except Exception as e:
+        print(f"[R2] Error deleting clinic logo: {e}")
+        return False
+
+
+def get_clinic_logo(object_name):
+    """
+    Get clinic logo from R2
+
+    Args:
+        object_name: R2 object path
+
+    Returns:
+        bytes: File content if successful, None otherwise
+    """
+    # Get R2 credentials from environment
+    access_key_id = os.getenv('R2_ACCESS_KEY_ID', '').strip()
+    secret_access_key = os.getenv('R2_SECRET_ACCESS_KEY', '').strip()
+    endpoint_url = os.getenv('R2_ENDPOINT_URL', '').strip()
+    bucket_name = os.getenv('R2_BUCKET_NAME', 'ranksewa-documents').strip()
+
+    # Check if R2 is configured
+    if not all([access_key_id, secret_access_key, endpoint_url]):
+        return None
+
+    # Initialize R2 client
+    try:
+        r2 = R2Storage(access_key_id, secret_access_key, endpoint_url, bucket_name)
+        return r2.get_file_object(object_name)
+    except Exception as e:
+        print(f"[R2] Error getting clinic logo: {e}")
+        return None

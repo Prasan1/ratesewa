@@ -4560,14 +4560,37 @@ def serve_photo(filename):
 
 @app.route('/uploads/clinic_logos/<path:filename>')
 def serve_clinic_logo(filename):
-    """Serve clinic logos from local storage"""
-    from flask import send_from_directory, make_response
+    """Serve clinic logos from R2 or local storage"""
+    from flask import send_from_directory, send_file, make_response
+    from io import BytesIO
     import os
 
     # Security: Prevent directory traversal
     if '..' in filename or filename.startswith('/'):
         abort(404)
 
+    # If filename contains clinic ID (R2 format: {clinic_id}/{filename}), try R2 first
+    if '/' in filename:
+        # Try to fetch from R2
+        try:
+            from r2_storage import get_clinic_logo
+            r2_path = f"clinic_logos/{filename}"
+            logo_data = get_clinic_logo(r2_path)
+            if logo_data:
+                response = make_response(send_file(
+                    BytesIO(logo_data),
+                    mimetype='image/jpeg',
+                    as_attachment=False
+                ))
+                response.headers['Cache-Control'] = 'public, max-age=604800, immutable'
+                return response
+        except Exception as e:
+            print(f"[R2] Error fetching clinic logo from R2: {e}")
+
+        # Extract just the filename for local fallback
+        filename = filename.split('/')[-1]
+
+    # Fallback: Try local storage
     logos_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'clinic_logos')
     local_path = os.path.join(logos_folder, filename)
 
