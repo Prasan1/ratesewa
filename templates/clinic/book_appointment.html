@@ -10,8 +10,14 @@
             <div class="card sticky-top" style="border-radius: 16px; border: none; top: 20px;">
                 <div class="card-body text-center p-4">
                     {% if doctor.photo_url %}
-                    <img src="{{ doctor.photo_url }}" alt="{{ doctor.name }}"
-                         class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                    {% set photo_path = doctor.photo_url.replace('photos/', '') %}
+                    <img src="{{ url_for('serve_photo', filename=photo_path) }}" alt="{{ doctor.name }}"
+                         class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width: 100px; height: 100px; background: var(--brand-soft); color: var(--brand); font-weight: bold; font-size: 2.5rem; display: none;">
+                        {{ doctor.name[:1] }}
+                    </div>
                     {% else %}
                     <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
                          style="width: 100px; height: 100px; background: var(--brand-soft); color: var(--brand); font-weight: bold; font-size: 2.5rem;">

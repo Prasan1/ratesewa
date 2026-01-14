@@ -75,7 +75,7 @@
                     {% endif %}
                 </div>
                 <p class="text-muted small mb-2">
-                    <i class="fas fa-map-marker-alt me-1"></i>{{ clinic.city.name }}
+                    <i class="fas fa-map-marker-alt me-1"></i>{{ clinic.city or clinic.address or 'Location not specified' }}
                 </p>
                 {% if clinic.description %}
                 <p class="text-muted small mb-3">{{ clinic.description }}</p>

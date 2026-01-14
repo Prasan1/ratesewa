@@ -188,7 +188,8 @@
                             {% endif %}
                             <li><a class="dropdown-item" href="{{ url_for('user_profile') }}"><i class="fas fa-user-circle me-2"></i>My Profile</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('my_appointments') }}"><i class="fas fa-calendar-check me-2"></i>My Appointments</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('clinics') }}"><i class="fas fa-hospital me-2"></i>Clinics</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('my_clinics') }}"><i class="fas fa-hospital me-2"></i>My Clinics</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('clinics') }}"><i class="fas fa-search me-2"></i>Find Clinics</a></li>
                             <li><hr class="dropdown-divider"></li>
                             {% endif %}
                             <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>

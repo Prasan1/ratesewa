@@ -71,8 +71,14 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
                         {% if cd.doctor.photo_url %}
-                        <img src="{{ cd.doctor.photo_url }}" alt="{{ cd.doctor.name }}"
-                             class="rounded-circle me-3" style="width: 70px; height: 70px; object-fit: cover;">
+                        {% set photo_path = cd.doctor.photo_url.replace('photos/', '') %}
+                        <img src="{{ url_for('serve_photo', filename=photo_path) }}" alt="{{ cd.doctor.name }}"
+                             class="rounded-circle me-3" style="width: 70px; height: 70px; object-fit: cover;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="rounded-circle me-3 d-flex align-items-center justify-content-center"
+                             style="width: 70px; height: 70px; background: var(--brand-soft); color: var(--brand); font-weight: bold; font-size: 1.5rem; display: none;">
+                            {{ cd.doctor.name[:1] }}
+                        </div>
                         {% else %}
                         <div class="rounded-circle me-3 d-flex align-items-center justify-content-center"
                              style="width: 70px; height: 70px; background: var(--brand-soft); color: var(--brand); font-weight: bold; font-size: 1.5rem;">

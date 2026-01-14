@@ -13,6 +13,53 @@
     </a>
 </div>
 
+<!-- Inactive Clinics Section -->
+{% if pending_clinics %}
+<div class="alert alert-secondary mb-4" style="border-radius: 12px;">
+    <h5 class="mb-3"><i class="fas fa-eye-slash me-2"></i>Inactive Clinics ({{ pending_clinics|length }})</h5>
+    <p class="small text-muted mb-3">These clinics are not visible to patients. Activate to make them public.</p>
+    <div class="table-responsive">
+        <table class="table table-sm mb-0" style="background: transparent;">
+            <thead>
+                <tr>
+                    <th>Clinic</th>
+                    <th>City</th>
+                    <th>Owner</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for clinic in pending_clinics %}
+                <tr>
+                    <td>
+                        <strong>{{ clinic.name }}</strong>
+                        <br><small class="text-muted">{{ clinic.address or '' }}</small>
+                    </td>
+                    <td>{{ clinic.city or '—' }}</td>
+                    <td>
+                        {% if clinic.created_by_user_id %}
+                        User #{{ clinic.created_by_user_id }}
+                        {% else %}
+                        Admin
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <form method="post" action="{{ url_for('admin_clinic_approve', clinic_id=clinic.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="fas fa-eye me-1"></i>Activate
+                            </button>
+                        </form>
+                        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin_clinic_edit', clinic_id=clinic.id) }}">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
 <div class="table-responsive">
     <table class="table table-hover align-middle">
         <thead>
@@ -39,6 +86,12 @@
                     {% endif %}
                 </td>
                 <td class="text-end">
+                    {% if not clinic.is_active %}
+                    <form method="post" action="{{ url_for('admin_clinic_approve', clinic_id=clinic.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-sm btn-success">Activate</button>
+                    </form>
+                    {% endif %}
                     <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin_clinic_edit', clinic_id=clinic.id) }}">Edit</a>
                     <form method="post" action="{{ url_for('admin_clinic_delete', clinic_id=clinic.id) }}" class="d-inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>

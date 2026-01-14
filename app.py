@@ -2906,11 +2906,14 @@ def admin_cities():
 @app.route('/admin/clinics')
 @admin_required
 def admin_clinics():
-    # Pagination for better performance
+    # Get pending clinics first (for prominent display)
+    pending_clinics = Clinic.query.filter_by(is_active=False).order_by(Clinic.created_at.desc()).all()
+
+    # Pagination for all clinics
     page = request.args.get('page', 1, type=int)
     per_page = 50
 
-    pagination = Clinic.query.order_by(Clinic.name.asc()).paginate(
+    pagination = Clinic.query.order_by(Clinic.is_active.asc(), Clinic.name.asc()).paginate(
         page=page,
         per_page=per_page,
         error_out=False
@@ -2918,6 +2921,7 @@ def admin_clinics():
 
     return render_template('admin_clinics.html',
                          clinics=pagination.items,
+                         pending_clinics=pending_clinics,
                          pagination=pagination)
 
 
@@ -2985,6 +2989,17 @@ def admin_clinic_edit(clinic_id):
         return redirect(url_for('admin_clinics'))
 
     return render_template('admin_clinic_form.html', clinic=clinic)
+
+
+@app.route('/admin/clinics/<int:clinic_id>/approve', methods=['POST'])
+@admin_required
+def admin_clinic_approve(clinic_id):
+    """Activate an inactive clinic"""
+    clinic = Clinic.query.get_or_404(clinic_id)
+    clinic.is_active = True
+    db.session.commit()
+    flash(f'Clinic "{clinic.name}" has been activated and is now visible to patients.', 'success')
+    return redirect(url_for('admin_clinics'))
 
 
 @app.route('/admin/clinics/<int:clinic_id>/delete', methods=['POST'])
@@ -6514,6 +6529,30 @@ def api_search_doctors_for_network():
 # CLINIC & APPOINTMENT SYSTEM ROUTES
 # =============================================================================
 
+@app.route('/my-clinics')
+@login_required
+def my_clinics():
+    """Show clinics owned or managed by the current user"""
+    from models import Clinic, ClinicStaff
+
+    user_id = session['user_id']
+
+    # Get clinics created by user
+    owned_clinics = Clinic.query.filter_by(created_by_user_id=user_id).all()
+
+    # Get clinics where user is staff
+    staff_roles = ClinicStaff.query.filter_by(user_id=user_id, is_active=True).all()
+    staff_clinic_ids = [s.clinic_id for s in staff_roles]
+    staff_clinics = Clinic.query.filter(
+        Clinic.id.in_(staff_clinic_ids),
+        Clinic.created_by_user_id != user_id  # Exclude already owned
+    ).all() if staff_clinic_ids else []
+
+    return render_template('my_clinics.html',
+                          owned_clinics=owned_clinics,
+                          staff_clinics=staff_clinics)
+
+
 @app.route('/clinic/register', methods=['GET', 'POST'])
 @login_required
 def clinic_register():
@@ -6557,7 +6596,7 @@ def clinic_register():
         city_id = city_record.id if city_record else 1  # Default to Kathmandu (id=1) if not found
 
         try:
-            # Create clinic
+            # Create clinic (active immediately - payment will gate premium features later)
             clinic = Clinic(
                 name=name,
                 slug=slug,
@@ -6568,7 +6607,8 @@ def clinic_register():
                 email=email,
                 clinic_type=clinic_type,
                 description=description,
-                created_by_user_id=session['user_id']
+                created_by_user_id=session['user_id'],
+                is_active=True
             )
             db.session.add(clinic)
             db.session.flush()  # Get the clinic ID
@@ -6596,7 +6636,7 @@ def clinic_register():
             db.session.add(staff)
             db.session.commit()
 
-            flash('Clinic registered successfully! Now add doctors to your clinic.', 'success')
+            flash('Clinic registered successfully! Your clinic is now live. Add doctors and set up schedules to start accepting appointments.', 'success')
             return redirect(url_for('clinic_dashboard', clinic_slug=clinic.slug))
 
         except Exception as e:
