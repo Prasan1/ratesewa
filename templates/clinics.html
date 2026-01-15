@@ -71,7 +71,8 @@
             <div class="clinic-header" style="height: 6px; background: {% if clinic.clinic_type == 'hospital' %}linear-gradient(90deg, #dc3545, #fd7e14){% elif clinic.clinic_type == 'polyclinic' %}linear-gradient(90deg, #6f42c1, #e83e8c){% else %}linear-gradient(90deg, var(--brand), #20c997){% endif %};"></div>
 
             <div class="card-body p-4">
-                {% set clinic_doctors = clinic.get_active_doctors() if clinic.get_active_doctors else [] %}
+                {# Use eager-loaded clinic_doctors instead of get_active_doctors() to avoid N+1 queries #}
+                {% set clinic_doctors = clinic.clinic_doctors|selectattr('status', 'equalto', 'approved')|selectattr('is_active')|list %}
                 {% set doctor_count = clinic_doctors|length %}
                 {% set has_booking = clinic_doctors|selectattr('accepts_online_booking')|list|length > 0 %}
 

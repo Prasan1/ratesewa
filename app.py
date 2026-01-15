@@ -2311,9 +2311,14 @@ def index():
 
 @app.route('/clinics')
 def clinics():
+    from sqlalchemy.orm import selectinload
+
     city_id = request.args.get('city_id', '')
 
-    query = Clinic.query.filter_by(is_active=True)
+    # Eager load clinic_doctors and their doctors to avoid N+1 queries
+    query = Clinic.query.filter_by(is_active=True).options(
+        selectinload(Clinic.clinic_doctors).selectinload(ClinicDoctor.doctor)
+    )
 
     if city_id:
         query = query.filter_by(city_id=city_id)
