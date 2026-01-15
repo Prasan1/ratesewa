@@ -6,6 +6,7 @@ Calculates composite ranking scores for verified doctors based on:
 - Profile Completion (25%) - Percentage of filled profile fields
 - Review Response Rate (15%) - % of reviews doctor has responded to
 - Account Age Bonus (10%) - Small boost for established accounts, capped at 2 years
+- Review Bonus - Extra points for doctors with actual patient reviews
 """
 from datetime import datetime
 
@@ -30,6 +31,23 @@ WEIGHT_AGE = 0.10
 
 # Account age cap (2 years = 730 days)
 MAX_ACCOUNT_AGE_DAYS = 730
+
+# Review bonus: doctors with actual reviews get extra ranking points
+# This ensures reviewed doctors rank higher than those with just slightly better profiles
+REVIEW_BONUS_POINTS = 15  # Points added to composite score (on 0-100 scale)
+
+
+def calculate_review_bonus(total_reviews):
+    """
+    Calculate review bonus for doctors with actual patient reviews.
+
+    Args:
+        total_reviews: Total number of reviews for the doctor
+
+    Returns:
+        int: Bonus points (0 or REVIEW_BONUS_POINTS)
+    """
+    return REVIEW_BONUS_POINTS if total_reviews > 0 else 0
 
 
 def calculate_profile_completion(doctor):
@@ -149,10 +167,15 @@ def get_ranking_breakdown(doctor, rating_score, total_reviews, total_responses):
     profile_completion = calculate_profile_completion(doctor)
     response_rate = calculate_response_rate(total_reviews, total_responses)
     account_age_bonus = calculate_account_age_bonus(doctor.created_at)
+    review_bonus = calculate_review_bonus(total_reviews)
 
     composite = calculate_composite_score(
         rating_score, profile_completion, response_rate, account_age_bonus
     )
+
+    # Add review bonus to the raw composite calculation (for SQL-like scoring)
+    # Composite is 0-1, profile is 0-100, rating*20 is 0-100, so review_bonus is on same scale
+    raw_score = int(profile_completion * 100) + (rating_score / 5.0 * 100 if rating_score else 0) + review_bonus
 
     return {
         'rating': {
@@ -181,6 +204,12 @@ def get_ranking_breakdown(doctor, rating_score, total_reviews, total_responses):
             'weight': WEIGHT_AGE,
             'contribution': account_age_bonus * WEIGHT_AGE
         },
+        'review_bonus': {
+            'has_reviews': total_reviews > 0,
+            'bonus_points': review_bonus,
+            'description': 'Bonus for having patient reviews'
+        },
         'composite_score': composite,
-        'composite_percent': int(composite * 100)
+        'composite_percent': int(composite * 100),
+        'raw_ranking_score': raw_score  # Used for SQL-like sorting comparison
     }

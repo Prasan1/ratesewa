@@ -65,6 +65,24 @@
                     <h3 class="mb-4">
                         <i class="fas fa-calendar-plus me-2" style="color: var(--brand);"></i>Book Your Appointment
                     </h3>
+                    <div class="booking-stepper mb-4" aria-label="Booking steps">
+                        <div class="booking-step is-active" data-step="1">
+                            <span class="step-index">1</span>
+                            <span class="step-label">Date</span>
+                        </div>
+                        <div class="booking-step" data-step="2">
+                            <span class="step-index">2</span>
+                            <span class="step-label">Time</span>
+                        </div>
+                        <div class="booking-step" data-step="3">
+                            <span class="step-index">3</span>
+                            <span class="step-label">Details</span>
+                        </div>
+                        <div class="booking-step" data-step="4">
+                            <span class="step-index">4</span>
+                            <span class="step-label">Confirm</span>
+                        </div>
+                    </div>
 
                     <!-- Step 1: Select Date -->
                     <div class="mb-4">
@@ -225,11 +243,88 @@
     color: #9ca3af;
     border-color: #e5e7eb;
 }
+.date-btn,
+.time-btn{
+    border-radius: 12px;
+    font-weight: 600;
+}
+.booking-stepper{
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 0.75rem;
+}
+.booking-step{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.7rem 0.5rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+    color: #6b7280;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+.booking-step .step-index{
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #e2e8f0;
+    color: #475569;
+    font-weight: 700;
+}
+.booking-step.is-active{
+    background: #fff;
+    color: #0f172a;
+    border-color: rgba(13,148,136,0.3);
+    box-shadow: 0 10px 20px rgba(15,23,42,0.06);
+}
+.booking-step.is-active .step-index{
+    background: var(--brand);
+    color: #fff;
+}
+.booking-step.is-complete{
+    color: #0f172a;
+    border-color: rgba(13,148,136,0.25);
+    background: rgba(13,148,136,0.08);
+}
+.booking-step.is-complete .step-index{
+    background: rgba(13,148,136,0.2);
+    color: var(--brand);
+}
+@media (max-width: 576px){
+    .booking-stepper{
+        grid-template-columns: repeat(2, minmax(0,1fr));
+    }
+}
 </style>
 
 <script>
 let selectedDate = null;
 let selectedTime = null;
+
+function setStep(activeStep) {
+    const steps = document.querySelectorAll('.booking-step');
+    steps.forEach(step => {
+        const stepNum = Number(step.dataset.step);
+        step.classList.toggle('is-active', stepNum === activeStep);
+        step.classList.toggle('is-complete', stepNum < activeStep);
+    });
+}
+
+function maybeAdvanceToConfirm() {
+    const patientName = document.getElementById('patientName')?.value.trim();
+    const patientPhone = document.getElementById('patientPhone')?.value.trim();
+    if (patientName && patientPhone) {
+        setStep(4);
+    } else {
+        setStep(3);
+    }
+}
 
 // Date selection
 document.querySelectorAll('.date-btn').forEach(function(btn) {
@@ -243,6 +338,7 @@ document.querySelectorAll('.date-btn').forEach(function(btn) {
 
 function loadTimeSlots(date) {
     document.getElementById('timeSection').style.display = 'block';
+    setStep(2);
     document.getElementById('timeSlots').innerHTML = '<p class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i>Loading available times...</p>';
 
     fetch('/api/booking/slots?clinic_doctor_id={{ clinic_doctor.id }}&date=' + date)
@@ -276,12 +372,22 @@ function selectTime(btn, time, display) {
     document.getElementById('detailsSection').style.display = 'block';
     document.getElementById('summarySection').style.display = 'block';
     document.getElementById('submitSection').style.display = 'block';
+    setStep(3);
 
     // Update summary
     const dateBtn = document.querySelector('.date-btn.active');
     document.getElementById('summaryDate').textContent = dateBtn.querySelector('.fw-bold').textContent + ', ' + dateBtn.querySelector('small.text-muted').textContent;
     document.getElementById('summaryTime').textContent = display;
 }
+
+['patientName', 'patientPhone'].forEach(function(id) {
+    const field = document.getElementById(id);
+    if (field) {
+        field.addEventListener('input', maybeAdvanceToConfirm);
+    }
+});
+
+setStep(1);
 
 function submitBooking() {
     const patientName = document.getElementById('patientName').value.trim();

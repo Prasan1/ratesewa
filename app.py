@@ -2309,30 +2309,6 @@ def index():
                          verified_doctors=verified_doctors,
                          featured_clinics=featured_clinics)
 
-@app.route('/test-homepage')
-def test_homepage():
-    """Test route for improved homepage design"""
-    cities = City.query.all()
-    specialties = Specialty.query.all()
-
-    # Get stats for social proof section
-    total_doctors = Doctor.query.filter_by(is_active=True).count()
-    total_cities = City.query.count()
-    total_reviews = Rating.query.count()
-    verified_doctors = Doctor.query.filter_by(is_verified=True, is_active=True).count()
-    featured_clinics = Clinic.query.filter_by(is_active=True)\
-        .order_by(Clinic.is_featured.desc(), Clinic.name.asc())\
-        .limit(6).all()
-
-    return render_template('index_improved.html',
-                         cities=cities,
-                         specialties=specialties,
-                         total_doctors=total_doctors,
-                         total_cities=total_cities,
-                         total_reviews=total_reviews,
-                         verified_doctors=verified_doctors,
-                         featured_clinics=featured_clinics)
-
 @app.route('/clinics')
 def clinics():
     city_id = request.args.get('city_id', '')
@@ -2418,13 +2394,21 @@ def get_doctors():
         else_=1                              # Non-verified after
     ).label('sort_rank')
 
+    # Review bonus: doctors with actual patient reviews get a ranking boost
+    # This ensures reviewed doctors rank higher than those with just slightly better profiles
+    review_bonus = case(
+        (func.count(Rating.id) > 0, 15),  # 15 points for having any reviews
+        else_=0
+    ).label('review_bonus')
+
     rating_stats = db.session.query(
         Doctor.id.label('doctor_id'),
         avg_rating,
         rating_count,
         rating_score.label('rating_score'),
         sort_rank,
-        profile_score
+        profile_score,
+        review_bonus
     ).outerjoin(Rating).group_by(Doctor.id).subquery()
 
     query = db.session.query(
@@ -2468,12 +2452,13 @@ def get_doctors():
     # 2) Within tiers, sort by composite ranking score:
     #    - Rating score (Bayesian weighted) - 50%
     #    - Profile completion score - 25%
+    #    - Review bonus - doctors with actual reviews rank higher
     #    - Response rate - 15% (calculated in Python post-fetch)
     #    - Account age bonus - 10% (calculated in Python post-fetch)
-    # For SQL efficiency, we use profile_score + rating_score as primary sort
+    # Composite: profile (0-100) + rating (0-5)*20 + review_bonus (0 or 15)
     query = query.order_by(
         rating_stats.c.sort_rank.asc(),
-        (rating_stats.c.profile_score + rating_stats.c.rating_score * 20).desc(),  # Combine profile (0-100) + rating (0-5)*20
+        (rating_stats.c.profile_score + rating_stats.c.rating_score * 20 + rating_stats.c.review_bonus).desc(),
         rating_stats.c.rating_score.desc(),
         Doctor.name.asc()
     )

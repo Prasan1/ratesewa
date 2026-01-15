@@ -71,6 +71,10 @@
             <div class="clinic-header" style="height: 6px; background: {% if clinic.clinic_type == 'hospital' %}linear-gradient(90deg, #dc3545, #fd7e14){% elif clinic.clinic_type == 'polyclinic' %}linear-gradient(90deg, #6f42c1, #e83e8c){% else %}linear-gradient(90deg, var(--brand), #20c997){% endif %};"></div>
 
             <div class="card-body p-4">
+                {% set clinic_doctors = clinic.get_active_doctors() if clinic.get_active_doctors else [] %}
+                {% set doctor_count = clinic_doctors|length %}
+                {% set has_booking = clinic_doctors|selectattr('accepts_online_booking')|list|length > 0 %}
+
                 <!-- Logo + Name Row -->
                 <div class="d-flex align-items-start mb-3">
                     {% if clinic.logo_url %}
@@ -103,24 +107,30 @@
                     </div>
                 </div>
 
-                <!-- Info Grid -->
-                <div class="clinic-info mb-3">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-map-marker-alt me-2" style="color: var(--brand); width: 16px;"></i>
-                        <span class="text-muted small text-truncate">{{ clinic.address or clinic.city or 'Location not specified' }}</span>
-                    </div>
-                    {% if clinic.phone or clinic.phone_number %}
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-phone me-2" style="color: var(--brand); width: 16px;"></i>
-                        <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="text-muted small text-decoration-none">{{ clinic.phone or clinic.phone_number }}</a>
-                    </div>
+                <!-- Meta Badges -->
+                <div class="clinic-meta mb-3">
+                    <span class="meta-pill">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ clinic.address or clinic.city or 'Location not specified' }}
+                    </span>
+                    <span class="meta-pill">
+                        <i class="fas fa-user-md"></i>
+                        {{ doctor_count }} Doctor{{ 's' if doctor_count != 1 else '' }}
+                    </span>
+                    {% if has_booking %}
+                    <span class="meta-pill meta-pill--brand">
+                        <i class="fas fa-calendar-check"></i>
+                        Online booking
+                    </span>
                     {% endif %}
-                    {% set doctor_count = clinic.get_active_doctors()|length if clinic.get_active_doctors else 0 %}
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-user-md me-2" style="color: var(--brand); width: 16px;"></i>
-                        <span class="text-muted small">{{ doctor_count }} Doctor{{ 's' if doctor_count != 1 else '' }} Available</span>
-                    </div>
                 </div>
+
+                {% if clinic.phone or clinic.phone_number %}
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-phone me-2" style="color: var(--brand); width: 16px;"></i>
+                    <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="text-muted small text-decoration-none">{{ clinic.phone or clinic.phone_number }}</a>
+                </div>
+                {% endif %}
 
                 <!-- Description (truncated) -->
                 {% if clinic.description %}
@@ -160,6 +170,32 @@
 }
 .min-width-0 {
     min-width: 0;
+}
+.clinic-meta{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+.meta-pill{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 600;
+    max-width: 100%;
+}
+.meta-pill i{
+    color: var(--brand);
+}
+.meta-pill--brand{
+    background: var(--brand-soft);
+    border-color: rgba(13,148,136,0.2);
+    color: var(--brand);
 }
 </style>
 {% endblock %}

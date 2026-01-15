@@ -189,6 +189,25 @@
         box-shadow: var(--shadow-sm);
         min-width: 220px;
     }
+    .booking-cta {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .booking-cta-title {
+        font-weight: 700;
+        color: var(--text-main);
+    }
+    .booking-cta-sub {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: -6px;
+    }
+    .hero-divider {
+        height: 1px;
+        background: var(--border-color);
+        margin: 4px 0;
+    }
 
     .hero-action-row {
         display: flex;
@@ -724,6 +743,43 @@
         border: 1px solid var(--border-color);
         background: #f8fafc;
     }
+    .review-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+    }
+    .review-metric {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        background: #ffffff;
+        box-shadow: var(--shadow-sm);
+    }
+    .metric-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--brand-light);
+        color: var(--brand);
+        flex-shrink: 0;
+    }
+    .metric-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+    .metric-value {
+        font-weight: 700;
+        color: var(--text-main);
+    }
     .summary-score {
         display: flex;
         flex-direction: column;
@@ -826,6 +882,7 @@
         .content-card { padding: 20px 16px; }
         .facts-grid { grid-template-columns: 1fr; }
         .hero-actions-card { width: 100%; }
+        .review-metrics { grid-template-columns: 1fr; }
         .review-summary { grid-template-columns: 1fr; }
         .review-masonry { grid-template-columns: 1fr; }
     }
@@ -953,6 +1010,20 @@ function handleBackClick(e) {
           </div>
 
           <div class="hero-actions-card">
+            {% if clinic_affiliations %}
+              {% set primary_clinic = clinic_affiliations[0].clinic %}
+              <div class="booking-cta">
+                <div class="booking-cta-title">Book at {{ primary_clinic.name }}</div>
+                <div class="booking-cta-sub">Secure your slot in minutes.</div>
+                <a class="btn btn-primary w-100" href="{{ url_for('clinic_book_appointment', clinic_slug=primary_clinic.slug, doctor_id=doctor.id) }}" style="border-radius: 12px; font-weight:600;">
+                  <i class="fas fa-calendar-check me-2"></i>Book Appointment
+                </a>
+                <a class="btn btn-outline-secondary w-100" href="{{ url_for('clinic_public_page', clinic_slug=primary_clinic.slug) }}" style="border-radius: 12px;">
+                  View Clinic
+                </a>
+              </div>
+              <div class="hero-divider"></div>
+            {% endif %}
             <div class="rating-badge">
               <span class="star-rating">
                 {% set full_stars = avg_rating | int %}
@@ -1374,6 +1445,29 @@ function handleBackClick(e) {
 
         {% set total_reviews = ratings|length %}
         {% if total_reviews > 0 %}
+        <div class="review-metrics mb-4">
+          <div class="review-metric">
+            <div class="metric-icon"><i class="fas fa-star"></i></div>
+            <div>
+              <div class="metric-label">Average rating</div>
+              <div class="metric-value">{{ "%.1f"|format(avg_rating) }}/5</div>
+            </div>
+          </div>
+          <div class="review-metric">
+            <div class="metric-icon"><i class="fas fa-comment-dots"></i></div>
+            <div>
+              <div class="metric-label">Total reviews</div>
+              <div class="metric-value">{{ total_reviews }}</div>
+            </div>
+          </div>
+          <div class="review-metric">
+            <div class="metric-icon"><i class="fas fa-user-check"></i></div>
+            <div>
+              <div class="metric-label">Verified reviewers</div>
+              <div class="metric-value">Real users only</div>
+            </div>
+          </div>
+        </div>
         <div class="review-summary mb-4">
           <div class="summary-score">
             <div class="score">{{ "%.1f"|format(avg_rating) }}</div>
