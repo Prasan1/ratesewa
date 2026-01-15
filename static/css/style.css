@@ -155,7 +155,6 @@ a:hover {
 .footer-surface {
     background: linear-gradient(135deg, var(--footer-grad-start) 0%, var(--footer-grad-end) 100%) !important;
     box-shadow: 0 -12px 24px rgba(17, 29, 35, 0.08);
-    border-top: 1px solid rgba(4, 130, 136, 0.12);
 }
 
 .footer-bridge {
