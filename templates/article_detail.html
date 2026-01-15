@@ -124,24 +124,25 @@
             <p>Connect with verified specialists for personalized medical advice.</p>
             <div class="doctors-grid">
                 {% for doctor in related_doctors[:4] %}
-                <a href="{{ url_for('doctor_profile', slug=doctor.slug) }}" class="doctor-card">
-                    <div class="doctor-avatar">
-                        {% if doctor.photo_url %}
-                        {% set photo_path = doctor.photo_url.replace('photos/', '') %}
-                        <img src="{{ url_for('serve_photo', filename=photo_path) }}"
-                             alt="{{ doctor.name }}"
-                             onerror="this.src='{{ doctor|doctor_avatar }}'">
-                        {% else %}
-                        <img src="{{ doctor|doctor_avatar }}" alt="{{ doctor.name }}">
-                        {% endif %}
-                        {% if doctor.is_verified %}
-                        <span class="verified-badge" title="RankSewa Verified">✓</span>
-                        {% endif %}
-                    </div>
-                    <div class="doctor-info">
-                        <strong>{{ doctor.name }}</strong>
-                        <span class="doctor-specialty">{{ doctor.specialty.name }}</span>
-                        <span class="doctor-meta">{{ doctor.city.name }} &bull; {{ doctor.experience }} yrs</span>
+                <a href="{{ url_for('doctor_profile', slug=doctor.slug) }}" class="doctor-card-v2">
+                    {% if doctor.photo_url %}
+                    {% set photo_path = doctor.photo_url.replace('photos/', '') %}
+                    <img src="{{ url_for('serve_photo', filename=photo_path) }}"
+                         alt="{{ doctor.name }}"
+                         class="doctor-photo"
+                         onerror="this.src='{{ doctor|doctor_avatar }}'">
+                    {% else %}
+                    <img src="{{ doctor|doctor_avatar }}" alt="{{ doctor.name }}" class="doctor-photo">
+                    {% endif %}
+                    <div class="doctor-details">
+                        <div class="doctor-name-row">
+                            <strong>{{ doctor.name }}</strong>
+                            {% if doctor.is_verified %}
+                            <span class="verified-tag">Verified</span>
+                            {% endif %}
+                        </div>
+                        <span class="doctor-spec">{{ doctor.specialty.name }}</span>
+                        <span class="doctor-loc">{{ doctor.city.name }} &bull; {{ doctor.experience }} yrs exp</span>
                     </div>
                 </a>
                 {% endfor %}
