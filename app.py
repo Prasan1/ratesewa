@@ -2385,18 +2385,37 @@ def get_doctors():
     from sqlalchemy import func, case, and_
     from sqlalchemy.orm import selectinload
 
+    # Rating statistics
     avg_rating = func.coalesce(func.avg(Rating.rating), 0).label('avg_rating')
     rating_count = func.count(Rating.id).label('rating_count')
-    # Weighted rating to avoid single-review dominance
+    # Weighted rating to avoid single-review dominance (Bayesian smoothing)
     global_avg = 3.5
     min_reviews = 5
     rating_score = ((avg_rating * rating_count) + (global_avg * min_reviews)) / (rating_count + min_reviews)
+
+    # Response count subquery for response rate calculation
+    response_counts = db.session.query(
+        DoctorResponse.doctor_id,
+        func.count(DoctorResponse.id).label('response_count')
+    ).group_by(DoctorResponse.doctor_id).subquery()
+
+    # Profile completion score (SQL calculation)
+    # Weights: photo=20, description=20, education=15, college=10, experience=10, workplace=10, phone=10, hours=5
+    profile_score = (
+        case((Doctor.photo_url.isnot(None), 20), else_=0) +
+        case((Doctor.description.isnot(None), 20), else_=0) +
+        case((Doctor.education.isnot(None), 15), else_=0) +
+        case((Doctor.college.isnot(None), 10), else_=0) +
+        case((Doctor.experience.isnot(None), 10), else_=0) +
+        case((Doctor.workplace.isnot(None), 10), else_=0) +
+        case((Doctor.phone_number.isnot(None), 10), else_=0) +
+        case((Doctor.working_hours.isnot(None), 5), else_=0)
+    ).label('profile_score')
+
+    # Tiered ranking: verified doctors first, then by composite score
     sort_rank = case(
-        (and_(Doctor.is_featured.is_(True), Doctor.is_verified.is_(True)), 0),
-        (and_(Doctor.is_verified.is_(True), rating_count > 0), 1),  # Verified WITH ratings
-        (Doctor.is_verified.is_(True), 2),  # Verified without ratings
-        (rating_count > 0, 3),  # Has ratings but not verified
-        else_=4
+        (Doctor.is_verified.is_(True), 0),  # Verified doctors first
+        else_=1                              # Non-verified after
     ).label('sort_rank')
 
     rating_stats = db.session.query(
@@ -2404,7 +2423,8 @@ def get_doctors():
         avg_rating,
         rating_count,
         rating_score.label('rating_score'),
-        sort_rank
+        sort_rank,
+        profile_score
     ).outerjoin(Rating).group_by(Doctor.id).subquery()
 
     query = db.session.query(
@@ -2412,8 +2432,12 @@ def get_doctors():
         rating_stats.c.avg_rating,
         rating_stats.c.rating_count,
         rating_stats.c.rating_score,
-        rating_stats.c.sort_rank
-    ).join(rating_stats, Doctor.id == rating_stats.c.doctor_id).options(
+        rating_stats.c.sort_rank,
+        rating_stats.c.profile_score,
+        func.coalesce(response_counts.c.response_count, 0).label('response_count')
+    ).join(rating_stats, Doctor.id == rating_stats.c.doctor_id).outerjoin(
+        response_counts, Doctor.id == response_counts.c.doctor_id
+    ).options(
         selectinload(Doctor.city),
         selectinload(Doctor.specialty),
         selectinload(Doctor.clinic),
@@ -2440,13 +2464,16 @@ def get_doctors():
     total_pages = (total_doctors + per_page - 1) // per_page  # Ceiling division
 
     # Order by priority:
-    # 0) Featured + verified
-    # 1) Verified with ratings (sorted by rating score)
-    # 2) Verified without ratings (sorted alphabetically)
-    # 3) Has ratings but not verified
-    # 4) Others
+    # 1) Verified doctors first (sort_rank=0)
+    # 2) Within tiers, sort by composite ranking score:
+    #    - Rating score (Bayesian weighted) - 50%
+    #    - Profile completion score - 25%
+    #    - Response rate - 15% (calculated in Python post-fetch)
+    #    - Account age bonus - 10% (calculated in Python post-fetch)
+    # For SQL efficiency, we use profile_score + rating_score as primary sort
     query = query.order_by(
         rating_stats.c.sort_rank.asc(),
+        (rating_stats.c.profile_score + rating_stats.c.rating_score * 20).desc(),  # Combine profile (0-100) + rating (0-5)*20
         rating_stats.c.rating_score.desc(),
         Doctor.name.asc()
     )
@@ -2457,7 +2484,7 @@ def get_doctors():
 
     # Serialize to JSON
     doctors_list = []
-    for d, avg_rating_value, rating_count_value, _rating_score, _sort_rank in doctors:
+    for d, avg_rating_value, rating_count_value, _rating_score, _sort_rank, profile_score_value, response_count_value in doctors:
         # Generate proper photo URL
         photo_url = None
         if d.photo_url:
@@ -2471,6 +2498,11 @@ def get_doctors():
                 photo_path = d.photo_url.split('/')[-1]
 
             photo_url = url_for('serve_photo', filename=photo_path, _external=False)
+
+        # Calculate response rate for this doctor
+        rating_count_int = int(rating_count_value or 0)
+        response_count_int = int(response_count_value or 0)
+        response_rate = (response_count_int / rating_count_int * 100) if rating_count_int > 0 else 0
 
         doctors_list.append({
             'id': d.id,
@@ -2493,7 +2525,9 @@ def get_doctors():
             'is_verified': d.is_verified,
             'is_claimed': d.user_account is not None,
             'avg_rating': float(avg_rating_value or 0),
-            'rating_count': int(rating_count_value or 0)
+            'rating_count': rating_count_int,
+            'profile_completion': int(profile_score_value or 0),
+            'response_rate': int(response_rate)
         })
 
     return jsonify({

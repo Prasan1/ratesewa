@@ -126,6 +126,9 @@ class Doctor(db.Model):
     # Analytics
     profile_views = db.Column(db.Integer, default=0)
 
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     # Subscription and monetization
     subscription_tier = db.Column(db.String(20), default='free')  # 'free', 'premium', 'featured'
     subscription_expires_at = db.Column(db.DateTime, nullable=True)  # When paid subscription ends
