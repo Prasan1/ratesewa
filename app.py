@@ -135,12 +135,23 @@ stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
-# Initialize Rate Limiter (protection against brute force attacks)
+# Proxy + Rate Limiter (respect Cloudflare/forwarded IPs)
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+
+def get_client_ip():
+    cf_ip = request.headers.get('CF-Connecting-IP')
+    if cf_ip:
+        return cf_ip
+    forwarded_for = request.headers.get('X-Forwarded-For', '')
+    if forwarded_for:
+        return forwarded_for.split(',')[0].strip()
+    return request.remote_addr
+
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
 limiter = Limiter(
-    key_func=get_remote_address,
+    key_func=get_client_ip,
     app=app,
     default_limits=["200 per day", "50 per hour"],
     storage_uri="memory://",
@@ -204,13 +215,6 @@ def send_email_verification(user):
         if should_show_dev_verify_link():
             return verify_url
         return None
-
-def get_client_ip():
-    forwarded_for = request.headers.get('X-Forwarded-For', '')
-    if forwarded_for:
-        return forwarded_for.split(',')[0].strip()
-    return request.remote_addr
-
 
 # --- Password Reset Functions ---
 def generate_password_reset_token(email):
