@@ -130,9 +130,3 @@ Invest in your health now. Schedule your annual checkup today.
 ---
 
 *Looking for a General Physician in Nepal? Use RankSewa to find verified doctors, compare qualifications, and read patient reviews.*
-
----
-
-**Related Specialty**: General Physician
-**Category**: General Health
-**SEO Keywords**: general physician Nepal, health checkup Kathmandu, annual checkup Nepal, doctor near me Nepal, full body checkup Nepal cost, health screening Kathmandu, MBBS doctor Nepal

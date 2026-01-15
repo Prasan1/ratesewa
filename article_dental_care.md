@@ -166,10 +166,3 @@ Don't wait for pain. By the time a tooth hurts, significant damage has already o
 ---
 
 *Looking for a qualified dentist in Nepal? Use RankSewa to find NMC-verified dentists near you, read patient reviews, and book appointments.*
-
----
-
-**Related Specialty**: Dentistry
-**Category**: Oral Health
-**Recommended doctor specialty**: Dentist (ID 11 based on your production database)
-**SEO Keywords**: best dentist in Kathmandu, dental tourism Nepal, cheap dental work Nepal, NRN dentist Kathmandu, dentist near me Kathmandu, dental implant Nepal cost, root canal Nepal, dental clinic Kathmandu, verified dentist Nepal
