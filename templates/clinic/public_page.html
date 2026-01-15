@@ -41,7 +41,7 @@
                         </div>
                         <h1 class="clinic-name">{{ clinic.name }}</h1>
                         {% if clinic.description %}
-                        <p class="clinic-tagline">{{ clinic.description[:150] }}{% if clinic.description|length > 150 %}...{% endif %}</p>
+                        <p class="clinic-tagline">{{ clinic.description }}</p>
                         {% endif %}
                     </div>
                 </div>
