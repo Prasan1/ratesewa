@@ -82,6 +82,8 @@
                     <img src="{% if clinic.logo_url.startswith('http') %}{{ clinic.logo_url }}{% else %}{{ url_for('serve_clinic_logo', filename=clinic.logo_url.replace('clinic_logos/', '')) }}{% endif %}"
                          alt="{{ clinic.name }}"
                          class="clinic-logo me-3"
+                         loading="lazy"
+                         decoding="async"
                          style="width: 56px; height: 56px; object-fit: contain; border-radius: 12px; background: #f8f9fa; padding: 4px;">
                     {% else %}
                     {% set name_parts = clinic.name.split() %}

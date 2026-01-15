@@ -375,6 +375,17 @@
         window.addEventListener('load', () => {
             fetch('/track-human', { method: 'POST' }).catch(() => {});
         });
+
+        // Mobile nav: Auto-close menu when clicking a link
+        document.querySelectorAll('.navbar-collapse .nav-link:not(.dropdown-toggle)').forEach(link => {
+            link.addEventListener('click', () => {
+                const navbarCollapse = document.getElementById('navbarNav');
+                if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+                    const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
+                    if (bsCollapse) bsCollapse.hide();
+                }
+            });
+        });
     </script>
     {% block scripts %}{% endblock %}
 </body>

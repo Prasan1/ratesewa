@@ -412,6 +412,53 @@ a:hover {
     opacity: 0.8;
 }
 
+/* Mobile Navbar Improvements */
+@media (max-width: 991.98px) {
+    .custom-navbar .navbar-collapse {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 12px;
+        margin-top: 0.5rem;
+        padding: 1rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
+    }
+
+    .custom-navbar .navbar-nav {
+        gap: 0.25rem;
+    }
+
+    .custom-navbar .nav-item {
+        width: 100%;
+    }
+
+    .custom-navbar .nav-link {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        transition: background 0.15s ease;
+    }
+
+    .custom-navbar .nav-link:hover,
+    .custom-navbar .nav-link:focus {
+        background: var(--brand-soft);
+    }
+
+    .custom-navbar .nav-item .btn {
+        width: 100%;
+        margin: 0.25rem 0;
+        justify-content: center;
+    }
+
+    .custom-navbar .dropdown-menu {
+        position: static !important;
+        transform: none !important;
+        width: 100%;
+        margin-top: 0.25rem;
+        box-shadow: none;
+        border: 1px solid var(--border);
+        background: var(--surface-alt);
+    }
+}
+
 /* Cards */
 .card,
 .doctor-card {

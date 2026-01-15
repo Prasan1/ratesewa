@@ -2285,17 +2285,47 @@ def internal_error(error):
     db.session.rollback()  # Roll back any failed transactions
     return render_template('500.html'), 500
 
+# --- Homepage Stats Cache ---
+# Simple in-memory cache to avoid running count queries on every page load
+_homepage_stats_cache = {
+    'data': None,
+    'expires_at': None
+}
+STATS_CACHE_TTL = 300  # 5 minutes
+
+def get_homepage_stats():
+    """Get cached homepage stats or fetch from DB if expired"""
+    import time
+    now = time.time()
+
+    # Return cached data if still valid
+    if _homepage_stats_cache['data'] and _homepage_stats_cache['expires_at'] and now < _homepage_stats_cache['expires_at']:
+        return _homepage_stats_cache['data']
+
+    # Fetch fresh data
+    stats = {
+        'total_doctors': Doctor.query.filter_by(is_active=True).count(),
+        'total_cities': City.query.count(),
+        'total_reviews': Rating.query.count(),
+        'verified_doctors': Doctor.query.filter_by(is_verified=True, is_active=True).count(),
+    }
+
+    # Update cache
+    _homepage_stats_cache['data'] = stats
+    _homepage_stats_cache['expires_at'] = now + STATS_CACHE_TTL
+
+    return stats
+
+
 # --- Main App Routes ---
 @app.route('/')
 def index():
     cities = City.query.all()
     specialties = Specialty.query.all()
 
-    # Get stats for social proof section
-    total_doctors = Doctor.query.filter_by(is_active=True).count()  # All doctors (NMC city = practice location)
-    total_cities = City.query.count()
-    total_reviews = Rating.query.count()
-    verified_doctors = Doctor.query.filter_by(is_verified=True, is_active=True).count()
+    # Get cached stats for social proof section
+    stats = get_homepage_stats()
+
     featured_clinics = Clinic.query.filter_by(is_active=True)\
         .order_by(Clinic.is_featured.desc(), Clinic.name.asc())\
         .limit(6).all()
@@ -2303,10 +2333,10 @@ def index():
     return render_template('index.html',
                          cities=cities,
                          specialties=specialties,
-                         total_doctors=total_doctors,
-                         total_cities=total_cities,
-                         total_reviews=total_reviews,
-                         verified_doctors=verified_doctors,
+                         total_doctors=stats['total_doctors'],
+                         total_cities=stats['total_cities'],
+                         total_reviews=stats['total_reviews'],
+                         verified_doctors=stats['verified_doctors'],
                          featured_clinics=featured_clinics)
 
 @app.route('/clinics')
