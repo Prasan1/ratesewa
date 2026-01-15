@@ -7,785 +7,902 @@
 {% endblock %}
 
 {% block content %}
-<div class="clinic-page">
-    <!-- Hero Section -->
-    <section class="clinic-hero">
-        <div class="container">
-            <nav class="mb-4">
-                <a href="{{ url_for('clinics') }}" class="back-link">
-                    <i class="fas fa-arrow-left"></i> All Clinics
-                </a>
-            </nav>
+<div class="rs-clinic">
+  <!-- HERO -->
+  <header class="rs-hero">
+    <div class="container">
+      <nav class="rs-breadcrumb">
+        <a href="{{ url_for('clinics') }}" class="rs-back">
+          <i class="fas fa-arrow-left"></i> All Clinics
+        </a>
+      </nav>
 
-            <div class="hero-content">
-                <div class="clinic-identity">
-                    {% if clinic.logo_url %}
-                    <div class="clinic-logo">
-                        <img src="{% if clinic.logo_url.startswith('http') %}{{ clinic.logo_url }}{% else %}{{ url_for('serve_clinic_logo', filename=clinic.logo_url.replace('clinic_logos/', '')) }}{% endif %}"
-                             alt="{{ clinic.name }}">
-                    </div>
-                    {% else %}
-                    <div class="clinic-logo clinic-logo--placeholder">
-                        <span>{{ clinic.name[:2]|upper }}</span>
-                    </div>
-                    {% endif %}
+      <div class="rs-hero-grid">
+        <div class="rs-hero-card">
+          <div class="rs-hero-top">
+            {% if clinic.logo_url %}
+              <div class="rs-logo">
+                <img
+                  src="{% if clinic.logo_url.startswith('http') %}{{ clinic.logo_url }}{% else %}{{ url_for('serve_clinic_logo', filename=clinic.logo_url.replace('clinic_logos/', '')) }}{% endif %}"
+                  alt="{{ clinic.name }}"
+                  loading="lazy"
+                >
+              </div>
+            {% else %}
+              <div class="rs-logo rs-logo--placeholder" aria-label="{{ clinic.name }}">
+                <span>{{ clinic.name[:2]|upper }}</span>
+              </div>
+            {% endif %}
 
-                    <div class="clinic-info">
-                        <div class="clinic-badges">
-                            <span class="badge badge--type">{{ clinic.clinic_type|title }}</span>
-                            {% if clinic.is_verified %}
-                            <span class="badge badge--verified">
-                                <i class="fas fa-shield-alt"></i> Verified
-                            </span>
-                            {% endif %}
-                        </div>
-                        <h1 class="clinic-name">{{ clinic.name }}</h1>
-                        {% if clinic.description %}
-                        <p class="clinic-tagline">{{ clinic.description }}</p>
-                        {% endif %}
-                    </div>
-                </div>
+            <div class="rs-hero-meta">
+              <div class="rs-badges">
+                <span class="rs-badge rs-badge--type">
+                  <i class="fas fa-hospital"></i> {{ clinic.clinic_type|title }}
+                </span>
+                {% if clinic.is_verified %}
+                  <span class="rs-badge rs-badge--verified">
+                    <i class="fas fa-shield-alt"></i> Verified Clinic
+                  </span>
+                {% endif %}
+              </div>
 
-                <div class="clinic-stats">
-                    <div class="stat">
-                        <div class="stat-value">{{ clinic_doctors|length }}</div>
-                        <div class="stat-label">Doctors</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+              <h1 class="rs-title">{{ clinic.name }}</h1>
 
-    <!-- Quick Contact Bar -->
-    <section class="contact-bar">
-        <div class="container">
-            <div class="contact-items">
+              {% if clinic.description %}
+                <p class="rs-subtitle">{{ clinic.description }}</p>
+              {% else %}
+                <p class="rs-subtitle">
+                  A modern clinic page powered by RankSewa — verified doctors, transparent schedules, and online booking.
+                </p>
+              {% endif %}
+
+              <div class="rs-mini">
                 {% if clinic.address or clinic.city %}
-                <div class="contact-item">
+                  <span class="rs-mini-item">
                     <i class="fas fa-map-marker-alt"></i>
                     <span>{{ clinic.address }}{% if clinic.address and clinic.city %}, {% endif %}{{ clinic.city }}</span>
-                </div>
+                  </span>
                 {% endif %}
-
                 {% if clinic.phone or clinic.phone_number %}
-                <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="contact-item contact-item--link">
+                  <span class="rs-mini-item">
                     <i class="fas fa-phone-alt"></i>
                     <span>{{ clinic.phone or clinic.phone_number }}</span>
-                </a>
+                  </span>
                 {% endif %}
-
-                {% if clinic.email %}
-                <a href="mailto:{{ clinic.email }}" class="contact-item contact-item--link">
-                    <i class="fas fa-envelope"></i>
-                    <span>{{ clinic.email }}</span>
-                </a>
-                {% endif %}
-
-                {% if clinic.website %}
-                <a href="{{ clinic.website }}" target="_blank" rel="noopener" class="contact-item contact-item--link">
-                    <i class="fas fa-globe"></i>
-                    <span>Website</span>
-                </a>
-                {% endif %}
-
-                {% set full_address = [clinic.address, clinic.city, 'Nepal']|select|join(', ') %}
-                <a href="https://www.google.com/maps/search/?api=1&query={{ full_address|urlencode }}"
-                   target="_blank" rel="noopener"
-                   class="contact-item contact-item--cta">
-                    <i class="fas fa-directions"></i>
-                    <span>Get Directions</span>
-                </a>
+              </div>
             </div>
-        </div>
-    </section>
+          </div>
 
-    <!-- Doctors Section -->
-    <section class="doctors-section">
-        <div class="container">
-            <div class="section-header">
-                <h2><i class="fas fa-user-md"></i> Our Doctors</h2>
-                <p class="section-subtitle">Meet our team of verified healthcare professionals</p>
-            </div>
-
-            {% if clinic_doctors %}
-            <div class="doctors-grid">
-                {% for cd in clinic_doctors %}
-                <article class="doctor-card">
-                    <div class="doctor-card__header">
-                        {% if cd.doctor.photo_url %}
-                        {% set photo_path = cd.doctor.photo_url.replace('photos/', '') %}
-                        <img src="{{ url_for('serve_photo', filename=photo_path) }}"
-                             alt="{{ cd.doctor.name }}"
-                             class="doctor-card__photo">
-                        {% else %}
-                        {% set name_parts = cd.doctor.name.replace('Dr. ', '').replace('Dr.', '').split() %}
-                        {% set initials = name_parts[0][:1] ~ (name_parts[-1][:1] if name_parts|length > 1 else '') %}
-                        <div class="doctor-card__photo doctor-card__photo--placeholder">
-                            {{ initials|upper }}
-                        </div>
-                        {% endif %}
-
-                        <div class="doctor-card__identity">
-                            <h3 class="doctor-card__name">
-                                <a href="{{ url_for('doctor_profile', slug=cd.doctor.slug) }}">
-                                    {{ cd.doctor.name }}
-                                </a>
-                            </h3>
-                            <p class="doctor-card__specialty">
-                                {{ cd.doctor.specialty.name if cd.doctor.specialty else 'General Physician' }}
-                            </p>
-                            {% if cd.doctor.is_verified %}
-                            <span class="doctor-card__verified">
-                                <i class="fas fa-check-circle"></i> Verified
-                            </span>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="doctor-card__details">
-                        {% if cd.consultation_fee %}
-                        <div class="doctor-card__fee">
-                            <span class="fee-label">Consultation Fee</span>
-                            <span class="fee-value">NPR {{ cd.consultation_fee }}</span>
-                        </div>
-                        {% endif %}
-
-                        {% if cd.role and cd.role != 'consultant' %}
-                        <div class="doctor-card__role">
-                            <i class="fas fa-id-badge"></i> {{ cd.role|title }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    {% set schedules = cd.get_schedules() %}
-                    {% if schedules %}
-                    <div class="doctor-card__schedule">
-                        <div class="schedule-label">
-                            <i class="fas fa-clock"></i> Available
-                        </div>
-                        <div class="schedule-days">
-                            {% set days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] %}
-                            {% for s in schedules %}
-                            <span class="schedule-day">
-                                {{ days[s.day_of_week] }} {{ s.start_time.strftime('%I:%M %p').lstrip('0') }}
-                            </span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <div class="doctor-card__actions">
-                        {% if schedules and cd.accepts_online_booking %}
-                        <a href="{{ url_for('clinic_book_appointment', clinic_slug=clinic.slug, doctor_id=cd.doctor.id) }}"
-                           class="btn btn--primary">
-                            <i class="fas fa-calendar-check"></i> Book Appointment
-                        </a>
-                        {% else %}
-                        <a href="{{ url_for('doctor_profile', slug=cd.doctor.slug) }}"
-                           class="btn btn--secondary">
-                            <i class="fas fa-user"></i> View Profile
-                        </a>
-                        {% endif %}
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <div class="empty-state__icon">
-                    <i class="fas fa-user-md"></i>
+          <div class="rs-hero-bottom">
+            <div class="rs-kpis">
+              <div class="rs-kpi">
+                <div class="rs-kpi-icon"><i class="fas fa-user-md"></i></div>
+                <div>
+                  <div class="rs-kpi-value">{{ clinic_doctors|length }}</div>
+                  <div class="rs-kpi-label">Doctors</div>
                 </div>
-                <h3>No Doctors Listed Yet</h3>
-                <p>This clinic is setting up their doctor profiles. Check back soon.</p>
+              </div>
+
+              <div class="rs-kpi rs-kpi--soft">
+                <div class="rs-kpi-icon"><i class="fas fa-bolt"></i></div>
+                <div>
+                  <div class="rs-kpi-value">Online</div>
+                  <div class="rs-kpi-label">Booking Ready</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rs-hero-actions">
+              {% set full_address = [clinic.name, clinic.address, clinic.city, 'Nepal']|select|join(', ') %}
+              <a href="https://www.google.com/maps/search/?api=1&query={{ full_address|urlencode }}"
+                 target="_blank" rel="noopener"
+                 class="rs-btn rs-btn--outline">
+                <i class="fas fa-directions"></i> Directions
+              </a>
+
+              {% if clinic.phone or clinic.phone_number %}
+              <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--primary">
+                <i class="fas fa-phone-alt"></i> Call Clinic
+              </a>
+              {% else %}
+              <a href="#doctors" class="rs-btn rs-btn--primary">
+                <i class="fas fa-calendar-check"></i> Book an Appointment
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTACT / TRUST PANEL -->
+        <aside class="rs-side">
+          <div class="rs-side-card">
+            <div class="rs-side-title">
+              <div class="rs-side-icon"><i class="fas fa-headset"></i></div>
+              <div>
+                <div class="rs-side-h">Clinic Contacts</div>
+                <div class="rs-side-sub">Fast access for patients</div>
+              </div>
+            </div>
+
+            <div class="rs-side-list">
+              {% if clinic.address or clinic.city %}
+              <div class="rs-side-row">
+                <i class="fas fa-map-marker-alt"></i>
+                <div class="rs-side-text">
+                  <div class="rs-side-label">Location</div>
+                  <div class="rs-side-value">{{ clinic.address }}{% if clinic.address and clinic.city %}, {% endif %}{{ clinic.city }}</div>
+                </div>
+              </div>
+              {% endif %}
+
+              {% if clinic.phone or clinic.phone_number %}
+              <a class="rs-side-row rs-side-row--link" href="tel:{{ clinic.phone or clinic.phone_number }}">
+                <i class="fas fa-phone-alt"></i>
+                <div class="rs-side-text">
+                  <div class="rs-side-label">Phone</div>
+                  <div class="rs-side-value">{{ clinic.phone or clinic.phone_number }}</div>
+                </div>
+                <span class="rs-side-chip">Tap to call</span>
+              </a>
+              {% endif %}
+
+              {% if clinic.email %}
+              <a class="rs-side-row rs-side-row--link" href="mailto:{{ clinic.email }}">
+                <i class="fas fa-envelope"></i>
+                <div class="rs-side-text">
+                  <div class="rs-side-label">Email</div>
+                  <div class="rs-side-value">{{ clinic.email }}</div>
+                </div>
+                <span class="rs-side-chip">Send</span>
+              </a>
+              {% endif %}
+
+              {% if clinic.website %}
+              <a class="rs-side-row rs-side-row--link" href="{{ clinic.website }}" target="_blank" rel="noopener">
+                <i class="fas fa-globe"></i>
+                <div class="rs-side-text">
+                  <div class="rs-side-label">Website</div>
+                  <div class="rs-side-value">Visit site</div>
+                </div>
+                <span class="rs-side-chip">Open</span>
+              </a>
+              {% endif %}
+
+              {% set full_address2 = [clinic.address, clinic.city, 'Nepal']|select|join(', ') %}
+              <a class="rs-side-row rs-side-row--cta"
+                 href="https://www.google.com/maps/search/?api=1&query={{ full_address2|urlencode }}"
+                 target="_blank" rel="noopener">
+                <i class="fas fa-map-marked-alt"></i>
+                <div class="rs-side-text">
+                  <div class="rs-side-label">Navigation</div>
+                  <div class="rs-side-value">Open in Google Maps</div>
+                </div>
+                <span class="rs-side-chip rs-side-chip--white">Go</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="rs-side-card rs-side-card--trust">
+            <div class="rs-trust">
+              <div class="rs-trust-item">
+                <div class="rs-trust-dot"><i class="fas fa-check"></i></div>
+                <div>
+                  <div class="rs-trust-h">Verified doctors</div>
+                  <div class="rs-trust-p">Only approved profiles can appear here.</div>
+                </div>
+              </div>
+
+              <div class="rs-trust-item">
+                <div class="rs-trust-dot"><i class="fas fa-clock"></i></div>
+                <div>
+                  <div class="rs-trust-h">Clear schedules</div>
+                  <div class="rs-trust-p">Patients see availability before booking.</div>
+                </div>
+              </div>
+
+              <div class="rs-trust-item">
+                <div class="rs-trust-dot"><i class="fas fa-shield-alt"></i></div>
+                <div>
+                  <div class="rs-trust-h">Clinic-first experience</div>
+                  <div class="rs-trust-p">Designed to look premium and trustworthy.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <!-- DOCTORS -->
+  <section class="rs-section" id="doctors">
+    <div class="container">
+      <div class="rs-section-head">
+        <div>
+          <h2 class="rs-h2"><i class="fas fa-user-md"></i> Our Doctors</h2>
+          <p class="rs-muted">Meet our verified healthcare professionals. Book online when schedules are available.</p>
+        </div>
+        <div class="rs-pill">
+          <i class="fas fa-layer-group"></i>
+          <span>{{ clinic_doctors|length }} listed</span>
+        </div>
+      </div>
+
+      {% if clinic_doctors %}
+      <div class="rs-grid">
+        {% for cd in clinic_doctors %}
+        <article class="rs-card">
+          <div class="rs-card-top">
+            <div class="rs-doc">
+              {% if cd.doctor.photo_url %}
+                {% set photo_path = cd.doctor.photo_url.replace('photos/', '') %}
+                <img src="{{ url_for('serve_photo', filename=photo_path) }}"
+                     alt="{{ cd.doctor.name }}"
+                     class="rs-avatar"
+                     loading="lazy">
+              {% else %}
+                {% set name_parts = cd.doctor.name.replace('Dr. ', '').replace('Dr.', '').split() %}
+                {% set initials = name_parts[0][:1] ~ (name_parts[-1][:1] if name_parts|length > 1 else '') %}
+                <div class="rs-avatar rs-avatar--placeholder" aria-label="{{ cd.doctor.name }}">
+                  {{ initials|upper }}
+                </div>
+              {% endif %}
+
+              <div class="rs-doc-meta">
+                <h3 class="rs-doc-name">
+                  <a href="{{ url_for('doctor_profile', slug=cd.doctor.slug) }}">
+                    {{ cd.doctor.name }}
+                  </a>
+                </h3>
+                <div class="rs-doc-sub">
+                  <span class="rs-spec">
+                    <i class="fas fa-stethoscope"></i>
+                    {{ cd.doctor.specialty.name if cd.doctor.specialty else 'General Physician' }}
+                  </span>
+
+                  {% if cd.role and cd.role != 'consultant' %}
+                  <span class="rs-role">
+                    <i class="fas fa-id-badge"></i> {{ cd.role|title }}
+                  </span>
+                  {% endif %}
+                </div>
+
+                {% if cd.doctor.is_verified %}
+                <div class="rs-verify">
+                  <i class="fas fa-check-circle"></i> Verified doctor
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="rs-card-kv">
+              {% if cd.consultation_fee %}
+              <div class="rs-fee">
+                <div class="rs-fee-label">Consultation</div>
+                <div class="rs-fee-value">NPR {{ cd.consultation_fee }}</div>
+              </div>
+              {% else %}
+              <div class="rs-fee rs-fee--muted">
+                <div class="rs-fee-label">Consultation</div>
+                <div class="rs-fee-value">—</div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          {% set schedules = cd.get_schedules() %}
+          {% if schedules %}
+          <div class="rs-schedule">
+            <div class="rs-schedule-head">
+              <i class="fas fa-clock"></i>
+              <span>Availability</span>
+            </div>
+            <div class="rs-chips">
+              {% set days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] %}
+              {% for s in schedules %}
+              <span class="rs-chip">
+                {{ days[s.day_of_week] }} · {{ s.start_time.strftime('%I:%M %p').lstrip('0') }}
+              </span>
+              {% endfor %}
+            </div>
+          </div>
+          {% else %}
+          <div class="rs-schedule rs-schedule--empty">
+            <div class="rs-schedule-head">
+              <i class="fas fa-clock"></i>
+              <span>Availability</span>
+            </div>
+            <div class="rs-muted-sm">Schedule not published yet.</div>
+          </div>
+          {% endif %}
+
+          <div class="rs-actions">
+            {% if schedules and cd.accepts_online_booking %}
+            <a href="{{ url_for('clinic_book_appointment', clinic_slug=clinic.slug, doctor_id=cd.doctor.id) }}"
+               class="rs-btn rs-btn--primary">
+              <i class="fas fa-calendar-check"></i> Book Appointment
+            </a>
+            {% else %}
+            <a href="{{ url_for('doctor_profile', slug=cd.doctor.slug) }}"
+               class="rs-btn rs-btn--soft">
+              <i class="fas fa-user"></i> View Profile
+            </a>
+            {% endif %}
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="rs-empty">
+        <div class="rs-empty-icon"><i class="fas fa-user-md"></i></div>
+        <h3>No Doctors Listed Yet</h3>
+        <p>This clinic is setting up their doctor profiles. Check back soon.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- LOCATION -->
+  {% if clinic.address or clinic.city %}
+  <section class="rs-section rs-section--tight">
+    <div class="container">
+      <div class="rs-location">
+        <div class="rs-location-left">
+          <h3 class="rs-h3"><i class="fas fa-hospital"></i> Visit Us</h3>
+          <div class="rs-location-body">
+            <div class="rs-lrow">
+              <div class="rs-licon"><i class="fas fa-map-marker-alt"></i></div>
+              <div>
+                <div class="rs-llabel">{{ clinic.name }}</div>
+                <div class="rs-ltext">
+                  {% if clinic.address %}{{ clinic.address }}<br>{% endif %}
+                  {% if clinic.city %}{{ clinic.city }}, Nepal{% endif %}
+                </div>
+              </div>
+            </div>
+
+            {% if clinic.phone or clinic.phone_number %}
+            <div class="rs-lrow">
+              <div class="rs-licon"><i class="fas fa-phone-alt"></i></div>
+              <div>
+                <div class="rs-llabel">Phone</div>
+                <div class="rs-ltext">
+                  <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-link">
+                    {{ clinic.phone or clinic.phone_number }}
+                  </a>
+                </div>
+              </div>
             </div>
             {% endif %}
+          </div>
         </div>
-    </section>
 
-    <!-- Location Section -->
-    {% if clinic.address or clinic.city %}
-    <section class="location-section">
-        <div class="container">
-            <div class="location-card">
-                <div class="location-info">
-                    <h3><i class="fas fa-hospital"></i> Visit Us</h3>
-                    <address>
-                        {{ clinic.name }}<br>
-                        {% if clinic.address %}{{ clinic.address }}<br>{% endif %}
-                        {% if clinic.city %}{{ clinic.city }}, Nepal{% endif %}
-                    </address>
-                    {% if clinic.phone or clinic.phone_number %}
-                    <p class="location-phone">
-                        <i class="fas fa-phone-alt"></i>
-                        <a href="tel:{{ clinic.phone or clinic.phone_number }}">
-                            {{ clinic.phone or clinic.phone_number }}
-                        </a>
-                    </p>
-                    {% endif %}
-                </div>
-                <div class="location-cta">
-                    {% set full_address = [clinic.name, clinic.address, clinic.city, 'Nepal']|select|join(', ') %}
-                    <a href="https://www.google.com/maps/search/?api=1&query={{ full_address|urlencode }}"
-                       target="_blank" rel="noopener"
-                       class="btn btn--outline">
-                        <i class="fas fa-map-marked-alt"></i> Open in Google Maps
-                    </a>
-                </div>
-            </div>
+        <div class="rs-location-right">
+          {% set full_address3 = [clinic.name, clinic.address, clinic.city, 'Nepal']|select|join(', ') %}
+          <a href="https://www.google.com/maps/search/?api=1&query={{ full_address3|urlencode }}"
+             target="_blank" rel="noopener"
+             class="rs-btn rs-btn--outline rs-btn--wide">
+            <i class="fas fa-map-marked-alt"></i> Open in Google Maps
+          </a>
+          <div class="rs-muted-sm rs-center">Tip: patients can save directions for later.</div>
         </div>
-    </section>
-    {% endif %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
 </div>
 
 <style>
-/* Clinic Page - Professional Medical Style */
-.clinic-page {
-    background: #f8fafc;
-    min-height: 100vh;
-}
-
-/* Hero Section */
-.clinic-hero {
-    background: white;
-    padding: 2rem 0 3rem;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #64748b;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.2s;
-}
-
-.back-link:hover {
-    color: var(--brand);
-}
-
-.hero-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 2rem;
-}
-
-.clinic-identity {
-    display: flex;
-    gap: 1.5rem;
-    align-items: flex-start;
-}
-
-.clinic-logo {
-    flex-shrink: 0;
-    width: 100px;
-    height: 100px;
-    border-radius: 16px;
-    overflow: hidden;
-    background: white;
-    border: 2px solid #e2e8f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.clinic-logo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 8px;
-}
-
-.clinic-logo--placeholder {
-    background: linear-gradient(135deg, var(--brand) 0%, #0d9488 100%);
-    border: none;
-}
-
-.clinic-logo--placeholder span {
-    color: white;
-    font-size: 2rem;
-    font-weight: 700;
-}
-
-.clinic-badges {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.badge--type {
-    background: #f1f5f9;
-    color: #475569;
-}
-
-.badge--verified {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.clinic-name {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin: 0 0 0.5rem;
-    line-height: 1.2;
-}
-
-.clinic-tagline {
-    color: #64748b;
-    font-size: 1rem;
-    margin: 0;
-    max-width: 500px;
-    line-height: 1.5;
-}
-
-.clinic-stats {
-    text-align: center;
-    padding: 1rem 2rem;
-    background: var(--brand-soft);
-    border-radius: 12px;
-}
-
-.stat-value {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--brand);
-    line-height: 1;
-}
-
-.stat-label {
-    font-size: 0.875rem;
-    color: #64748b;
-    margin-top: 0.25rem;
-}
-
-/* Contact Bar */
-.contact-bar {
-    background: white;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 1rem 0;
-}
-
-.contact-items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    align-items: center;
-}
-
-.contact-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #475569;
-    font-size: 0.9rem;
-    text-decoration: none;
-}
-
-.contact-item i {
-    color: var(--brand);
-    width: 16px;
-    text-align: center;
-}
-
-.contact-item--link:hover {
-    color: var(--brand);
-}
-
-.contact-item--cta {
-    margin-left: auto;
-    background: var(--brand);
-    color: white !important;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: background 0.2s;
-}
-
-.contact-item--cta i {
-    color: white;
-}
-
-.contact-item--cta:hover {
-    background: #0d9488;
-    color: white !important;
-}
-
-/* Doctors Section */
-.doctors-section {
-    padding: 3rem 0;
-}
-
-.section-header {
-    margin-bottom: 2rem;
-}
-
-.section-header h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin: 0 0 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.section-header h2 i {
-    color: var(--brand);
-}
-
-.section-subtitle {
-    color: #64748b;
-    margin: 0;
-}
-
-.doctors-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 1.5rem;
-}
-
-/* Doctor Card */
-.doctor-card {
-    background: white;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    padding: 1.5rem;
-    transition: box-shadow 0.2s, transform 0.2s;
-}
-
-.doctor-card:hover {
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
-}
-
-.doctor-card__header {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.doctor-card__photo {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.doctor-card__photo--placeholder {
-    background: linear-gradient(135deg, var(--brand-soft) 0%, #e0f2f1 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--brand);
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-.doctor-card__identity {
-    flex: 1;
-    min-width: 0;
-}
-
-.doctor-card__name {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0 0 0.25rem;
-    line-height: 1.3;
-}
-
-.doctor-card__name a {
-    color: #1e293b;
-    text-decoration: none;
-}
-
-.doctor-card__name a:hover {
-    color: var(--brand);
-}
-
-.doctor-card__specialty {
-    color: #64748b;
-    font-size: 0.9rem;
-    margin: 0 0 0.25rem;
-}
-
-.doctor-card__verified {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: #16a34a;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.doctor-card__details {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-top: 1px solid #f1f5f9;
-    border-bottom: 1px solid #f1f5f9;
-    margin-bottom: 1rem;
-}
-
-.doctor-card__fee {
-    display: flex;
-    flex-direction: column;
-}
-
-.fee-label {
-    font-size: 0.75rem;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.fee-value {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.doctor-card__role {
-    font-size: 0.85rem;
-    color: #64748b;
-}
-
-.doctor-card__schedule {
-    margin-bottom: 1rem;
-}
-
-.schedule-label {
-    font-size: 0.8rem;
-    color: #64748b;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.schedule-days {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-}
-
-.schedule-day {
-    background: #f8fafc;
-    color: #475569;
-    padding: 0.25rem 0.6rem;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    border: 1px solid #e2e8f0;
-}
-
-.doctor-card__actions {
-    margin-top: auto;
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 0.75rem 1.25rem;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.2s;
-    border: none;
-    cursor: pointer;
-}
-
-.btn--primary {
-    background: var(--brand);
-    color: white;
-}
-
-.btn--primary:hover {
-    background: #0d9488;
-    color: white;
-}
-
-.btn--secondary {
-    background: #f1f5f9;
-    color: #475569;
-}
-
-.btn--secondary:hover {
-    background: #e2e8f0;
-    color: #1e293b;
-}
-
-.btn--outline {
-    background: transparent;
-    color: var(--brand);
-    border: 2px solid var(--brand);
-}
-
-.btn--outline:hover {
-    background: var(--brand);
-    color: white;
-}
-
-/* Empty State */
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: white;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-}
-
-.empty-state__icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 1.5rem;
-    background: var(--brand-soft);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.empty-state__icon i {
-    font-size: 2rem;
-    color: var(--brand);
-}
-
-.empty-state h3 {
-    color: #1e293b;
-    margin: 0 0 0.5rem;
-}
-
-.empty-state p {
-    color: #64748b;
-    margin: 0;
-}
-
-/* Location Section */
-.location-section {
-    padding: 0 0 3rem;
-}
-
-.location-card {
-    background: white;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    padding: 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
-}
-
-.location-info h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #1e293b;
-    margin: 0 0 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.location-info h3 i {
-    color: var(--brand);
-}
-
-.location-info address {
-    font-style: normal;
-    color: #475569;
-    line-height: 1.6;
-    margin-bottom: 0.75rem;
-}
-
-.location-phone {
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.location-phone i {
-    color: var(--brand);
-}
-
-.location-phone a {
-    color: #1e293b;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.location-phone a:hover {
-    color: var(--brand);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .hero-content {
-        flex-direction: column;
-    }
-
-    .clinic-identity {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .clinic-tagline {
-        max-width: 100%;
-    }
-
-    .clinic-stats {
-        width: 100%;
-    }
-
-    .contact-items {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-
-    .contact-item--cta {
-        margin-left: 0;
-        width: 100%;
-        justify-content: center;
-    }
-
-    .doctors-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .location-card {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .location-info h3 {
-        justify-content: center;
-    }
-
-    .location-phone {
-        justify-content: center;
-    }
+/* =========================================
+   RankSewa Clinic Portal (Premium)
+   - Drop-in replacement: same data/links/logic
+   - Uses existing CSS vars: --brand, --brand-soft
+========================================= */
+
+.rs-clinic{
+  background:
+    radial-gradient(900px 450px at 20% -10%, rgba(20,184,166,.18), transparent 55%),
+    radial-gradient(700px 420px at 85% 10%, rgba(59,130,246,.14), transparent 52%),
+    linear-gradient(180deg, #f8fafc 0%, #f8fafc 35%, #f1f5f9 100%);
+  min-height: 100vh;
+}
+
+/* HERO */
+.rs-hero{
+  padding: 1.5rem 0 2.5rem;
+}
+.rs-breadcrumb{ margin-bottom: 1rem; }
+.rs-back{
+  display:inline-flex; align-items:center; gap:.5rem;
+  color:#64748b; text-decoration:none; font-weight:600;
+  padding:.5rem .75rem; border-radius:999px;
+  background: rgba(255,255,255,.7);
+  border: 1px solid rgba(226,232,240,.9);
+  backdrop-filter: blur(10px);
+  transition: all .2s ease;
+}
+.rs-back:hover{ color: var(--brand); transform: translateY(-1px); box-shadow: 0 10px 25px rgba(15,23,42,.08); }
+
+.rs-hero-grid{
+  display:grid;
+  grid-template-columns: 1.6fr .9fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.rs-hero-card{
+  background: rgba(255,255,255,.85);
+  border: 1px solid rgba(226,232,240,.9);
+  border-radius: 20px;
+  box-shadow: 0 25px 60px rgba(15,23,42,.10);
+  overflow:hidden;
+  position:relative;
+}
+.rs-hero-card:before{
+  content:"";
+  position:absolute; inset:-2px;
+  background: linear-gradient(120deg, rgba(20,184,166,.30), rgba(59,130,246,.18), rgba(34,197,94,.18));
+  filter: blur(18px);
+  opacity:.6;
+  z-index:0;
+}
+.rs-hero-card > *{ position:relative; z-index:1; }
+
+.rs-hero-top{
+  padding: 1.5rem 1.5rem 1.25rem;
+  display:flex;
+  gap: 1.25rem;
+  align-items:flex-start;
+}
+
+.rs-logo{
+  width: 96px; height: 96px; border-radius: 18px;
+  background: white;
+  border: 1px solid rgba(226,232,240,.95);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  box-shadow: 0 12px 30px rgba(15,23,42,.10);
+  flex-shrink: 0;
+}
+.rs-logo img{ width:100%; height:100%; object-fit: contain; padding: 10px; }
+.rs-logo--placeholder{
+  background: linear-gradient(135deg, var(--brand) 0%, #0ea5e9 100%);
+  border: none;
+}
+.rs-logo--placeholder span{
+  color: #fff; font-size: 2rem; font-weight: 800; letter-spacing:.5px;
+}
+
+.rs-hero-meta{ min-width:0; flex:1; }
+.rs-badges{ display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:.6rem; }
+.rs-badge{
+  display:inline-flex; align-items:center; gap:.4rem;
+  padding: .35rem .7rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .35px;
+  text-transform: uppercase;
+  border: 1px solid rgba(226,232,240,.9);
+  background: rgba(248,250,252,.9);
+  color: #334155;
+}
+.rs-badge--verified{
+  background: rgba(220,252,231,.9);
+  border-color: rgba(134,239,172,.65);
+  color: #166534;
+}
+.rs-title{
+  margin:0 0 .5rem;
+  font-size: clamp(1.5rem, 2.4vw, 2.2rem);
+  line-height:1.15;
+  font-weight: 900;
+  color:#0f172a;
+  letter-spacing: -.3px;
+}
+.rs-subtitle{
+  margin:0 0 .75rem;
+  color:#475569;
+  font-size: 1rem;
+  line-height: 1.55;
+  max-width: 56ch;
+}
+.rs-mini{
+  display:flex; flex-wrap:wrap; gap:.75rem 1rem;
+  margin-top:.25rem;
+}
+.rs-mini-item{
+  display:inline-flex; align-items:center; gap:.5rem;
+  color:#475569; font-weight:600; font-size:.9rem;
+}
+.rs-mini-item i{ color: var(--brand); width: 16px; text-align:center; }
+
+.rs-hero-bottom{
+  border-top: 1px solid rgba(226,232,240,.9);
+  padding: 1.1rem 1.5rem 1.4rem;
+  display:flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items:center;
+  background: rgba(255,255,255,.6);
+}
+
+.rs-kpis{ display:flex; gap:.75rem; flex-wrap:wrap; }
+.rs-kpi{
+  display:flex; gap:.75rem; align-items:center;
+  padding: .75rem .9rem;
+  border-radius: 16px;
+  background: rgba(248,250,252,.9);
+  border: 1px solid rgba(226,232,240,.9);
+}
+.rs-kpi--soft{
+  background: rgba(236,254,255,.9);
+  border-color: rgba(165,243,252,.8);
+}
+.rs-kpi-icon{
+  width: 40px; height: 40px; border-radius: 14px;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.rs-kpi-value{ font-size: 1.15rem; font-weight: 900; color:#0f172a; line-height:1; }
+.rs-kpi-label{ font-size: .8rem; color:#64748b; font-weight:700; margin-top:.15rem; }
+
+.rs-hero-actions{
+  display:flex; gap:.65rem;
+  align-items:center;
+}
+.rs-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.55rem;
+  padding:.75rem 1rem;
+  border-radius: 14px;
+  font-weight: 800;
+  text-decoration:none;
+  border: 1px solid rgba(226,232,240,.9);
+  transition: all .2s ease;
+  white-space: nowrap;
+}
+.rs-btn:focus{ outline: 3px solid rgba(20,184,166,.25); outline-offset: 2px; }
+.rs-btn--primary{
+  background: linear-gradient(135deg, var(--brand) 0%, #0ea5e9 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 14px 35px rgba(20,184,166,.22);
+}
+.rs-btn--primary:hover{ transform: translateY(-1px); box-shadow: 0 22px 48px rgba(20,184,166,.28); color:#fff; }
+.rs-btn--outline{
+  background: rgba(255,255,255,.9);
+  color: #0f172a;
+}
+.rs-btn--outline:hover{ transform: translateY(-1px); box-shadow: 0 14px 35px rgba(15,23,42,.10); color:#0f172a; }
+.rs-btn--soft{
+  width: 100%;
+  background: rgba(241,245,249,.95);
+  color:#334155;
+}
+.rs-btn--soft:hover{ background: rgba(226,232,240,.95); color:#0f172a; transform: translateY(-1px); }
+.rs-btn--wide{ width: 100%; }
+
+.rs-side{ display:flex; flex-direction:column; gap: 1.25rem; }
+.rs-side-card{
+  background: rgba(255,255,255,.85);
+  border: 1px solid rgba(226,232,240,.9);
+  border-radius: 20px;
+  box-shadow: 0 20px 55px rgba(15,23,42,.08);
+  overflow:hidden;
+}
+.rs-side-title{
+  display:flex; gap:.9rem; align-items:center;
+  padding: 1.25rem 1.25rem 1rem;
+  border-bottom: 1px solid rgba(226,232,240,.9);
+  background: rgba(248,250,252,.8);
+}
+.rs-side-icon{
+  width: 44px; height: 44px; border-radius: 16px;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.rs-side-h{ font-weight: 900; color:#0f172a; line-height:1.1; }
+.rs-side-sub{ color:#64748b; font-size:.85rem; font-weight:700; margin-top:.15rem; }
+
+.rs-side-list{ padding: 1rem 1.25rem 1.25rem; display:flex; flex-direction:column; gap:.75rem; }
+.rs-side-row{
+  display:flex; gap:.75rem; align-items:flex-start;
+  padding: .85rem .9rem;
+  border-radius: 16px;
+  border: 1px solid rgba(226,232,240,.9);
+  background: rgba(255,255,255,.8);
+  text-decoration:none;
+  color: inherit;
+  position:relative;
+}
+.rs-side-row i{ color: var(--brand); width: 18px; text-align:center; margin-top:.2rem; }
+.rs-side-row--link:hover{ transform: translateY(-1px); box-shadow: 0 14px 35px rgba(15,23,42,.10); }
+.rs-side-row--cta{
+  background: linear-gradient(135deg, var(--brand) 0%, #0ea5e9 100%);
+  border: none;
+  color: #fff;
+}
+.rs-side-row--cta i{ color:#fff; }
+.rs-side-text{ flex:1; min-width:0; }
+.rs-side-label{ font-size:.78rem; color:#64748b; font-weight:900; text-transform:uppercase; letter-spacing:.35px; }
+.rs-side-row--cta .rs-side-label{ color: rgba(255,255,255,.8); }
+.rs-side-value{ color:#0f172a; font-weight:800; margin-top:.15rem; word-break: break-word; }
+.rs-side-row--cta .rs-side-value{ color:#fff; }
+.rs-side-chip{
+  flex-shrink:0;
+  align-self:center;
+  font-size:.75rem;
+  font-weight:900;
+  padding:.25rem .55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(226,232,240,.9);
+  background: rgba(248,250,252,.9);
+  color:#334155;
+}
+.rs-side-chip--white{
+  border-color: rgba(255,255,255,.35);
+  background: rgba(255,255,255,.18);
+  color: #fff;
+}
+
+.rs-side-card--trust{
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+.rs-trust{ display:flex; flex-direction:column; gap: .9rem; }
+.rs-trust-item{ display:flex; gap:.75rem; align-items:flex-start; }
+.rs-trust-dot{
+  width: 34px; height: 34px; border-radius: 14px;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(220,252,231,.9);
+  color: #166534;
+  border: 1px solid rgba(134,239,172,.65);
+  flex-shrink:0;
+}
+.rs-trust-h{ font-weight: 900; color:#0f172a; line-height:1.2; }
+.rs-trust-p{ color:#64748b; font-weight:700; font-size:.88rem; margin-top:.15rem; }
+
+/* SECTION */
+.rs-section{ padding: 2.25rem 0 2.75rem; }
+.rs-section--tight{ padding: 0 0 2.75rem; }
+
+.rs-section-head{
+  display:flex; justify-content:space-between; gap:1rem; align-items:flex-end;
+  margin-bottom: 1.25rem;
+}
+.rs-h2{
+  margin:0 0 .35rem;
+  font-size: 1.55rem;
+  font-weight: 950;
+  color:#0f172a;
+  letter-spacing:-.2px;
+  display:flex; align-items:center; gap:.65rem;
+}
+.rs-h2 i{ color: var(--brand); }
+.rs-muted{ margin:0; color:#64748b; font-weight:700; }
+.rs-muted-sm{ color:#64748b; font-weight:700; font-size:.88rem; }
+.rs-center{ text-align:center; }
+
+.rs-pill{
+  display:inline-flex; align-items:center; gap:.5rem;
+  padding:.5rem .75rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,.85);
+  border: 1px solid rgba(226,232,240,.9);
+  color:#334155;
+  font-weight:900;
+}
+
+/* DOCTOR GRID + CARD */
+.rs-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.1rem;
+}
+
+.rs-card{
+  background: rgba(255,255,255,.88);
+  border: 1px solid rgba(226,232,240,.9);
+  border-radius: 20px;
+  box-shadow: 0 18px 50px rgba(15,23,42,.08);
+  overflow:hidden;
+  transition: transform .2s ease, box-shadow .2s ease;
+  display:flex;
+  flex-direction:column;
+}
+.rs-card:hover{ transform: translateY(-2px); box-shadow: 0 26px 70px rgba(15,23,42,.12); }
+
+.rs-card-top{
+  padding: 1.2rem 1.2rem .9rem;
+  display:flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items:flex-start;
+}
+.rs-doc{ display:flex; gap: .9rem; align-items:flex-start; min-width:0; }
+.rs-avatar{
+  width: 72px; height:72px; border-radius: 18px;
+  object-fit: cover;
+  border: 1px solid rgba(226,232,240,.9);
+  box-shadow: 0 10px 28px rgba(15,23,42,.10);
+  flex-shrink:0;
+  background:#fff;
+}
+.rs-avatar--placeholder{
+  display:flex; align-items:center; justify-content:center;
+  font-weight: 950;
+  color: var(--brand);
+  background: linear-gradient(135deg, rgba(20,184,166,.16) 0%, rgba(59,130,246,.10) 100%);
+}
+
+.rs-doc-meta{ min-width:0; }
+.rs-doc-name{
+  margin:0 0 .25rem;
+  font-size: 1.05rem;
+  font-weight: 950;
+  line-height: 1.25;
+}
+.rs-doc-name a{ color:#0f172a; text-decoration:none; }
+.rs-doc-name a:hover{ color: var(--brand); }
+.rs-doc-sub{ display:flex; flex-wrap:wrap; gap:.45rem .75rem; }
+.rs-spec, .rs-role{
+  display:inline-flex; align-items:center; gap:.4rem;
+  font-weight: 800;
+  color:#475569;
+  font-size:.88rem;
+}
+.rs-spec i, .rs-role i{ color: var(--brand); }
+
+.rs-verify{
+  margin-top:.45rem;
+  display:inline-flex; align-items:center; gap:.4rem;
+  font-weight: 950;
+  font-size:.82rem;
+  color:#166534;
+  background: rgba(220,252,231,.85);
+  border: 1px solid rgba(134,239,172,.65);
+  padding: .25rem .55rem;
+  border-radius: 999px;
+}
+.rs-card-kv{ flex-shrink:0; }
+.rs-fee{
+  min-width: 140px;
+  text-align:right;
+  padding: .6rem .75rem;
+  border-radius: 16px;
+  border: 1px solid rgba(226,232,240,.9);
+  background: rgba(248,250,252,.9);
+}
+.rs-fee--muted{ opacity:.85; }
+.rs-fee-label{
+  font-size:.72rem;
+  font-weight: 950;
+  letter-spacing:.35px;
+  text-transform: uppercase;
+  color:#64748b;
+}
+.rs-fee-value{
+  margin-top:.15rem;
+  font-weight: 950;
+  color:#0f172a;
+  font-size: 1.05rem;
+}
+
+/* SCHEDULE */
+.rs-schedule{
+  padding: .95rem 1.2rem 1.05rem;
+  border-top: 1px solid rgba(226,232,240,.9);
+  background: rgba(255,255,255,.75);
+}
+.rs-schedule--empty{ background: rgba(248,250,252,.7); }
+.rs-schedule-head{
+  display:flex; align-items:center; gap:.5rem;
+  font-weight: 950;
+  color:#334155;
+  margin-bottom:.55rem;
+}
+.rs-schedule-head i{ color: var(--brand); }
+.rs-chips{ display:flex; flex-wrap:wrap; gap:.45rem; }
+.rs-chip{
+  display:inline-flex; align-items:center;
+  padding:.3rem .6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(226,232,240,.9);
+  background: rgba(248,250,252,.95);
+  color:#334155;
+  font-weight: 900;
+  font-size:.82rem;
+}
+
+/* ACTIONS */
+.rs-actions{
+  padding: 1rem 1.2rem 1.2rem;
+  background: rgba(255,255,255,.85);
+  border-top: 1px solid rgba(226,232,240,.9);
+}
+.rs-actions .rs-btn{ width:100%; }
+.rs-actions .rs-btn--primary{
+  box-shadow: 0 16px 40px rgba(20,184,166,.22);
+}
+.rs-actions .rs-btn--primary:hover{ box-shadow: 0 24px 55px rgba(20,184,166,.28); }
+
+/* EMPTY */
+.rs-empty{
+  text-align:center;
+  padding: 3.5rem 2rem;
+  background: rgba(255,255,255,.88);
+  border: 1px solid rgba(226,232,240,.9);
+  border-radius: 20px;
+  box-shadow: 0 18px 50px rgba(15,23,42,.08);
+}
+.rs-empty-icon{
+  width: 78px; height: 78px;
+  margin: 0 auto 1.25rem;
+  border-radius: 26px;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--brand-soft);
+  color: var(--brand);
+  box-shadow: 0 16px 40px rgba(15,23,42,.10);
+}
+.rs-empty-icon i{ font-size: 1.9rem; }
+
+/* LOCATION */
+.rs-location{
+  background: rgba(255,255,255,.88);
+  border: 1px solid rgba(226,232,240,.9);
+  border-radius: 20px;
+  box-shadow: 0 20px 55px rgba(15,23,42,.08);
+  padding: 1.5rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 1.25rem;
+}
+.rs-h3{
+  margin:0 0 1rem;
+  font-size: 1.15rem;
+  font-weight: 950;
+  color:#0f172a;
+  display:flex; align-items:center; gap:.55rem;
+}
+.rs-h3 i{ color: var(--brand); }
+.rs-location-body{ display:flex; flex-direction:column; gap:.9rem; }
+.rs-lrow{ display:flex; gap:.75rem; align-items:flex-start; }
+.rs-licon{
+  width: 40px; height:40px; border-radius: 16px;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(248,250,252,.95);
+  border: 1px solid rgba(226,232,240,.9);
+  color: var(--brand);
+  flex-shrink:0;
+}
+.rs-llabel{ font-weight: 950; color:#0f172a; }
+.rs-ltext{ color:#475569; font-weight: 800; line-height:1.55; }
+.rs-link{ color:#0f172a; text-decoration:none; font-weight: 950; }
+.rs-link:hover{ color: var(--brand); }
+.rs-location-right{ min-width: 260px; display:flex; flex-direction:column; gap:.6rem; }
+
+/* MOBILE */
+@media (max-width: 992px){
+  .rs-hero-grid{ grid-template-columns: 1fr; }
+  .rs-location-right{ min-width: 0; width:100%; }
+}
+
+@media (max-width: 768px){
+  .rs-hero-top{ flex-direction: column; align-items: center; text-align:center; }
+  .rs-hero-actions{ width:100%; flex-direction: column; }
+  .rs-hero-actions .rs-btn{ width:100%; }
+  .rs-kpis{ width:100%; justify-content:center; }
+  .rs-hero-bottom{ flex-direction: column; align-items: stretch; }
+  .rs-fee{ min-width: 0; text-align:left; width:100%; }
+  .rs-card-top{ flex-direction: column; }
+  .rs-card-kv{ width:100%; }
+  .rs-grid{ grid-template-columns: 1fr; }
+  .rs-location{ flex-direction: column; text-align:left; }
 }
 </style>
 {% endblock %}
