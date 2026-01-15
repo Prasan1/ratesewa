@@ -131,8 +131,7 @@ def seed_general_checkup_article():
         )
 
         meta_description = (
-            "Complete guide to health checkups in Nepal: what to expect, costs, and how to find "
-            "a verified General Physician. Annual checkup packages and when to see a doctor."
+            "Guide to health checkups in Nepal: costs, what to expect, and how to find a verified General Physician near you."
         )
 
         meta_keywords = (
