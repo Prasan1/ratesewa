@@ -99,21 +99,19 @@
 
             <div class="rs-hero-actions">
               {% set full_address = [clinic.name, clinic.address, clinic.city, 'Nepal']|select|join(', ') %}
-              <a href="https://www.google.com/maps/search/?api=1&query={{ full_address|urlencode }}"
-                 target="_blank" rel="noopener"
-                 class="rs-btn rs-btn--outline">
-                <i class="fas fa-directions"></i> Directions
-              </a>
-
-              {% if clinic.phone or clinic.phone_number %}
-              <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--primary">
-                <i class="fas fa-phone-alt"></i> Call Clinic
-              </a>
-              {% else %}
               <a href="#doctors" class="rs-btn rs-btn--primary">
                 <i class="fas fa-calendar-check"></i> Book an Appointment
               </a>
+              {% if clinic.phone or clinic.phone_number %}
+              <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--outline">
+                <i class="fas fa-phone-alt"></i> Call Clinic
+              </a>
               {% endif %}
+              <a href="https://www.google.com/maps/search/?api=1&query={{ full_address|urlencode }}"
+                 target="_blank" rel="noopener"
+                 class="rs-btn rs-btn--ghost">
+                <i class="fas fa-directions"></i> Directions
+              </a>
             </div>
           </div>
         </div>
@@ -227,21 +225,21 @@
           <div class="rs-value-icon"><i class="fas fa-calendar-check"></i></div>
           <div>
             <div class="rs-value-h">Instant booking</div>
-            <div class="rs-value-p">Patients book with published schedules.</div>
+            <div class="rs-value-p">Patients pick verified slots instantly.</div>
           </div>
         </div>
         <div class="rs-value-item">
           <div class="rs-value-icon"><i class="fas fa-user-shield"></i></div>
           <div>
-            <div class="rs-value-h">Verified doctors</div>
-            <div class="rs-value-p">Only approved profiles are listed.</div>
+            <div class="rs-value-h">Clinic-first listing</div>
+            <div class="rs-value-p">Managed by your clinic team.</div>
           </div>
         </div>
         <div class="rs-value-item">
           <div class="rs-value-icon"><i class="fas fa-headset"></i></div>
           <div>
-            <div class="rs-value-h">Clinic-first support</div>
-            <div class="rs-value-p">Built for front desks and patients.</div>
+            <div class="rs-value-h">RankSewa booking</div>
+            <div class="rs-value-p">Premium experience for your patients.</div>
           </div>
         </div>
       </div>
@@ -426,14 +424,13 @@
   {% endif %}
 </div>
 
-<div class="rs-sticky-cta">
-  {% if clinic.phone or clinic.phone_number %}
-  <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--primary">
-    <i class="fas fa-phone-alt"></i> Call Clinic
-  </a>
-  {% else %}
+<div class="rs-sticky-cta" aria-hidden="true">
   <a href="#doctors" class="rs-btn rs-btn--primary">
     <i class="fas fa-calendar-check"></i> Book Appointment
+  </a>
+  {% if clinic.phone or clinic.phone_number %}
+  <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--outline">
+    <i class="fas fa-phone-alt"></i> Call Clinic
   </a>
   {% endif %}
 </div>
@@ -654,6 +651,16 @@
   color: #0f172a;
 }
 .rs-btn--outline:hover{ transform: translateY(-1px); box-shadow: 0 14px 35px rgba(15,23,42,.10); color:#0f172a; }
+.rs-btn--ghost{
+  background: transparent;
+  color:#64748b;
+  border: 1px dashed rgba(226,232,240,.9);
+}
+.rs-btn--ghost:hover{
+  color:#0f172a;
+  border-color: rgba(15,23,42,.18);
+  transform: translateY(-1px);
+}
 .rs-btn--soft{
   width: 100%;
   background: rgba(241,245,249,.95);
@@ -818,32 +825,36 @@
 /* DOCTOR GRID + CARD */
 .rs-grid{
   display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 1.1rem;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1.2rem;
 }
 
 .rs-card{
-  background: rgba(255,255,255,.88);
+  background: #fff;
   border: 1px solid rgba(226,232,240,.9);
   border-radius: 20px;
-  box-shadow: 0 18px 50px rgba(15,23,42,.08);
+  box-shadow: 0 18px 45px rgba(15,23,42,.08);
   overflow:hidden;
   transition: transform .2s ease, box-shadow .2s ease;
   display:flex;
   flex-direction:column;
 }
-.rs-card:hover{ transform: translateY(-2px); box-shadow: 0 26px 70px rgba(15,23,42,.12); }
+.rs-card:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 28px 70px rgba(15,23,42,.12);
+  border-color: rgba(20,184,166,.5);
+}
 
 .rs-card-top{
-  padding: 1.2rem 1.2rem .9rem;
+  padding: 1.35rem 1.35rem 1rem;
   display:flex;
   gap: 1rem;
   justify-content: space-between;
-  align-items:flex-start;
+  align-items:center;
 }
-.rs-doc{ display:flex; gap: .9rem; align-items:flex-start; min-width:0; }
+.rs-doc{ display:flex; gap: 1rem; align-items:center; min-width:0; }
 .rs-avatar{
-  width: 72px; height:72px; border-radius: 18px;
+  width: 104px; height:104px; border-radius: 0;
   object-fit: cover;
   border: 1px solid rgba(226,232,240,.9);
   box-shadow: 0 10px 28px rgba(15,23,42,.10);
@@ -857,9 +868,14 @@
   background: linear-gradient(135deg, rgba(20,184,166,.16) 0%, rgba(59,130,246,.10) 100%);
 }
 
-.rs-doc-meta{ min-width:0; }
+.rs-doc-meta{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:.35rem;
+}
 .rs-doc-name{
-  margin:0 0 .25rem;
+  margin:0;
   font-size: 1.05rem;
   font-weight: 950;
   line-height: 1.25;
@@ -876,28 +892,28 @@
 .rs-spec i, .rs-role i{ color: var(--brand); }
 
 .rs-verify{
-  margin-top:.45rem;
+  margin-top:.15rem;
   display:inline-flex; align-items:center; gap:.4rem;
-  font-weight: 950;
-  font-size:.82rem;
-  color:#166534;
-  background: rgba(220,252,231,.85);
-  border: 1px solid rgba(134,239,172,.65);
-  padding: .25rem .55rem;
-  border-radius: 999px;
+  font-weight: 900;
+  font-size:.72rem;
+  color:#047857;
+  background: #ecfdf5;
+  border: 1px solid #d1fae5;
+  padding: .2rem .45rem;
+  border-radius: 6px;
 }
-.rs-card-kv{ flex-shrink:0; }
+.rs-card-kv{ flex-shrink:0; align-self:center; }
 .rs-fee{
-  min-width: 140px;
-  text-align:right;
-  padding: .6rem .75rem;
-  border-radius: 16px;
+  min-width: 110px;
+  text-align:center;
+  padding: .55rem .7rem;
+  border-radius: 12px;
   border: 1px solid rgba(226,232,240,.9);
-  background: rgba(248,250,252,.9);
+  background: #f8fafc;
 }
 .rs-fee--muted{ opacity:.85; }
 .rs-fee-label{
-  font-size:.72rem;
+  font-size:.65rem;
   font-weight: 950;
   letter-spacing:.35px;
   text-transform: uppercase;
@@ -907,21 +923,24 @@
   margin-top:.15rem;
   font-weight: 950;
   color:#0f172a;
-  font-size: 1.05rem;
+  font-size: .98rem;
 }
 
 /* SCHEDULE */
 .rs-schedule{
-  padding: .95rem 1.2rem 1.05rem;
-  border-top: 1px solid rgba(226,232,240,.9);
-  background: rgba(255,255,255,.75);
+  padding: 1rem 1.35rem 0;
+  border-top: 1px dashed rgba(226,232,240,.9);
+  background: transparent;
 }
-.rs-schedule--empty{ background: rgba(248,250,252,.7); }
+.rs-schedule--empty{ background: transparent; }
 .rs-schedule-head{
   display:flex; align-items:center; gap:.5rem;
-  font-weight: 950;
-  color:#334155;
-  margin-bottom:.55rem;
+  font-weight: 900;
+  color:#64748b;
+  margin-bottom:.5rem;
+  font-size:.72rem;
+  letter-spacing:.35px;
+  text-transform: uppercase;
 }
 .rs-schedule-head i{ color: var(--brand); }
 .rs-chips{ display:flex; flex-wrap:wrap; gap:.45rem; }
@@ -935,12 +954,19 @@
   font-weight: 900;
   font-size:.82rem;
 }
+.rs-chip.is-hidden{ display:none; }
+.rs-chip-toggle{
+  background: #fff;
+  border-style: dashed;
+  color:#64748b;
+  cursor: pointer;
+}
 
 /* ACTIONS */
 .rs-actions{
-  padding: 1rem 1.2rem 1.2rem;
-  background: rgba(255,255,255,.85);
-  border-top: 1px solid rgba(226,232,240,.9);
+  padding: 1.1rem 1.35rem 1.35rem;
+  background: transparent;
+  border-top: none;
 }
 .rs-actions .rs-btn{ width:100%; }
 .rs-actions .rs-btn--primary{
@@ -1017,8 +1043,14 @@
   box-shadow: 0 -12px 35px rgba(15,23,42,.08);
   display:none;
   z-index: 50;
+  gap: .5rem;
+  flex-direction: column;
 }
 .rs-sticky-cta .rs-btn{ width:100%; }
+.rs-sticky-cta.is-hidden{
+  transform: translateY(120%);
+  transition: transform .25s ease;
+}
 
 /* MOBILE */
 @media (max-width: 992px){
@@ -1037,10 +1069,14 @@
   .rs-kpis{ width:100%; justify-content:center; }
   .rs-hero-bottom{ flex-direction: column; align-items: stretch; }
   .rs-fee{ min-width: 0; text-align:left; width:100%; }
-  .rs-card-top{ flex-direction: column; }
-  .rs-card-kv{ width:100%; }
+  .rs-card-top{ flex-direction: column; align-items:flex-start; }
+  .rs-doc{ width:100%; }
+  .rs-card-kv{ width:100%; order: 3; }
+  .rs-fee{ text-align:left; }
   .rs-grid{ grid-template-columns: 1fr; }
   .rs-location{ flex-direction: column; text-align:left; }
+  .rs-location-left, .rs-location-right{ width:100%; }
+  .rs-location-right{ align-items:flex-start; text-align:left; }
   .rs-sticky-cta{ display:block; }
   body{ padding-bottom: 90px; }
 }
@@ -1071,6 +1107,62 @@
         toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
         toggle.textContent = expanded ? "Show less" : "Read more";
       });
+    });
+
+    const collapseScheduleChips = () => {
+      const isMobile = window.matchMedia("(max-width: 768px)").matches;
+      document.querySelectorAll(".rs-chips").forEach((chips) => {
+        const items = Array.from(chips.querySelectorAll(".rs-chip"));
+        const existingToggle = chips.querySelector(".rs-chip-toggle");
+        items.forEach((item) => item.classList.remove("is-hidden"));
+        if (existingToggle) existingToggle.remove();
+        if (!isMobile || items.length <= 3) return;
+
+        items.slice(3).forEach((item) => item.classList.add("is-hidden"));
+        const toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = "rs-chip rs-chip-toggle";
+        toggle.textContent = `+${items.length - 3} more`;
+        toggle.addEventListener("click", () => {
+          const expanded = toggle.getAttribute("data-expanded") === "true";
+          if (expanded) {
+            items.slice(3).forEach((item) => item.classList.add("is-hidden"));
+            toggle.textContent = `+${items.length - 3} more`;
+            toggle.setAttribute("data-expanded", "false");
+          } else {
+            items.slice(3).forEach((item) => item.classList.remove("is-hidden"));
+            toggle.textContent = "Show less";
+            toggle.setAttribute("data-expanded", "true");
+          }
+        });
+        chips.appendChild(toggle);
+      });
+    };
+
+    const stickyCta = document.querySelector(".rs-sticky-cta");
+    const doctorsSection = document.querySelector("#doctors");
+    if (stickyCta && doctorsSection) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              stickyCta.classList.add("is-hidden");
+              stickyCta.setAttribute("aria-hidden", "true");
+            } else {
+              stickyCta.classList.remove("is-hidden");
+              stickyCta.setAttribute("aria-hidden", "false");
+            }
+          });
+        },
+        { root: null, threshold: 0.2 }
+      );
+      observer.observe(doctorsSection);
+    }
+
+    collapseScheduleChips();
+    window.addEventListener("resize", () => {
+      clearTimeout(window.__rsResizeTimer);
+      window.__rsResizeTimer = setTimeout(collapseScheduleChips, 150);
     });
   });
 </script>
