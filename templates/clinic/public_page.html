@@ -48,13 +48,18 @@
 
               <h1 class="rs-title">{{ clinic.name }}</h1>
 
-              {% if clinic.description %}
-                <p class="rs-subtitle">{{ clinic.description }}</p>
-              {% else %}
-                <p class="rs-subtitle">
-                  A modern clinic page powered by RankSewa — verified doctors, transparent schedules, and online booking.
-                </p>
-              {% endif %}
+              <div class="rs-description" data-role="clinic-description">
+                {% if clinic.description %}
+                  <p class="rs-subtitle">{{ clinic.description }}</p>
+                {% else %}
+                  <p class="rs-subtitle">
+                    A modern clinic page powered by RankSewa — verified doctors, transparent schedules, and online booking.
+                  </p>
+                {% endif %}
+                <button class="rs-desc-toggle" type="button" aria-expanded="false">
+                  Read more
+                </button>
+              </div>
 
               <div class="rs-mini">
                 {% if clinic.address or clinic.city %}
@@ -213,6 +218,35 @@
       </div>
     </div>
   </header>
+
+  <!-- VALUE STRIP -->
+  <section class="rs-value">
+    <div class="container">
+      <div class="rs-value-card">
+        <div class="rs-value-item">
+          <div class="rs-value-icon"><i class="fas fa-calendar-check"></i></div>
+          <div>
+            <div class="rs-value-h">Instant booking</div>
+            <div class="rs-value-p">Patients book with published schedules.</div>
+          </div>
+        </div>
+        <div class="rs-value-item">
+          <div class="rs-value-icon"><i class="fas fa-user-shield"></i></div>
+          <div>
+            <div class="rs-value-h">Verified doctors</div>
+            <div class="rs-value-p">Only approved profiles are listed.</div>
+          </div>
+        </div>
+        <div class="rs-value-item">
+          <div class="rs-value-icon"><i class="fas fa-headset"></i></div>
+          <div>
+            <div class="rs-value-h">Clinic-first support</div>
+            <div class="rs-value-p">Built for front desks and patients.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- DOCTORS -->
   <section class="rs-section" id="doctors">
@@ -392,6 +426,18 @@
   {% endif %}
 </div>
 
+<div class="rs-sticky-cta">
+  {% if clinic.phone or clinic.phone_number %}
+  <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--primary">
+    <i class="fas fa-phone-alt"></i> Call Clinic
+  </a>
+  {% else %}
+  <a href="#doctors" class="rs-btn rs-btn--primary">
+    <i class="fas fa-calendar-check"></i> Book Appointment
+  </a>
+  {% endif %}
+</div>
+
 <style>
 /* =========================================
    RankSewa Clinic Portal (Premium)
@@ -400,11 +446,25 @@
 ========================================= */
 
 .rs-clinic{
+  font-family: "Source Sans 3", "Plus Jakarta Sans", sans-serif;
   background:
     radial-gradient(900px 450px at 20% -10%, rgba(20,184,166,.18), transparent 55%),
     radial-gradient(700px 420px at 85% 10%, rgba(59,130,246,.14), transparent 52%),
     linear-gradient(180deg, #f8fafc 0%, #f8fafc 35%, #f1f5f9 100%);
   min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.rs-clinic > *{ position: relative; z-index: 1; }
+.rs-clinic:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    repeating-linear-gradient(120deg, rgba(15,23,42,.03), rgba(15,23,42,.03) 1px, transparent 1px, transparent 28px);
+  pointer-events:none;
+  opacity:.45;
+  z-index: 0;
 }
 
 /* HERO */
@@ -499,14 +559,30 @@
   font-weight: 900;
   color:#0f172a;
   letter-spacing: -.3px;
+  font-family: "Fraunces", "Playfair Display", serif;
 }
 .rs-subtitle{
-  margin:0 0 .75rem;
+  margin:0 0 .65rem;
   color:#475569;
   font-size: 1rem;
   line-height: 1.55;
   max-width: 56ch;
+  overflow-wrap: anywhere;
 }
+.rs-description{ position: relative; }
+.rs-desc-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  border: none;
+  background: transparent;
+  color: var(--brand);
+  font-weight: 900;
+  font-size: .9rem;
+  padding: 0;
+}
+.rs-desc-toggle:focus{ outline: 3px solid rgba(20,184,166,.25); outline-offset: 2px; }
+.rs-desc-toggle:hover{ color:#0f172a; }
 .rs-mini{
   display:flex; flex-wrap:wrap; gap:.75rem 1rem;
   margin-top:.25rem;
@@ -666,6 +742,47 @@
 .rs-trust-h{ font-weight: 900; color:#0f172a; line-height:1.2; }
 .rs-trust-p{ color:#64748b; font-weight:700; font-size:.88rem; margin-top:.15rem; }
 
+/* VALUE STRIP */
+.rs-value{
+  padding: 0 0 1.5rem;
+}
+.rs-value-card{
+  background: rgba(255,255,255,.88);
+  border: 1px solid rgba(226,232,240,.9);
+  border-radius: 20px;
+  box-shadow: 0 18px 45px rgba(15,23,42,.08);
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+}
+.rs-value-item{
+  display:flex;
+  gap:.75rem;
+  align-items:flex-start;
+  padding: .75rem;
+  border-radius: 16px;
+  background: rgba(248,250,252,.8);
+  border: 1px solid rgba(226,232,240,.9);
+}
+.rs-value-icon{
+  width: 42px; height: 42px; border-radius: 16px;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--brand-soft);
+  color: var(--brand);
+  flex-shrink:0;
+}
+.rs-value-h{
+  font-weight: 900;
+  color:#0f172a;
+  margin-bottom:.2rem;
+}
+.rs-value-p{
+  color:#64748b;
+  font-weight:700;
+  font-size:.9rem;
+}
+
 /* SECTION */
 .rs-section{ padding: 2.25rem 0 2.75rem; }
 .rs-section--tight{ padding: 0 0 2.75rem; }
@@ -681,6 +798,7 @@
   color:#0f172a;
   letter-spacing:-.2px;
   display:flex; align-items:center; gap:.65rem;
+  font-family: "Fraunces", "Playfair Display", serif;
 }
 .rs-h2 i{ color: var(--brand); }
 .rs-muted{ margin:0; color:#64748b; font-weight:700; }
@@ -868,6 +986,7 @@
   font-weight: 950;
   color:#0f172a;
   display:flex; align-items:center; gap:.55rem;
+  font-family: "Fraunces", "Playfair Display", serif;
 }
 .rs-h3 i{ color: var(--brand); }
 .rs-location-body{ display:flex; flex-direction:column; gap:.9rem; }
@@ -886,13 +1005,32 @@
 .rs-link:hover{ color: var(--brand); }
 .rs-location-right{ min-width: 260px; display:flex; flex-direction:column; gap:.6rem; }
 
+/* STICKY CTA */
+.rs-sticky-cta{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: .75rem 1rem 1rem;
+  background: rgba(248,250,252,.94);
+  border-top: 1px solid rgba(226,232,240,.9);
+  box-shadow: 0 -12px 35px rgba(15,23,42,.08);
+  display:none;
+  z-index: 50;
+}
+.rs-sticky-cta .rs-btn{ width:100%; }
+
 /* MOBILE */
 @media (max-width: 992px){
   .rs-hero-grid{ grid-template-columns: 1fr; }
   .rs-location-right{ min-width: 0; width:100%; }
+  .rs-value-card{ grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px){
+  .rs-description:not(.is-expanded) .rs-subtitle{
+    -webkit-line-clamp: 4;
+  }
   .rs-hero-top{ flex-direction: column; align-items: center; text-align:center; }
   .rs-hero-actions{ width:100%; flex-direction: column; }
   .rs-hero-actions .rs-btn{ width:100%; }
@@ -903,6 +1041,37 @@
   .rs-card-kv{ width:100%; }
   .rs-grid{ grid-template-columns: 1fr; }
   .rs-location{ flex-direction: column; text-align:left; }
+  .rs-sticky-cta{ display:block; }
+  body{ padding-bottom: 90px; }
+}
+
+.rs-description:not(.is-expanded) .rs-subtitle{
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('[data-role="clinic-description"]').forEach((wrapper) => {
+      const subtitle = wrapper.querySelector(".rs-subtitle");
+      const toggle = wrapper.querySelector(".rs-desc-toggle");
+      if (!subtitle || !toggle) return;
+
+      const isOverflowing = subtitle.scrollHeight > subtitle.clientHeight + 2;
+      if (!isOverflowing) {
+        toggle.style.display = "none";
+        return;
+      }
+
+      toggle.addEventListener("click", () => {
+        const expanded = wrapper.classList.toggle("is-expanded");
+        toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+        toggle.textContent = expanded ? "Show less" : "Read more";
+      });
+    });
+  });
+</script>
 {% endblock %}
