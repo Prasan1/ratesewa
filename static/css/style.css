@@ -3546,22 +3546,23 @@ html {
 /* Related Doctors */
 .article-doctors {
     margin: 48px 0;
-    padding: 32px;
-    background: #f9f9f9;
-    border: 1px solid #eee;
+    padding: 28px;
+    background: linear-gradient(135deg, #f0fafa 0%, #f8f8f8 100%);
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
 }
 
 .article-doctors h3 {
     font-family: var(--journal-serif);
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #1a1a1a;
-    margin: 0 0 8px;
+    margin: 0 0 6px;
 }
 
 .article-doctors > p {
     font-family: var(--journal-sans);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: #666;
     margin: 0 0 20px;
 }
@@ -3569,27 +3570,26 @@ html {
 .doctors-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 16px;
 }
 
 .article-doctors .doctor-card {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 16px;
+    padding: 14px 16px;
     background: #fff;
-    border: 1px solid #1a1a1a;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     text-decoration: none;
-    transition: all 0.15s;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .article-doctors .doctor-card:hover {
-    background: #1a1a1a;
-}
-
-.article-doctors .doctor-card:hover .doctor-info strong,
-.article-doctors .doctor-card:hover .doctor-info span {
-    color: #fff;
+    border-color: var(--brand);
+    box-shadow: 0 4px 12px rgba(4, 130, 136, 0.15);
+    transform: translateY(-2px);
 }
 
 .doctor-avatar {
@@ -3598,33 +3598,30 @@ html {
 }
 
 .article-doctors .doctor-card img {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .verified-badge {
     position: absolute;
-    bottom: 0;
-    right: -2px;
-    width: 18px;
-    height: 18px;
-    background: #1a1a1a;
+    bottom: -2px;
+    right: -4px;
+    width: 20px;
+    height: 20px;
+    background: var(--brand);
     color: #fff;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     border: 2px solid #fff;
-}
-
-.article-doctors .doctor-card:hover .verified-badge {
-    background: #fff;
-    color: #1a1a1a;
-    border-color: #1a1a1a;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 .article-doctors .doctor-info {
@@ -3639,21 +3636,19 @@ html {
     font-size: 0.9rem;
     font-weight: 700;
     color: #1a1a1a;
-    transition: color 0.15s;
 }
 
 .article-doctors .doctor-specialty {
     font-family: var(--journal-sans);
     font-size: 0.8rem;
-    color: #444;
-    transition: color 0.15s;
+    color: var(--brand);
+    font-weight: 500;
 }
 
 .article-doctors .doctor-meta {
     font-family: var(--journal-sans);
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: #888;
-    transition: color 0.15s;
 }
 
 /* Related Articles */
