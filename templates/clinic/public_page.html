@@ -171,7 +171,7 @@
               </a>
               {% endif %}
 
-              {% set full_address2 = [clinic.address, clinic.city, 'Nepal']|select|join(', ') %}
+              {% set full_address2 = [clinic.name, clinic.address, clinic.city, 'Nepal']|select|join(', ') %}
               <a class="rs-side-row rs-side-row--cta"
                  href="https://www.google.com/maps/search/?api=1&query={{ full_address2|urlencode }}"
                  target="_blank" rel="noopener">
