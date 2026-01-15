@@ -1472,29 +1472,16 @@ def article_detail(slug):
      .limit(3).all()
 
     # Get related doctors if article has a related specialty
+    # ONLY show verified doctors - never show unverified ones
     related_doctors = []
     if article.related_specialty_id:
-        # First, try to get verified doctors only
-        verified_doctors = Doctor.query.filter_by(
+        related_doctors = Doctor.query.filter_by(
             specialty_id=article.related_specialty_id,
             is_active=True,
             is_verified=True
         ).order_by(
             Doctor.is_featured.desc()
         ).limit(4).all()
-
-        # Only show verified doctors if any exist
-        # Don't show unverified doctors if verified ones are available
-        if verified_doctors:
-            related_doctors = verified_doctors
-        else:
-            # Only if NO verified doctors exist, show unverified ones
-            related_doctors = Doctor.query.filter_by(
-                specialty_id=article.related_specialty_id,
-                is_active=True
-            ).order_by(
-                Doctor.is_featured.desc()
-            ).limit(4).all()
 
     return render_template('article_detail.html',
                          article=article,

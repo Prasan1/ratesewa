@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ article.title }} - Health Digest - RankSewa{% endblock %}
+{% block title %}{{ article.title }} - The Nepal Health Journal - RankSewa{% endblock %}
 
 {% block head %}
 <!-- SEO Meta Tags -->
@@ -23,290 +23,173 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('health_digest') }}">Health Digest</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('health_digest', category=article.category.slug) }}">{{ article.category.name }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ article.title }}</li>
-        </ol>
+<article class="article-page">
+    <!-- Back Navigation -->
+    <nav class="article-nav">
+        <a href="{{ url_for('health_digest') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            <span>The Nepal Health Journal</span>
+        </a>
     </nav>
 
-    <div class="row">
-        <!-- Main Article Content -->
-        <div class="col-lg-8">
-            <article class="article-content">
-                <!-- Article Header -->
-                <header class="mb-4">
-                    <span class="badge bg-primary mb-3">
-                        <i class="fas {{ article.category.icon }} me-1"></i>
-                        {{ article.category.name }}
-                    </span>
-                    <h1 class="display-5 fw-bold mb-3">{{ article.title }}</h1>
-
-                    <!-- Article Meta -->
-                    <div class="d-flex flex-wrap align-items-center text-muted small mb-3">
-                        <div class="me-4">
-                            <i class="fas fa-user-edit me-1"></i>
-                            <strong>{{ article.author_name }}</strong>
-                        </div>
-                        <div class="me-4">
-                            <i class="far fa-calendar me-1"></i>
-                            {{ article.published_at.strftime('%B %d, %Y') if article.published_at else article.created_at.strftime('%B %d, %Y') }}
-                        </div>
-                        <div class="me-4">
-                            <i class="far fa-clock me-1"></i>
-                            {{ article.read_time }} min read
-                        </div>
-                        <div>
-                            <i class="far fa-eye me-1"></i>
-                            {{ article.view_count }} views
-                        </div>
-                    </div>
-
-                    <!-- Social Share Buttons -->
-                    <div class="d-flex gap-2 mb-4">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}"
-                           target="_blank"
-                           class="btn btn-sm btn-outline-primary">
-                            <i class="fab fa-facebook-f me-1"></i>Share
-                        </a>
-                        <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text={{ article.title }}"
-                           target="_blank"
-                           class="btn btn-sm btn-outline-info">
-                            <i class="fab fa-twitter me-1"></i>Tweet
-                        </a>
-                        <a href="https://wa.me/?text={{ article.title }}%20{{ request.url }}"
-                           target="_blank"
-                           class="btn btn-sm btn-outline-success">
-                            <i class="fab fa-whatsapp me-1"></i>WhatsApp
-                        </a>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="copyLink()">
-                            <i class="fas fa-link me-1"></i>Copy Link
-                        </button>
-                    </div>
-                </header>
-
-                <!-- Featured Image -->
-                {% if article.featured_image %}
-                    {% if article.featured_image.startswith('/static/') or article.featured_image.startswith('http') %}
-                    <img src="{{ article.featured_image }}"
-                    {% else %}
-                    <img src="{{ url_for('static', filename='img/' + article.featured_image) }}"
-                    {% endif %}
-                         class="img-fluid rounded mb-4 w-100"
-                         alt="{{ article.title }}"
-                         loading="lazy"
-                         width="900"
-                         height="600"
-                         style="max-height: 500px; object-fit: cover;">
-                {% endif %}
-
-                <!-- Quick Answer Box (reduces bounce by answering immediately) -->
-                {% if article.quick_answer %}
-                <div class="quick-answer-box mb-4">
-                    <div class="quick-answer-header">
-                        <i class="fas fa-bolt me-2"></i>Quick Answer
-                    </div>
-                    <div class="quick-answer-content">
-                        {{ article.quick_answer | safe }}
-                    </div>
-                </div>
-                {% endif %}
-
-                <!-- Table of Contents (for long articles) -->
-                {% if article.read_time and article.read_time >= 5 %}
-                <div class="toc-box mb-4" id="tableOfContents">
-                    <div class="toc-header" onclick="toggleTOC()">
-                        <span><i class="fas fa-list me-2"></i>Table of Contents</span>
-                        <i class="fas fa-chevron-down toc-toggle-icon"></i>
-                    </div>
-                    <nav class="toc-content" id="tocContent">
-                        <!-- Generated by JavaScript -->
-                    </nav>
-                </div>
-                {% endif %}
-
-                <!-- Medical Disclaimer (collapsible, less intrusive) -->
-                <details class="disclaimer-box mb-4">
-                    <summary class="disclaimer-summary">
-                        <i class="fas fa-info-circle me-2"></i>Medical Disclaimer
-                    </summary>
-                    <div class="disclaimer-content">
-                        This article is for informational purposes only and does not replace professional medical advice.
-                        If you have symptoms or health concerns, please consult a licensed healthcare provider.
-                    </div>
-                </details>
-
-                <!-- Article Content -->
-                <div class="article-body" id="articleBody">
-                    {{ article.content | markdown | safe }}
-                </div>
-
-                <!-- Related Doctors Section -->
-                {% if related_doctors %}
-                <div class="related-doctors mt-5 p-4 bg-light rounded">
-                    <h4 class="mb-4">
-                        <i class="fas fa-user-md text-primary me-2"></i>
-                        Consult Expert {{ article.related_specialty.name }}s in Nepal
-                    </h4>
-                    <p class="text-muted mb-4">Need personalized medical advice? Consult with our verified specialists.</p>
-                    <div class="row g-3">
-                        {% for doctor in related_doctors %}
-                        <div class="col-md-6">
-                            <div class="card h-100 shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-2">
-                                        {% if doctor.photo_url %}
-                                        {% set photo_path = doctor.photo_url.replace('photos/', '') %}
-                                        <img src="{{ url_for('serve_photo', filename=photo_path) }}"
-                                             class="rounded-circle me-3"
-                                             width="60"
-                                             height="60"
-                                             loading="lazy"
-                                             alt="{{ doctor.name }}"
-                                             onerror="this.src='{{ doctor|doctor_avatar }}'">
-                                        {% else %}
-                                        <img src="{{ doctor|doctor_avatar }}"
-                                             class="rounded-circle me-3"
-                                             width="60"
-                                             height="60"
-                                             loading="lazy"
-                                             alt="{{ doctor.name }}">
-                                        {% endif %}
-                                        <div>
-                                            <h6 class="mb-0">{{ doctor.name }}</h6>
-                                            <small class="text-muted">{{ doctor.specialty.name }}</small>
-                                            {% if doctor.is_verified %}
-                                            <span class="badge bg-success" style="font-size: 0.65rem;">✓ Verified</span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <p class="small text-muted mb-2">
-                                        <i class="fas fa-map-marker-alt me-1"></i>{{ doctor.city.name }}
-                                        <span class="mx-2">•</span>
-                                        {{ doctor.experience }} years exp.
-                                    </p>
-                                    <a href="{{ url_for('doctor_profile', slug=doctor.slug) }}" class="btn btn-sm btn-outline-primary w-100">
-                                        View Profile
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <div class="text-center mt-4">
-                        <a href="{{ url_for('index') }}" class="btn btn-primary">
-                            <i class="fas fa-search me-2"></i>Find More Doctors
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
-
-                <!-- Social Share (Bottom) -->
-                <div class="text-center my-5 py-4 border-top border-bottom">
-                    <h5 class="mb-3">Found this helpful? Share with others!</h5>
-                    <div class="d-flex justify-content-center gap-3">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}"
-                           target="_blank"
-                           class="btn btn-primary">
-                            <i class="fab fa-facebook-f me-2"></i>Facebook
-                        </a>
-                        <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text={{ article.title }}"
-                           target="_blank"
-                           class="btn btn-info text-white">
-                            <i class="fab fa-twitter me-2"></i>Twitter
-                        </a>
-                        <a href="https://wa.me/?text={{ article.title }}%20{{ request.url }}"
-                           target="_blank"
-                           class="btn btn-success">
-                            <i class="fab fa-whatsapp me-2"></i>WhatsApp
-                        </a>
-                    </div>
-                </div>
-            </article>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <!-- Related Articles -->
-            {% if related_articles %}
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">
-                        <i class="fas fa-newspaper me-2"></i>Related Articles
-                    </h5>
-                    {% for rel_article in related_articles %}
-                    <div class="mb-3 pb-3 {% if not loop.last %}border-bottom{% endif %}">
-                        <a href="{{ url_for('article_detail', slug=rel_article.slug) }}" class="text-decoration-none">
-                            <h6 class="mb-1 text-dark">{{ rel_article.title }}</h6>
-                        </a>
-                        <small class="text-muted">
-                            <i class="far fa-clock me-1"></i>{{ rel_article.read_time }} min read
-                        </small>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
+    <!-- Article Header -->
+    <header class="article-header">
+        <div class="article-header-inner">
+            <a href="{{ url_for('health_digest', category=article.category.slug) }}" class="article-category">
+                {{ article.category.name }}
+            </a>
+            <h1 class="article-title">{{ article.title }}</h1>
+            {% if article.summary %}
+            <p class="article-dek">{{ article.summary }}</p>
             {% endif %}
-
-            <!-- Browse More -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">
-                        <i class="fas fa-book-medical me-2"></i>Browse More
-                    </h5>
-                    <a href="{{ url_for('health_digest') }}" class="btn btn-outline-primary w-100 mb-2">
-                        <i class="fas fa-list me-2"></i>All Articles
-                    </a>
-                    <a href="{{ url_for('health_digest', category=article.category.slug) }}" class="btn btn-outline-primary w-100">
-                        <i class="fas {{ article.category.icon }} me-2"></i>{{ article.category.name }}
-                    </a>
-                </div>
-            </div>
-
-            <!-- Newsletter (Future) -->
-            <div class="card shadow-sm bg-light">
-                <div class="card-body text-center">
-                    <i class="fas fa-heartbeat fa-3x text-primary mb-3"></i>
-                    <h5 class="card-title">Stay Healthy!</h5>
-                    <p class="small text-muted">Explore more health articles on RankSewa</p>
-                    <a href="{{ url_for('health_digest') }}" class="btn btn-primary btn-sm">
-                        Browse Health Digest
-                    </a>
-                </div>
+            <div class="article-byline">
+                <span>By <strong>{{ article.author_name }}</strong></span>
+                <span class="sep">/</span>
+                <span>{{ article.published_at.strftime('%B %d, %Y') if article.published_at else article.created_at.strftime('%B %d, %Y') }}</span>
+                <span class="sep">/</span>
+                <span>{{ article.read_time }} min read</span>
             </div>
         </div>
-    </div>
-</div>
+    </header>
 
-<!-- Sticky CTA for Mobile (appears after scrolling) -->
-<div class="sticky-cta-mobile" id="stickyCTAMobile">
-    <a href="{{ url_for('index') }}" class="btn btn-primary">
-        <i class="fas fa-search me-2"></i>Find a Doctor Now
-    </a>
-</div>
+    <!-- Featured Image -->
+    {% if article.featured_image %}
+    <figure class="article-hero">
+        {% if article.featured_image.startswith('/static/') or article.featured_image.startswith('http') %}
+        <img src="{{ article.featured_image }}"
+        {% else %}
+        <img src="{{ url_for('static', filename='img/' + article.featured_image) }}"
+        {% endif %}
+             alt="{{ article.title }}"
+             loading="eager">
+    </figure>
+    {% endif %}
+
+    <!-- Article Body -->
+    <div class="article-container">
+        <!-- Medical Disclaimer -->
+        <aside class="article-callout article-callout--warning">
+            <strong>Medical Disclaimer:</strong> This article is for informational purposes only and does not replace professional medical advice. Consult a healthcare provider for medical concerns.
+        </aside>
+
+        <!-- Quick Answer -->
+        {% if article.quick_answer %}
+        <aside class="article-callout article-callout--highlight">
+            <strong>Quick Answer:</strong>
+            {{ article.quick_answer | safe }}
+        </aside>
+        {% endif %}
+
+        <!-- Table of Contents -->
+        {% if article.read_time and article.read_time >= 5 %}
+        <nav class="article-toc" id="tableOfContents">
+            <h4>In This Article</h4>
+            <div class="toc-links" id="tocContent">
+                <!-- Generated by JavaScript -->
+            </div>
+        </nav>
+        {% endif %}
+
+        <!-- Main Content -->
+        <div class="article-content" id="articleBody">
+            {{ article.content | markdown | safe }}
+        </div>
+
+        <!-- Share Section -->
+        <div class="article-share">
+            <span class="share-label">Share this article</span>
+            <div class="share-buttons">
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" class="share-btn">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text={{ article.title }}" target="_blank" class="share-btn">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="https://wa.me/?text={{ article.title }}%20{{ request.url }}" target="_blank" class="share-btn">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url }}" target="_blank" class="share-btn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <button class="share-btn" onclick="copyLink()">
+                    <i class="fas fa-link"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Related Doctors -->
+        {% if related_doctors %}
+        <section class="article-doctors">
+            <h3>Consult Expert {{ article.related_specialty.name }}s</h3>
+            <p>Connect with verified specialists for personalized medical advice.</p>
+            <div class="doctors-grid">
+                {% for doctor in related_doctors[:4] %}
+                <a href="{{ url_for('doctor_profile', slug=doctor.slug) }}" class="doctor-card">
+                    <div class="doctor-avatar">
+                        {% if doctor.photo_url %}
+                        {% set photo_path = doctor.photo_url.replace('photos/', '') %}
+                        <img src="{{ url_for('serve_photo', filename=photo_path) }}"
+                             alt="{{ doctor.name }}"
+                             onerror="this.src='{{ doctor|doctor_avatar }}'">
+                        {% else %}
+                        <img src="{{ doctor|doctor_avatar }}" alt="{{ doctor.name }}">
+                        {% endif %}
+                        {% if doctor.is_verified %}
+                        <span class="verified-badge" title="Verified Doctor">✓</span>
+                        {% endif %}
+                    </div>
+                    <div class="doctor-info">
+                        <strong>{{ doctor.name }}</strong>
+                        <span class="doctor-specialty">{{ doctor.specialty.name }}</span>
+                        <span class="doctor-meta">{{ doctor.city.name }} &bull; {{ doctor.experience }} yrs</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Related Articles -->
+        {% if related_articles %}
+        <section class="article-related">
+            <h3>Related Articles</h3>
+            <div class="related-grid">
+                {% for rel_article in related_articles[:3] %}
+                <a href="{{ url_for('article_detail', slug=rel_article.slug) }}" class="related-card">
+                    <span class="related-category">{{ rel_article.category.name }}</span>
+                    <h4>{{ rel_article.title }}</h4>
+                    <span class="related-meta">{{ rel_article.read_time }} min read</span>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </div>
+
+    <!-- CTA Section -->
+    <section class="article-cta">
+        <div class="cta-inner">
+            <h3>Find the Right Doctor for You</h3>
+            <p>Search verified healthcare providers across Nepal</p>
+            <a href="{{ url_for('index') }}" class="cta-button">Search Doctors</a>
+        </div>
+    </section>
+
+    <!-- Back to Journal -->
+    <div class="article-back">
+        <a href="{{ url_for('health_digest') }}">
+            <i class="fas fa-arrow-left"></i> Back to The Nepal Health Journal
+        </a>
+    </div>
+</article>
 
 <script>
 function copyLink() {
     navigator.clipboard.writeText(window.location.href).then(function() {
-        showAlert('Link copied to clipboard!', 'success');
-    }, function() {
-        showAlert('Failed to copy link', 'error');
+        alert('Link copied to clipboard!');
     });
 }
 
-// Toggle Table of Contents
-function toggleTOC() {
-    const tocBox = document.getElementById('tableOfContents');
-    if (tocBox) {
-        tocBox.classList.toggle('collapsed');
-    }
-}
-
-// Generate Table of Contents from article headings
 document.addEventListener('DOMContentLoaded', function() {
     const articleBody = document.getElementById('articleBody');
     const tocContent = document.getElementById('tocContent');
@@ -316,393 +199,21 @@ document.addEventListener('DOMContentLoaded', function() {
         let tocHTML = '';
 
         headings.forEach(function(heading, index) {
-            // Create an ID for the heading if it doesn't have one
             if (!heading.id) {
                 heading.id = 'section-' + index;
             }
-
             const level = heading.tagName.toLowerCase();
-            const className = level === 'h3' ? 'toc-h3' : '';
-            tocHTML += `<a href="#${heading.id}" class="${className}">${heading.textContent}</a>`;
+            const indent = level === 'h3' ? ' class="toc-indent"' : '';
+            tocHTML += `<a href="#${heading.id}"${indent}>${heading.textContent}</a>`;
         });
 
         if (tocHTML) {
             tocContent.innerHTML = tocHTML;
         } else {
-            // Hide TOC if no headings found
             const tocBox = document.getElementById('tableOfContents');
             if (tocBox) tocBox.style.display = 'none';
         }
     }
-
-    // Sticky CTA visibility on scroll (mobile)
-    const stickyCTA = document.getElementById('stickyCTAMobile');
-    if (stickyCTA) {
-        let lastScroll = 0;
-        window.addEventListener('scroll', function() {
-            const currentScroll = window.pageYOffset;
-
-            // Show after scrolling 300px
-            if (currentScroll > 300) {
-                stickyCTA.classList.add('visible');
-            } else {
-                stickyCTA.classList.remove('visible');
-            }
-
-            lastScroll = currentScroll;
-        }, { passive: true });
-    }
 });
 </script>
-
-<style>
-/* Quick Answer Box - Answers user's question immediately */
-.quick-answer-box {
-    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
-    border: 2px solid #4caf50;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.quick-answer-header {
-    background: #4caf50;
-    color: white;
-    padding: 10px 16px;
-    font-weight: 700;
-    font-size: 0.9rem;
-}
-
-.quick-answer-content {
-    padding: 16px;
-    font-size: 1rem;
-    line-height: 1.6;
-}
-
-.quick-answer-content ul {
-    margin: 10px 0;
-    padding-left: 20px;
-}
-
-.quick-answer-content li {
-    margin-bottom: 6px;
-}
-
-/* Table of Contents */
-.toc-box {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.toc-header {
-    background: #e9ecef;
-    padding: 12px 16px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background 0.2s;
-}
-
-.toc-header:hover {
-    background: #dee2e6;
-}
-
-.toc-toggle-icon {
-    transition: transform 0.3s;
-}
-
-.toc-box.collapsed .toc-toggle-icon {
-    transform: rotate(-90deg);
-}
-
-.toc-box.collapsed .toc-content {
-    display: none;
-}
-
-.toc-content {
-    padding: 12px 16px;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.toc-content a {
-    display: block;
-    padding: 6px 0;
-    color: #495057;
-    text-decoration: none;
-    border-bottom: 1px solid #f1f3f4;
-    font-size: 0.9rem;
-}
-
-.toc-content a:hover {
-    color: var(--brand);
-}
-
-.toc-content a.toc-h3 {
-    padding-left: 16px;
-    font-size: 0.85rem;
-}
-
-/* Collapsible Disclaimer */
-.disclaimer-box {
-    background: #fff8e1;
-    border: 1px solid #ffecb3;
-    border-radius: 8px;
-    font-size: 0.85rem;
-}
-
-.disclaimer-summary {
-    padding: 10px 14px;
-    cursor: pointer;
-    color: #f57c00;
-    font-weight: 500;
-    list-style: none;
-}
-
-.disclaimer-summary::-webkit-details-marker {
-    display: none;
-}
-
-.disclaimer-summary::after {
-    content: " (click to expand)";
-    font-weight: 400;
-    font-size: 0.75rem;
-    color: #999;
-}
-
-.disclaimer-box[open] .disclaimer-summary::after {
-    content: "";
-}
-
-.disclaimer-content {
-    padding: 0 14px 14px;
-    color: #666;
-    line-height: 1.5;
-}
-
-/* Sticky Mobile CTA */
-.sticky-cta-mobile {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    .sticky-cta-mobile {
-        display: block;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: white;
-        padding: 12px 16px;
-        box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
-        z-index: 1000;
-        transform: translateY(100%);
-        transition: transform 0.3s ease;
-    }
-
-    .sticky-cta-mobile.visible {
-        transform: translateY(0);
-    }
-
-    .sticky-cta-mobile .btn {
-        width: 100%;
-    }
-
-    /* Add padding to prevent content being hidden behind sticky CTA */
-    .article-content {
-        padding-bottom: 80px;
-    }
-}
-
-/* Editorial Article Styling - Clean & Professional */
-.article-body {
-    font-family: 'Georgia', 'Times New Roman', serif;
-    font-size: 1.125rem;
-    line-height: 1.85;
-    color: #1a1a1a;
-    max-width: 720px;
-}
-
-.article-body h1 {
-    font-family: 'Georgia', serif;
-    font-size: 2.5rem;
-    font-weight: 700;
-    line-height: 1.2;
-    margin-top: 3rem;
-    margin-bottom: 1.5rem;
-    color: #0d0d0d;
-    border-bottom: 2px solid #e5e7eb;
-    padding-bottom: 0.75rem;
-}
-
-.article-body h2 {
-    font-family: 'Georgia', serif;
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1.3;
-    margin-top: 2.5rem;
-    margin-bottom: 1.25rem;
-    color: #1a1a1a;
-    border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 0.5rem;
-}
-
-.article-body h3 {
-    font-family: 'Georgia', serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    line-height: 1.4;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    color: #2d2d2d;
-}
-
-.article-body h4 {
-    font-family: 'Georgia', serif;
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-    color: #3d3d3d;
-}
-
-.article-body p {
-    margin-bottom: 1.5rem;
-    text-align: justify;
-}
-
-.article-body p strong {
-    font-weight: 700;
-    color: #0d0d0d;
-}
-
-.article-body ul, .article-body ol {
-    margin-bottom: 1.75rem;
-    padding-left: 2.5rem;
-}
-
-.article-body li {
-    margin-bottom: 0.75rem;
-    line-height: 1.75;
-}
-
-.article-body ul li {
-    list-style-type: disc;
-}
-
-.article-body ol li {
-    list-style-type: decimal;
-}
-
-.article-body a {
-    color: var(--brand);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
-}
-
-.article-body a:hover {
-    color: var(--brand-hover);
-    text-decoration-thickness: 2px;
-}
-
-.article-body img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 4px;
-    margin: 2rem auto;
-    display: block;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.article-body blockquote {
-    border-left: 4px solid var(--brand);
-    padding: 1.25rem 1.75rem;
-    margin: 2rem 0;
-    background: #f9fafb;
-    font-style: italic;
-    color: #4a4a4a;
-    font-size: 1.15rem;
-}
-
-.article-body code {
-    background: #f5f5f5;
-    padding: 0.2rem 0.4rem;
-    border-radius: 3px;
-    font-family: 'Monaco', 'Courier New', monospace;
-    font-size: 0.9em;
-    color: #d73a49;
-}
-
-.article-body pre {
-    background: #f6f8fa;
-    padding: 1.25rem;
-    border-radius: 6px;
-    overflow-x: auto;
-    margin: 1.75rem 0;
-    border: 1px solid #e1e4e8;
-}
-
-.article-body pre code {
-    background: none;
-    padding: 0;
-    color: #24292e;
-}
-
-.article-body hr {
-    border: none;
-    border-top: 1px solid #e5e7eb;
-    margin: 2.5rem 0;
-}
-
-.article-body table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 2rem 0;
-}
-
-.article-body table th,
-.article-body table td {
-    padding: 0.75rem;
-    border: 1px solid #e5e7eb;
-    text-align: left;
-}
-
-.article-body table th {
-    background: #f9fafb;
-    font-weight: 700;
-    color: #1a1a1a;
-}
-
-.article-body table tr:hover {
-    background: #fafafa;
-}
-
-/* Improve readability on mobile */
-@media (max-width: 768px) {
-    .article-body {
-        font-size: 1rem;
-        line-height: 1.75;
-    }
-
-    .article-body h1 {
-        font-size: 2rem;
-    }
-
-    .article-body h2 {
-        font-size: 1.65rem;
-    }
-
-    .article-body h3 {
-        font-size: 1.35rem;
-    }
-
-    .article-body p {
-        text-align: left;
-    }
-}
-</style>
 {% endblock %}

@@ -1,6 +1,5 @@
 """
-Seed the dental care article into the Health Digest.
-Reads article_dental_care.md and inserts/updates the article in the database.
+Seed the general health checkup article into the Health Digest.
 """
 from datetime import datetime
 import os
@@ -15,14 +14,13 @@ def format_inline(text):
     """Convert basic markdown inline styles to HTML."""
     if not text:
         return text
-    # Bold first to avoid clashing with italics.
     text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
     text = re.sub(r"\*(.+?)\*", r"<em>\1</em>", text)
     return text
 
 
 def markdown_to_html(markdown_text):
-    """Convert a limited subset of markdown to HTML for this article."""
+    """Convert markdown to HTML."""
     lines = markdown_text.splitlines()
     html_parts = []
     paragraph_lines = []
@@ -97,38 +95,50 @@ def markdown_to_html(markdown_text):
     return "\n".join(html_parts)
 
 
-def seed_dental_article():
+def seed_general_checkup_article():
     with app.app_context():
-        article_path = os.path.join(os.path.dirname(__file__), "article_dental_care.md")
+        article_path = os.path.join(os.path.dirname(__file__), "article_general_checkup.md")
         if not os.path.exists(article_path):
-            raise FileNotFoundError("article_dental_care.md not found")
+            raise FileNotFoundError("article_general_checkup.md not found")
 
         with open(article_path, "r", encoding="utf-8") as f:
             markdown_text = f.read()
 
         html_content = markdown_to_html(markdown_text)
 
-        category = ArticleCategory.query.filter_by(slug="oral-health").first()
+        # Get or create General Health category
+        category = ArticleCategory.query.filter_by(slug="general-health").first()
         if not category:
             category = ArticleCategory(
-                name="Oral Health",
-                slug="oral-health",
-                description="Dental care, oral hygiene, and prevention tips",
-                icon="fa-tooth",
-                display_order=9
+                name="General Health",
+                slug="general-health",
+                description="General health topics, checkups, and preventive care",
+                icon="fa-heartbeat",
+                display_order=10
             )
             db.session.add(category)
             db.session.flush()
 
-        specialty = Specialty.query.filter_by(name="Dentist").first()
+        # Link to General Physician specialty
+        specialty = Specialty.query.filter_by(name="General Physician").first()
 
-        title = "Why Dental Care Matters: A Guide for Nepal"
+        title = "When to See a Doctor in Nepal: A Guide to General Health Checkups"
         slug = slugify(title)
 
         summary = (
-            "Looking for a dentist in Kathmandu? Whether you're a local, NRN, or dental tourist, "
-            "this guide covers why Nepal is becoming a dental tourism hub, how to find verified dentists, "
-            "and essential tips for oral health."
+            "Don't wait until you're sick. Learn why annual health checkups matter, "
+            "what tests you need at different ages, and how to find a trusted General Physician in Nepal."
+        )
+
+        meta_description = (
+            "Complete guide to health checkups in Nepal: what to expect, costs, and how to find "
+            "a verified General Physician. Annual checkup packages and when to see a doctor."
+        )
+
+        meta_keywords = (
+            "general physician Nepal, health checkup Kathmandu, annual checkup Nepal, "
+            "doctor near me Nepal, full body checkup Nepal cost, health screening Kathmandu, "
+            "MBBS doctor Nepal, best doctor Kathmandu"
         )
 
         existing = Article.query.filter_by(slug=slug).first()
@@ -137,14 +147,14 @@ def seed_dental_article():
             existing.category_id = category.id
             existing.summary = summary
             existing.content = html_content
-            existing.meta_description = "Find the best dentist in Kathmandu. Guide for NRNs, dental tourists, and locals: costs, what to look for, and verified dentists in Nepal."
-            existing.meta_keywords = "best dentist in Kathmandu, dental tourism Nepal, cheap dental work Nepal, NRN dentist Kathmandu, dentist near me Kathmandu, dental implant Nepal cost, root canal Nepal, dental clinic Kathmandu, verified dentist Nepal, oral health Nepal"
+            existing.meta_description = meta_description
+            existing.meta_keywords = meta_keywords
             existing.related_specialty_id = specialty.id if specialty else None
             existing.is_published = True
             if not existing.published_at:
                 existing.published_at = datetime.utcnow()
             existing.updated_at = datetime.utcnow()
-            print("Updated existing dental care article.")
+            print("Updated existing general checkup article.")
         else:
             article = Article(
                 title=title,
@@ -154,18 +164,18 @@ def seed_dental_article():
                 content=html_content,
                 featured_image=None,
                 author_name="RankSewa Team",
-                meta_description="Find the best dentist in Kathmandu. Guide for NRNs, dental tourists, and locals: costs, what to look for, and verified dentists in Nepal.",
-                meta_keywords="best dentist in Kathmandu, dental tourism Nepal, cheap dental work Nepal, NRN dentist Kathmandu, dentist near me Kathmandu, dental implant Nepal cost, root canal Nepal, dental clinic Kathmandu, verified dentist Nepal, oral health Nepal",
+                meta_description=meta_description,
+                meta_keywords=meta_keywords,
                 related_specialty_id=specialty.id if specialty else None,
                 is_published=True,
                 is_featured=False,
                 published_at=datetime.utcnow()
             )
             db.session.add(article)
-            print("Created dental care article.")
+            print("Created general checkup article.")
 
         db.session.commit()
 
 
 if __name__ == "__main__":
-    seed_dental_article()
+    seed_general_checkup_article()

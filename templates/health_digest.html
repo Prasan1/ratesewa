@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Compass - RankSewa{% endblock %}
+{% block title %}The Nepal Health Journal - RankSewa{% endblock %}
 
 {% block head %}
 <style>
@@ -12,372 +12,187 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <!-- Header Section -->
-    <div class="text-center mb-4">
-        <h1 class="display-4 fw-bold mb-3">Compass</h1>
-        <p class="lead text-muted">Direction for better health and healthcare decisions</p>
-    </div>
+<div class="journal-container">
+    <!-- Journal Masthead -->
+    <header class="journal-masthead">
+        <div class="journal-masthead-inner">
+            <div class="journal-title">
+                <span class="journal-the">The</span>
+                <span class="journal-name">Nepal Health Journal</span>
+            </div>
+            <p class="journal-tagline">Nepal's trusted source for health insights</p>
+        </div>
+    </header>
 
-    <div class="compass-tabs mb-4">
-        <ul class="nav nav-pills justify-content-center flex-wrap" role="tablist" style="gap: 0.5rem;">
-            <li class="nav-item" role="presentation">
-                <a class="nav-link {% if not current_category %}active{% endif %}" href="{{ url_for('health_digest') }}">All</a>
-            </li>
-            {% for cat in categories %}
-            <li class="nav-item" role="presentation">
-                <a class="nav-link {% if current_category and current_category.slug == cat.slug %}active{% endif %}"
-                   href="{{ url_for('health_digest', category=cat.slug) }}">
-                    <i class="fas {{ cat.icon }} me-1"></i>{{ cat.name }}
+    <!-- Category Navigation -->
+    <nav class="journal-nav">
+        <a href="{{ url_for('health_digest') }}" class="journal-nav-link {% if not current_category %}active{% endif %}">All</a>
+        {% for cat in categories %}
+        <a href="{{ url_for('health_digest', category=cat.slug) }}"
+           class="journal-nav-link {% if current_category and current_category.slug == cat.slug %}active{% endif %}">
+            {{ cat.name }}
+        </a>
+        {% endfor %}
+    </nav>
+
+    {% if articles %}
+    <!-- Newspaper Layout -->
+    <div class="journal-layout">
+        <!-- Main Content Area -->
+        <div class="journal-main">
+            <!-- Lead Story -->
+            {% set featured = articles|selectattr('is_featured')|first or articles[0] %}
+            <article class="journal-lead">
+                <a href="{{ url_for('article_detail', slug=featured.slug) }}" class="journal-lead-image">
+                    {% if featured.featured_image %}
+                        {% if featured.featured_image.startswith('/static/') or featured.featured_image.startswith('http') %}
+                            <img src="{{ featured.featured_image }}"
+                        {% else %}
+                            <img src="{{ url_for('static', filename='img/' + featured.featured_image) }}"
+                        {% endif %}
+                    {% else %}
+                        <img src="https://picsum.photos/seed/article{{ featured.id }}/800/450"
+                    {% endif %}
+                         alt="{{ featured.title }}"
+                         loading="eager">
                 </a>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="row">
-        <!-- Main Content -->
-        <div class="col-lg-8">
-            <!-- Category Filter & Search -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <div class="dropdown">
-                                <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-filter me-2"></i>
-                                    {% if current_category %}{{ current_category.name }}{% else %}All Categories{% endif %}
-                                </button>
-                                <ul class="dropdown-menu w-100">
-                                    <li><a class="dropdown-item" href="{{ url_for('health_digest') }}">All Categories</a></li>
-                                    {% for cat in categories %}
-                                    <li>
-                                        <a class="dropdown-item" href="{{ url_for('health_digest', category=cat.slug) }}">
-                                            <i class="fas {{ cat.icon }} me-2"></i>{{ cat.name }}
-                                        </a>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <form action="{{ url_for('health_digest') }}" method="GET">
-                                {% if current_category %}
-                                <input type="hidden" name="category" value="{{ current_category.slug }}">
-                                {% endif %}
-                                <div class="input-group">
-                                    <input type="text" class="form-control" name="q" placeholder="Search articles..." value="{{ search_query or '' }}">
-                                    <button class="btn btn-primary" type="submit">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                <div class="journal-lead-content">
+                    <span class="journal-category">{{ featured.category.name }}</span>
+                    <h1 class="journal-lead-title">
+                        <a href="{{ url_for('article_detail', slug=featured.slug) }}">{{ featured.title }}</a>
+                    </h1>
+                    <p class="journal-lead-excerpt">{{ featured.summary or (featured.content[:250] + '...') }}</p>
+                    <div class="journal-byline">
+                        By <strong>{{ featured.author_name }}</strong> &bull; {{ featured.published_at.strftime('%B %d, %Y') if featured.published_at else featured.created_at.strftime('%B %d, %Y') }}
                     </div>
                 </div>
-            </div>
+            </article>
 
-            <!-- Articles Grid -->
-            {% if articles %}
-                <div class="digest-grid">
-                    {% for article in articles %}
-                    <article class="digest-card {% if loop.first %}digest-card-featured{% endif %} {% if article.is_featured %}is-featured{% endif %}">
-                        <a href="{{ url_for('article_detail', slug=article.slug) }}" class="digest-thumb" style="background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite;">
-                            {% if article.featured_image %}
-                                {% if article.featured_image.startswith('/static/') or article.featured_image.startswith('http') %}
-                                    <img src="{{ article.featured_image }}"
-                                {% else %}
-                                    <img src="{{ url_for('static', filename='img/' + article.featured_image) }}"
-                                {% endif %}
+            <!-- Secondary Stories (2-column newspaper style) -->
+            {% set remaining_articles = articles|rejectattr('id', 'equalto', featured.id)|list %}
+            {% if remaining_articles %}
+            <div class="journal-columns">
+                {% for article in remaining_articles[:6] %}
+                <article class="journal-story {% if loop.index <= 2 %}journal-story--with-image{% endif %}">
+                    {% if loop.index <= 2 %}
+                    <a href="{{ url_for('article_detail', slug=article.slug) }}" class="journal-story-image">
+                        {% if article.featured_image %}
+                            {% if article.featured_image.startswith('/static/') or article.featured_image.startswith('http') %}
+                                <img src="{{ article.featured_image }}"
                             {% else %}
-                                <img src="https://picsum.photos/seed/article{{ article.id }}/600/420"
+                                <img src="{{ url_for('static', filename='img/' + article.featured_image) }}"
                             {% endif %}
-                                 alt="{{ article.title }}"
-                                 loading="lazy"
-                                 width="600"
-                                 height="420"
-                                 style="opacity: 0; transition: opacity 0.3s;"
-                                 onload="this.style.opacity=1; this.parentElement.style.animation='none'; this.parentElement.style.background='transparent';"
-                                 onerror="this.src='https://picsum.photos/seed/article{{ article.id }}/600/420'; this.style.opacity=1;">
-                        </a>
-                        <div class="digest-body">
-                            <div class="digest-meta">
-                                <span class="digest-kicker">
-                                    <i class="fas {{ article.category.icon }} me-1"></i>
-                                    {{ article.category.name }}
-                                </span>
-                                {% if article.is_featured %}
-                                <span class="digest-featured">Featured</span>
-                                {% endif %}
-                                <span class="digest-readtime">
-                                    <i class="far fa-clock me-1"></i>{{ article.read_time }} min read
-                                </span>
-                            </div>
-                            <h3 class="digest-title">
-                                <a href="{{ url_for('article_detail', slug=article.slug) }}" class="text-decoration-none text-dark">
-                                    {{ article.title }}
-                                </a>
-                            </h3>
-                            <p class="digest-summary">{{ article.summary or (article.content[:160] + '...') }}</p>
-                            <div class="digest-footer">
-                                <span><i class="fas fa-user-edit me-1"></i>{{ article.author_name }}</span>
-                                <span class="mx-1">•</span>
-                                <span><i class="far fa-calendar me-1"></i>{{ article.published_at.strftime('%b %d, %Y') if article.published_at else article.created_at.strftime('%b %d, %Y') }}</span>
-                                <span class="mx-1">•</span>
-                                <a href="{{ url_for('article_detail', slug=article.slug) }}" class="digest-link">Read article</a>
-                            </div>
-                        </div>
+                        {% else %}
+                            <img src="https://picsum.photos/seed/article{{ article.id }}/400/250"
+                        {% endif %}
+                             alt="{{ article.title }}"
+                             loading="lazy">
+                    </a>
+                    {% endif %}
+                    <div class="journal-story-content">
+                        <span class="journal-category-sm">{{ article.category.name }}</span>
+                        <h3 class="journal-story-title">
+                            <a href="{{ url_for('article_detail', slug=article.slug) }}">{{ article.title }}</a>
+                        </h3>
+                        <p class="journal-story-excerpt">{{ article.summary or (article.content[:100] + '...') }}</p>
+                        <span class="journal-story-meta">{{ article.author_name }} &bull; {{ article.published_at.strftime('%b %d') if article.published_at else article.created_at.strftime('%b %d') }}</span>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- More Stories (compact list) -->
+            {% if remaining_articles|length > 6 %}
+            <div class="journal-more">
+                <h4 class="journal-section-title">More Stories</h4>
+                <div class="journal-headlines">
+                    {% for article in remaining_articles[6:] %}
+                    <article class="journal-headline">
+                        <span class="journal-category-xs">{{ article.category.name }}</span>
+                        <h4 class="journal-headline-title">
+                            <a href="{{ url_for('article_detail', slug=article.slug) }}">{{ article.title }}</a>
+                        </h4>
+                        <span class="journal-headline-meta">{{ article.author_name }} &bull; {{ article.read_time }} min</span>
                     </article>
                     {% endfor %}
                 </div>
-            {% else %}
-                <div class="text-center py-5">
-                    <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
-                    <h4>No Articles Found</h4>
-                    <p class="text-muted">
-                        {% if search_query %}
-                            No articles match your search "{{ search_query }}"
-                        {% else %}
-                            Check back soon for new health articles!
-                        {% endif %}
-                    </p>
-                </div>
+            </div>
             {% endif %}
         </div>
 
         <!-- Sidebar -->
-        <div class="col-lg-4">
-            <!-- Categories Widget -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">
-                        <i class="fas fa-list me-2"></i>All Categories
-                    </h5>
-                    <div class="list-group list-group-flush">
-                        <a href="{{ url_for('health_digest') }}"
-                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if not current_category %}active{% endif %}">
-                            <span>
-                                <i class="fas fa-layer-group me-2"></i>All
-                            </span>
-                            <span class="badge bg-primary rounded-pill">{{ categories|map(attribute='articles')|map('length')|sum }}</span>
-                        </a>
-                        {% for cat in categories %}
-                        <a href="{{ url_for('health_digest', category=cat.slug) }}"
-                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if current_category and current_category.slug == cat.slug %}active{% endif %}">
-                            <span>
-                                <i class="fas {{ cat.icon }} me-2"></i>{{ cat.name }}
-                            </span>
-                            <span class="badge bg-primary rounded-pill">{{ cat.articles|length }}</span>
-                        </a>
-                        {% endfor %}
-                    </div>
-                </div>
+        <aside class="journal-sidebar">
+            <!-- Search -->
+            <div class="journal-widget">
+                <form action="{{ url_for('health_digest') }}" method="GET" class="journal-search">
+                    {% if current_category %}
+                    <input type="hidden" name="category" value="{{ current_category.slug }}">
+                    {% endif %}
+                    <input type="text" name="q" placeholder="Search..." value="{{ search_query or '' }}" class="journal-search-input">
+                    <button type="submit" class="journal-search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
             </div>
 
-            <!-- Featured Articles Widget -->
-            {% if featured_articles %}
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">
-                        <i class="fas fa-star text-warning me-2"></i>Featured Articles
-                    </h5>
-                    {% for article in featured_articles %}
-                    <div class="mb-3 pb-3 {% if not loop.last %}border-bottom{% endif %}">
-                        <a href="{{ url_for('article_detail', slug=article.slug) }}" class="text-decoration-none">
-                            <h6 class="mb-1 text-dark">{{ article.title }}</h6>
+            <!-- Categories -->
+            <div class="journal-widget">
+                <h4 class="journal-widget-heading">Sections</h4>
+                <ul class="journal-sections">
+                    <li>
+                        <a href="{{ url_for('health_digest') }}" class="{% if not current_category %}active{% endif %}">
+                            All <span>{{ categories|map(attribute='articles')|map('length')|sum }}</span>
                         </a>
-                        <small class="text-muted">
-                            <i class="far fa-calendar me-1"></i>{{ article.published_at.strftime('%b %d') if article.published_at else article.created_at.strftime('%b %d') }}
-                            <span class="mx-1">•</span>
-                            <i class="far fa-clock me-1"></i>{{ article.read_time }} min
-                        </small>
-                    </div>
+                    </li>
+                    {% for cat in categories %}
+                    <li>
+                        <a href="{{ url_for('health_digest', category=cat.slug) }}"
+                           class="{% if current_category and current_category.slug == cat.slug %}active{% endif %}">
+                            {{ cat.name }} <span>{{ cat.articles|length }}</span>
+                        </a>
+                    </li>
                     {% endfor %}
-                </div>
+                </ul>
+            </div>
+
+            <!-- Editor's Picks -->
+            {% if featured_articles %}
+            <div class="journal-widget">
+                <h4 class="journal-widget-heading">Editor's Picks</h4>
+                <ol class="journal-picks">
+                    {% for article in featured_articles[:5] %}
+                    <li>
+                        <a href="{{ url_for('article_detail', slug=article.slug) }}">
+                            {{ article.title }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ol>
             </div>
             {% endif %}
 
-            <!-- CTA Widget -->
-            <div class="card shadow-sm bg-primary text-white">
-                <div class="card-body text-center">
-                    <i class="fas fa-user-md fa-3x mb-3"></i>
-                    <h5 class="card-title">Need Medical Advice?</h5>
-                    <p class="card-text small">Consult with verified doctors across Nepal</p>
-                    <a href="{{ url_for('index') }}" class="btn btn-light btn-sm">
-                        <i class="fas fa-search me-1"></i>Find a Doctor
-                    </a>
-                </div>
+            <!-- CTA -->
+            <div class="journal-widget journal-widget--cta">
+                <i class="fas fa-stethoscope"></i>
+                <h4>Find a Doctor</h4>
+                <p>Connect with verified specialists across Nepal</p>
+                <a href="{{ url_for('index') }}" class="journal-cta-btn">Search Doctors</a>
             </div>
-        </div>
+        </aside>
     </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+        <h4>No Articles Found</h4>
+        <p class="text-muted">
+            {% if search_query %}
+                No articles match your search "{{ search_query }}"
+            {% else %}
+                Check back soon for new health articles!
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
 </div>
-
-<style>
-.compass-tabs {
-    overflow-x: auto;
-    padding: 0 8px 4px;
-    scroll-padding-left: 8px;
-}
-
-.compass-tabs .nav {
-    gap: 8px;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-}
-
-.compass-tabs .nav-link {
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    color: var(--ink);
-    background: #ffffff;
-    font-weight: 600;
-    font-size: 0.85rem;
-    padding: 6px 14px;
-    white-space: nowrap;
-}
-
-.compass-tabs .nav-link.active {
-    background: var(--brand);
-    border-color: var(--brand);
-    color: #fff;
-}
-
-.digest-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 28px;
-    align-content: start;
-    grid-auto-flow: dense;
-}
-
-.digest-card {
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--border);
-}
-
-.digest-card-featured {
-    grid-column: span 2;
-}
-
-.digest-meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 10px 0 6px;
-}
-
-.digest-kicker {
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.72rem;
-    color: var(--muted);
-}
-
-.digest-featured {
-    font-size: 0.7rem;
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: var(--accent-gold-soft);
-    color: #6c5a1f;
-    font-weight: 600;
-}
-
-.digest-readtime {
-    font-size: 0.8rem;
-    color: var(--muted);
-}
-
-.digest-title {
-    font-family: 'Fraunces', 'Georgia', serif;
-    font-size: 1.3rem;
-    margin-bottom: 6px;
-    line-height: 1.2;
-}
-
-.digest-card-featured .digest-title {
-    font-size: 2rem;
-}
-
-.digest-summary {
-    color: var(--muted);
-    font-size: 0.95rem;
-    margin-bottom: 12px;
-}
-
-.digest-card-featured .digest-summary {
-    font-size: 1rem;
-}
-
-.digest-footer {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    font-size: 0.82rem;
-    color: var(--muted);
-}
-
-.digest-link {
-    color: var(--brand);
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.digest-link:hover {
-    color: var(--brand-dark);
-}
-
-.digest-thumb {
-    display: block;
-    border-radius: 10px;
-    overflow: hidden;
-    background: #f2f4f3;
-    box-shadow: var(--shadow-sm);
-}
-
-.digest-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    aspect-ratio: 4 / 3;
-}
-
-.digest-card-featured .digest-thumb img {
-    aspect-ratio: 16 / 9;
-}
-
-@media (max-width: 992px) {
-    .digest-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .digest-card-featured {
-        grid-column: span 2;
-    }
-
-    .digest-card-featured .digest-title {
-        font-size: 1.6rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .digest-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .digest-card-featured {
-        grid-column: span 1;
-    }
-
-    .digest-title {
-        font-size: 1.2rem;
-    }
-
-    .digest-card-featured .digest-title {
-        font-size: 1.35rem;
-    }
-}
-</style>
 {% endblock %}
