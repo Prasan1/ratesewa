@@ -4,8 +4,21 @@ from sqlalchemy import or_
 import re
 import os
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date, time
+from zoneinfo import ZoneInfo
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+
+# Nepal timezone helper (UTC+5:45)
+NEPAL_TZ = ZoneInfo('Asia/Kathmandu')
+
+def nepal_now():
+    """Get current datetime in Nepal timezone"""
+    return datetime.now(NEPAL_TZ)
+
+def nepal_today():
+    """Get current date in Nepal timezone"""
+    return datetime.now(NEPAL_TZ).date()
+
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
@@ -3851,10 +3864,9 @@ def doctor_profile(slug):
         # Increment total profile views
         doctor.profile_views = (doctor.profile_views or 0) + 1
 
-        # Track daily analytics
-        from datetime import date
+        # Track daily analytics (using Nepal timezone)
         from models import DoctorAnalytics
-        today = date.today()
+        today = nepal_today()
         analytics = DoctorAnalytics.query.filter_by(
             doctor_id=doctor.id,
             date=today
@@ -6757,8 +6769,8 @@ def clinic_dashboard(clinic_slug):
     # Get all doctors (including pending)
     clinic_doctors = ClinicDoctor.query.filter_by(clinic_id=clinic.id).all()
 
-    # Get today's appointments grouped by doctor
-    today = date.today()
+    # Get today's appointments grouped by doctor (using Nepal timezone)
+    today = nepal_today()
     today_appointments = {}
     for cd in clinic_doctors:
         if cd.status == 'approved':
@@ -7240,9 +7252,9 @@ def clinic_book_appointment(clinic_slug, doctor_id):
     # Get schedules
     schedules = clinic_doctor.get_schedules()
 
-    # Generate available dates for next 14 days
+    # Generate available dates for next 14 days (using Nepal timezone)
     available_dates = []
-    today = date.today()
+    today = nepal_today()
 
     for i in range(14):
         check_date = today + timedelta(days=i)
@@ -7337,7 +7349,9 @@ def api_get_available_slots():
 
     current = datetime.combine(selected_date, start_time)
     end = datetime.combine(selected_date, end_time)
-    now = datetime.now()
+    # Use Nepal timezone for current time (UTC+5:45)
+    now = nepal_now().replace(tzinfo=None)
+    today_nepal = nepal_today()
 
     # Get booked slots
     booked_appointments = Appointment.query.filter(
@@ -7351,8 +7365,8 @@ def api_get_available_slots():
     while current < end:
         slot_time = current.time()
 
-        # Skip past times for today
-        if selected_date == date.today() and current <= now:
+        # Skip past times for today (using Nepal timezone)
+        if selected_date == today_nepal and current <= now:
             current += timedelta(minutes=slot_duration)
             continue
 
@@ -7515,8 +7529,8 @@ def my_appointments():
         patient_user_id=session['user_id']
     ).order_by(Appointment.appointment_date.desc(), Appointment.appointment_time.desc()).all()
 
-    # Separate into upcoming and past
-    today = date.today()
+    # Separate into upcoming and past (using Nepal timezone)
+    today = nepal_today()
     upcoming = [a for a in appointments if a.appointment_date >= today and a.status not in ['completed', 'cancelled', 'no_show']]
     past = [a for a in appointments if a.appointment_date < today or a.status in ['completed', 'cancelled', 'no_show']]
 
