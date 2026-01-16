@@ -7328,7 +7328,8 @@ def api_get_available_slots():
     ).first()
 
     if not schedule:
-        return jsonify({'success': True, 'slots': [], 'message': 'No schedule for this day'})
+        return jsonify({'success': True, 'slots': [], 'message': 'No schedule for this day',
+                       'debug': {'day_of_week': day_of_week, 'clinic_doctor_id': clinic_doctor_id}})
 
     # Check for exceptions
     exception = ScheduleException.query.filter_by(
@@ -7386,7 +7387,21 @@ def api_get_available_slots():
 
         current += timedelta(minutes=slot_duration)
 
-    return jsonify({'success': True, 'slots': slots})
+    return jsonify({
+        'success': True,
+        'slots': slots,
+        'debug': {
+            'selected_date': str(selected_date),
+            'day_of_week': day_of_week,
+            'nepal_today': str(today_nepal),
+            'nepal_now': str(now),
+            'schedule_start': str(start_time),
+            'schedule_end': str(end_time),
+            'slot_duration': slot_duration,
+            'booking_notice_hours': clinic_doctor.booking_notice_hours,
+            'total_booked': len(booked_times)
+        }
+    })
 
 
 @app.route('/api/booking/create', methods=['POST'])
