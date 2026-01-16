@@ -3099,6 +3099,87 @@ def admin_clinic_delete(clinic_id):
     flash('Clinic deleted successfully.', 'success')
     return redirect(url_for('admin_clinics'))
 
+
+@app.route('/admin/schedules/fix', methods=['GET', 'POST'])
+@admin_required
+def admin_fix_schedules():
+    """View and fix invalid schedules (end_time <= start_time)"""
+    from datetime import time
+
+    # Find all invalid schedules
+    invalid_schedules = ClinicSchedule.query.filter(
+        ClinicSchedule.end_time <= ClinicSchedule.start_time
+    ).all()
+
+    if request.method == 'POST':
+        schedule_id = request.form.get('schedule_id')
+        new_end_time = request.form.get('end_time')
+
+        if schedule_id and new_end_time:
+            schedule = ClinicSchedule.query.get(schedule_id)
+            if schedule:
+                try:
+                    schedule.end_time = time.fromisoformat(new_end_time)
+                    if schedule.end_time > schedule.start_time:
+                        db.session.commit()
+                        flash(f'Schedule {schedule_id} fixed successfully!', 'success')
+                    else:
+                        flash('End time must be after start time.', 'danger')
+                except Exception as e:
+                    flash(f'Error: {str(e)}', 'danger')
+
+        return redirect(url_for('admin_fix_schedules'))
+
+    # Prepare data for display
+    day_names = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    rows_html = ""
+    for s in invalid_schedules:
+        cd = ClinicDoctor.query.get(s.clinic_doctor_id)
+        doctor_name = cd.doctor.name if cd and cd.doctor else 'Unknown'
+        clinic_name = cd.clinic.name if cd and cd.clinic else 'Unknown'
+        day = day_names[s.day_of_week]
+        start = s.start_time.strftime('%H:%M')
+        end = s.end_time.strftime('%H:%M')
+        suggested = end.replace('06:', '18:').replace('07:', '19:').replace('08:', '20:')
+
+        rows_html += f'''<tr>
+            <td>{s.id}</td>
+            <td>{doctor_name}</td>
+            <td>{clinic_name}</td>
+            <td>{day}</td>
+            <td>{start}</td>
+            <td class="text-danger">{end}</td>
+            <td>
+                <form method="POST" class="d-flex gap-2">
+                    <input type="hidden" name="schedule_id" value="{s.id}">
+                    <input type="time" name="end_time" value="{suggested}" class="form-control form-control-sm" style="width:120px">
+                    <button type="submit" class="btn btn-sm btn-primary">Fix</button>
+                </form>
+            </td>
+        </tr>'''
+
+    count = len(invalid_schedules)
+    success_msg = "<div class='alert alert-success'>All schedules are valid!</div>" if count == 0 else ""
+
+    return f'''<!DOCTYPE html>
+    <html>
+    <head><title>Fix Invalid Schedules</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body class="p-4">
+    <div class="container">
+        <h2>Invalid Schedules (end_time &lt;= start_time)</h2>
+        <p>Found {count} invalid schedule(s)</p>
+        {success_msg}
+        <table class="table table-striped">
+            <thead><tr><th>ID</th><th>Doctor</th><th>Clinic</th><th>Day</th><th>Start</th><th>End (Wrong)</th><th>Fix</th></tr></thead>
+            <tbody>{rows_html}</tbody>
+        </table>
+        <a href="/admin/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+    </body></html>'''
+
+
 @app.route('/admin/cities/new', methods=['GET', 'POST'])
 @admin_required
 def admin_city_new():
@@ -7204,6 +7285,11 @@ def doctor_clinic_schedule(clinic_doctor_id):
                     start_time = time.fromisoformat(start_time_str)
                     end_time = time.fromisoformat(end_time_str)
 
+                    # Validate end time is after start time
+                    if end_time <= start_time:
+                        flash(f'End time must be after start time for day {day_num}. Did you mean PM instead of AM?', 'warning')
+                        continue
+
                     schedule = ClinicSchedule(
                         clinic_doctor_id=clinic_doctor_id,
                         day_of_week=day_num,
@@ -7328,8 +7414,7 @@ def api_get_available_slots():
     ).first()
 
     if not schedule:
-        return jsonify({'success': True, 'slots': [], 'message': 'No schedule for this day',
-                       'debug': {'day_of_week': day_of_week, 'clinic_doctor_id': clinic_doctor_id}})
+        return jsonify({'success': True, 'slots': [], 'message': 'No schedule for this day'})
 
     # Check for exceptions
     exception = ScheduleException.query.filter_by(
@@ -7387,21 +7472,7 @@ def api_get_available_slots():
 
         current += timedelta(minutes=slot_duration)
 
-    return jsonify({
-        'success': True,
-        'slots': slots,
-        'debug': {
-            'selected_date': str(selected_date),
-            'day_of_week': day_of_week,
-            'nepal_today': str(today_nepal),
-            'nepal_now': str(now),
-            'schedule_start': str(start_time),
-            'schedule_end': str(end_time),
-            'slot_duration': slot_duration,
-            'booking_notice_hours': clinic_doctor.booking_notice_hours,
-            'total_booked': len(booked_times)
-        }
-    })
+    return jsonify({'success': True, 'slots': slots})
 
 
 @app.route('/api/booking/create', methods=['POST'])
