@@ -119,8 +119,8 @@ def seed_general_checkup_article():
             db.session.add(category)
             db.session.flush()
 
-        # Link to General Physician specialty
-        specialty = Specialty.query.filter_by(name="General Physician").first()
+        # Link to Internal Medicine specialty
+        specialty = Specialty.query.filter_by(name="Internal Medicine").first()
 
         title = "When to See a Doctor in Nepal: A Guide to General Health Checkups"
         slug = slugify(title)
