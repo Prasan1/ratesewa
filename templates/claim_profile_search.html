@@ -11,35 +11,18 @@
         <div class="card shadow-sm border-0">
             <div class="card-body p-5">
 
-                <!-- NMC Required Notice -->
-                <div class="alert alert-warning border-0 shadow-sm mb-3">
-                    <h6 class="mb-2">
-                        <i class="fas fa-exclamation-triangle me-2"></i>NMC Registration Required
-                    </h6>
-                    <p class="mb-0 small">
-                        To claim a profile on RankSewa, you must be registered with the
-                        <strong>Nepal Medical Council (NMC)</strong>. A valid NMC registration number and NMC license document are required for verification.
-                        <a href="https://nmc.org.np" target="_blank" rel="noopener" class="alert-link">
-                            Check NMC registration <i class="fas fa-external-link-alt small"></i>
-                        </a>
-                    </p>
-                </div>
-
-                <!-- Start Here -->
-                <div class="alert alert-info border-0 shadow-sm mb-4">
+                <!-- Quick Start Notice -->
+                <div class="alert border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #22c55e !important;">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                         <div>
-                            <h5 class="mb-1"><i class="fas fa-compass me-2"></i>Start here</h5>
+                            <h5 class="mb-1" style="color: #166534;"><i class="fas fa-bolt me-2"></i>Quick Claim Available!</h5>
                             <div class="text-muted">
-                                Submit your verification documents. Once approved, you'll get full dashboard access.
+                                Claim your profile now and start editing immediately. Verification documents are <strong>optional</strong> - you can submit them later.
                             </div>
                         </div>
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="#claim-search" class="btn btn-outline-primary">
-                                <i class="fas fa-hand-paper me-2"></i>Claim Existing Profile
-                            </a>
-                            <a href="{{ url_for('doctor_self_register') }}" class="btn btn-primary">
-                                <i class="fas fa-plus-circle me-2"></i>Create New Profile
+                            <a href="#claim-search" class="btn btn-success">
+                                <i class="fas fa-search me-2"></i>Find My Profile
                             </a>
                         </div>
                     </div>
@@ -94,6 +77,12 @@
                                     <small class="text-muted">
                                         <i class="fas fa-life-ring me-1"></i>
                                         If your profile is already claimed, please contact support to regain access.
+                                    </small>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-shield-alt me-1"></i>
+                                        Verified profiles cannot be claimed. If a verified listing belongs to you, email <strong>support@ranksewa.com</strong> and include your NMC and documents for review.
                                     </small>
                                 </div>
                             </div>

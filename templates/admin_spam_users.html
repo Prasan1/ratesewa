@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Detect Spam Users{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="mb-1"><i class="fas fa-robot text-danger me-2"></i>Spam Account Detection</h2>
+        <p class="text-muted mb-0">Review and remove suspicious bot registrations.</p>
+    </div>
+    <a href="{{ url_for('admin_users') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Back to Users
+    </a>
+</div>
+
+{% if spam_users %}
+<div class="card border-danger mb-4">
+    <div class="card-header bg-danger text-white">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Likely Spam Accounts ({{ spam_users|length }})</strong>
+        <span class="ms-2 small">Gibberish names, never logged in, unverified email</span>
+    </div>
+    <div class="card-body p-0">
+        <form method="POST" action="{{ url_for('admin_bulk_delete_users') }}" id="bulkDeleteForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 40px;">
+                                <input type="checkbox" id="selectAllSpam" class="form-check-input" onclick="toggleAll(this, 'spam')">
+                            </th>
+                            <th>User</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in spam_users %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="user_ids" value="{{ user.id }}" class="form-check-input spam-checkbox">
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-danger">{{ user.name }}</div>
+                                <div class="text-muted small">{{ user.email }}</div>
+                            </td>
+                            <td class="small text-muted">
+                                {{ user.created_at.strftime('%b %d, %Y %H:%M') if user.created_at else '-' }}
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">Never logged in</span>
+                                <span class="badge bg-warning text-dark">Unverified</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-footer bg-light">
+                <div class="d-flex flex-wrap gap-3 align-items-center">
+                    <div class="flex-grow-1">
+                        <label class="form-label mb-1 small text-danger fw-bold">Type "DELETE SPAM" to confirm:</label>
+                        <input type="text" name="confirm_text" class="form-control form-control-sm" style="max-width: 200px;" placeholder="DELETE SPAM" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger" onclick="return confirmBulkDelete()">
+                        <i class="fas fa-trash-alt me-1"></i> Delete Selected (<span id="selectedCount">0</span>)
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-success">
+    <i class="fas fa-check-circle me-2"></i>
+    <strong>No obvious spam accounts detected.</strong> Your registration protections are working!
+</div>
+{% endif %}
+
+{% if other_unverified %}
+<div class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+        <i class="fas fa-question-circle me-2"></i>
+        <strong>Other Unverified Accounts ({{ other_unverified|length }})</strong>
+        <span class="ms-2 small">May be legitimate users who haven't verified yet</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>User</th>
+                        <th>Created</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in other_unverified[:20] %}
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">{{ user.name }}</div>
+                            <div class="text-muted small">{{ user.email }}</div>
+                        </td>
+                        <td class="small text-muted">
+                            {{ user.created_at.strftime('%b %d, %Y') if user.created_at else '-' }}
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">Never logged in</span>
+                        </td>
+                        <td class="text-end">
+                            <form method="post" action="{{ url_for('admin_user_status', user_id=user.id) }}" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <input type="hidden" name="action" value="deactivate"/>
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Deactivate">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if other_unverified|length > 20 %}
+        <div class="card-footer text-muted small">
+            Showing first 20 of {{ other_unverified|length }} accounts. These may be legitimate users.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<div class="alert alert-info">
+    <h6><i class="fas fa-shield-alt me-2"></i>Prevention Tips</h6>
+    <ul class="mb-0">
+        <li>Enable reCAPTCHA on registration forms</li>
+        <li>Use honeypot fields to catch simple bots</li>
+        <li>Implement rate limiting on registration endpoints</li>
+        <li>Require email verification for accessing sensitive data</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+function toggleAll(source, type) {
+    const checkboxes = document.querySelectorAll('.spam-checkbox');
+    checkboxes.forEach(cb => cb.checked = source.checked);
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const count = document.querySelectorAll('.spam-checkbox:checked').length;
+    document.getElementById('selectedCount').textContent = count;
+}
+
+function confirmBulkDelete() {
+    const count = document.querySelectorAll('.spam-checkbox:checked').length;
+    if (count === 0) {
+        alert('Please select at least one account to delete.');
+        return false;
+    }
+    return true;
+}
+
+// Update count when checkboxes change
+document.querySelectorAll('.spam-checkbox').forEach(cb => {
+    cb.addEventListener('change', updateSelectedCount);
+});
+
+// Initial count
+updateSelectedCount();
+</script>
+{% endblock %}

@@ -32,6 +32,7 @@ import stripe
 import subscription_config
 import promo_config
 import resend
+import requests
 from PIL import Image, ImageDraw, ImageFont
 import secrets
 import qrcode
@@ -147,6 +148,50 @@ google = oauth.register(
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
+
+# reCAPTCHA v3 Configuration (for bot protection)
+RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY')
+RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY')
+RECAPTCHA_THRESHOLD = 0.5  # Score threshold (0.0 = bot, 1.0 = human)
+
+def verify_recaptcha(token, action='register'):
+    """Verify reCAPTCHA v3 token. Returns (success, score, error_msg)"""
+    if not RECAPTCHA_SECRET_KEY:
+        # Skip verification in development if not configured
+        if not is_production:
+            return True, 1.0, None
+        return False, 0.0, 'reCAPTCHA not configured'
+
+    if not token:
+        return False, 0.0, 'No reCAPTCHA token provided'
+
+    try:
+        response = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={
+                'secret': RECAPTCHA_SECRET_KEY,
+                'response': token
+            },
+            timeout=5
+        )
+        result = response.json()
+
+        if not result.get('success'):
+            return False, 0.0, 'reCAPTCHA verification failed'
+
+        # Check action matches (prevents token reuse across forms)
+        if result.get('action') != action:
+            return False, 0.0, 'Invalid reCAPTCHA action'
+
+        score = result.get('score', 0.0)
+        if score < RECAPTCHA_THRESHOLD:
+            return False, score, f'Suspicious activity detected (score: {score})'
+
+        return True, score, None
+    except Exception as e:
+        print(f"reCAPTCHA verification error: {e}")
+        # Allow through in case of API failure, but log it
+        return True, 0.5, None
 
 # Proxy + Rate Limiter (respect Cloudflare/forwarded IPs)
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -304,6 +349,12 @@ def admin_required(f):
     return decorated_function
 
 
+LIMITED_DOCTOR_ALLOWED_ENDPOINTS = {
+    'doctor_dashboard',
+    'doctor_profile_edit',
+}
+
+
 def doctor_required(f):
     from functools import wraps
     @wraps(f)
@@ -331,6 +382,33 @@ def doctor_required(f):
         doctor = user.doctor_profile
         if doctor:
             enforce_subscription_expiry(doctor)
+            if not doctor.is_verified and request.endpoint not in LIMITED_DOCTOR_ALLOWED_ENDPOINTS:
+                flash('Complete verification to unlock dashboard features. You can still edit your profile.', 'warning')
+                return redirect(url_for('doctor_dashboard'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def verified_doctor_required(f):
+    """Decorator for routes that require a verified doctor"""
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Please log in first.', 'warning')
+            return redirect(url_for('login'))
+        user = User.query.get(session['user_id'])
+        if not user or not user.is_active:
+            session.clear()
+            flash('Your account has been deactivated.', 'danger')
+            return redirect(url_for('login'))
+        if user.role != 'doctor' or not user.doctor_id:
+            flash('Doctor access required.', 'warning')
+            return redirect(url_for('index'))
+        doctor = user.doctor_profile
+        if not doctor or not doctor.is_verified:
+            flash('This feature is only available to verified doctors. Please complete verification first.', 'warning')
+            return redirect(url_for('doctor_dashboard'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -382,17 +460,26 @@ def get_safe_redirect(param_name='next', fallback='index'):
     return url_for(fallback)
 
 
+def get_doctor_effective_tier(doctor):
+    if not doctor:
+        return 'free'
+    tier = doctor.subscription_tier or 'free'
+    if doctor.is_verified and tier == 'free':
+        return 'verified'
+    return tier
+
+
 def build_doctor_analytics_context(doctor):
     """Build analytics context for doctor or clinic manager views."""
-    tier_order = ['free', 'premium', 'featured']
-    effective_tier = doctor.subscription_tier or 'free'
+    tier_order = ['free', 'verified', 'premium', 'featured']
+    effective_tier = get_doctor_effective_tier(doctor)
     promo_tier = promo_config.get_promotional_tier()
     if promo_tier in tier_order:
         promo_index = tier_order.index(promo_tier)
         current_index = tier_order.index(effective_tier) if effective_tier in tier_order else 0
         if promo_index > current_index:
             effective_tier = promo_tier
-    has_enhanced_analytics = effective_tier == 'featured'
+    has_enhanced_analytics = effective_tier in {'verified', 'featured'}
 
     ratings = doctor.ratings
     review_count = len(ratings)
@@ -1041,10 +1128,25 @@ def optimize_and_save_article_image(image_file):
 
 # --- Authentication Routes ---
 @app.route('/register', methods=['GET', 'POST'])
-@limiter.limit("5 per minute", methods=["POST"])  # Prevent registration spam
+@limiter.limit("3 per hour", methods=["POST"])  # Strict rate limit to prevent bot registrations
 def register():
     next_url = request.args.get('next', '')
     if request.method == 'POST':
+        # Honeypot check - this field should be empty (bots will fill it)
+        honeypot = request.form.get('website', '')
+        if honeypot:
+            # Silently reject - don't tell bots why
+            flash('Registration failed. Please try again.', 'danger')
+            return redirect(url_for('register'))
+
+        # reCAPTCHA v3 verification
+        recaptcha_token = request.form.get('g-recaptcha-response', '')
+        success, score, error_msg = verify_recaptcha(recaptcha_token, action='register')
+        if not success:
+            flash('Security verification failed. Please try again.', 'danger')
+            print(f"reCAPTCHA failed: {error_msg}, score: {score}")
+            return redirect(url_for('register'))
+
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
@@ -1089,7 +1191,7 @@ def register():
             flash('An error occurred during registration.', 'danger')
             return redirect(url_for('register'))
 
-    return render_template('register.html', next_url=next_url)
+    return render_template('register.html', next_url=next_url, recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 @app.route('/login', methods=['GET', 'POST'])
 @limiter.limit("10 per minute", methods=["POST"])  # Prevent brute force attacks
@@ -1372,6 +1474,32 @@ def verify_email(token):
     flash('Email verified successfully. You can log in now.', 'success')
     return redirect(url_for('login'))
 
+@app.route('/resend-verification', methods=['GET', 'POST'])
+@limiter.limit("3 per hour")
+def resend_verification():
+    """Resend email verification link"""
+    if 'user_id' not in session:
+        flash('Please log in first.', 'warning')
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.clear()
+        return redirect(url_for('login'))
+
+    if user.email_verified:
+        flash('Your email is already verified.', 'info')
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        verify_url = send_email_verification(user)
+        if verify_url:
+            flash(f'DEV: Verify your email here: {verify_url}', 'info')
+        flash('Verification email sent. Please check your inbox.', 'success')
+        return redirect(url_for('index'))
+
+    return render_template('resend_verification.html', user=user)
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -1585,6 +1713,7 @@ def claim_profile():
                 )
             )\
             .filter(User.id.is_(None))\
+            .filter(Doctor.is_verified == False)\
             .filter(Doctor.is_active == True)\
             .all()
 
@@ -1598,6 +1727,10 @@ def claim_profile():
 def claim_profile_form(doctor_id):
     """Show verification form for claiming a doctor profile"""
     doctor = Doctor.query.get_or_404(doctor_id)
+
+    if doctor.is_verified:
+        flash('This profile is already verified and cannot be claimed.', 'warning')
+        return redirect(url_for('claim_profile'))
 
     # Check if doctor is already claimed
     if doctor.user_account and doctor.user_account.id != session['user_id']:
@@ -1632,11 +1765,46 @@ def claim_profile_form(doctor_id):
 @login_required
 def claim_profile_quick(doctor_id):
     """
-    Quick claim is DISABLED - all doctors must verify before accessing dashboard.
-    This route now redirects to the full verification form.
+    Quick claim - allows doctors to claim profile without full verification.
+    They get dashboard access with limited features, can verify later for full access.
     """
-    flash('To protect patients, all doctors must verify their credentials before accessing the dashboard.', 'info')
-    return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
+    doctor = Doctor.query.get_or_404(doctor_id)
+
+    if doctor.is_verified:
+        flash('This profile is already verified and cannot be claimed.', 'warning')
+        return redirect(url_for('claim_profile'))
+
+    # Check if doctor is already claimed by someone else
+    if doctor.user_account and doctor.user_account.id != session['user_id']:
+        flash('This profile has already been claimed by another user.', 'warning')
+        return redirect(url_for('claim_profile'))
+
+    # Check if current user already has a doctor profile
+    user = User.query.get(session['user_id'])
+    if user.doctor_id and user.doctor_id != doctor_id:
+        flash('You already have a doctor profile linked to your account.', 'warning')
+        return redirect(url_for('doctor_dashboard'))
+
+    try:
+        # Link user to doctor profile
+        user.doctor_id = doctor.id
+        user.role = 'doctor'
+
+        # Doctor remains unverified - they can verify later
+        # doctor.is_verified stays False
+
+        db.session.commit()
+
+        # Update session
+        session['role'] = 'doctor'
+
+        flash('Profile claimed successfully! You can now edit your profile. Complete verification to unlock all features.', 'success')
+        return redirect(url_for('doctor_dashboard'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error claiming profile: {str(e)}', 'danger')
+        return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
 
 
 @app.route('/claim-profile/<int:doctor_id>/submit', methods=['POST'])
@@ -1644,6 +1812,10 @@ def claim_profile_quick(doctor_id):
 def claim_profile_submit(doctor_id):
     """Process verification request submission"""
     doctor = Doctor.query.get_or_404(doctor_id)
+
+    if doctor.is_verified:
+        flash('This profile is already verified and cannot be claimed.', 'warning')
+        return redirect(url_for('claim_profile'))
 
     # Check if doctor is already claimed
     if doctor.user_account and doctor.user_account.id != session['user_id']:
@@ -1825,6 +1997,77 @@ def doctor_self_register():
     cities = City.query.order_by(City.name).all()
     specialties = Specialty.query.order_by(Specialty.name).all()
     return render_template('doctor_self_register.html', cities=cities, specialties=specialties)
+
+
+@app.route('/doctor/self-register/quick', methods=['POST'])
+@login_required
+def doctor_self_register_quick():
+    """
+    Quick self-registration - creates doctor profile with basic info only.
+    No NMC or documents required. Doctor gets limited dashboard access.
+    """
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+
+    # Check if user already has a doctor profile
+    if user.doctor_id:
+        flash('You already have a doctor profile linked to your account.', 'warning')
+        return redirect(url_for('doctor_dashboard'))
+
+    try:
+        # Get basic form data
+        name = text_utils.normalize_name(request.form.get('name', '').strip())
+        specialty_id = request.form.get('specialty_id')
+        city_id = request.form.get('city_id')
+
+        # Validate required fields
+        if not all([name, specialty_id, city_id]):
+            flash('Name, specialty, and city are required.', 'danger')
+            return redirect(url_for('doctor_self_register'))
+
+        # Validate specialty and city exist
+        specialty = Specialty.query.get(specialty_id)
+        city = City.query.get(city_id)
+        if not specialty or not city:
+            flash('Invalid specialty or city selected.', 'danger')
+            return redirect(url_for('doctor_self_register'))
+
+        # Generate a unique slug for the doctor
+        base_slug = re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')
+        slug = base_slug
+        counter = 1
+        while Doctor.query.filter_by(slug=slug).first():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+
+        # Create new doctor profile (unverified)
+        doctor = Doctor(
+            name=name,
+            slug=slug,
+            specialty_id=specialty_id,
+            city_id=city_id,
+            is_verified=False,
+            is_active=True
+        )
+        db.session.add(doctor)
+        db.session.flush()  # Get the doctor.id
+
+        # Link user to doctor profile
+        user.doctor_id = doctor.id
+        user.role = 'doctor'
+
+        db.session.commit()
+
+        # Update session
+        session['role'] = 'doctor'
+
+        flash('Profile created successfully! You can now edit your profile. Complete verification to unlock all features.', 'success')
+        return redirect(url_for('doctor_dashboard'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error creating profile: {str(e)}', 'danger')
+        return redirect(url_for('doctor_self_register'))
 
 
 @app.route('/doctor/self-register/submit', methods=['POST'])
@@ -3640,6 +3883,93 @@ def admin_user_toggle_admin(user_id):
     return redirect(url_for('admin_users'))
 
 
+@app.route('/admin/users/detect-spam')
+@admin_required
+def admin_detect_spam_users():
+    """Detect suspicious/spam user accounts"""
+    # Criteria for suspicious accounts:
+    # 1. Random gibberish username (high consonant ratio, no spaces)
+    # 2. Never logged in
+    # 3. Email not verified
+    # 4. Created recently (within last 7 days)
+    # 5. No meaningful activity (no reviews, no doctor profile)
+
+    from datetime import timedelta
+    cutoff_date = datetime.utcnow() - timedelta(days=7)
+
+    suspicious_users = User.query.filter(
+        User.email_verified == False,
+        User.last_login_at == None,
+        User.created_at >= cutoff_date,
+        User.is_admin == False,
+        User.doctor_id == None  # Not linked to a doctor profile
+    ).order_by(User.created_at.desc()).all()
+
+    # Further filter by username pattern (gibberish detection)
+    def is_gibberish_name(name):
+        if not name or len(name) < 3:
+            return False
+        name_lower = name.lower().replace(' ', '')
+        vowels = set('aeiou')
+        consonants = set('bcdfghjklmnpqrstvwxyz')
+        vowel_count = sum(1 for c in name_lower if c in vowels)
+        consonant_count = sum(1 for c in name_lower if c in consonants)
+        # High consonant ratio with no spaces = likely gibberish
+        if consonant_count > 0 and vowel_count > 0:
+            ratio = consonant_count / vowel_count
+            # Names with ratio > 3 and no spaces are suspicious
+            if ratio > 3 and ' ' not in name:
+                return True
+        # All consonants or very few vowels
+        if vowel_count <= 1 and len(name_lower) > 5:
+            return True
+        return False
+
+    # Split into likely spam and possibly legitimate
+    spam_users = [u for u in suspicious_users if is_gibberish_name(u.name)]
+    other_unverified = [u for u in suspicious_users if not is_gibberish_name(u.name)]
+
+    return render_template('admin_spam_users.html',
+                          spam_users=spam_users,
+                          other_unverified=other_unverified,
+                          now=datetime.utcnow())
+
+
+@app.route('/admin/users/bulk-delete', methods=['POST'])
+@admin_required
+def admin_bulk_delete_users():
+    """Bulk delete selected spam users"""
+    user_ids = request.form.getlist('user_ids')
+    confirm_text = request.form.get('confirm_text', '')
+
+    if confirm_text != 'DELETE SPAM':
+        flash('Please type "DELETE SPAM" to confirm deletion.', 'danger')
+        return redirect(url_for('admin_detect_spam_users'))
+
+    if not user_ids:
+        flash('No users selected for deletion.', 'warning')
+        return redirect(url_for('admin_detect_spam_users'))
+
+    # Convert to integers and exclude current admin
+    user_ids = [int(uid) for uid in user_ids if uid.isdigit()]
+    current_user_id = session.get('user_id')
+    user_ids = [uid for uid in user_ids if uid != current_user_id]
+
+    # Delete users (only unverified, never-logged-in accounts)
+    deleted_count = 0
+    for uid in user_ids:
+        user = User.query.get(uid)
+        if user and not user.email_verified and not user.last_login_at and not user.is_admin:
+            # Check no linked data
+            if not user.doctor_id and Rating.query.filter_by(user_id=uid).count() == 0:
+                db.session.delete(user)
+                deleted_count += 1
+
+    db.session.commit()
+    flash(f'Successfully deleted {deleted_count} spam accounts.', 'success')
+    return redirect(url_for('admin_users'))
+
+
 @app.route('/admin/users/<int:user_id>/reviews')
 @admin_required
 def admin_user_reviews(user_id):
@@ -4010,7 +4340,8 @@ def doctor_profile(slug):
 
     # Get tier features for access control
     import subscription_config
-    tier_features = subscription_config.TIER_FEATURES.get(doctor.subscription_tier, subscription_config.TIER_FEATURES['free'])
+    effective_tier = get_doctor_effective_tier(doctor)
+    tier_features = subscription_config.TIER_FEATURES.get(effective_tier, subscription_config.TIER_FEATURES['free'])
 
     # Get clinic affiliations with schedules for this doctor
     clinic_affiliations = ClinicDoctor.query.filter_by(
@@ -4018,6 +4349,14 @@ def doctor_profile(slug):
         status='approved',
         is_active=True
     ).all()
+
+    # Check if current user has verified email (for contact info access)
+    user_email_verified = False
+    current_user = None
+    if 'user_id' in session:
+        current_user = User.query.get(session['user_id'])
+        if current_user:
+            user_email_verified = current_user.email_verified
 
     return render_template('doctor_profile.html',
                           doctor=doctor,
@@ -4028,7 +4367,8 @@ def doctor_profile(slug):
                           banner_ad=banner_ad,
                           inline_ad=inline_ad,
                           tier_features=tier_features,
-                          clinic_affiliations=clinic_affiliations)
+                          clinic_affiliations=clinic_affiliations,
+                          user_email_verified=user_email_verified)
 
 @app.route('/rate_doctor', methods=['POST'])
 @login_required
@@ -4512,7 +4852,7 @@ def admin_verification_detail(request_id):
                         is_verified=True,  # Immediately verified upon approval
                         is_active=True,
                         is_featured=qualifies_for_lifetime,
-                        subscription_tier='featured' if qualifies_for_lifetime else 'free',
+                        subscription_tier='featured' if qualifies_for_lifetime else 'verified',
                         description=f"Verified doctor with {verification_request.proposed_experience} years of experience."
                     )
 
@@ -4558,6 +4898,8 @@ def admin_verification_detail(request_id):
                         doctor.subscription_tier = 'featured'
                         doctor.is_featured = True
                         doctor.subscription_expires_at = None
+                    elif doctor.subscription_tier in {None, 'free', ''}:
+                        doctor.subscription_tier = 'verified'
                     doctor.nmc_number = verification_request.nmc_number
                     doctor.nmc_expiry_date = nmc_expiry_date  # Can be None for permanent licenses
                     doctor.phone_number = verification_request.phone_number
@@ -4855,7 +5197,8 @@ def doctor_dashboard():
 
     # Get tier features for access control
     import subscription_config
-    tier_features = subscription_config.TIER_FEATURES.get(doctor.subscription_tier, subscription_config.TIER_FEATURES['free'])
+    effective_tier = get_doctor_effective_tier(doctor)
+    tier_features = subscription_config.TIER_FEATURES.get(effective_tier, subscription_config.TIER_FEATURES['free'])
 
     # Get pending clinic invitations count
     pending_invitations_count = ClinicDoctor.query.filter_by(
@@ -4887,13 +5230,14 @@ def doctor_dashboard():
                          response_rate=response_rate,
                          verification_request=verification_request,
                          tier_features=tier_features,
+                         effective_tier=effective_tier,
                          pending_invitations_count=pending_invitations_count,
                          upcoming_appointments=upcoming_appointments,
                          todays_appointments_count=todays_appointments_count)
 
 
 @app.route('/doctor/qr-code/generate')
-@doctor_required
+@verified_doctor_required
 def generate_qr_code():
     """Generate QR code for doctor's public profile"""
     user = User.query.get(session['user_id'])
@@ -4928,7 +5272,7 @@ def generate_qr_code():
 
 
 @app.route('/doctor/qr-code/preview')
-@doctor_required
+@verified_doctor_required
 def preview_printable_qr():
     """Preview the printable template (inline, no download)"""
     user = User.query.get(session['user_id'])
@@ -5008,7 +5352,7 @@ def preview_printable_qr():
 
 
 @app.route('/doctor/qr-code/printable')
-@doctor_required
+@verified_doctor_required
 def generate_printable_qr():
     """Generate a printable template with QR code and doctor info (download)"""
     user = User.query.get(session['user_id'])
@@ -5188,7 +5532,7 @@ def doctor_update_working_hours():
     doctor = user.doctor_profile
 
     # Check if doctor has access to working hours feature
-    tier = doctor.subscription_tier or 'free'
+    tier = get_doctor_effective_tier(doctor)
     tier_features = subscription_config.TIER_FEATURES.get(tier, subscription_config.TIER_FEATURES['free'])
 
     if not tier_features['can_show_hours']:
@@ -5356,7 +5700,7 @@ def api_doctor_workplace_detail(workplace_id):
 
 
 @app.route('/doctor/reviews')
-@doctor_required
+@verified_doctor_required
 def doctor_reviews():
     """View all reviews for doctor's profile"""
     user = User.query.get(session['user_id'])
@@ -5428,7 +5772,7 @@ def doctor_respond_to_review(rating_id):
 
 
 @app.route('/doctor/analytics')
-@doctor_required
+@verified_doctor_required
 def doctor_analytics():
     """View profile analytics"""
     user = User.query.get(session['user_id'])
@@ -5436,7 +5780,8 @@ def doctor_analytics():
 
     # Check if doctor has access to analytics (Premium+)
     import subscription_config
-    if not subscription_config.can_access_feature(doctor.subscription_tier, 'can_view_analytics'):
+    effective_tier = get_doctor_effective_tier(doctor)
+    if not subscription_config.can_access_feature(effective_tier, 'can_view_analytics'):
         flash('Analytics dashboard is available with Premium subscription. Upgrade to unlock detailed insights!', 'info')
         return redirect(url_for('subscription_pricing'))
 
@@ -6897,10 +7242,10 @@ def clinic_add_doctor(clinic_slug):
             flash('Please select a doctor.', 'danger')
             return redirect(url_for('clinic_add_doctor', clinic_slug=clinic_slug))
 
-        # Check if doctor is verified
+        # Get doctor (verified or not - clinics can add any doctor)
         doctor = Doctor.query.get(doctor_id)
-        if not doctor or not doctor.is_verified:
-            flash('Only verified doctors can be added to clinics.', 'danger')
+        if not doctor:
+            flash('Doctor not found.', 'danger')
             return redirect(url_for('clinic_add_doctor', clinic_slug=clinic_slug))
 
         # Check if already added
@@ -6939,7 +7284,7 @@ def clinic_add_doctor(clinic_slug):
 @app.route('/api/clinic/search-doctors')
 @login_required
 def api_clinic_search_doctors():
-    """Search verified doctors to add to clinic"""
+    """Search doctors to add to clinic (verified and unverified)"""
     from models import Doctor
 
     query = request.args.get('q', '').strip()
@@ -6954,11 +7299,11 @@ def api_clinic_search_doctors():
     if clinic_id:
         existing_ids = [cd.doctor_id for cd in ClinicDoctor.query.filter_by(clinic_id=clinic_id).all()]
 
-    # Search ONLY verified doctors
+    # Search all active doctors (verified first, then unverified)
     doctors = Doctor.query.filter(
-        Doctor.is_verified == True,
+        Doctor.is_active == True,
         Doctor.name.ilike(f'%{query}%')
-    )
+    ).order_by(Doctor.is_verified.desc(), Doctor.name)
 
     if existing_ids:
         doctors = doctors.filter(~Doctor.id.in_(existing_ids))
@@ -6972,7 +7317,8 @@ def api_clinic_search_doctors():
             'name': d.name,
             'specialty': d.specialty.name if d.specialty else 'General',
             'city': d.city.name if d.city else '',
-            'photo_url': d.photo_url
+            'photo_url': d.photo_url,
+            'is_verified': d.is_verified
         } for d in doctors]
     })
 
@@ -7092,14 +7438,10 @@ def api_update_appointment_status(appointment_id):
 # --- Doctor's Clinic Invitation Management ---
 
 @app.route('/doctor/clinic-invitations')
-@login_required
+@verified_doctor_required
 def doctor_clinic_invitations():
     """View pending clinic invitations for a doctor"""
     from models import Doctor, ClinicDoctor
-
-    if session.get('role') != 'doctor':
-        flash('This page is for verified doctors only.', 'warning')
-        return redirect(url_for('index'))
 
     user = User.query.get(session['user_id'])
     if not user.doctor_id:
@@ -7135,7 +7477,8 @@ def api_respond_clinic_invitation(invitation_id):
         return jsonify({'success': False, 'error': 'Access denied'}), 403
 
     user = User.query.get(session['user_id'])
-    if not user.doctor_id:
+    doctor = user.doctor_profile if user else None
+    if not doctor or not doctor.is_verified:
         return jsonify({'success': False, 'error': 'Not a verified doctor'}), 403
 
     invitation = ClinicDoctor.query.get_or_404(invitation_id)
@@ -7188,7 +7531,8 @@ def api_add_schedule_exception():
         return jsonify({'success': False, 'error': 'Access denied'}), 403
 
     user = User.query.get(session['user_id'])
-    if not user.doctor_id:
+    doctor = user.doctor_profile if user else None
+    if not doctor or not doctor.is_verified:
         return jsonify({'success': False, 'error': 'Not a verified doctor'}), 403
 
     data = request.get_json()
@@ -7262,6 +7606,10 @@ def doctor_clinic_schedule(clinic_doctor_id):
         return redirect(url_for('index'))
 
     user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile if user else None
+    if not doctor or not doctor.is_verified:
+        flash('You need to be a verified doctor to manage clinic schedules.', 'warning')
+        return redirect(url_for('doctor_dashboard'))
     clinic_doctor = ClinicDoctor.query.get_or_404(clinic_doctor_id)
 
     if clinic_doctor.doctor_id != user.doctor_id:

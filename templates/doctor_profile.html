@@ -1065,26 +1065,39 @@ function handleBackClick(e) {
 
           {% if doctor.phone_number %}
             {% if tier_features is defined and tier_features.can_show_contact %}
-              <div id="phoneContainer">
-                <button id="showPhoneBtn" class="contact-action mb-2" onclick="revealPhone()">
-                  <i class="fas fa-phone"></i> Show Contact Number
-                </button>
-              </div>
+              {# Check if user is logged in and has verified email #}
+              {% if not session.get('user_id') %}
+                <div class="locked-note">
+                  <i class="fas fa-user-lock me-2"></i>
+                  <a href="{{ url_for('login', next=request.url) }}" class="text-decoration-none">Log in</a> to view contact details.
+                </div>
+              {% elif not user_email_verified %}
+                <div class="locked-note">
+                  <i class="fas fa-envelope me-2"></i>
+                  Please <a href="{{ url_for('resend_verification') }}" class="text-decoration-none">verify your email</a> to view contact details.
+                </div>
+              {% else %}
+                <div id="phoneContainer">
+                  <button id="showPhoneBtn" class="contact-action mb-2" onclick="revealPhone()">
+                    <i class="fas fa-phone"></i> Show Contact Number
+                  </button>
+                </div>
 
-              <div id="phoneNumberRevealed" class="d-none">
-                <div class="alert alert-success d-flex justify-content-center align-items-center fw-bold" style="font-size: 1.1rem;">
-                  {{ doctor.phone_number }}
+                <div id="phoneNumberRevealed" class="d-none">
+                  <div class="alert alert-success d-flex justify-content-center align-items-center fw-bold" style="font-size: 1.1rem;">
+                    {{ doctor.phone_number }}
+                  </div>
+                  <div class="d-grid gap-2 mt-2">
+                    <a href="https://wa.me/{{ doctor.phone_number | replace('+', '') | replace(' ', '') | replace('-', '') }}"
+                       class="whatsapp-btn" target="_blank">
+                      <i class="fab fa-whatsapp fa-lg"></i> Chat on WhatsApp
+                    </a>
+                    <a href="tel:{{ doctor.phone_number }}" class="btn btn-outline-secondary" style="border-radius: 10px;">
+                      <i class="fas fa-phone-alt me-2"></i>Call Directly
+                    </a>
+                  </div>
                 </div>
-                <div class="d-grid gap-2 mt-2">
-                  <a href="https://wa.me/{{ doctor.phone_number | replace('+', '') | replace(' ', '') | replace('-', '') }}"
-                     class="whatsapp-btn" target="_blank">
-                    <i class="fab fa-whatsapp fa-lg"></i> Chat on WhatsApp
-                  </a>
-                  <a href="tel:{{ doctor.phone_number }}" class="btn btn-outline-secondary" style="border-radius: 10px;">
-                    <i class="fas fa-phone-alt me-2"></i>Call Directly
-                  </a>
-                </div>
-              </div>
+              {% endif %}
             {% else %}
               <div class="locked-note">
                 <i class="fas fa-lock me-2"></i>
