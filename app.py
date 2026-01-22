@@ -3909,20 +3909,48 @@ def admin_detect_spam_users():
     def is_gibberish_name(name):
         if not name or len(name) < 3:
             return False
-        name_lower = name.lower().replace(' ', '')
-        vowels = set('aeiou')
-        consonants = set('bcdfghjklmnpqrstvwxyz')
-        vowel_count = sum(1 for c in name_lower if c in vowels)
-        consonant_count = sum(1 for c in name_lower if c in consonants)
-        # High consonant ratio with no spaces = likely gibberish
-        if consonant_count > 0 and vowel_count > 0:
-            ratio = consonant_count / vowel_count
-            # Names with ratio > 3 and no spaces are suspicious
-            if ratio > 3 and ' ' not in name:
+        name_lower = name.lower().strip()
+
+        # Real names have spaces (first + last name)
+        # Single word names over 7 chars with no spaces are suspicious
+        if ' ' not in name and len(name_lower) > 7:
+            # Check for uncommon letter patterns
+            vowels = set('aeiou')
+            consonants = set('bcdfghjklmnpqrstvwxyz')
+            vowel_count = sum(1 for c in name_lower if c in vowels)
+            consonant_count = sum(1 for c in name_lower if c in consonants)
+
+            # Consonant to vowel ratio > 2 is suspicious for single words
+            if vowel_count > 0:
+                ratio = consonant_count / vowel_count
+                if ratio > 2:
+                    return True
+
+            # Check for rare letter combinations (qx, xj, zx, etc.)
+            rare_combos = ['qx', 'xj', 'zx', 'qz', 'jq', 'vq', 'wq', 'xq', 'zj', 'jx', 'qj']
+            for combo in rare_combos:
+                if combo in name_lower:
+                    return True
+
+            # 3+ consonants in a row is unusual in real names
+            consonant_run = 0
+            max_consonant_run = 0
+            for c in name_lower:
+                if c in consonants:
+                    consonant_run += 1
+                    max_consonant_run = max(max_consonant_run, consonant_run)
+                else:
+                    consonant_run = 0
+            if max_consonant_run >= 4:
                 return True
-        # All consonants or very few vowels
-        if vowel_count <= 1 and len(name_lower) > 5:
+
+        # Very few vowels in longer names
+        vowels = set('aeiou')
+        name_alpha = ''.join(c for c in name_lower if c.isalpha())
+        vowel_count = sum(1 for c in name_alpha if c in vowels)
+        if len(name_alpha) > 6 and vowel_count <= 2:
             return True
+
         return False
 
     # Split into likely spam and possibly legitimate
