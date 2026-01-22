@@ -3337,6 +3337,12 @@ def admin_clinic_delete(clinic_id):
         flash('Clinic cannot be deleted while it has appointment history.', 'warning')
         return redirect(url_for('admin_clinics'))
 
+    # Delete associated clinic staff records first
+    ClinicStaff.query.filter_by(clinic_id=clinic.id).delete()
+
+    # Delete associated schedules
+    ClinicSchedule.query.filter_by(clinic_id=clinic.id).delete()
+
     db.session.delete(clinic)
     db.session.commit()
     flash('Clinic deleted successfully.', 'success')
