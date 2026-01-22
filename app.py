@@ -2621,6 +2621,7 @@ def service_worker():
 
 
 @app.route('/track-human', methods=['POST'])
+@csrf.exempt  # Called via JS fetch without CSRF token
 def track_human():
     """
     Anti-bot endpoint - only real browsers executing JS will hit this.
