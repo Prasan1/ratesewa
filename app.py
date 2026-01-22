@@ -7291,10 +7291,14 @@ def clinic_add_doctor(clinic_slug):
             flash('Please select a doctor.', 'danger')
             return redirect(url_for('clinic_add_doctor', clinic_slug=clinic_slug))
 
-        # Get doctor (verified or not - clinics can add any doctor)
+        # Only verified doctors can be added to clinics
         doctor = Doctor.query.get(doctor_id)
         if not doctor:
             flash('Doctor not found.', 'danger')
+            return redirect(url_for('clinic_add_doctor', clinic_slug=clinic_slug))
+
+        if not doctor.is_verified:
+            flash('Only verified doctors can be added to clinics. The doctor must complete verification first.', 'warning')
             return redirect(url_for('clinic_add_doctor', clinic_slug=clinic_slug))
 
         # Check if already added
@@ -7348,11 +7352,12 @@ def api_clinic_search_doctors():
     if clinic_id:
         existing_ids = [cd.doctor_id for cd in ClinicDoctor.query.filter_by(clinic_id=clinic_id).all()]
 
-    # Search all active doctors (verified first, then unverified)
+    # Only search verified doctors - unverified doctors cannot be added to clinics
     doctors = Doctor.query.filter(
         Doctor.is_active == True,
+        Doctor.is_verified == True,
         Doctor.name.ilike(f'%{query}%')
-    ).order_by(Doctor.is_verified.desc(), Doctor.name)
+    ).order_by(Doctor.name)
 
     if existing_ids:
         doctors = doctors.filter(~Doctor.id.in_(existing_ids))
