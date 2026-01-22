@@ -1,6 +1,6 @@
 """Add last_verification_sent_at to users
 
-Revision ID: 010_add_user_verification_sent_at
+Revision ID: 010_user_verify_sent
 Revises: 009_add_doctor_created_at
 Create Date: 2026-02-01 00:00:00
 
@@ -11,7 +11,7 @@ from sqlalchemy.engine.reflection import Inspector
 
 
 # revision identifiers, used by Alembic.
-revision = '010_add_user_verification_sent_at'
+revision = '010_user_verify_sent'
 down_revision = '009_add_doctor_created_at'
 branch_labels = None
 depends_on = None

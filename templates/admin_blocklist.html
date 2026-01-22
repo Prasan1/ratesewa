@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Blocklist - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h4 mb-1"><i class="fas fa-ban me-2 text-danger"></i>Blocklist</h1>
+            <p class="text-muted mb-0">Block emails, domains, or IPs from sensitive actions.</p>
+        </div>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin_blocklist') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Type</label>
+                        <select class="form-select" name="block_type" required>
+                            <option value="email">Email</option>
+                            <option value="domain">Domain</option>
+                            <option value="ip">IP</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Value</label>
+                        <input class="form-control" name="value" placeholder="e.g. user@example.com, example.com, 203.0.113.5" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Reason (optional)</label>
+                        <input class="form-control" name="reason" placeholder="Why is this blocked?">
+                    </div>
+                    <div class="col-md-1 d-grid">
+                        <button type="submit" class="btn btn-danger">Add</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Value</th>
+                            <th>Status</th>
+                            <th>Reason</th>
+                            <th>Created</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in blocklist %}
+                        <tr>
+                            <td class="text-capitalize">{{ entry.block_type }}</td>
+                            <td>{{ entry.value }}</td>
+                            <td>
+                                {% if entry.active %}
+                                    <span class="badge bg-danger">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted">{{ entry.reason or '-' }}</td>
+                            <td class="text-muted small">{{ entry.created_at.strftime('%Y-%m-%d %H:%M') if entry.created_at else '-' }}</td>
+                            <td class="text-end">
+                                <form method="POST" action="{{ url_for('admin_blocklist_toggle', block_id=entry.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button class="btn btn-sm btn-outline-secondary" type="submit">
+                                        {% if entry.active %}Deactivate{% else %}Activate{% endif %}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No blocklist entries.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

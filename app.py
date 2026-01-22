@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, s
 from sqlalchemy.orm import joinedload
 from sqlalchemy import or_
 import re
+import ipaddress
 import os
 import json
 from datetime import datetime, timedelta, date, time
@@ -23,7 +24,7 @@ from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
 from authlib.integrations.flask_client import OAuth
-from models import db, City, Specialty, Clinic, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag, BadgeDefinition, UserBadge, ReviewHelpful, Article, ArticleCategory, ClinicManagerDoctor, ClinicAccount, DoctorContact, DoctorWorkplace, DoctorSubscription, DoctorCredentials, DoctorSettings, DoctorMedicalTools, DoctorTemplateUsage, ClinicStaff, ClinicDoctor, ClinicSchedule, ScheduleException, AppointmentReminder, PatientNoShowRecord
+from models import db, City, Specialty, Clinic, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag, BadgeDefinition, UserBadge, ReviewHelpful, Article, ArticleCategory, ClinicManagerDoctor, ClinicAccount, DoctorContact, DoctorWorkplace, DoctorSubscription, DoctorCredentials, DoctorSettings, DoctorMedicalTools, DoctorTemplateUsage, ClinicStaff, ClinicDoctor, ClinicSchedule, ScheduleException, AppointmentReminder, PatientNoShowRecord, BlockedIdentity, SecurityEvent
 from config import Config
 import ad_manager
 import upload_utils
@@ -107,6 +108,8 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
 VERIFICATION_EMAIL_COOLDOWN_SECONDS = int(os.getenv('VERIFICATION_EMAIL_COOLDOWN_SECONDS', '21600'))
+VERIFICATION_EMAIL_IP_LIMIT = int(os.getenv('VERIFICATION_EMAIL_IP_LIMIT', '5'))
+VERIFICATION_EMAIL_IP_WINDOW_SECONDS = int(os.getenv('VERIFICATION_EMAIL_IP_WINDOW_SECONDS', '3600'))
 
 # File upload configurations
 app.config['UPLOAD_FOLDER'] = os.path.join(app.instance_path, 'uploads')
@@ -216,6 +219,83 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
+def log_security_event(event_type, user_id=None, email=None, ip=None, meta=None):
+    try:
+        event = SecurityEvent(
+            event_type=event_type,
+            user_id=user_id,
+            email=email,
+            ip=ip or get_client_ip(),
+            user_agent=request.headers.get('User-Agent'),
+            path=request.path,
+            method=request.method,
+            meta=json.dumps(meta) if meta else None,
+        )
+        db.session.add(event)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"[SECURITY LOG ERROR] {e}")
+
+def normalize_block_value(block_type, value):
+    if value is None:
+        return ''
+    value = value.strip().lower()
+    if block_type == 'domain' and value.startswith('@'):
+        value = value[1:]
+    return value
+
+def get_email_domain(email):
+    if not email or '@' not in email:
+        return ''
+    return email.split('@', 1)[1].strip().lower()
+
+def get_blocked_identity_for_email(email):
+    normalized_email = normalize_block_value('email', email)
+    if normalized_email:
+        blocked_email = BlockedIdentity.query.filter_by(
+            block_type='email',
+            value=normalized_email,
+            active=True
+        ).first()
+        if blocked_email:
+            return blocked_email
+
+    domain = get_email_domain(normalized_email)
+    if domain:
+        blocked_domain = BlockedIdentity.query.filter_by(
+            block_type='domain',
+            value=domain,
+            active=True
+        ).first()
+        if blocked_domain:
+            return blocked_domain
+    return None
+
+def is_ip_blocked(ip):
+    normalized_ip = normalize_block_value('ip', ip or '')
+    if not normalized_ip:
+        return None
+    return BlockedIdentity.query.filter_by(
+        block_type='ip',
+        value=normalized_ip,
+        active=True
+    ).first()
+
+@app.before_request
+def blocklist_guard():
+    if request.endpoint == 'static':
+        return None
+    if session.get('is_admin'):
+        return None
+    blocked_ip = is_ip_blocked(get_client_ip())
+    if blocked_ip:
+        log_security_event(
+            'blocked_ip_request',
+            meta={'block_id': blocked_ip.id, 'reason': blocked_ip.reason}
+        )
+        abort(403)
+
 # Anti-scraping protection
 from anti_scrape import anti_scrape_middleware
 
@@ -258,6 +338,17 @@ def should_show_dev_verify_link():
 def format_cooldown_minutes(seconds):
     minutes = max(1, int((seconds + 59) // 60))
     return f"{minutes} minute{'s' if minutes != 1 else ''}"
+
+def is_verification_ip_limited(ip):
+    if VERIFICATION_EMAIL_IP_LIMIT <= 0:
+        return False
+    window_start = datetime.utcnow() - timedelta(seconds=VERIFICATION_EMAIL_IP_WINDOW_SECONDS)
+    recent_count = SecurityEvent.query.filter(
+        SecurityEvent.event_type == 'verification_email_sent',
+        SecurityEvent.ip == ip,
+        SecurityEvent.created_at >= window_start
+    ).count()
+    return recent_count >= VERIFICATION_EMAIL_IP_LIMIT
 
 def send_email_verification(user):
     now = datetime.utcnow()
@@ -1186,6 +1277,16 @@ def register():
             flash('All fields are required.', 'danger')
             return redirect(url_for('register'))
 
+        blocked_identity = get_blocked_identity_for_email(email)
+        if blocked_identity:
+            log_security_event(
+                'blocked_email_register',
+                email=email,
+                meta={'block_id': blocked_identity.id, 'reason': blocked_identity.reason}
+            )
+            flash('Registration failed. Please contact support.', 'danger')
+            return redirect(url_for('register'))
+
         # Check if email already exists
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
@@ -1200,9 +1301,27 @@ def register():
             db.session.add(user)
             db.session.commit()
 
+            if is_verification_ip_limited(get_client_ip()):
+                log_security_event(
+                    'verification_email_ip_throttled',
+                    user_id=user.id,
+                    email=user.email
+                )
+                flash('Account created, but verification email is temporarily rate limited. Please try again later.', 'warning')
+                return redirect(url_for('login'))
+
             verification_result = send_email_verification(user)
             if verification_result.get("verify_url"):
                 flash(f'DEV: Verify your email here: {verification_result["verify_url"]}', 'info')
+            if verification_result.get("sent"):
+                log_security_event('verification_email_sent', user_id=user.id, email=user.email)
+            elif verification_result.get("cooldown_seconds"):
+                log_security_event(
+                    'verification_email_throttled',
+                    user_id=user.id,
+                    email=user.email,
+                    meta={'cooldown_seconds': verification_result.get("cooldown_seconds")}
+                )
 
             # If user indicated they're a doctor, auto-login and redirect to claim profile
             redirect_next = next_url if is_safe_url(next_url) else None
@@ -1229,21 +1348,47 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
+        blocked_identity = get_blocked_identity_for_email(email)
+        if blocked_identity:
+            log_security_event(
+                'blocked_email_login',
+                email=email,
+                meta={'block_id': blocked_identity.id, 'reason': blocked_identity.reason}
+            )
+            flash('Access denied. Please contact support.', 'danger')
+            return redirect(url_for('login'))
+
         user = User.query.filter_by(email=email).first()
 
         if user and user.check_password(password):
             # Skip email verification in local development
             if not user.email_verified and is_production:
+                if is_verification_ip_limited(get_client_ip()):
+                    log_security_event(
+                        'verification_email_ip_throttled',
+                        user_id=user.id,
+                        email=user.email
+                    )
+                    flash('Please verify your email before logging in. Too many verification emails from your network. Try again later.', 'warning')
+                    return redirect(url_for('login'))
+
                 verification_result = send_email_verification(user)
                 if verification_result.get("verify_url"):
                     flash(f'DEV: Verify your email here: {verification_result["verify_url"]}', 'info')
                 if verification_result.get("sent"):
                     flash('Please verify your email before logging in. We sent a new verification link.', 'warning')
+                    log_security_event('verification_email_sent', user_id=user.id, email=user.email)
                 else:
                     cooldown_seconds = verification_result.get("cooldown_seconds", 0)
                     if cooldown_seconds:
                         wait_time = format_cooldown_minutes(cooldown_seconds)
                         flash(f'Please verify your email before logging in. A link was sent recently. Try again in {wait_time}.', 'warning')
+                        log_security_event(
+                            'verification_email_throttled',
+                            user_id=user.id,
+                            email=user.email,
+                            meta={'cooldown_seconds': cooldown_seconds}
+                        )
                     else:
                         flash('Please verify your email before logging in.', 'warning')
                 return redirect(url_for('login'))
@@ -1265,6 +1410,7 @@ def login():
             return redirect(get_safe_redirect('next', 'index'))
         else:
             flash('Invalid email or password.', 'danger')
+            log_security_event('login_failed', email=email, meta={'reason': 'invalid_credentials'})
 
     return render_template('login.html')
 
@@ -1281,6 +1427,16 @@ def forgot_password():
 
         if not email:
             flash('Please enter your email address.', 'warning')
+            return render_template('forgot_password.html')
+
+        blocked_identity = get_blocked_identity_for_email(email)
+        if blocked_identity:
+            log_security_event(
+                'blocked_email_forgot_password',
+                email=email,
+                meta={'block_id': blocked_identity.id, 'reason': blocked_identity.reason}
+            )
+            flash('If that email exists, a reset link has been sent.', 'success')
             return render_template('forgot_password.html')
 
         user = User.query.filter_by(email=email).first()
@@ -1520,21 +1676,48 @@ def resend_verification():
         session.clear()
         return redirect(url_for('login'))
 
+    blocked_identity = get_blocked_identity_for_email(user.email)
+    if blocked_identity:
+        log_security_event(
+            'blocked_email_resend_verification',
+            user_id=user.id,
+            email=user.email,
+            meta={'block_id': blocked_identity.id, 'reason': blocked_identity.reason}
+        )
+        flash('Access denied. Please contact support.', 'danger')
+        return redirect(url_for('index'))
+
     if user.email_verified:
         flash('Your email is already verified.', 'info')
         return redirect(url_for('index'))
 
     if request.method == 'POST':
+        if is_verification_ip_limited(get_client_ip()):
+            log_security_event(
+                'verification_email_ip_throttled',
+                user_id=user.id,
+                email=user.email
+            )
+            flash('Too many verification emails from your network. Please try again later.', 'warning')
+            return redirect(url_for('index'))
+
         verification_result = send_email_verification(user)
         if verification_result.get("verify_url"):
             flash(f'DEV: Verify your email here: {verification_result["verify_url"]}', 'info')
         if verification_result.get("sent"):
             flash('Verification email sent. Please check your inbox.', 'success')
+            log_security_event('verification_email_sent', user_id=user.id, email=user.email)
             return redirect(url_for('index'))
         cooldown_seconds = verification_result.get("cooldown_seconds", 0)
         if cooldown_seconds:
             wait_time = format_cooldown_minutes(cooldown_seconds)
             flash(f'Verification email sent recently. Please try again in {wait_time}.', 'warning')
+            log_security_event(
+                'verification_email_throttled',
+                user_id=user.id,
+                email=user.email,
+                meta={'cooldown_seconds': cooldown_seconds}
+            )
             return redirect(url_for('index'))
         flash('Unable to send verification email. Please try again later.', 'warning')
         return redirect(url_for('index'))
@@ -3893,6 +4076,97 @@ def admin_users():
                          show_tests=show_tests,
                          now=datetime.utcnow())
 
+@app.route('/admin/blocklist', methods=['GET', 'POST'])
+@admin_required
+def admin_blocklist():
+    if request.method == 'POST':
+        block_type = request.form.get('block_type', '').strip().lower()
+        value = request.form.get('value', '').strip()
+        reason = request.form.get('reason', '').strip() or None
+
+        if block_type not in {'email', 'domain', 'ip'}:
+            flash('Invalid block type.', 'danger')
+            return redirect(url_for('admin_blocklist'))
+
+        normalized_value = normalize_block_value(block_type, value)
+        if not normalized_value:
+            flash('Value is required.', 'danger')
+            return redirect(url_for('admin_blocklist'))
+
+        if block_type == 'email' and '@' not in normalized_value:
+            flash('Please enter a valid email address.', 'danger')
+            return redirect(url_for('admin_blocklist'))
+        if block_type == 'domain' and '@' in normalized_value:
+            flash('Please enter a domain only (no @).', 'danger')
+            return redirect(url_for('admin_blocklist'))
+        if block_type == 'ip':
+            try:
+                ipaddress.ip_address(normalized_value)
+            except ValueError:
+                flash('Please enter a valid IP address.', 'danger')
+                return redirect(url_for('admin_blocklist'))
+
+        existing = BlockedIdentity.query.filter_by(
+            block_type=block_type,
+            value=normalized_value,
+            active=True
+        ).first()
+        if existing:
+            flash('This value is already blocked.', 'info')
+            return redirect(url_for('admin_blocklist'))
+
+        new_block = BlockedIdentity(
+            block_type=block_type,
+            value=normalized_value,
+            reason=reason,
+            created_by=session.get('user_id'),
+            active=True
+        )
+        db.session.add(new_block)
+        db.session.commit()
+        log_security_event(
+            'blocklist_added',
+            user_id=session.get('user_id'),
+            meta={'block_type': block_type, 'value': normalized_value}
+        )
+        flash('Blocked identity added.', 'success')
+        return redirect(url_for('admin_blocklist'))
+
+    blocklist = BlockedIdentity.query.order_by(BlockedIdentity.created_at.desc()).all()
+    return render_template('admin_blocklist.html', blocklist=blocklist)
+
+@app.route('/admin/blocklist/<int:block_id>/toggle', methods=['POST'])
+@admin_required
+def admin_blocklist_toggle(block_id):
+    block = BlockedIdentity.query.get_or_404(block_id)
+    block.active = not block.active
+    db.session.commit()
+    log_security_event(
+        'blocklist_toggled',
+        user_id=session.get('user_id'),
+        meta={'block_id': block.id, 'active': block.active}
+    )
+    flash('Blocklist entry updated.', 'success')
+    return redirect(url_for('admin_blocklist'))
+
+@app.route('/admin/security-events')
+@admin_required
+def admin_security_events():
+    page = request.args.get('page', 1, type=int)
+    per_page = 50
+    pagination = SecurityEvent.query.order_by(
+        SecurityEvent.created_at.desc()
+    ).paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+    return render_template(
+        'admin_security_events.html',
+        events=pagination.items,
+        pagination=pagination
+    )
+
 @app.route('/admin/users/<int:user_id>/status', methods=['POST'])
 @admin_required
 def admin_user_status(user_id):
@@ -4495,6 +4769,17 @@ def rate_doctor():
 
     # CRITICAL FIX: Prevent doctors from rating themselves
     user = User.query.get(user_id)
+    if user:
+        blocked_identity = get_blocked_identity_for_email(user.email)
+        if blocked_identity:
+            log_security_event(
+                'blocked_email_review',
+                user_id=user.id,
+                email=user.email,
+                meta={'block_id': blocked_identity.id, 'reason': blocked_identity.reason, 'doctor_id': doctor_id}
+            )
+            flash('Your account is not permitted to post reviews.', 'danger')
+            return redirect(request.referrer or url_for('index'))
     if user.doctor_id and int(user.doctor_id) == int(doctor_id):
         flash('You cannot rate yourself. Reviews must be from patients.', 'warning')
         doctor = Doctor.query.get(doctor_id)

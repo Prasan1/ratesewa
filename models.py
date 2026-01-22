@@ -222,6 +222,43 @@ class User(db.Model):
         else:
             return 'bronze'
 
+
+class BlockedIdentity(db.Model):
+    __tablename__ = 'blocked_identities'
+
+    id = db.Column(db.Integer, primary_key=True)
+    block_type = db.Column(db.String(20), nullable=False)  # 'email', 'domain', 'ip'
+    value = db.Column(db.String(255), nullable=False)
+    reason = db.Column(db.Text, nullable=True)
+    active = db.Column(db.Boolean, default=True)
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    creator = db.relationship('User', foreign_keys=[created_by])
+
+    def __repr__(self):
+        return f'<BlockedIdentity {self.block_type}:{self.value}>'
+
+
+class SecurityEvent(db.Model):
+    __tablename__ = 'security_events'
+
+    id = db.Column(db.Integer, primary_key=True)
+    event_type = db.Column(db.String(50), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    email = db.Column(db.String(200), nullable=True)
+    ip = db.Column(db.String(64), nullable=True)
+    user_agent = db.Column(db.String(255), nullable=True)
+    path = db.Column(db.String(255), nullable=True)
+    method = db.Column(db.String(10), nullable=True)
+    meta = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', foreign_keys=[user_id])
+
+    def __repr__(self):
+        return f'<SecurityEvent {self.event_type} {self.created_at}>'
+
     @property
     def tier_name(self):
         """Get display name for user tier"""
