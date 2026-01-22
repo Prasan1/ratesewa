@@ -215,6 +215,14 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
+# Anti-scraping protection
+from anti_scrape import anti_scrape_middleware
+
+@app.before_request
+def check_for_scraping():
+    """Global anti-scraping check for sensitive routes"""
+    return anti_scrape_middleware()
+
 # --- Authentication Decorators ---
 def login_required(f):
     from functools import wraps
