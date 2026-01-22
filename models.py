@@ -222,6 +222,30 @@ class User(db.Model):
         else:
             return 'bronze'
 
+    @property
+    def tier_name(self):
+        """Get display name for user tier"""
+        tier_names = {
+            'bronze': 'Basic Contributor',
+            'silver': 'Trusted Reviewer',
+            'gold': 'Expert Reviewer',
+            'platinum': 'Community Leader'
+        }
+        return tier_names.get(self.tier, 'Basic Contributor')
+
+    @property
+    def review_count(self):
+        """Get total number of reviews written"""
+        return len(self.ratings)
+
+    @property
+    def helpful_count(self):
+        """Get total number of helpful votes received on reviews"""
+        count = 0
+        for rating in self.ratings:
+            count += len(rating.helpful_votes)
+        return count
+
 
 class BlockedIdentity(db.Model):
     __tablename__ = 'blocked_identities'

@@ -1287,11 +1287,11 @@ def register():
             flash('Registration failed. Please contact support.', 'danger')
             return redirect(url_for('register'))
 
-        # Check if email already exists
+        # Check if email already exists (avoid user enumeration in response)
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
-            flash('Email address already exists.', 'danger')
-            return redirect(url_for('register'))
+            flash('If this email is registered, a verification link has been sent.', 'success')
+            return redirect(url_for('login'))
 
         # Create new user
         user = User(name=name, email=email, email_verified=False, is_doctor_intent=is_doctor)
@@ -1329,7 +1329,7 @@ def register():
             if is_doctor and not redirect_next:
                 redirect_next = url_for('claim_profile')
 
-            flash('Check your email to verify your account before logging in.', 'success')
+            flash('If this email is registered, a verification link has been sent.', 'success')
             if redirect_next:
                 return redirect(url_for('login', next=redirect_next))
             return redirect(url_for('login'))
