@@ -1702,6 +1702,11 @@ def claim_profile():
     search_query = request.args.get('search', '').strip()
     unclaimed_doctors = []
 
+    # Count claimed doctors for social proof (doctors with linked user accounts)
+    claimed_count = db.session.query(db.func.count(User.id)).filter(
+        User.doctor_id.isnot(None)
+    ).scalar() or 0
+
     if search_query:
         # Find doctors without a linked user account
         # Search by both name AND NMC number for better accuracy
@@ -1719,7 +1724,8 @@ def claim_profile():
 
     return render_template('claim_profile_search.html',
                           search_query=search_query,
-                          unclaimed_doctors=unclaimed_doctors)
+                          unclaimed_doctors=unclaimed_doctors,
+                          claimed_count=claimed_count)
 
 
 @app.route('/claim-profile/<int:doctor_id>', methods=['GET'])
