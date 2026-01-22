@@ -16,15 +16,15 @@
 **Status:** Live
 **URL:** /health-digest/how-long-wait-doctor-nepal
 
-### Article 3: How to Verify Your Doctor's NMC Number Online
-**Keywords:** verify doctor nmc nepal, check doctor credentials, nmc number lookup
-**Why:** Teaches patients to verify credentials, positions RankSewa as trustworthy
-**Length:** 1,200-1,500 words
+### ✅ Article 3: PUBLISHED
+**Title:** "How to Verify Your Doctor's NMC Number Online"
+**Status:** Live
+**URL:** /health-digest/verify-doctor-nmc-nepal
 
-### Article 4: Understanding Medical Bills in Nepal: Common Overcharges to Watch For
-**Keywords:** medical bill nepal, hospital charges kathmandu, overcharge doctor
-**Why:** Money matters - high engagement topic
-**Length:** 1,500-1,800 words
+### ✅ Article 4: PUBLISHED
+**Title:** "Understanding Medical Bills in Nepal: Common Overcharges to Watch For"
+**Status:** Live
+**URL:** /health-digest/medical-bills-nepal-common-overcharges
 
 ---
 
