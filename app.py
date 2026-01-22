@@ -215,7 +215,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 limiter = Limiter(
     key_func=get_client_ip,
     app=app,
-    default_limits=["200 per day", "50 per hour"],
+    default_limits=["1000 per day", "200 per hour"],  # Generous for browsing, specific routes have stricter limits
     storage_uri="memory://",
 )
 
@@ -281,6 +281,80 @@ def is_ip_blocked(ip):
         value=normalized_ip,
         active=True
     ).first()
+
+# Known disposable/temporary email domains - block registration from these
+DISPOSABLE_EMAIL_DOMAINS = {
+    # Popular disposable email services
+    'tempmail.com', 'temp-mail.org', 'tempmailo.com', 'tempmail.net',
+    'guerrillamail.com', 'guerrillamail.org', 'guerrillamail.net', 'guerrillamail.biz',
+    'mailinator.com', 'mailinator2.com', 'mailinater.com',
+    '10minutemail.com', '10minutemail.net', '10minutemail.org',
+    'throwaway.email', 'throwawaymail.com',
+    'yopmail.com', 'yopmail.fr', 'yopmail.net',
+    'fakeinbox.com', 'fakemailgenerator.com',
+    'getnada.com', 'nada.email',
+    'mailnesia.com', 'mailnesia.net',
+    'dispostable.com', 'discard.email',
+    'sharklasers.com', 'guerrillamailblock.com',
+    'spam4.me', 'spamgourmet.com', 'spamcowboy.com',
+    'trashmail.com', 'trashmail.net', 'trashmail.org',
+    'maildrop.cc', 'mailsac.com',
+    'mohmal.com', 'emailondeck.com',
+    'mytemp.email', 'tempail.com',
+    'tempr.email', 'temp.email',
+    'crazymailing.com', 'emailfake.com',
+    'emkei.cz', 'anonymbox.com',
+    'getairmail.com', 'moakt.com',
+    'dropmail.me', 'owlyvip.com',
+    'mailcatch.com', 'mintemail.com',
+    # Bot-specific domains found in abuse logs
+    'checkyourform.xyz',
+}
+
+def is_disposable_email(email):
+    """Check if email is from a known disposable email service"""
+    domain = get_email_domain(email)
+    if not domain:
+        return False
+    # Check exact domain match
+    if domain in DISPOSABLE_EMAIL_DOMAINS:
+        return True
+    # Check for subdomains of disposable services
+    for disposable_domain in DISPOSABLE_EMAIL_DOMAINS:
+        if domain.endswith('.' + disposable_domain):
+            return True
+    return False
+
+# Global email send rate limiting (prevent quota abuse)
+GLOBAL_EMAIL_RATE_LIMIT = int(os.getenv('GLOBAL_EMAIL_RATE_LIMIT', '30'))  # Max emails per window
+GLOBAL_EMAIL_RATE_WINDOW = int(os.getenv('GLOBAL_EMAIL_RATE_WINDOW', '60'))  # Window in seconds
+
+def is_global_email_rate_limited():
+    """Check if global email sending is rate limited to prevent quota abuse"""
+    if GLOBAL_EMAIL_RATE_LIMIT <= 0:
+        return False
+    window_start = datetime.utcnow() - timedelta(seconds=GLOBAL_EMAIL_RATE_WINDOW)
+    recent_count = SecurityEvent.query.filter(
+        SecurityEvent.event_type == 'verification_email_sent',
+        SecurityEvent.created_at >= window_start
+    ).count()
+    return recent_count >= GLOBAL_EMAIL_RATE_LIMIT
+
+# Per-email rate limiting (prevent abuse of specific email addresses)
+EMAIL_VERIFICATION_LIMIT = int(os.getenv('EMAIL_VERIFICATION_LIMIT', '3'))  # Max per email per window
+EMAIL_VERIFICATION_WINDOW = int(os.getenv('EMAIL_VERIFICATION_WINDOW', '3600'))  # 1 hour in seconds
+
+def is_email_verification_limited(email):
+    """Check if too many verification emails have been sent to this email address"""
+    if EMAIL_VERIFICATION_LIMIT <= 0:
+        return False
+    window_start = datetime.utcnow() - timedelta(seconds=EMAIL_VERIFICATION_WINDOW)
+    recent_count = SecurityEvent.query.filter(
+        SecurityEvent.event_type == 'verification_email_sent',
+        SecurityEvent.email == email.lower().strip(),
+        SecurityEvent.created_at >= window_start
+    ).count()
+    return recent_count >= EMAIL_VERIFICATION_LIMIT
 
 @app.before_request
 def blocklist_guard():
@@ -1248,7 +1322,7 @@ def optimize_and_save_article_image(image_file):
 
 # --- Authentication Routes ---
 @app.route('/register', methods=['GET', 'POST'])
-@limiter.limit("3 per hour", methods=["POST"])  # Strict rate limit to prevent bot registrations
+@limiter.limit("10 per minute", methods=["POST"])  # Rate limit - reCAPTCHA handles bot prevention
 def register():
     next_url = request.args.get('next', '')
     if request.method == 'POST':
@@ -1287,6 +1361,16 @@ def register():
             flash('Registration failed. Please contact support.', 'danger')
             return redirect(url_for('register'))
 
+        # Block disposable/temporary email addresses
+        if is_disposable_email(email):
+            log_security_event(
+                'disposable_email_register',
+                email=email,
+                meta={'domain': get_email_domain(email)}
+            )
+            flash('Please use a permanent email address. Temporary email services are not allowed.', 'danger')
+            return redirect(url_for('register'))
+
         # Check if email already exists (avoid user enumeration in response)
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
@@ -1308,6 +1392,26 @@ def register():
                     email=user.email
                 )
                 flash('Account created, but verification email is temporarily rate limited. Please try again later.', 'warning')
+                return redirect(url_for('login'))
+
+            # Global rate limit to prevent quota abuse
+            if is_global_email_rate_limited():
+                log_security_event(
+                    'verification_email_global_throttled',
+                    user_id=user.id,
+                    email=user.email
+                )
+                flash('Account created. Verification emails are temporarily paused. Please try again later.', 'warning')
+                return redirect(url_for('login'))
+
+            # Per-email rate limit
+            if is_email_verification_limited(user.email):
+                log_security_event(
+                    'verification_email_per_email_throttled',
+                    user_id=user.id,
+                    email=user.email
+                )
+                flash('Account created. Too many verification emails sent to this address. Please try again later.', 'warning')
                 return redirect(url_for('login'))
 
             verification_result = send_email_verification(user)
@@ -1370,6 +1474,26 @@ def login():
                         email=user.email
                     )
                     flash('Please verify your email before logging in. Too many verification emails from your network. Try again later.', 'warning')
+                    return redirect(url_for('login'))
+
+                # Global rate limit to prevent quota abuse
+                if is_global_email_rate_limited():
+                    log_security_event(
+                        'verification_email_global_throttled',
+                        user_id=user.id,
+                        email=user.email
+                    )
+                    flash('Please verify your email. Verification emails are temporarily paused. Try again later.', 'warning')
+                    return redirect(url_for('login'))
+
+                # Per-email rate limit
+                if is_email_verification_limited(user.email):
+                    log_security_event(
+                        'verification_email_per_email_throttled',
+                        user_id=user.id,
+                        email=user.email
+                    )
+                    flash('Please verify your email. Too many verification emails sent. Try again later.', 'warning')
                     return redirect(url_for('login'))
 
                 verification_result = send_email_verification(user)
@@ -1699,6 +1823,26 @@ def resend_verification():
                 email=user.email
             )
             flash('Too many verification emails from your network. Please try again later.', 'warning')
+            return redirect(url_for('index'))
+
+        # Global rate limit to prevent quota abuse
+        if is_global_email_rate_limited():
+            log_security_event(
+                'verification_email_global_throttled',
+                user_id=user.id,
+                email=user.email
+            )
+            flash('Verification emails are temporarily paused. Please try again later.', 'warning')
+            return redirect(url_for('index'))
+
+        # Per-email rate limit
+        if is_email_verification_limited(user.email):
+            log_security_event(
+                'verification_email_per_email_throttled',
+                user_id=user.id,
+                email=user.email
+            )
+            flash('Too many verification emails sent to this address. Please try again later.', 'warning')
             return redirect(url_for('index'))
 
         verification_result = send_email_verification(user)

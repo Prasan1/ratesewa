@@ -50,3 +50,4 @@ _archive/
 # Backups and internal docs
 _backups/
 docs/
+SECURITY_CONFIG.md
