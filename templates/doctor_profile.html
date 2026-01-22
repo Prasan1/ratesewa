@@ -989,6 +989,11 @@ function handleBackClick(e) {
             <i class="fas fa-check-circle"></i> Verified
           </div>
         {% endif %}
+        {% if is_trusted %}
+          <div class="verified-badge-below" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); margin-top: 0.3rem;">
+            <i class="fas fa-star"></i> Trusted
+          </div>
+        {% endif %}
       </div>
 
       <!-- Title & Meta Area -->

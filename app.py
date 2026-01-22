@@ -4415,6 +4415,9 @@ def doctor_profile(slug):
         if current_user:
             user_email_verified = current_user.email_verified
 
+    # Trusted badge: 10+ reviews with 4+ average rating
+    is_trusted = len(ratings) >= 10 and avg_rating and avg_rating >= 4.0
+
     return render_template('doctor_profile.html',
                           doctor=doctor,
                           ratings=ratings,
@@ -4425,7 +4428,8 @@ def doctor_profile(slug):
                           inline_ad=inline_ad,
                           tier_features=tier_features,
                           clinic_affiliations=clinic_affiliations,
-                          user_email_verified=user_email_verified)
+                          user_email_verified=user_email_verified,
+                          is_trusted=is_trusted)
 
 @app.route('/rate_doctor', methods=['POST'])
 @login_required
