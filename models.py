@@ -189,6 +189,7 @@ class User(db.Model):
 
     # Activity tracking
     last_login_at = db.Column(db.DateTime, nullable=True)
+    last_verification_sent_at = db.Column(db.DateTime, nullable=True)
 
     # Relationships
     ratings = db.relationship('Rating', backref='user', lazy=True)

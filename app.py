@@ -106,6 +106,7 @@ app.config['SESSION_COOKIE_SECURE'] = is_production
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
+VERIFICATION_EMAIL_COOLDOWN_SECONDS = int(os.getenv('VERIFICATION_EMAIL_COOLDOWN_SECONDS', '21600'))
 
 # File upload configurations
 app.config['UPLOAD_FOLDER'] = os.path.join(app.instance_path, 'uploads')
@@ -254,14 +255,30 @@ def should_show_dev_verify_link():
     env = os.getenv('FLASK_ENV', '').lower()
     return app.debug or env in {'development', 'local'} or os.getenv('SHOW_DEV_VERIFY_LINK') == '1'
 
+def format_cooldown_minutes(seconds):
+    minutes = max(1, int((seconds + 59) // 60))
+    return f"{minutes} minute{'s' if minutes != 1 else ''}"
+
 def send_email_verification(user):
+    now = datetime.utcnow()
+    if user.last_verification_sent_at:
+        elapsed = (now - user.last_verification_sent_at).total_seconds()
+        if elapsed < VERIFICATION_EMAIL_COOLDOWN_SECONDS:
+            return {
+                "sent": False,
+                "verify_url": None,
+                "cooldown_seconds": int(VERIFICATION_EMAIL_COOLDOWN_SECONDS - elapsed),
+            }
+
     token = generate_email_token(user.email)
     verify_url = url_for('verify_email', token=token, _external=True)
 
     if not resend_key:
         if should_show_dev_verify_link():
-            return verify_url
-        return None
+            user.last_verification_sent_at = now
+            db.session.commit()
+            return {"sent": True, "verify_url": verify_url, "cooldown_seconds": 0}
+        return {"sent": False, "verify_url": None, "cooldown_seconds": 0}
 
     subject = "Verify your RankSewa email"
     html = f"""
@@ -275,12 +292,16 @@ def send_email_verification(user):
     params = {"from": "RankSewa <support@ranksewa.com>", "to": [user.email], "subject": subject, "html": html}
     try:
         resend.Emails.send(params)
-        return None
+        user.last_verification_sent_at = now
+        db.session.commit()
+        return {"sent": True, "verify_url": None, "cooldown_seconds": 0}
     except Exception as e:
         print(f"❌ Failed to send verification email: {e}")
         if should_show_dev_verify_link():
-            return verify_url
-        return None
+            user.last_verification_sent_at = now
+            db.session.commit()
+            return {"sent": True, "verify_url": verify_url, "cooldown_seconds": 0}
+        return {"sent": False, "verify_url": None, "cooldown_seconds": 0}
 
 # --- Password Reset Functions ---
 def generate_password_reset_token(email):
@@ -1179,9 +1200,9 @@ def register():
             db.session.add(user)
             db.session.commit()
 
-            verify_url = send_email_verification(user)
-            if verify_url:
-                flash(f'DEV: Verify your email here: {verify_url}', 'info')
+            verification_result = send_email_verification(user)
+            if verification_result.get("verify_url"):
+                flash(f'DEV: Verify your email here: {verification_result["verify_url"]}', 'info')
 
             # If user indicated they're a doctor, auto-login and redirect to claim profile
             redirect_next = next_url if is_safe_url(next_url) else None
@@ -1213,14 +1234,18 @@ def login():
         if user and user.check_password(password):
             # Skip email verification in local development
             if not user.email_verified and is_production:
-                now = datetime.utcnow().timestamp()
-                last_sent = session.get('verification_sent_at', 0)
-                if now - last_sent > 300:
-                    verify_url = send_email_verification(user)
-                    if verify_url:
-                        flash(f'DEV: Verify your email here: {verify_url}', 'info')
-                    session['verification_sent_at'] = now
-                flash('Please verify your email before logging in. We sent a new verification link.', 'warning')
+                verification_result = send_email_verification(user)
+                if verification_result.get("verify_url"):
+                    flash(f'DEV: Verify your email here: {verification_result["verify_url"]}', 'info')
+                if verification_result.get("sent"):
+                    flash('Please verify your email before logging in. We sent a new verification link.', 'warning')
+                else:
+                    cooldown_seconds = verification_result.get("cooldown_seconds", 0)
+                    if cooldown_seconds:
+                        wait_time = format_cooldown_minutes(cooldown_seconds)
+                        flash(f'Please verify your email before logging in. A link was sent recently. Try again in {wait_time}.', 'warning')
+                    else:
+                        flash('Please verify your email before logging in.', 'warning')
                 return redirect(url_for('login'))
             if not user.is_active:
                 flash('Your account is not active yet. Please wait for admin approval.', 'warning')
@@ -1500,10 +1525,18 @@ def resend_verification():
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        verify_url = send_email_verification(user)
-        if verify_url:
-            flash(f'DEV: Verify your email here: {verify_url}', 'info')
-        flash('Verification email sent. Please check your inbox.', 'success')
+        verification_result = send_email_verification(user)
+        if verification_result.get("verify_url"):
+            flash(f'DEV: Verify your email here: {verification_result["verify_url"]}', 'info')
+        if verification_result.get("sent"):
+            flash('Verification email sent. Please check your inbox.', 'success')
+            return redirect(url_for('index'))
+        cooldown_seconds = verification_result.get("cooldown_seconds", 0)
+        if cooldown_seconds:
+            wait_time = format_cooldown_minutes(cooldown_seconds)
+            flash(f'Verification email sent recently. Please try again in {wait_time}.', 'warning')
+            return redirect(url_for('index'))
+        flash('Unable to send verification email. Please try again later.', 'warning')
         return redirect(url_for('index'))
 
     return render_template('resend_verification.html', user=user)
