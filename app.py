@@ -3955,15 +3955,23 @@ def admin_bulk_delete_users():
     current_user_id = session.get('user_id')
     user_ids = [uid for uid in user_ids if uid != current_user_id]
 
-    # Delete users (only unverified, never-logged-in accounts)
-    deleted_count = 0
-    for uid in user_ids:
-        user = User.query.get(uid)
-        if user and not user.email_verified and not user.last_login_at and not user.is_admin:
-            # Check no linked data
-            if not user.doctor_id and Rating.query.filter_by(user_id=uid).count() == 0:
-                db.session.delete(user)
-                deleted_count += 1
+    if not user_ids:
+        flash('No valid users to delete.', 'warning')
+        return redirect(url_for('admin_detect_spam_users'))
+
+    # Use bulk delete to avoid loading objects and triggering relationship checks
+    # Only delete unverified, never-logged-in, non-admin users without doctor profiles or reviews
+    deleted_count = User.query.filter(
+        User.id.in_(user_ids),
+        User.email_verified == False,
+        User.last_login_at == None,
+        User.is_admin == False,
+        User.doctor_id == None
+    ).filter(
+        ~User.id.in_(
+            db.session.query(Rating.user_id).filter(Rating.user_id.in_(user_ids))
+        )
+    ).delete(synchronize_session=False)
 
     db.session.commit()
     flash(f'Successfully deleted {deleted_count} spam accounts.', 'success')
