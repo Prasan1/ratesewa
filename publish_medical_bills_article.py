@@ -361,7 +361,7 @@ def publish_article():
     <strong>Looking for affordable healthcare options?</strong> Search for doctors on RankSewa and filter by location to compare options. Check reviews for mentions of "fair pricing," "transparent billing," or "good value" to find doctors known for reasonable costs.
 </div>''',
             category_id=category.id,
-            meta_description='Are you being overcharged at hospitals in Nepal? Learn common medical billing overcharges, how to read your hospital bill, and protect yourself from unfair charges.',
+            meta_description='Are you being overcharged at hospitals in Nepal? Learn common medical overcharges and how to protect yourself from unfair billing.',
             meta_keywords='medical bill Nepal, hospital charges Kathmandu, overcharge doctor Nepal, hospital billing Nepal, healthcare cost Nepal, medical expenses Nepal',
             is_published=True,
             is_featured=True,

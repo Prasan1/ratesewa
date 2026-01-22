@@ -378,7 +378,7 @@ def publish():
         'Are you being overcharged at hospitals in Nepal? Learn how to read your medical bill, spot common overcharges, and protect yourself from unfair billing practices.',
         ARTICLE_CONTENT,
         category_id,
-        'Are you being overcharged at hospitals in Nepal? Learn common medical billing overcharges, how to read your hospital bill, and protect yourself from unfair charges.',
+        'Are you being overcharged at hospitals in Nepal? Learn common medical overcharges and how to protect yourself from unfair billing.',
         'medical bill Nepal, hospital charges Kathmandu, overcharge doctor Nepal, hospital billing Nepal, healthcare cost Nepal, medical expenses Nepal',
         True,
         True,
