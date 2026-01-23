@@ -130,8 +130,9 @@
                                 <input type="email" class="form-control" id="patientEmail" placeholder="For confirmation email">
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Reason for Visit (Optional)</label>
-                                <textarea class="form-control" id="reason" rows="2" placeholder="Brief description of your concern"></textarea>
+                                <label class="form-label">Reason for Visit <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="reason" rows="2" required minlength="10" placeholder="e.g., Headache and fever for 3 days"></textarea>
+                                <small class="text-muted">Help the doctor prepare by briefly describing your symptoms.</small>
                             </div>
                         </div>
                     </div>
@@ -319,7 +320,8 @@ function setStep(activeStep) {
 function maybeAdvanceToConfirm() {
     const patientName = document.getElementById('patientName')?.value.trim();
     const patientPhone = document.getElementById('patientPhone')?.value.trim();
-    if (patientName && patientPhone) {
+    const reason = document.getElementById('reason')?.value.trim();
+    if (patientName && patientPhone && reason && reason.length >= 10) {
         setStep(4);
     } else {
         setStep(3);
@@ -380,7 +382,7 @@ function selectTime(btn, time, display) {
     document.getElementById('summaryTime').textContent = display;
 }
 
-['patientName', 'patientPhone'].forEach(function(id) {
+['patientName', 'patientPhone', 'reason'].forEach(function(id) {
     const field = document.getElementById(id);
     if (field) {
         field.addEventListener('input', maybeAdvanceToConfirm);
@@ -395,13 +397,18 @@ function submitBooking() {
     const patientEmail = document.getElementById('patientEmail').value.trim();
     const reason = document.getElementById('reason').value.trim();
 
-    if (!patientName || !patientPhone) {
-        showAlert('Please fill in your name and phone number.', 'warning');
+    if (!patientName || !patientPhone || !reason) {
+        showAlert('Please fill in all required fields.', 'warning');
         return;
     }
 
     if (patientPhone.length < 10) {
         showAlert('Please enter a valid phone number.', 'warning');
+        return;
+    }
+
+    if (reason.length < 10) {
+        showAlert('Please describe your reason for visit in a bit more detail.', 'warning');
         return;
     }
 

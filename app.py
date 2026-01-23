@@ -8452,11 +8452,14 @@ def api_create_booking():
     reason = data.get('reason', '').strip()
 
     # Validation
-    if not all([clinic_doctor_id, date_str, time_str, patient_name, patient_phone]):
+    if not all([clinic_doctor_id, date_str, time_str, patient_name, patient_phone, reason]):
         return jsonify({'success': False, 'error': 'All fields are required'}), 400
 
     if len(patient_phone) < 10:
         return jsonify({'success': False, 'error': 'Invalid phone number'}), 400
+
+    if len(reason) < 10:
+        return jsonify({'success': False, 'error': 'Please describe your reason for visit in a bit more detail'}), 400
 
     # Rate limiting - check IP
     if is_booking_ip_limited(client_ip):
