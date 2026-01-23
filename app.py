@@ -356,6 +356,50 @@ def is_email_verification_limited(email):
     ).count()
     return recent_count >= EMAIL_VERIFICATION_LIMIT
 
+
+# --- Booking Rate Limiting (anti-bot protection) ---
+BOOKING_IP_LIMIT = int(os.getenv('BOOKING_IP_LIMIT', '1'))  # Max bookings per IP per hour
+BOOKING_IP_WINDOW = int(os.getenv('BOOKING_IP_WINDOW', '3600'))  # 1 hour
+BOOKING_PHONE_LIMIT = int(os.getenv('BOOKING_PHONE_LIMIT', '1'))  # Max bookings per phone per day
+BOOKING_PHONE_WINDOW = int(os.getenv('BOOKING_PHONE_WINDOW', '86400'))  # 24 hours
+
+def is_booking_ip_limited(ip):
+    """Check if IP has made too many bookings recently"""
+    if BOOKING_IP_LIMIT <= 0:
+        return False
+    window_start = datetime.utcnow() - timedelta(seconds=BOOKING_IP_WINDOW)
+    recent_count = SecurityEvent.query.filter(
+        SecurityEvent.event_type == 'booking_created',
+        SecurityEvent.ip_address == ip,
+        SecurityEvent.created_at >= window_start
+    ).count()
+    return recent_count >= BOOKING_IP_LIMIT
+
+def is_booking_phone_limited(phone):
+    """Check if phone number has made too many bookings recently"""
+    if BOOKING_PHONE_LIMIT <= 0:
+        return False
+    # Normalize phone number (remove spaces, dashes)
+    normalized_phone = ''.join(filter(str.isdigit, phone))[-10:]  # Last 10 digits
+    window_start = datetime.utcnow() - timedelta(seconds=BOOKING_PHONE_WINDOW)
+    recent_count = SecurityEvent.query.filter(
+        SecurityEvent.event_type == 'booking_created',
+        SecurityEvent.meta.contains({'phone_suffix': normalized_phone}),
+        SecurityEvent.created_at >= window_start
+    ).count()
+    return recent_count >= BOOKING_PHONE_LIMIT
+
+def log_booking_event(ip, phone):
+    """Log a booking for rate limiting purposes"""
+    normalized_phone = ''.join(filter(str.isdigit, phone))[-10:]
+    event = SecurityEvent(
+        event_type='booking_created',
+        ip_address=ip,
+        meta={'phone_suffix': normalized_phone}
+    )
+    db.session.add(event)
+
+
 @app.before_request
 def blocklist_guard():
     if request.endpoint == 'static':
@@ -8377,8 +8421,27 @@ def api_create_booking():
     """Create a new appointment booking"""
     from models import Clinic, ClinicDoctor, Appointment
     from datetime import date, time, datetime
+    from anti_scrape import is_bot_user_agent, is_data_center_ip, get_real_ip
+
+    # Anti-bot protection
+    user_agent = request.headers.get('User-Agent', '')
+    client_ip = get_real_ip()
+
+    # Block obvious bots
+    if is_bot_user_agent(user_agent):
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    # Block data center IPs (likely bots)
+    if is_data_center_ip(client_ip):
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
 
     data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'Invalid request'}), 400
+
+    # Honeypot check - bots often fill hidden fields
+    if data.get('website') or data.get('url') or data.get('honeypot'):
+        return jsonify({'success': False, 'error': 'Invalid request'}), 400
 
     clinic_doctor_id = data.get('clinic_doctor_id')
     date_str = data.get('date')
@@ -8394,6 +8457,14 @@ def api_create_booking():
 
     if len(patient_phone) < 10:
         return jsonify({'success': False, 'error': 'Invalid phone number'}), 400
+
+    # Rate limiting - check IP
+    if is_booking_ip_limited(client_ip):
+        return jsonify({'success': False, 'error': 'Too many booking attempts. Please try again later.'}), 429
+
+    # Rate limiting - check phone number
+    if is_booking_phone_limited(patient_phone):
+        return jsonify({'success': False, 'error': 'This phone number has reached the booking limit. Please try again tomorrow.'}), 429
 
     try:
         appointment_date = date.fromisoformat(date_str)
@@ -8447,6 +8518,10 @@ def api_create_booking():
         )
 
         db.session.add(appointment)
+        db.session.commit()
+
+        # Log booking for rate limiting
+        log_booking_event(client_ip, patient_phone)
         db.session.commit()
 
         # TODO: Send confirmation email if patient_email provided

@@ -37,6 +37,10 @@
                         <div class="mb-4">
                             <label class="form-label fw-semibold">Weekly Schedule</label>
                             <p class="text-muted small">Select the days and times you're available at this clinic.</p>
+                            <div class="alert alert-warning py-2 small">
+                                <i class="fas fa-clock me-1"></i>
+                                <strong>Time format:</strong> Use 24-hour format. For example: 10:00 AM = <code>10:00</code>, 6:00 PM = <code>18:00</code>
+                            </div>
 
                             {% set days = [('0', 'Sunday'), ('1', 'Monday'), ('2', 'Tuesday'), ('3', 'Wednesday'), ('4', 'Thursday'), ('5', 'Friday'), ('6', 'Saturday')] %}
 
@@ -106,5 +110,66 @@ function toggleDayInputs(dayNum) {
     endInput.disabled = !checkbox.checked;
     maxInput.disabled = !checkbox.checked;
 }
+
+// Validate end time is after start time
+function validateScheduleTimes() {
+    const days = ['0', '1', '2', '3', '4', '5', '6'];
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    let errors = [];
+
+    for (let i = 0; i < days.length; i++) {
+        const checkbox = document.getElementById('day' + days[i]);
+        if (checkbox && checkbox.checked) {
+            const startInput = document.getElementById('start_' + days[i]);
+            const endInput = document.getElementById('end_' + days[i]);
+
+            if (startInput.value && endInput.value) {
+                if (endInput.value <= startInput.value) {
+                    errors.push(dayNames[i] + ': End time (' + formatTime(endInput.value) + ') must be after start time (' + formatTime(startInput.value) + '). Did you mean ' + formatTime(addTwelveHours(endInput.value)) + ' (PM) instead?');
+                    endInput.style.borderColor = 'red';
+                } else {
+                    endInput.style.borderColor = '';
+                }
+            }
+        }
+    }
+
+    if (errors.length > 0) {
+        alert('Schedule Error:\\n\\n' + errors.join('\\n\\n'));
+        return false;
+    }
+    return true;
+}
+
+function formatTime(time24) {
+    const [hours, minutes] = time24.split(':');
+    const h = parseInt(hours);
+    const suffix = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return h12 + ':' + minutes + ' ' + suffix;
+}
+
+function addTwelveHours(time24) {
+    const [hours, minutes] = time24.split(':');
+    const newHours = (parseInt(hours) + 12) % 24;
+    return newHours.toString().padStart(2, '0') + ':' + minutes;
+}
+
+// Add validation on form submit
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!validateScheduleTimes()) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    // Also validate on time input change
+    document.querySelectorAll('input[type="time"]').forEach(function(input) {
+        input.addEventListener('change', validateScheduleTimes);
+    });
+});
 </script>
 {% endblock %}
