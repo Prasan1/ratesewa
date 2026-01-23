@@ -176,17 +176,29 @@ HISTORY_CLEANUP_INTERVAL = 300  # Clean up every 5 minutes
 last_cleanup = datetime.now()
 
 
+def is_legitimate_bot(user_agent):
+    """Check if user agent is a legitimate search engine/social bot (good for SEO)"""
+    if not user_agent:
+        return False
+
+    legitimate_bots = ['googlebot', 'bingbot', 'yandexbot', 'duckduckbot', 'baiduspider',
+                       'facebookexternalhit', 'twitterbot', 'linkedinbot', 'whatsapp', 'slackbot',
+                       'applebot', 'apis-google', 'mediapartners-google', 'adsbot-google']
+    user_agent_lower = user_agent.lower()
+    for legit in legitimate_bots:
+        if legit in user_agent_lower:
+            return True
+    return False
+
+
 def is_bot_user_agent(user_agent):
     """Check if user agent matches known scraping bot patterns"""
     if not user_agent:
         return True  # No user agent = suspicious
 
     # Allow legitimate search engine bots (good for SEO)
-    legitimate_bots = ['googlebot', 'bingbot', 'yandexbot', 'duckduckbot', 'baiduspider', 'facebookexternalhit', 'twitterbot', 'linkedinbot', 'whatsapp', 'slackbot']
-    user_agent_lower = user_agent.lower()
-    for legit in legitimate_bots:
-        if legit in user_agent_lower:
-            return False  # Allow legitimate bots
+    if is_legitimate_bot(user_agent):
+        return False  # Allow legitimate bots
 
     # Block scraping bots
     for pattern in BOT_PATTERNS:
@@ -280,11 +292,17 @@ def anti_scrape_check():
     if session.get('user_id'):
         return None
 
-    ip = get_real_ip()
     user_agent = request.headers.get('User-Agent', '')
+
+    # Skip ALL checks for legitimate search engine bots (critical for SEO!)
+    # Googlebot, Bingbot, etc. come from data center IPs but must be allowed
+    if is_legitimate_bot(user_agent):
+        return None
+
+    ip = get_real_ip()
     path = request.path
 
-    # 1. Check user agent
+    # 1. Check user agent (blocks bad bots like scrapy, curl, etc.)
     if is_bot_user_agent(user_agent):
         # Don't reveal why - just return 403
         return ('Access denied', 403)
