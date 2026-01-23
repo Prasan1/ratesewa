@@ -1001,11 +1001,6 @@ function handleBackClick(e) {
         <div class="hero-main">
           <div class="hero-identity">
             <h1 class="hero-title">{{ doctor.name|doctor_title }}</h1>
-            {% if doctor.subscription_tier == 'featured' or doctor.is_featured %}
-            <div class="hero-badges">
-                <span class="status-pill featured"><i class="fas fa-crown"></i>Featured</span>
-            </div>
-            {% endif %}
             <div class="hero-tagline">
               {{ doctor.specialty.name }} in {{ doctor.city.name }}
               {% if doctor.experience is defined %}
@@ -1206,16 +1201,6 @@ function handleBackClick(e) {
         </div>
       </div>
 
-      {% if doctor.subscription_tier == 'featured' or doctor.is_featured %}
-        <div class="alert alert-dismissible fade show mb-4 d-flex align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; border-radius: 12px;" role="alert">
-          <div class="me-3 fs-2"><i class="fas fa-certificate"></i></div>
-          <div>
-            <h5 class="mb-1 fw-bold"><i class="fas fa-star me-2"></i>Featured Doctor</h5>
-            <p class="mb-0 small opacity-75">Featured doctors get enhanced analytics and premium support.</p>
-          </div>
-          <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="alert"></button>
-        </div>
-      {% endif %}
 
       <!-- About Card -->
       <div class="content-card">
