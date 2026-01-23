@@ -1024,6 +1024,7 @@ function handleBackClick(e) {
               </div>
               <div class="hero-divider"></div>
             {% endif %}
+            {% if ratings|length > 0 %}
             <div class="rating-badge">
               <span class="star-rating">
                 {% set full_stars = avg_rating | int %}
@@ -1034,7 +1035,13 @@ function handleBackClick(e) {
               </span>
               <span>{{ "%.1f"|format(avg_rating) }} / 5</span>
             </div>
-            <div class="text-muted small">{{ ratings|length }} reviews from patients</div>
+            <div class="text-muted small">{{ ratings|length }} review{{ 's' if ratings|length != 1 else '' }} from patients</div>
+            {% else %}
+            <div class="text-center py-2">
+              <div class="text-muted mb-1"><i class="far fa-star me-1"></i>No reviews yet</div>
+              <div class="small text-muted">Be the first to share your experience</div>
+            </div>
+            {% endif %}
 
             {% if 'user_id' in session and session.get('doctor_id') != doctor.id %}
               <button class="btn btn-primary w-100" style="border-radius: 12px; font-weight:600;" data-bs-toggle="modal" data-bs-target="#ratingModal">
