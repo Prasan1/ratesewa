@@ -13,8 +13,8 @@
 
     <title>{% block title %}RankSewa - Find Trusted Doctors Through Real Patient Reviews{% endblock %}</title>
 
-    <!-- Canonical URL (important for SEO) -->
-    <link rel="canonical" href="{% block canonical_url %}{{ request.url }}{% endblock %}">
+    <!-- Canonical URL (important for SEO - strips query params to prevent duplicate content) -->
+    <link rel="canonical" href="{% block canonical_url %}{{ request.url_root.rstrip('/') }}{{ request.path }}{% endblock %}">
 
     <!-- Meta Description (important for SEO) -->
     <meta name="description" content="{% block meta_description %}Find trusted doctors in Nepal through real patient reviews. Community-driven healthcare transparency where patient experiences matter more than credentials alone.{% endblock %}">

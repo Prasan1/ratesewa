@@ -2966,6 +2966,13 @@ def clinics():
 
     city_id = request.args.get('city_id', '')
 
+    # Validate city_id to prevent 500 errors
+    if city_id:
+        try:
+            city_id = int(city_id)
+        except (ValueError, TypeError):
+            city_id = None  # Invalid city_id, show all clinics
+
     # Eager load clinic_doctors and their doctors to avoid N+1 queries
     query = Clinic.query.filter_by(is_active=True).options(
         selectinload(Clinic.clinic_doctors).selectinload(ClinicDoctor.doctor)
@@ -3013,6 +3020,17 @@ def get_doctors():
     name_search = request.args.get('name', '')
     page = request.args.get('page', 1, type=int)
     per_page = 50  # Limit results per page
+
+    # Validate integer parameters to prevent 500 errors (critical for SEO)
+    try:
+        if city_id:
+            city_id = int(city_id)
+        if specialty_id:
+            specialty_id = int(specialty_id)
+    except (ValueError, TypeError):
+        response = jsonify({'error': 'Invalid city_id or specialty_id parameter'})
+        response.status_code = 400
+        return response
 
     # Build query with rating aggregates and eager loading to prevent N+1 queries
     from sqlalchemy import func, case, and_
@@ -3086,10 +3104,10 @@ def get_doctors():
     ).filter(Doctor.is_active.is_(True))  # Show all active doctors (NMC city = practice location)
 
     if city_id:
-        query = query.filter(Doctor.city_id == int(city_id))
+        query = query.filter(Doctor.city_id == city_id)
 
     if specialty_id:
-        query = query.filter(Doctor.specialty_id == int(specialty_id))
+        query = query.filter(Doctor.specialty_id == specialty_id)
 
     if name_search:
         # Search by doctor or clinic name (case-insensitive partial match)
@@ -3172,7 +3190,8 @@ def get_doctors():
             'response_rate': int(response_rate)
         })
 
-    return jsonify({
+    # Add X-Robots-Tag to prevent Google from indexing API responses
+    response = make_response(jsonify({
         'doctors': doctors_list,
         'pagination': {
             'page': page,
@@ -3182,7 +3201,9 @@ def get_doctors():
             'has_next': page < total_pages,
             'has_prev': page > 1
         }
-    })
+    }))
+    response.headers['X-Robots-Tag'] = 'noindex, nofollow'
+    return response
 
 @app.route('/admin')
 @app.route('/admin/dashboard')
