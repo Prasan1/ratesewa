@@ -776,9 +776,10 @@ a:hover {
 
 .claim-prompt {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 6px;
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid #f1f5f9;
@@ -789,7 +790,7 @@ a:hover {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     color: #9ca3af;
     background: transparent;
     padding: 0;

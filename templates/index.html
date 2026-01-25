@@ -799,7 +799,7 @@ function displayDoctors(response, shouldScroll = true) {
         // Claim link for unclaimed profiles - with view count for social proof
         const showClaimPrompt = !doctor.is_claimed && !doctor.is_verified && currentUserRole !== 'doctor' && !isAdmin;
         const viewCount = doctor.profile_views || 0;
-        const viewsText = viewCount >= 10 ? `<span class="claim-views"><i class="fas fa-eye"></i> ${viewCount} views</span>` : '';
+        const viewsText = viewCount >= 10 ? `<div class="claim-views"><i class="fas fa-eye"></i> ${viewCount} views</div>` : '';
         const unclaimedPillHtml = showClaimPrompt
             ? '<span class="badge bg-light text-dark border ms-2" style="font-size: 0.62rem; padding: 2px 6px;">Unclaimed</span>'
             : '';
