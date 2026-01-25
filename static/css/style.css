@@ -789,15 +789,14 @@ a:hover {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: 0.75rem;
-    color: #64748b;
-    background: #f1f5f9;
-    padding: 4px 10px;
-    border-radius: 999px;
+    font-size: 0.68rem;
+    color: #9ca3af;
+    background: transparent;
+    padding: 0;
 }
 
 .claim-views i {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
 }
 
 /* Limit description text to 3 lines to keep cards uniform */
