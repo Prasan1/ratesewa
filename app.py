@@ -1946,10 +1946,32 @@ def robots():
     """Robots.txt for search engines"""
     robots_txt = """User-agent: *
 Allow: /
+
+# Admin and private areas
 Disallow: /admin/
 Disallow: /api/
 Disallow: /doctor/dashboard
 Disallow: /doctor/analytics
+Disallow: /doctor/profile/edit
+Disallow: /clinic/dashboard
+Disallow: /user/profile
+
+# Auth pages (not useful for search)
+Disallow: /login
+Disallow: /register
+Disallow: /logout
+Disallow: /forgot-password
+Disallow: /reset-password
+
+# Claim pages (prevent duplicate indexing)
+Disallow: /claim-profile
+
+# Filter and paginated URLs (prevent duplicate content)
+Disallow: /*?city_id=
+Disallow: /*?specialty_id=
+Disallow: /*?page=
+Disallow: /*?q=
+Disallow: /*?category=
 
 Sitemap: https://ranksewa.com/sitemap.xml
 """
@@ -2141,34 +2163,46 @@ def claim_profile():
 
 
 @app.route('/claim-profile/<int:doctor_id>', methods=['GET'])
-@login_required
 def claim_profile_form(doctor_id):
-    """Show verification form for claiming a doctor profile"""
+    """Show verification form for claiming a doctor profile.
+
+    No login required - allows inline registration to reduce friction.
+    Doctors can claim their profile in one step without registering first.
+    """
     doctor = Doctor.query.get_or_404(doctor_id)
 
     if doctor.is_verified:
         flash('This profile is already verified and cannot be claimed.', 'warning')
         return redirect(url_for('claim_profile'))
 
-    # Check if doctor is already claimed
-    if doctor.user_account and doctor.user_account.id != session['user_id']:
+    # Check if doctor is already claimed by someone
+    if doctor.user_account:
+        # If logged in and it's their profile, redirect to dashboard
+        if session.get('user_id') and doctor.user_account.id == session['user_id']:
+            flash('You have already claimed this profile.', 'info')
+            return redirect(url_for('doctor_dashboard'))
+        # Otherwise, it's claimed by someone else
         flash('This profile has already been claimed.', 'warning')
         return redirect(url_for('claim_profile'))
 
-    # Check if user already has ANY pending or approved verification request
-    user_id = session['user_id']
-    existing_request = VerificationRequest.query.filter_by(
-        user_id=user_id
-    ).order_by(VerificationRequest.created_at.desc()).first()
+    # If user is logged in, check for existing verification requests
+    current_user = None
+    is_logged_in = session.get('user_id') is not None
 
-    if existing_request:
-        if existing_request.status == 'pending':
-            flash('You already have a pending verification request. Please wait for admin review.', 'info')
-            return redirect(url_for('verification_submitted'))
-        elif existing_request.status == 'approved':
-            flash('Your doctor profile is already verified.', 'success')
-            return redirect(url_for('doctor_dashboard'))
-        # If rejected, allow them to claim a different profile
+    if is_logged_in:
+        current_user = User.query.get(session['user_id'])
+        existing_request = VerificationRequest.query.filter_by(
+            user_id=session['user_id']
+        ).order_by(VerificationRequest.created_at.desc()).first()
+
+        if existing_request:
+            if existing_request.status == 'pending':
+                flash('You already have a pending verification request. Please wait for admin review.', 'info')
+                return redirect(url_for('verification_submitted'))
+            elif existing_request.status == 'approved':
+                flash('Your doctor profile is already verified.', 'success')
+                return redirect(url_for('doctor_dashboard'))
+            # If rejected, allow them to claim a different profile
 
     # Get all cities for the dropdown
     cities = City.query.order_by(City.name).all()
@@ -2176,7 +2210,8 @@ def claim_profile_form(doctor_id):
     return render_template('claim_profile_form.html',
                           doctor=doctor,
                           cities=cities,
-                          current_user=User.query.get(session['user_id']))
+                          current_user=current_user,
+                          is_logged_in=is_logged_in)
 
 
 @app.route('/claim-profile/<int:doctor_id>/quick', methods=['POST'])
@@ -2222,6 +2257,158 @@ def claim_profile_quick(doctor_id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error claiming profile: {str(e)}', 'danger')
+        return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
+
+
+@app.route('/claim-profile/<int:doctor_id>/after-login', methods=['GET'])
+@login_required
+def claim_profile_quick_after_login(doctor_id):
+    """
+    Called after Google OAuth login to complete the claim.
+    This is the redirect target for "Continue with Google" button.
+    """
+    doctor = Doctor.query.get_or_404(doctor_id)
+
+    if doctor.is_verified:
+        flash('This profile is already verified and cannot be claimed.', 'warning')
+        return redirect(url_for('claim_profile'))
+
+    # Check if doctor is already claimed by someone else
+    if doctor.user_account and doctor.user_account.id != session['user_id']:
+        flash('This profile has already been claimed by another user.', 'warning')
+        return redirect(url_for('claim_profile'))
+
+    # Check if current user already has a doctor profile
+    user = User.query.get(session['user_id'])
+    if user.doctor_id and user.doctor_id != doctor_id:
+        flash('You already have a doctor profile linked to your account.', 'warning')
+        return redirect(url_for('doctor_dashboard'))
+
+    try:
+        # Link user to doctor profile
+        user.doctor_id = doctor.id
+        user.role = 'doctor'
+
+        db.session.commit()
+
+        # Update session
+        session['role'] = 'doctor'
+
+        flash('Profile claimed successfully! You can now edit your profile.', 'success')
+        return redirect(url_for('doctor_dashboard'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error claiming profile: {str(e)}', 'danger')
+        return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
+
+
+@app.route('/claim-profile/<int:doctor_id>/register', methods=['POST'])
+@limiter.limit("5 per minute")  # Prevent spam registrations
+def claim_profile_with_registration(doctor_id):
+    """
+    Inline registration + claim in one step.
+    Creates a new account and claims the doctor profile immediately.
+    Reduces friction by eliminating the separate registration flow.
+    """
+    doctor = Doctor.query.get_or_404(doctor_id)
+
+    if doctor.is_verified:
+        flash('This profile is already verified and cannot be claimed.', 'warning')
+        return redirect(url_for('claim_profile'))
+
+    # Check if doctor is already claimed
+    if doctor.user_account:
+        flash('This profile has already been claimed.', 'warning')
+        return redirect(url_for('claim_profile'))
+
+    # Get form data
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip().lower()
+    password = request.form.get('password', '')
+
+    # Validate required fields
+    if not all([name, email, password]):
+        flash('All fields are required.', 'danger')
+        return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
+
+    if len(password) < 8:
+        flash('Password must be at least 8 characters.', 'danger')
+        return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
+
+    # Check if email is blocked
+    blocked_identity = get_blocked_identity_for_email(email)
+    if blocked_identity:
+        log_security_event(
+            'blocked_email_claim_register',
+            email=email,
+            meta={'block_id': blocked_identity.id, 'reason': blocked_identity.reason, 'doctor_id': doctor_id}
+        )
+        flash('Registration failed. Please contact support.', 'danger')
+        return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
+
+    # Block disposable email addresses
+    if is_disposable_email(email):
+        log_security_event(
+            'disposable_email_claim_register',
+            email=email,
+            meta={'domain': get_email_domain(email), 'doctor_id': doctor_id}
+        )
+        flash('Please use a permanent email address. Temporary email services are not allowed.', 'danger')
+        return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
+
+    # Check if email already exists
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        flash('An account with this email already exists. Please log in instead.', 'warning')
+        return redirect(url_for('login', next=url_for('claim_profile_form', doctor_id=doctor_id)))
+
+    try:
+        # Create new user
+        user = User(
+            name=name,
+            email=email,
+            email_verified=False,
+            is_doctor_intent=True,
+            role='doctor',
+            doctor_id=doctor.id
+        )
+        user.set_password(password)
+
+        db.session.add(user)
+        db.session.commit()
+
+        # Log the user in immediately
+        session['user_id'] = user.id
+        session['user_email'] = user.email
+        session['user_name'] = user.name
+        session['role'] = 'doctor'
+        session.permanent = True
+
+        # Send verification email in background (non-blocking)
+        try:
+            if not is_verification_ip_limited(get_client_ip()) and not is_global_email_rate_limited():
+                verification_result = send_email_verification(user)
+                if verification_result.get("verify_url"):
+                    flash(f'DEV: Verify your email here: {verification_result["verify_url"]}', 'info')
+        except Exception as email_error:
+            # Don't fail the claim if email fails
+            app.logger.warning(f"Failed to send verification email during claim: {email_error}")
+
+        log_security_event(
+            'claim_register_success',
+            user_id=user.id,
+            email=user.email,
+            meta={'doctor_id': doctor_id}
+        )
+
+        flash('Profile claimed successfully! Please verify your email to unlock all features.', 'success')
+        return redirect(url_for('doctor_dashboard'))
+
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error in claim_profile_with_registration: {e}")
+        flash('An error occurred. Please try again.', 'danger')
         return redirect(url_for('claim_profile_form', doctor_id=doctor_id))
 
 
@@ -3231,7 +3418,8 @@ def get_doctors():
             'avg_rating': float(avg_rating_value or 0),
             'rating_count': rating_count_int,
             'profile_completion': int(profile_score_value or 0),
-            'response_rate': int(response_rate)
+            'response_rate': int(response_rate),
+            'profile_views': d.profile_views or 0
         })
 
     # Add X-Robots-Tag to prevent Google from indexing API responses

@@ -27,10 +27,10 @@
                 <div class="col-lg-6">
                     <span class="eyebrow">Nepal’s doctor directory powered by patient experiences</span>
                     <h1 class="display-5 fw-bold mb-3 text-brand">
-                        Find Doctors in Nepal Based on Patient Reviews
+                        Find Doctors in Nepal You Can Trust
                     </h1>
                     <p class="lead text-muted mb-4">
-                        Search by city and specialty, read real experiences, and choose with confidence. Doctors can claim profiles and add verified details.
+                        Search by city and specialty, read real patient experiences, and choose with confidence.
                     </p>
 
                     <div class="trust-strip mb-4">
@@ -49,25 +49,36 @@
                         <a href="#searchSection" class="btn btn-primary btn-lg">
                             <i class="fas fa-search me-2"></i>Search Doctors
                         </a>
-                        <a href="#whyReviewsMatter" class="btn btn-outline-primary btn-lg">
+                        <a href="#whyReviewsMatter" class="btn btn-link btn-lg text-decoration-none">
                             <i class="fas fa-pen me-2"></i>Rate a Doctor
                         </a>
                     </div>
 
                     <p class="text-muted small mt-3 mb-0">
                         <i class="fas fa-info-circle me-1"></i>
-                        Reviews should be respectful and based on personal experience.
+                        No account needed to search. Reviews should be respectful and based on personal experience.
                     </p>
                 </div>
 
                 <div class="col-lg-6">
+                    {% set popular = namespace(kathmandu=None, pokhara=None, lalitpur=None, cardiology=None, pediatrics=None, orthopedics=None) %}
+                    {% for city in cities %}
+                        {% if city.name == 'Kathmandu' %}{% set popular.kathmandu = city.id %}{% endif %}
+                        {% if city.name == 'Pokhara' %}{% set popular.pokhara = city.id %}{% endif %}
+                        {% if city.name == 'Lalitpur' %}{% set popular.lalitpur = city.id %}{% endif %}
+                    {% endfor %}
+                    {% for specialty in specialties %}
+                        {% if specialty.name == 'Cardiology' %}{% set popular.cardiology = specialty.id %}{% endif %}
+                        {% if specialty.name == 'Pediatrics' or specialty.name == 'Paediatrics' %}{% set popular.pediatrics = specialty.id %}{% endif %}
+                        {% if specialty.name == 'Orthopedics' or specialty.name == 'Orthopaedics' %}{% set popular.orthopedics = specialty.id %}{% endif %}
+                    {% endfor %}
                     <div class="search-container search-card search-card--primary" id="searchSection">
                         <h3 class="text-center">
-                            <i class="fas fa-search me-2"></i>Search Doctors in Nepal
+                            <i class="fas fa-search me-2"></i>Find a Doctor Near You
                         </h3>
                         <p class="text-center text-muted mb-3">Search by name, city, or specialty</p>
                         <p class="text-center text-muted small mb-4">
-                            Tip: Try city + specialty first (fastest), then narrow by name.
+                            Tip: Start with city + specialty for the fastest results.
                         </p>
 
                         <form id="filterForm">
@@ -117,6 +128,29 @@
                                     Results update automatically when you change filters.
                                 </small>
                             </div>
+
+                            {% if popular.kathmandu or popular.pokhara or popular.lalitpur %}
+                            <div class="popular-searches mt-3">
+                                <div class="text-muted small mb-2 text-center">Popular searches</div>
+                                <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                    {% if popular.kathmandu and popular.cardiology %}
+                                    <button type="button" class="btn btn-sm btn-outline-secondary popular-search-chip" data-city="{{ popular.kathmandu }}" data-specialty="{{ popular.cardiology }}">
+                                        Kathmandu • Cardiology
+                                    </button>
+                                    {% endif %}
+                                    {% if popular.pokhara and popular.orthopedics %}
+                                    <button type="button" class="btn btn-sm btn-outline-secondary popular-search-chip" data-city="{{ popular.pokhara }}" data-specialty="{{ popular.orthopedics }}">
+                                        Pokhara • Orthopedics
+                                    </button>
+                                    {% endif %}
+                                    {% if popular.lalitpur and popular.pediatrics %}
+                                    <button type="button" class="btn btn-sm btn-outline-secondary popular-search-chip" data-city="{{ popular.lalitpur }}" data-specialty="{{ popular.pediatrics }}">
+                                        Lalitpur • Pediatrics
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
                         </form>
                     </div>
                 </div>
@@ -124,8 +158,6 @@
         </div><!-- /hero-card -->
     </div>
 </div>
-
-<div class="section-divider" aria-hidden="true"></div>
 
 <!-- Quick Stats -->
 <div class="row mb-4">
@@ -178,59 +210,40 @@
                     <div class="col-lg-8 mx-auto text-center">
                         <h2 class="h3 fw-bold mb-3 text-brand">What is RankSewa?</h2>
                         <p class="lead text-muted mb-4">
-                            RankSewa is Nepal's comprehensive healthcare directory platform that helps patients find and review doctors based on real patient experiences.
+                            Nepal's trusted healthcare directory built on real patient experiences and verified profiles.
                         </p>
-                        <div class="row g-3 text-start">
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-start gap-3">
-                                    <div class="flex-shrink-0">
-                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-search text-brand fs-5"></i>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="h-100 border rounded-3 p-3 text-start bg-white">
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-search text-brand fs-6"></i>
                                         </div>
+                                        <h5 class="fw-semibold mb-0">Search with confidence</h5>
                                     </div>
-                                    <div>
-                                        <h5 class="fw-semibold mb-2">Search by City & Specialty</h5>
-                                        <p class="text-muted small mb-0">Find doctors across Nepal's major cities including Kathmandu, Pokhara, Biratnagar, and more. Filter by medical specialty to find the right healthcare provider for your needs.</p>
-                                    </div>
+                                    <p class="text-muted small mb-0">Filter by city and specialty to find the right doctor faster.</p>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-start gap-3">
-                                    <div class="flex-shrink-0">
-                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-star text-brand fs-5"></i>
+                            <div class="col-md-4">
+                                <div class="h-100 border rounded-3 p-3 text-start bg-white">
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-star text-brand fs-6"></i>
                                         </div>
+                                        <h5 class="fw-semibold mb-0">Real patient reviews</h5>
                                     </div>
-                                    <div>
-                                        <h5 class="fw-semibold mb-2">Real Patient Reviews</h5>
-                                        <p class="text-muted small mb-0">Read authentic patient experiences and ratings to make informed healthcare decisions. Share your own experience to help others in the community.</p>
-                                    </div>
+                                    <p class="text-muted small mb-0">Read experiences and ratings to make an informed choice.</p>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-start gap-3">
-                                    <div class="flex-shrink-0">
-                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-shield-alt text-brand fs-5"></i>
+                            <div class="col-md-4">
+                                <div class="h-100 border rounded-3 p-3 text-start bg-white">
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-shield-alt text-brand fs-6"></i>
                                         </div>
+                                        <h5 class="fw-semibold mb-0">Verified profiles</h5>
                                     </div>
-                                    <div>
-                                        <h5 class="fw-semibold mb-2">Verified Credentials</h5>
-                                        <p class="text-muted small mb-0">Check Nepal Medical Council (NMC) registration numbers and verified doctor profiles. RankSewa reviews doctor-submitted information for accuracy.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-start gap-3">
-                                    <div class="flex-shrink-0">
-                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-user-md text-brand fs-5"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h5 class="fw-semibold mb-2">For Healthcare Providers</h5>
-                                        <p class="text-muted small mb-0">Doctors can claim their profiles for free, update their information, respond to reviews, and build trust with potential patients across Nepal.</p>
-                                    </div>
+                                    <p class="text-muted small mb-0">NMC credentials and profile updates are reviewed by RankSewa.</p>
                                 </div>
                             </div>
                         </div>
@@ -253,8 +266,8 @@
                         <div class="row align-items-center">
                             <div class="col-lg-8">
                                 <div class="d-inline-flex align-items-center gap-2 bg-white border rounded-pill px-3 py-1 mb-3">
-                                    <span class="badge bg-success">100% FREE</span>
-                                    <small class="fw-semibold text-brand">Launch Offer - Until April 25, 2026</small>
+                                    <span class="badge bg-success">ALWAYS FREE</span>
+                                    <small class="fw-semibold text-brand">Claim anytime</small>
                                 </div>
                                 <h4 class="mb-2 text-dark">Are You a Doctor? Claim Your Profile</h4>
                                 <p class="mb-3 text-muted">
@@ -295,7 +308,7 @@
                                     </a>
                                 </div>
                                 <div class="mt-3 small text-success fw-semibold">
-                                    <i class="fas fa-gift me-1"></i>100% Free during launch
+                                    <i class="fas fa-gift me-1"></i>Always free to claim
                                 </div>
                             </div>
                         </div><!-- /row -->
@@ -552,6 +565,8 @@ document.addEventListener('DOMContentLoaded', handleScrollButton);
 
 <script>
 $(document).ready(function() {
+    let suppressAutoLoad = false;
+
     // Initialize Select2 on city and specialty dropdowns for better UX with 1000+ cities
     $('#citySelect').select2({
         theme: 'bootstrap-5',
@@ -565,6 +580,30 @@ $(document).ready(function() {
         placeholder: 'Search specialties...',
         allowClear: true,
         width: '100%'
+    });
+
+    $('.popular-search-chip').on('click', function() {
+        const cityId = $(this).data('city');
+        const specialtyId = $(this).data('specialty');
+
+        suppressAutoLoad = true;
+
+        if (cityId) {
+            $('#citySelect').val(String(cityId)).trigger('change');
+        } else {
+            $('#citySelect').val(null).trigger('change');
+        }
+
+        if (specialtyId) {
+            $('#specialtySelect').val(String(specialtyId)).trigger('change');
+        } else {
+            $('#specialtySelect').val(null).trigger('change');
+        }
+
+        $('#nameSearch').val('');
+
+        suppressAutoLoad = false;
+        loadDoctors(1, true);
     });
 
     // Handle URL parameters (e.g., ?city=1&specialty=2)
@@ -587,6 +626,9 @@ $(document).ready(function() {
 
     // Use Select2 change event instead of regular change
     $('#citySelect, #specialtySelect').on('select2:select select2:clear', function() {
+        if (suppressAutoLoad) {
+            return;
+        }
         loadDoctors(1, false); // Update results without auto-scroll
     });
 
@@ -754,10 +796,18 @@ function displayDoctors(response, shouldScroll = true) {
             ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>'
             : '';
 
-        // Claim link for unclaimed profiles - subtle text
-        const showClaimPrompt = !doctor.is_claimed && currentUserRole !== 'doctor' && !isAdmin;
+        // Claim link for unclaimed profiles - with view count for social proof
+        const showClaimPrompt = !doctor.is_claimed && !doctor.is_verified && currentUserRole !== 'doctor' && !isAdmin;
+        const viewCount = doctor.profile_views || 0;
+        const viewsText = viewCount >= 10 ? `<span class="claim-views"><i class="fas fa-eye"></i> ${viewCount} views</span>` : '';
+        const unclaimedPillHtml = showClaimPrompt
+            ? '<span class="badge bg-light text-dark border ms-2" style="font-size: 0.62rem; padding: 2px 6px;">Unclaimed</span>'
+            : '';
+        const claimHintHtml = showClaimPrompt
+            ? '<div class="text-muted small">Claim free to update info + respond to reviews.</div>'
+            : '';
         const claimLinkHtml = showClaimPrompt
-            ? `<a href="/claim-profile/${doctor.id}" class="claim-link claim-link-pill"><i class="fas fa-bolt"></i>Is this you? Claim profile</a>`
+            ? `<div class="claim-prompt">${viewsText}<a href="/claim-profile/${doctor.id}" class="claim-link claim-link-pill"><i class="fas fa-bolt"></i>Is this you? Claim your profile</a></div>`
             : '';
         const claimButton = '';
 
@@ -786,7 +836,7 @@ function displayDoctors(response, shouldScroll = true) {
                                     >
                                 </div>
                                 <div class="doctor-title">
-                                    <div class="doctor-name">${doctor.name}</div>
+                                    <div class="doctor-name">${doctor.name}${unclaimedPillHtml}</div>
                                     <div class="doctor-subtitle">
                                         <i class="fas fa-stethoscope"></i>
                                         <span>${specialtyName}</span>
@@ -795,6 +845,7 @@ function displayDoctors(response, shouldScroll = true) {
                                         <i class="fas fa-map-marker-alt"></i>
                                         <span>${cityLabel}</span>
                                     </div>
+                                    ${claimHintHtml}
                                 </div>
                             </div>
                             <div class="doctor-badges">

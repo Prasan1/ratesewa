@@ -42,34 +42,22 @@
 </script>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-
-    :root {
-        --brand: #0d9488;
-        --brand-hover: #0f766e;
-        --brand-light: #ccfbf1;
-        --secondary: #06b6d4;
-        --text-main: #111827;
-        --text-muted: #6b7280;
-        --bg-body: #f8fafc;
-        --bg-card: #ffffff;
-        --border-color: #e5e7eb;
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    .doctor-profile-page {
+        --brand-hover: var(--brand-dark);
+        --brand-light: var(--brand-soft);
+        --text-main: var(--ink);
+        --text-muted: var(--muted);
+        --bg-card: var(--surface);
+        --border-color: var(--border);
+        --shadow-lg: var(--shadow-md);
         --radius: 16px;
-    }
-
-    body {
-        background-color: var(--bg-body);
-        color: var(--text-main);
+        color: var(--ink);
     }
 
     .profile-container {
         max-width: 1400px;
         margin: 0 auto;
         padding: 20px;
-        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     .profile-hero {
@@ -83,6 +71,38 @@
         position: relative;
         overflow: hidden;
         margin-bottom: 30px;
+    }
+
+    .unclaimed-banner {
+        background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+        border: 1px solid #fde047;
+        border-radius: 12px;
+        padding: 12px 16px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .view-count-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .view-count-badge i {
+        color: #6b7280;
+    }
+
+    .unclaimed-text {
+        font-size: 0.9rem;
+        color: #92400e;
+        font-weight: 500;
     }
 
     .profile-hero::before {
@@ -934,6 +954,26 @@
     .doctor-profile-page {
         margin-top: -8px;
     }
+
+    .mobile-cta {
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        z-index: 1020;
+    }
+
+    @media (max-width: 991px) {
+        .doctor-profile-page {
+            padding-bottom: 90px;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .mobile-cta {
+            display: none;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -971,6 +1011,20 @@ function handleBackClick(e) {
 
   <!-- HERO SECTION -->
   <div class="profile-hero">
+    <!-- Unclaimed Profile Banner -->
+    {% if not doctor.user_account and not doctor.is_verified %}
+    <div class="unclaimed-banner mb-3">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <span class="unclaimed-text">
+          <i class="fas fa-info-circle"></i> This profile is unclaimed
+        </span>
+        <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-sm btn-primary">
+          <i class="fas fa-bolt me-1"></i>Claim Profile
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
     <div class="row g-4 align-items-center hero-content">
 
       <!-- Avatar Area -->
@@ -1007,6 +1061,19 @@ function handleBackClick(e) {
                 • {{ doctor.experience }} yrs
               {% endif %}
             </div>
+            <div class="hero-chips">
+              {% if ratings|length > 0 %}
+                <span class="hero-chip"><i class="fas fa-star"></i>{{ "%.1f"|format(avg_rating) }} ({{ ratings|length }} reviews)</span>
+              {% else %}
+                <span class="hero-chip"><i class="far fa-star"></i>No reviews yet</span>
+              {% endif %}
+              {% if doctor.nmc_number %}
+                <span class="hero-chip"><i class="fas fa-id-card"></i>NMC {{ doctor.nmc_number }}</span>
+              {% endif %}
+              {% if doctor.profile_views and doctor.profile_views >= 10 %}
+                <span class="hero-chip"><i class="fas fa-eye"></i>{{ doctor.profile_views }} views</span>
+              {% endif %}
+            </div>
           </div>
 
           <div class="hero-actions-card">
@@ -1024,25 +1091,6 @@ function handleBackClick(e) {
               </div>
               <div class="hero-divider"></div>
             {% endif %}
-            {% if ratings|length > 0 %}
-            <div class="rating-badge">
-              <span class="star-rating">
-                {% set full_stars = avg_rating | int %}
-                {% set has_half_star = (avg_rating - full_stars) >= 0.5 %}
-                {% for i in range(full_stars) %}<i class="fas fa-star"></i>{% endfor %}
-                {% if has_half_star %}<i class="fas fa-star-half-alt"></i>{% endif %}
-                {% for i in range(5 - full_stars - (1 if has_half_star else 0)) %}<i class="far fa-star"></i>{% endfor %}
-              </span>
-              <span>{{ "%.1f"|format(avg_rating) }} / 5</span>
-            </div>
-            <div class="text-muted small">{{ ratings|length }} review{{ 's' if ratings|length != 1 else '' }} from patients</div>
-            {% else %}
-            <div class="text-center py-2">
-              <div class="text-muted mb-1"><i class="far fa-star me-1"></i>No reviews yet</div>
-              <div class="small text-muted">Be the first to share your experience</div>
-            </div>
-            {% endif %}
-
             {% if 'user_id' in session and session.get('doctor_id') != doctor.id %}
               <button class="btn btn-primary w-100" style="border-radius: 12px; font-weight:600;" data-bs-toggle="modal" data-bs-target="#ratingModal">
                 <i class="fas fa-star me-2"></i>Write a Review
@@ -1161,14 +1209,14 @@ function handleBackClick(e) {
             <p class="small text-muted mb-3">Sharing your profile helps patients find you faster.</p>
             <div class="alert alert-success small mb-0 border-0">
               <i class="fas fa-gift me-2"></i>
-              <strong>Tell your colleagues:</strong> RankSewa is FREE until April 25, 2026.
+              <strong>Tell your colleagues:</strong> RankSewa is always free to use.
             </div>
           </div>
         {% else %}
           <div class="sidebar-card">
             <h6 class="fw-bold mb-2"><i class="fas fa-user-check text-brand me-2"></i>Are you this doctor?</h6>
             <p class="small text-muted mb-3">Claim your profile to update details, respond to reviews, and access analytics.</p>
-            <a href="{{ url_for('claim_profile') }}" class="btn btn-outline-primary w-100" style="border-radius: 10px;">
+            <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-primary w-100" style="border-radius: 10px;">
               <i class="fas fa-bolt me-2"></i>Claim This Profile
             </a>
           </div>
@@ -1208,6 +1256,175 @@ function handleBackClick(e) {
         </div>
       </div>
 
+
+      <!-- Reviews Card -->
+      <div class="content-card" id="reviewsSection">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h3 class="section-title mb-0 border-0">Patient Reviews</h3>
+            <p class="text-muted small mb-0">Only real users can post reviews. Be respectful and honest.</p>
+          </div>
+          {% if 'user_id' in session and session.get('doctor_id') != doctor.id %}
+            <button class="btn btn-primary" style="border-radius: 12px;" data-bs-toggle="modal" data-bs-target="#ratingModal">
+              <i class="fas fa-star me-2"></i>Write a Review
+            </button>
+          {% endif %}
+        </div>
+
+        <hr class="mb-4">
+
+        {% set total_reviews = ratings|length %}
+        {% if total_reviews > 0 %}
+        <div class="review-metrics mb-4">
+          <div class="review-metric">
+            <div class="metric-icon"><i class="fas fa-star"></i></div>
+            <div>
+              <div class="metric-label">Average rating</div>
+              <div class="metric-value">{{ "%.1f"|format(avg_rating) }}/5</div>
+            </div>
+          </div>
+          <div class="review-metric">
+            <div class="metric-icon"><i class="fas fa-comment-dots"></i></div>
+            <div>
+              <div class="metric-label">Total reviews</div>
+              <div class="metric-value">{{ total_reviews }}</div>
+            </div>
+          </div>
+          <div class="review-metric">
+            <div class="metric-icon"><i class="fas fa-user-check"></i></div>
+            <div>
+              <div class="metric-label">Verified reviewers</div>
+              <div class="metric-value">Real users only</div>
+            </div>
+          </div>
+        </div>
+        <div class="review-summary mb-4">
+          <div class="summary-score">
+            <div class="score">{{ "%.1f"|format(avg_rating) }}</div>
+            <div class="star-rating">
+              {% set full_stars = avg_rating | int %}
+              {% set has_half_star = (avg_rating - full_stars) >= 0.5 %}
+              {% for i in range(full_stars) %}<i class="fas fa-star"></i>{% endfor %}
+              {% if has_half_star %}<i class="fas fa-star-half-alt"></i>{% endif %}
+              {% for i in range(5 - full_stars - (1 if has_half_star else 0)) %}<i class="far fa-star"></i>{% endfor %}
+            </div>
+            <div class="text-muted small">{{ total_reviews }} total reviews</div>
+          </div>
+          <div class="summary-bars">
+            {% for stars in [5,4,3,2,1] %}
+            {% set count = rating_breakdown[stars] %}
+            {% set percent = (count * 100 / total_reviews) if total_reviews > 0 else 0 %}
+            <div class="summary-bar">
+              <span>{{ stars }}</span>
+              <div class="bar"><span style="width: {{ percent }}%;"></span></div>
+              <span>{{ count }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if ratings %}
+          <div class="review-masonry">
+            {% for rating in ratings %}
+              {% set reviewer_initial = (rating.user_name or 'U')[:1] | upper %}
+              <article class="review-card">
+                <div class="review-card-header">
+                  <div class="reviewer-info">
+                    <div class="review-avatar" aria-hidden="true">{{ reviewer_initial }}</div>
+                    <div class="reviewer-meta">
+                      <div class="reviewer-name">
+                        {{ rating.user_name }}
+                        <span class="reviewer-badge">{{ rating.user.tier_name }}</span>
+                        {% if rating.user.created_at and now %}
+                          {% set account_age_days = (now - rating.user.created_at).days %}
+                          {% if rating.user.review_count >= 3 or rating.user.helpful_count >= 5 %}
+                            {% if account_age_days >= 7 %}
+                              <span class="reviewer-badge is-trusted">Trusted Reviewer</span>
+                            {% endif %}
+                          {% endif %}
+                        {% endif %}
+                      </div>
+                      <div class="reviewer-subtitle">
+                        {{ rating.user.review_count }} reviews
+                        {% if rating.user.created_at %}
+                          · Member since {{ rating.user.created_at.strftime('%Y') }}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="review-stars" aria-label="Rating: {{ rating.rating }} out of 5">
+                    {% for i in range(rating.rating) %}<i class="fas fa-star"></i>{% endfor %}
+                    {% for i in range(5 - rating.rating) %}<i class="far fa-star"></i>{% endfor %}
+                  </div>
+                </div>
+
+                <p class="review-body">{{ rating.comment }}</p>
+
+                <div class="review-footer">
+                  <span class="review-date">{{ rating.created_at.strftime('%B %d, %Y') }}</span>
+                  <div class="review-helpful">
+                    {% if rating.helpful_count > 0 %}
+                      <span class="review-helpful-count"><i class="fas fa-heart"></i>{{ rating.helpful_count }} Helpful</span>
+                    {% endif %}
+
+                    {% if 'user_id' in session and session.get('user_id') != rating.user_id %}
+                      <form method="POST" action="{{ url_for('mark_helpful') }}" class="d-inline">
+                        <input type="hidden" name="rating_id" value="{{ rating.id }}">
+                        <input type="hidden" name="doctor_slug" value="{{ doctor.slug }}">
+                        {% set user_voted = rating.helpful_votes | selectattr('user_id', 'equalto', session.get('user_id')) | list | length > 0 %}
+                        <button type="submit" class="btn btn-sm btn-{{ 'primary' if user_voted else 'outline-primary' }}">
+                          <i class="fas fa-thumbs-up me-1"></i>{{ 'Helpful' if not user_voted else 'Marked Helpful' }}
+                        </button>
+                      </form>
+                    {% elif 'user_id' not in session %}
+                      <a href="{{ url_for('login', next=request.url) }}" class="review-helpful-link">
+                        <i class="far fa-heart"></i>Log in to mark helpful
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="review-actions">
+                  <button class="btn btn-sm btn-outline-secondary flag-review-btn"
+                          data-rating-id="{{ rating.id }}"
+                          data-bs-toggle="modal"
+                          data-bs-target="#flagReviewModal">
+                    <i class="fas fa-flag me-1"></i>Flag
+                  </button>
+                </div>
+
+                {% if rating.doctor_response %}
+                  <div class="doctor-response">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <strong class="text-brand">
+                        <i class="fas fa-user-md me-1"></i>Doctor's Response
+                      </strong>
+                      <small class="text-muted">{{ rating.doctor_response.created_at.strftime('%B %d, %Y') }}</small>
+                    </div>
+                    <p class="mb-0">{{ rating.doctor_response.response_text }}</p>
+                  </div>
+                {% endif %}
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted text-center py-5">No reviews yet. Be the first to review this doctor.</p>
+        {% endif %}
+
+        {% if 'user_id' in session %}
+          {% if session.get('doctor_id') == doctor.id %}
+            <div class="alert alert-warning mt-4">
+              <i class="fas fa-info-circle me-2"></i>You cannot rate your own profile.
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="alert alert-info mt-4">
+            <i class="fas fa-info-circle me-2"></i>
+            You must be <a href="{{ url_for('login', next=request.url) }}" class="alert-link fw-bold">logged in</a> to rate a doctor.
+          </div>
+        {% endif %}
+      </div>
 
       <!-- About Card -->
       <div class="content-card">
@@ -1437,178 +1654,30 @@ function handleBackClick(e) {
         {% endif %} {# ✅ THIS WAS MISSING IN YOUR VERSION #}
       </div>
 
-      <!-- Reviews Card -->
-      <div class="content-card" id="reviewsSection">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h3 class="section-title mb-0 border-0">Patient Reviews</h3>
-            <p class="text-muted small mb-0">Only real users can post reviews. Be respectful and honest.</p>
-          </div>
-          {% if 'user_id' in session and session.get('doctor_id') != doctor.id %}
-            <button class="btn btn-primary" style="border-radius: 12px;" data-bs-toggle="modal" data-bs-target="#ratingModal">
-              <i class="fas fa-star me-2"></i>Write a Review
-            </button>
-          {% endif %}
-        </div>
-
-        <hr class="mb-4">
-
-        {% set total_reviews = ratings|length %}
-        {% if total_reviews > 0 %}
-        <div class="review-metrics mb-4">
-          <div class="review-metric">
-            <div class="metric-icon"><i class="fas fa-star"></i></div>
-            <div>
-              <div class="metric-label">Average rating</div>
-              <div class="metric-value">{{ "%.1f"|format(avg_rating) }}/5</div>
-            </div>
-          </div>
-          <div class="review-metric">
-            <div class="metric-icon"><i class="fas fa-comment-dots"></i></div>
-            <div>
-              <div class="metric-label">Total reviews</div>
-              <div class="metric-value">{{ total_reviews }}</div>
-            </div>
-          </div>
-          <div class="review-metric">
-            <div class="metric-icon"><i class="fas fa-user-check"></i></div>
-            <div>
-              <div class="metric-label">Verified reviewers</div>
-              <div class="metric-value">Real users only</div>
-            </div>
-          </div>
-        </div>
-        <div class="review-summary mb-4">
-          <div class="summary-score">
-            <div class="score">{{ "%.1f"|format(avg_rating) }}</div>
-            <div class="star-rating">
-              {% set full_stars = avg_rating | int %}
-              {% set has_half_star = (avg_rating - full_stars) >= 0.5 %}
-              {% for i in range(full_stars) %}<i class="fas fa-star"></i>{% endfor %}
-              {% if has_half_star %}<i class="fas fa-star-half-alt"></i>{% endif %}
-              {% for i in range(5 - full_stars - (1 if has_half_star else 0)) %}<i class="far fa-star"></i>{% endfor %}
-            </div>
-            <div class="text-muted small">{{ total_reviews }} total reviews</div>
-          </div>
-          <div class="summary-bars">
-            {% for stars in [5,4,3,2,1] %}
-            {% set count = rating_breakdown[stars] %}
-            {% set percent = (count * 100 / total_reviews) if total_reviews > 0 else 0 %}
-            <div class="summary-bar">
-              <span>{{ stars }}</span>
-              <div class="bar"><span style="width: {{ percent }}%;"></span></div>
-              <span>{{ count }}</span>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-        {% endif %}
-
-        {% if ratings %}
-          <div class="review-masonry">
-            {% for rating in ratings %}
-              {% set reviewer_initial = (rating.user_name or 'U')[:1] | upper %}
-              <article class="review-card">
-                <div class="review-card-header">
-                  <div class="reviewer-info">
-                    <div class="review-avatar" aria-hidden="true">{{ reviewer_initial }}</div>
-                    <div class="reviewer-meta">
-                      <div class="reviewer-name">
-                        {{ rating.user_name }}
-                        <span class="reviewer-badge">{{ rating.user.tier_name }}</span>
-                        {% if rating.user.created_at and now %}
-                          {% set account_age_days = (now - rating.user.created_at).days %}
-                          {% if rating.user.review_count >= 3 or rating.user.helpful_count >= 5 %}
-                            {% if account_age_days >= 7 %}
-                              <span class="reviewer-badge is-trusted">Trusted Reviewer</span>
-                            {% endif %}
-                          {% endif %}
-                        {% endif %}
-                      </div>
-                      <div class="reviewer-subtitle">
-                        {{ rating.user.review_count }} reviews
-                        {% if rating.user.created_at %}
-                          · Member since {{ rating.user.created_at.strftime('%Y') }}
-                        {% endif %}
-                      </div>
-                    </div>
-                  </div>
-                  <div class="review-stars" aria-label="Rating: {{ rating.rating }} out of 5">
-                    {% for i in range(rating.rating) %}<i class="fas fa-star"></i>{% endfor %}
-                    {% for i in range(5 - rating.rating) %}<i class="far fa-star"></i>{% endfor %}
-                  </div>
-                </div>
-
-                <p class="review-body">{{ rating.comment }}</p>
-
-                <div class="review-footer">
-                  <span class="review-date">{{ rating.created_at.strftime('%B %d, %Y') }}</span>
-                  <div class="review-helpful">
-                    {% if rating.helpful_count > 0 %}
-                      <span class="review-helpful-count"><i class="fas fa-heart"></i>{{ rating.helpful_count }} Helpful</span>
-                    {% endif %}
-
-                    {% if 'user_id' in session and session.get('user_id') != rating.user_id %}
-                      <form method="POST" action="{{ url_for('mark_helpful') }}" class="d-inline">
-                        <input type="hidden" name="rating_id" value="{{ rating.id }}">
-                        <input type="hidden" name="doctor_slug" value="{{ doctor.slug }}">
-                        {% set user_voted = rating.helpful_votes | selectattr('user_id', 'equalto', session.get('user_id')) | list | length > 0 %}
-                        <button type="submit" class="btn btn-sm btn-{{ 'primary' if user_voted else 'outline-primary' }}">
-                          <i class="fas fa-thumbs-up me-1"></i>{{ 'Helpful' if not user_voted else 'Marked Helpful' }}
-                        </button>
-                      </form>
-                    {% elif 'user_id' not in session %}
-                      <a href="{{ url_for('login', next=request.url) }}" class="review-helpful-link">
-                        <i class="far fa-heart"></i>Log in to mark helpful
-                      </a>
-                    {% endif %}
-                  </div>
-                </div>
-
-                <div class="review-actions">
-                  <button class="btn btn-sm btn-outline-secondary flag-review-btn"
-                          data-rating-id="{{ rating.id }}"
-                          data-bs-toggle="modal"
-                          data-bs-target="#flagReviewModal">
-                    <i class="fas fa-flag me-1"></i>Flag
-                  </button>
-                </div>
-
-                {% if rating.doctor_response %}
-                  <div class="doctor-response">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                      <strong class="text-brand">
-                        <i class="fas fa-user-md me-1"></i>Doctor's Response
-                      </strong>
-                      <small class="text-muted">{{ rating.doctor_response.created_at.strftime('%B %d, %Y') }}</small>
-                    </div>
-                    <p class="mb-0">{{ rating.doctor_response.response_text }}</p>
-                  </div>
-                {% endif %}
-              </article>
-            {% endfor %}
-          </div>
-        {% else %}
-          <p class="text-muted text-center py-5">No reviews yet. Be the first to review this doctor.</p>
-        {% endif %}
-
-        {% if 'user_id' in session %}
-          {% if session.get('doctor_id') == doctor.id %}
-            <div class="alert alert-warning mt-4">
-              <i class="fas fa-info-circle me-2"></i>You cannot rate your own profile.
-            </div>
-          {% endif %}
-        {% else %}
-          <div class="alert alert-info mt-4">
-            <i class="fas fa-info-circle me-2"></i>
-            You must be <a href="{{ url_for('login', next=request.url) }}" class="alert-link fw-bold">logged in</a> to rate a doctor.
-          </div>
-        {% endif %}
-      </div>
-
     </div>
   </div>
 </div>
+</div>
+
+<div class="mobile-cta d-lg-none">
+  {% if clinic_affiliations %}
+    {% set primary_clinic = clinic_affiliations[0].clinic %}
+    <a class="btn btn-primary w-100" href="{{ url_for('clinic_book_appointment', clinic_slug=primary_clinic.slug, doctor_id=doctor.id) }}">
+      <i class="fas fa-calendar-check me-2"></i>Book Appointment
+    </a>
+  {% elif 'user_id' in session and session.get('doctor_id') != doctor.id %}
+    <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#ratingModal">
+      <i class="fas fa-star me-2"></i>Write a Review
+    </button>
+  {% elif 'user_id' not in session %}
+    <a class="btn btn-primary w-100" href="{{ url_for('login', next=request.url) }}">
+      <i class="fas fa-sign-in-alt me-2"></i>Login to Review
+    </a>
+  {% else %}
+    <a class="btn btn-outline-secondary w-100" href="#reviewsSection">
+      <i class="fas fa-comments me-2"></i>View Reviews
+    </a>
+  {% endif %}
 </div>
 
 <!-- Rating Modal -->

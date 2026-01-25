@@ -3,62 +3,66 @@
 {% block title %}Clinics - RankSewa{% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-    <div>
-        <h2 class="mb-1">Clinics</h2>
-        <p class="text-muted mb-0">Browse clinics and book appointments with doctors.</p>
-    </div>
-    <div class="d-flex gap-2 align-items-center flex-wrap">
-        <form method="GET" action="{{ url_for('clinics') }}" class="d-flex gap-2" id="cityFilterForm">
-            <div class="searchable-select" style="min-width: 200px; position: relative;">
-                <input type="text"
-                       id="citySearch"
-                       class="form-control"
-                       placeholder="Search city..."
-                       autocomplete="off"
-                       value="{% if selected_city_id %}{% for city in cities %}{% if city.id|string == selected_city_id|string %}{{ city.name }}{% endif %}{% endfor %}{% endif %}">
-                <input type="hidden" name="city_id" id="cityIdInput" value="{{ selected_city_id or '' }}">
-                <div id="cityDropdown" class="searchable-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 250px; overflow-y: auto; background: white; border: 1px solid #dee2e6; border-top: none; border-radius: 0 0 8px 8px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                    <div class="dropdown-item city-option" data-id="" style="padding: 10px 16px; cursor: pointer;">
-                        <span style="color: #6c757d;">All Cities</span>
-                    </div>
-                    {% for city in cities %}
-                    <div class="dropdown-item city-option" data-id="{{ city.id }}" data-name="{{ city.name }}" style="padding: 10px 16px; cursor: pointer;">
-                        {{ city.name }}
-                    </div>
-                    {% endfor %}
-                </div>
+<div class="clinic-hero mb-4">
+    <div class="row g-4 align-items-center">
+        <div class="col-lg-7">
+            <span class="eyebrow">Clinic Growth & Booking Platform</span>
+            <h1 class="display-6 fw-bold mb-3 text-brand">Turn your clinic into a bookable destination</h1>
+            <p class="lead text-muted mb-4">
+                Make it easy for patients to discover your clinic, view doctors, and book appointments online.
+            </p>
+            <div class="hero-benefits">
+                <div class="benefit-item"><i class="fas fa-calendar-check"></i>Online booking with schedule control</div>
+                <div class="benefit-item"><i class="fas fa-users"></i>Bring all doctors into one trusted clinic page</div>
+                <div class="benefit-item"><i class="fas fa-chart-line"></i>Reduce no-shows with verified appointment flow</div>
             </div>
-        </form>
-        {% if 'user_id' in session %}
-        <a href="{{ url_for('clinic_register') }}" class="btn btn-primary">
-            <i class="fas fa-plus-circle me-2"></i>Register Your Clinic
-        </a>
-        {% else %}
-        <a href="{{ url_for('login') }}?next={{ url_for('clinic_register') }}" class="btn btn-primary">
-            <i class="fas fa-plus-circle me-2"></i>Register Your Clinic
-        </a>
-        {% endif %}
-    </div>
-</div>
-
-<!-- CTA Banner for Clinic Owners -->
-<div class="alert mb-4" style="background: linear-gradient(135deg, var(--brand-soft) 0%, #e0f2f1 100%); border: none; border-radius: 12px;">
-    <div class="row align-items-center">
-        <div class="col-md-8">
-            <h5 class="mb-1"><i class="fas fa-hospital me-2" style="color: var(--brand);"></i>Own a Clinic or Hospital?</h5>
-            <p class="mb-0 text-muted">Join our <strong>Availability & Flow Engine</strong> to streamline patient scheduling, reduce wait times, and let patients book appointments online.</p>
+            <div class="clinic-feature-strip mt-3">
+                <span class="feature-pill"><i class="fas fa-id-badge"></i>Doctor roster management</span>
+                <span class="feature-pill"><i class="fas fa-calendar-alt"></i>Appointment flow tools</span>
+                <span class="feature-pill"><i class="fas fa-hospital"></i>Premium clinic profile page</span>
+            </div>
         </div>
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            {% if 'user_id' in session %}
-            <a href="{{ url_for('clinic_register') }}" class="btn btn-success">
-                <i class="fas fa-rocket me-2"></i>Get Started Free
-            </a>
-            {% else %}
-            <a href="{{ url_for('login') }}?next={{ url_for('clinic_register') }}" class="btn btn-success">
-                <i class="fas fa-rocket me-2"></i>Get Started Free
-            </a>
-            {% endif %}
+        <div class="col-lg-5">
+            <div class="clinic-cta-card">
+                <div class="cta-title">Get your clinic live on RankSewa</div>
+                <div class="cta-sub">Show services, enable bookings, and manage your doctors.</div>
+                <div class="d-grid gap-2 mb-3">
+                    {% if 'user_id' in session %}
+                    <a href="{{ url_for('clinic_register') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus-circle me-2"></i>Register Your Clinic
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}?next={{ url_for('clinic_register') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus-circle me-2"></i>Register Your Clinic
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('pricing') }}" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-receipt me-2"></i>View Clinic Plans
+                    </a>
+                </div>
+                <form method="GET" action="{{ url_for('clinics') }}" id="cityFilterForm">
+                    <label class="form-label fw-semibold mb-1" for="citySearch">Browse clinics by city</label>
+                    <div class="searchable-select" style="position: relative;">
+                        <input type="text"
+                               id="citySearch"
+                               class="form-control"
+                               placeholder="Search city..."
+                               autocomplete="off"
+                               value="{% if selected_city_id %}{% for city in cities %}{% if city.id|string == selected_city_id|string %}{{ city.name }}{% endif %}{% endfor %}{% endif %}">
+                        <input type="hidden" name="city_id" id="cityIdInput" value="{{ selected_city_id or '' }}">
+                        <div id="cityDropdown" class="searchable-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 250px; overflow-y: auto; background: white; border: 1px solid #dee2e6; border-top: none; border-radius: 0 0 8px 8px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <div class="dropdown-item city-option" data-id="" style="padding: 10px 16px; cursor: pointer;">
+                                <span style="color: #6c757d;">All Cities</span>
+                            </div>
+                            {% for city in cities %}
+                            <div class="dropdown-item city-option" data-id="{{ city.id }}" data-name="{{ city.name }}" style="padding: 10px 16px; cursor: pointer;">
+                                {{ city.name }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -144,7 +148,7 @@
 
                 <!-- Action Button -->
                 <a href="{{ url_for('clinic_public_page', clinic_slug=clinic.slug) }}" class="btn btn-primary w-100" style="border-radius: 10px;">
-                    View Clinic <i class="fas fa-arrow-right ms-2"></i>
+                    View Clinic
                 </a>
             </div>
         </div>
@@ -164,6 +168,67 @@
 </div>
 
 <style>
+.clinic-hero {
+    background: linear-gradient(135deg, var(--brand-contrast) 0%, var(--brand-soft) 100%);
+    border-radius: 20px;
+    padding: 28px;
+    border: 1px solid rgba(4, 130, 136, 0.12);
+    box-shadow: var(--shadow-sm);
+}
+.hero-benefits {
+    display: grid;
+    gap: 0.6rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+.benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(4, 130, 136, 0.08);
+    padding: 0.65rem 0.9rem;
+    border-radius: 12px;
+}
+.benefit-item i {
+    color: var(--brand);
+}
+.clinic-cta-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid rgba(4, 130, 136, 0.12);
+    padding: 20px;
+    box-shadow: 0 12px 24px rgba(17, 29, 35, 0.08);
+}
+.cta-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.25rem;
+}
+.cta-sub {
+    color: var(--muted);
+    margin-bottom: 1rem;
+}
+.clinic-feature-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.feature-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(4, 130, 136, 0.12);
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+.feature-pill i {
+    color: var(--brand);
+}
 .clinic-card {
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }

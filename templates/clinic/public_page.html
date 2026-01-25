@@ -7,7 +7,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="rs-clinic">
+{% set has_doctors = clinic_doctors|length > 0 %}
+<div class="rs-clinic{% if not has_doctors %} rs-clinic--empty{% endif %}">
   <!-- HERO -->
   <header class="rs-hero">
     <div class="container">
@@ -18,6 +19,7 @@
       </nav>
 
       <div class="rs-hero-grid">
+        {% set has_online_booking = clinic_doctors|selectattr('accepts_online_booking')|list|length > 0 %}
         <div class="rs-hero-card">
           <div class="rs-hero-top">
             {% if clinic.logo_url %}
@@ -78,34 +80,61 @@
             </div>
           </div>
 
-          <div class="rs-hero-bottom">
-            <div class="rs-kpis">
-              <div class="rs-kpi">
-                <div class="rs-kpi-icon"><i class="fas fa-user-md"></i></div>
-                <div>
-                  <div class="rs-kpi-value">{{ clinic_doctors|length }}</div>
-                  <div class="rs-kpi-label">Doctors</div>
+            <div class="rs-hero-bottom">
+              <div class="rs-kpis">
+                <div class="rs-kpi">
+                  <div class="rs-kpi-icon"><i class="fas fa-user-md"></i></div>
+                  <div>
+                    <div class="rs-kpi-value">{{ clinic_doctors|length }}</div>
+                    <div class="rs-kpi-label">Doctors</div>
+                  </div>
+                </div>
+
+                <div class="rs-kpi rs-kpi--soft">
+                  <div class="rs-kpi-icon"><i class="fas fa-bolt"></i></div>
+                  <div>
+                    <div class="rs-kpi-value">{{ 'Online' if has_online_booking else 'Call' }}</div>
+                    <div class="rs-kpi-label">{{ 'Booking Ready' if has_online_booking else 'to Book' }}</div>
+                  </div>
                 </div>
               </div>
 
-              <div class="rs-kpi rs-kpi--soft">
-                <div class="rs-kpi-icon"><i class="fas fa-bolt"></i></div>
-                <div>
-                  <div class="rs-kpi-value">Online</div>
-                  <div class="rs-kpi-label">Booking Ready</div>
-                </div>
+              {% if not has_doctors %}
+              <div class="rs-empty-banner">
+                <i class="fas fa-info-circle"></i>
+                <span>Doctor listings are being added. Check back soon.</span>
               </div>
-            </div>
+              {% endif %}
 
-            <div class="rs-hero-actions">
-              {% set full_address = [clinic.name, clinic.address, clinic.city, 'Nepal']|select|join(', ') %}
-              <a href="#doctors" class="rs-btn rs-btn--primary">
-                <i class="fas fa-calendar-check"></i> Book an Appointment
-              </a>
-              {% if clinic.phone or clinic.phone_number %}
-              <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--outline">
-                <i class="fas fa-phone-alt"></i> Call Clinic
-              </a>
+              <div class="rs-hero-actions">
+                {% set full_address = [clinic.name, clinic.address, clinic.city, 'Nepal']|select|join(', ') %}
+                {% if has_doctors %}
+                  {% if has_online_booking %}
+                    <a href="#doctors" class="rs-btn rs-btn--primary">
+                    <i class="fas fa-calendar-check"></i> Book an Appointment
+                  </a>
+                {% else %}
+                  <a href="#doctors" class="rs-btn rs-btn--primary">
+                    <i class="fas fa-user-md"></i> View Doctors
+                  </a>
+                {% endif %}
+                {% if clinic.phone or clinic.phone_number %}
+                <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--outline">
+                  <i class="fas fa-phone-alt"></i> Call Clinic
+                </a>
+                {% endif %}
+              {% else %}
+                {% if clinic.phone or clinic.phone_number %}
+                <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--primary">
+                  <i class="fas fa-phone-alt"></i> Call Clinic
+                </a>
+                {% else %}
+                <a href="https://www.google.com/maps/search/?api=1&query={{ full_address|urlencode }}"
+                   target="_blank" rel="noopener"
+                   class="rs-btn rs-btn--primary">
+                  <i class="fas fa-directions"></i> Directions
+                </a>
+                {% endif %}
               {% endif %}
               <a href="https://www.google.com/maps/search/?api=1&query={{ full_address|urlencode }}"
                  target="_blank" rel="noopener"
@@ -218,6 +247,7 @@
   </header>
 
   <!-- VALUE STRIP -->
+  {% if has_doctors %}
   <section class="rs-value">
     <div class="container">
       <div class="rs-value-card">
@@ -245,6 +275,28 @@
       </div>
     </div>
   </section>
+  {% else %}
+  <section class="rs-value rs-value--empty">
+    <div class="container">
+      <div class="rs-empty-strip">
+        <div>
+          <div class="rs-empty-strip-title">Clinic setup in progress</div>
+          <div class="rs-empty-strip-text">Doctors and schedules will appear here soon.</div>
+        </div>
+        <div class="rs-empty-strip-actions">
+          {% if clinic.phone or clinic.phone_number %}
+          <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--primary">
+            <i class="fas fa-phone-alt"></i> Call Clinic
+          </a>
+          {% endif %}
+          <a href="{{ url_for('clinics') }}" class="rs-btn rs-btn--outline">
+            <i class="fas fa-hospital"></i> Browse Clinics
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
 
   <!-- DOCTORS -->
   <section class="rs-section" id="doctors">
@@ -369,6 +421,16 @@
         <div class="rs-empty-icon"><i class="fas fa-user-md"></i></div>
         <h3>No Doctors Listed Yet</h3>
         <p>This clinic is setting up their doctor profiles. Check back soon.</p>
+        <div class="rs-empty-actions">
+          {% if clinic.phone or clinic.phone_number %}
+          <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--primary">
+            <i class="fas fa-phone-alt"></i> Call Clinic
+          </a>
+          {% endif %}
+          <a href="{{ url_for('clinics') }}" class="rs-btn rs-btn--outline">
+            <i class="fas fa-hospital"></i> Browse Clinics
+          </a>
+        </div>
       </div>
       {% endif %}
     </div>
@@ -424,16 +486,36 @@
   {% endif %}
 </div>
 
+{% if has_doctors %}
 <div class="rs-sticky-cta" aria-hidden="true">
-  <a href="#doctors" class="rs-btn rs-btn--primary">
-    <i class="fas fa-calendar-check"></i> Book Appointment
-  </a>
-  {% if clinic.phone or clinic.phone_number %}
-  <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--outline">
-    <i class="fas fa-phone-alt"></i> Call Clinic
-  </a>
+  {% if has_doctors %}
+    {% if has_online_booking %}
+    <a href="#doctors" class="rs-btn rs-btn--primary">
+      <i class="fas fa-calendar-check"></i> Book Appointment
+    </a>
+    {% else %}
+    <a href="#doctors" class="rs-btn rs-btn--primary">
+      <i class="fas fa-user-md"></i> View Doctors
+    </a>
+    {% endif %}
+    {% if clinic.phone or clinic.phone_number %}
+    <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--outline">
+      <i class="fas fa-phone-alt"></i> Call Clinic
+    </a>
+    {% endif %}
+  {% else %}
+    {% if clinic.phone or clinic.phone_number %}
+    <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--primary">
+      <i class="fas fa-phone-alt"></i> Call Clinic
+    </a>
+    {% else %}
+    <a href="{{ url_for('clinics') }}" class="rs-btn rs-btn--primary">
+      <i class="fas fa-hospital"></i> Browse Clinics
+    </a>
+    {% endif %}
   {% endif %}
 </div>
+{% endif %}
 
 <style>
 /* =========================================
@@ -445,24 +527,14 @@
 .rs-clinic{
   font-family: "Source Sans 3", "Plus Jakarta Sans", sans-serif;
   background:
-    radial-gradient(900px 450px at 20% -10%, rgba(4,130,136,.18), transparent 55%),
-    radial-gradient(700px 420px at 85% 10%, rgba(4,92,97,.14), transparent 52%),
-    linear-gradient(180deg, #f8fafc 0%, #f8fafc 35%, #f1f5f9 100%);
+    radial-gradient(900px 450px at 20% -10%, rgba(4,130,136,.12), transparent 60%),
+    radial-gradient(700px 420px at 85% 10%, rgba(4,92,97,.10), transparent 58%),
+    linear-gradient(180deg, #f8fafc 0%, #f8fafc 40%, #f1f5f9 100%);
   min-height: 100vh;
   position: relative;
   overflow: hidden;
 }
 .rs-clinic > *{ position: relative; z-index: 1; }
-.rs-clinic:after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    repeating-linear-gradient(120deg, rgba(15,23,42,.03), rgba(15,23,42,.03) 1px, transparent 1px, transparent 28px);
-  pointer-events:none;
-  opacity:.45;
-  z-index: 0;
-}
 
 /* HERO */
 .rs-hero{
@@ -625,6 +697,19 @@
   display:flex; gap:.65rem;
   align-items:center;
 }
+.rs-empty-banner{
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  padding:.5rem .8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(226,232,240,.9);
+  background: rgba(248,250,252,.95);
+  color:#475569;
+  font-weight:800;
+  font-size:.82rem;
+}
+.rs-empty-banner i{ color: var(--brand); }
 .rs-btn{
   display:inline-flex;
   align-items:center;
@@ -762,6 +847,35 @@
   grid-template-columns: repeat(3, minmax(0,1fr));
   gap: 1rem;
   padding: 1.1rem 1.25rem;
+}
+.rs-value--empty{
+  padding: 0 0 1.25rem;
+}
+.rs-empty-strip{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 16px;
+  border: 1px solid rgba(226,232,240,.9);
+  background: rgba(255,255,255,.9);
+  box-shadow: 0 14px 35px rgba(15,23,42,.08);
+}
+.rs-empty-strip-title{
+  font-weight: 900;
+  color:#0f172a;
+}
+.rs-empty-strip-text{
+  color:#64748b;
+  font-weight:700;
+  font-size:.92rem;
+  margin-top:.2rem;
+}
+.rs-empty-strip-actions{
+  display:flex;
+  gap:.6rem;
+  flex-wrap: wrap;
 }
 .rs-value-item{
   display:flex;
@@ -977,7 +1091,7 @@
 /* EMPTY */
 .rs-empty{
   text-align:center;
-  padding: 3.5rem 2rem;
+  padding: 2.5rem 2rem;
   background: rgba(255,255,255,.88);
   border: 1px solid rgba(226,232,240,.9);
   border-radius: 20px;
@@ -993,6 +1107,13 @@
   box-shadow: 0 16px 40px rgba(15,23,42,.10);
 }
 .rs-empty-icon i{ font-size: 1.9rem; }
+.rs-empty-actions{
+  margin-top: 1.2rem;
+  display:flex;
+  justify-content:center;
+  gap:.6rem;
+  flex-wrap: wrap;
+}
 
 /* LOCATION */
 .rs-location{
@@ -1068,6 +1189,7 @@
   .rs-hero-actions .rs-btn{ width:100%; }
   .rs-kpis{ width:100%; justify-content:center; }
   .rs-hero-bottom{ flex-direction: column; align-items: stretch; }
+  .rs-empty-banner{ justify-content:center; }
   .rs-fee{ min-width: 0; text-align:left; width:100%; }
   .rs-card-top{ flex-direction: column; align-items:flex-start; }
   .rs-doc{ width:100%; }
@@ -1086,6 +1208,21 @@
   -webkit-line-clamp: 6;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+.rs-clinic--empty .rs-hero{ padding: 1.1rem 0 1.75rem; }
+.rs-clinic--empty .rs-section{ padding: 1.6rem 0 2rem; }
+.rs-clinic--empty .rs-section--tight{ padding: 0 0 2rem; }
+@media (max-width: 768px){
+  .rs-empty-strip{
+    flex-direction: column;
+    align-items:flex-start;
+  }
+  .rs-empty-strip-actions{
+    width:100%;
+  }
+  .rs-empty-strip-actions .rs-btn{
+    width:100%;
+  }
 }
 </style>
 

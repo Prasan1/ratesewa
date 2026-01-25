@@ -153,25 +153,14 @@ a:hover {
 }
 
 .footer-surface {
-    background: linear-gradient(135deg, var(--footer-grad-start) 0%, var(--footer-grad-end) 100%) !important;
-    box-shadow: 0 -12px 24px rgba(17, 29, 35, 0.08);
+    background: transparent !important;
+    border-top: 1px solid rgba(4, 130, 136, 0.08);
+    box-shadow: none;
 }
 
 .footer-bridge {
-    height: 36px;
-    background:
-        linear-gradient(180deg, rgba(248, 248, 245, 0) 0%, rgba(244, 250, 251, 0.7) 60%, rgba(244, 250, 251, 1) 100%);
-    position: relative;
-}
-
-.footer-bridge::after {
-    content: "";
-    position: absolute;
-    left: 8%;
-    right: 8%;
-    bottom: 10px;
-    height: 1px;
-    background: rgba(4, 130, 136, 0.12);
+    height: 24px;
+    background: transparent;
 }
 .footer-trust {
     display: flex;
@@ -783,6 +772,30 @@ a:hover {
     color: var(--brand);
     text-decoration: none;
     border-color: rgba(4, 130, 136, 0.3);
+}
+
+.claim-prompt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.claim-views {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.claim-views i {
+    font-size: 0.7rem;
 }
 
 /* Limit description text to 3 lines to keep cards uniform */
