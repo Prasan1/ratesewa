@@ -583,30 +583,84 @@
         </div>
         {% endif %}
 
-        <div class="card shadow-sm mb-4" style="border-radius: 16px; border: none;">
-            <div class="card-header" style="background: linear-gradient(135deg, var(--dash-1-start) 0%, var(--dash-1-end) 100%); border-radius: 16px 16px 0 0; border: none;">
-                <h5 class="mb-0 text-white"><i class="fas fa-user-md me-2"></i>Basic Information</h5>
-            </div>
+        <!-- Profile Preview for Unverified Doctors -->
+        <div class="card mb-4" style="border-radius: 20px; border: none; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);">
             <div class="card-body p-4">
-                <div class="mb-3">
-                    <label class="text-muted small mb-1">Full Name</label>
-                    <div class="h6">{{ doctor.name }}</div>
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    {% if doctor.photo_url %}
+                    {% set photo_path = doctor.photo_url.replace('photos/', '') %}
+                    <img src="{{ url_for('serve_photo', filename=photo_path) }}"
+                         alt="{{ doctor.name }}"
+                         style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    {% else %}
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #0d8abc 0%, #0ea5e9 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <i class="fas fa-user-md fa-2x text-white"></i>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <h4 class="mb-1" style="font-weight: 700;">{{ doctor.name }}</h4>
+                        <p class="text-muted mb-0"><i class="fas fa-stethoscope me-2"></i>{{ doctor.specialty.name }}</p>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="text-muted small mb-1">Specialty</label>
-                    <div class="h6">{{ doctor.specialty.name }}</div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="text-center p-3" style="background: white; border-radius: 12px;">
+                            <i class="fas fa-map-marker-alt text-primary mb-2"></i>
+                            <div class="small text-muted">Location</div>
+                            <div class="fw-bold">{{ doctor.city.name }}</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-center p-3" style="background: white; border-radius: 12px;">
+                            <i class="fas fa-briefcase text-primary mb-2"></i>
+                            <div class="small text-muted">Experience</div>
+                            <div class="fw-bold">{{ doctor.experience or 0 }} Years</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-center p-3" style="background: white; border-radius: 12px;">
+                            <i class="fas fa-id-card text-primary mb-2"></i>
+                            <div class="small text-muted">NMC</div>
+                            <div class="fw-bold">{{ doctor.nmc_number or 'Not set' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-center p-3" style="background: white; border-radius: 12px;">
+                            <i class="fas fa-star text-primary mb-2"></i>
+                            <div class="small text-muted">Reviews</div>
+                            <div class="fw-bold">{{ review_count }}</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="text-muted small mb-1">Workplace</label>
-                    <div>{{ doctor.workplace or '-' }}</div>
+
+                {% if doctor.workplace or doctor.practice_address or doctor.phone_number %}
+                <div class="p-3 mb-3" style="background: white; border-radius: 12px;">
+                    {% if doctor.workplace %}
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fas fa-hospital text-muted" style="width: 20px;"></i>
+                        <span>{{ doctor.workplace }}</span>
+                    </div>
+                    {% endif %}
+                    {% if doctor.practice_address %}
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fas fa-map-pin text-muted" style="width: 20px;"></i>
+                        <span>{{ doctor.practice_address }}</span>
+                    </div>
+                    {% endif %}
+                    {% if doctor.phone_number %}
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-phone text-muted" style="width: 20px;"></i>
+                        <span>{{ doctor.phone_number }}</span>
+                    </div>
+                    {% endif %}
                 </div>
-                <div class="mb-3">
-                    <label class="text-muted small mb-1">Practice Address</label>
-                    <div>{{ doctor.practice_address or '-' }}</div>
-                </div>
-                <div class="mb-3">
-                    <label class="text-muted small mb-1">Phone Number</label>
-                    <div>{{ doctor.phone_number or '-' }}</div>
+                {% endif %}
+
+                <div class="text-center">
+                    <a href="{{ url_for('doctor_profile', slug=doctor.slug) }}" target="_blank" class="btn btn-outline-primary">
+                        <i class="fas fa-external-link-alt me-2"></i>View Public Profile
+                    </a>
                 </div>
             </div>
         </div>
@@ -658,9 +712,9 @@
                                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                                     <small class="mb-0">
                                         <i class="fas fa-shield-alt me-1"></i>
-                                        Get the verified badge by submitting documents.
+                                        Get verified to unlock all features.
                                     </small>
-                                    <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-sm btn-outline-dark">
+                                    <a href="{{ url_for('doctor_request_verification') }}" class="btn btn-sm btn-outline-dark">
                                         Verify now
                                     </a>
                                 </div>
