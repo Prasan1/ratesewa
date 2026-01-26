@@ -945,6 +945,10 @@ def send_verification_approved_email(to_email, doctor_name):
     Returns:
         True if email sent successfully, False otherwise
     """
+    if not resend_key:
+        app.logger.warning("RESEND_API_KEY not set. Skipping verification approved email.")
+        return False
+
     try:
         # Extract last name for personalization
         last_name = doctor_name.split()[-1].replace('Dr.', '').strip()
@@ -1028,6 +1032,10 @@ def send_verification_rejected_email(to_email, doctor_name, admin_notes=None):
     Returns:
         True if email sent successfully, False otherwise
     """
+    if not resend_key:
+        app.logger.warning("RESEND_API_KEY not set. Skipping verification rejected email.")
+        return False
+
     try:
         last_name = doctor_name.split()[-1].replace('Dr.', '').strip()
 
@@ -1108,9 +1116,18 @@ def send_admin_verification_notification(verification_request, doctor_name, user
     Returns:
         True if email sent successfully, False otherwise
     """
+    if not resend_key:
+        app.logger.warning("RESEND_API_KEY not set. Skipping admin verification notification.")
+        return False
+
     try:
-        # Get admin email from environment variable
-        admin_email = os.getenv('ADMIN_EMAIL', 'paul.paudyal@gmail.com')
+        admin_emails = admin_email_set()
+        fallback_admin = os.getenv('ADMIN_EMAIL')
+        if fallback_admin:
+            admin_emails.add(fallback_admin.strip().lower())
+        if not admin_emails:
+            app.logger.warning("No admin emails configured. Set ADMIN_EMAILS or ADMIN_EMAIL.")
+            return False
 
         request_type = "New Doctor Registration" if verification_request.is_new_doctor else "Profile Claim"
 
@@ -1149,14 +1166,14 @@ def send_admin_verification_notification(verification_request, doctor_name, user
 
         params = {
             "from": "RankSewa Admin <onboarding@ranksewa.com>",
-            "to": [admin_email],
+            "to": sorted(admin_emails),
             "subject": subject,
             "html": html_body,
             "reply_to": user_email
         }
 
         email_response = resend.Emails.send(params)
-        print(f"✅ Admin notification sent to {admin_email} for {doctor_name}")
+        print(f"✅ Admin notification sent to {', '.join(sorted(admin_emails))} for {doctor_name}")
         return True
 
     except Exception as e:
