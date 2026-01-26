@@ -296,49 +296,6 @@
         z-index: 10;
     }
 
-    .profile-mini-bar {
-        position: sticky;
-        top: 90px;
-        z-index: 5;
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
-        border-radius: 14px;
-        padding: 10px 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 16px;
-    }
-
-    .mini-bar-title {
-        font-weight: 700;
-        color: var(--text-main);
-        font-size: 0.95rem;
-    }
-
-    .mini-bar-meta {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--text-muted);
-        font-size: 0.82rem;
-    }
-
-    .mini-bar-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    @media (max-width: 991px) {
-        .profile-mini-bar {
-            position: static;
-        }
-    }
-
     .sidebar-card {
         background: white;
         border-radius: var(--radius);
@@ -763,43 +720,6 @@
         border: 1px solid var(--border-color);
         background: #f8fafc;
     }
-    .review-metrics {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px;
-    }
-    .review-metric {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px;
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        background: #ffffff;
-        box-shadow: var(--shadow-sm);
-    }
-    .metric-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--brand-light);
-        color: var(--brand);
-        flex-shrink: 0;
-    }
-    .metric-label {
-        font-size: 0.72rem;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: var(--text-muted);
-        font-weight: 600;
-    }
-    .metric-value {
-        font-weight: 700;
-        color: var(--text-main);
-    }
     .summary-score {
         display: flex;
         flex-direction: column;
@@ -902,7 +822,6 @@
         .content-card { padding: 20px 16px; }
         .facts-grid { grid-template-columns: 1fr; }
         .hero-actions-card { width: 100%; }
-        .review-metrics { grid-template-columns: 1fr; }
         .review-summary { grid-template-columns: 1fr; }
         .review-masonry { grid-template-columns: 1fr; }
     }
@@ -1115,8 +1034,7 @@ function handleBackClick(e) {
       <div class="sidebar-wrapper">
 
         <div class="sidebar-card" id="contactCard">
-          <h5 class="fw-bold mb-3">Contact & Booking</h5>
-          <p class="text-muted small mb-4">Use official contact details if available.</p>
+          <h5 class="fw-bold mb-3">Contact</h5>
 
           {% if doctor.phone_number %}
             {% if tier_features is defined and tier_features.can_show_contact %}
@@ -1189,36 +1107,19 @@ function handleBackClick(e) {
         </div>
 
       <div class="sidebar-card" id="shareProfileCard">
-        <h5 class="fw-bold mb-3">Share Profile</h5>
-        <p class="text-muted small mb-3">Help patients find this doctor faster.</p>
-        <div class="d-flex justify-content-center gap-4">
-          <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" class="text-secondary"><i class="fab fa-facebook fa-lg"></i></a>
-          <a href="https://twitter.com/intent/tweet?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!&url={{ request.url }}" target="_blank" class="text-secondary"><i class="fab fa-twitter fa-lg"></i></a>
-          <a href="https://wa.me/?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!%20{{ request.url }}" target="_blank" class="text-secondary"><i class="fab fa-whatsapp fa-lg"></i></a>
-        </div>
-        <div class="text-center mt-3">
-          <button onclick="copyProfileLink()" class="btn btn-outline-primary btn-sm" id="copyLinkBtn">
-            <i class="fas fa-link me-2"></i>Copy profile link
-          </button>
+        <h6 class="fw-bold mb-2">Share Profile</h6>
+        <div class="d-flex justify-content-center gap-3">
+          <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fab fa-facebook"></i></a>
+          <a href="https://twitter.com/intent/tweet?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!&url={{ request.url }}" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fab fa-twitter"></i></a>
+          <a href="https://wa.me/?text=Check%20out%20{{ doctor.name|urlencode }}%20on%20RankSewa!%20{{ request.url }}" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fab fa-whatsapp"></i></a>
+          <button onclick="copyProfileLink()" class="btn btn-sm btn-outline-secondary" id="copyLinkBtn"><i class="fas fa-link"></i></button>
         </div>
       </div>
 
         {% if session.get('doctor_id') == doctor.id and doctor.is_verified %}
           <div class="sidebar-card border-success" style="border: 1px solid #d1fae5; background: #ecfdf5;">
             <h6 class="text-success fw-bold mb-2"><i class="fas fa-bullhorn me-2"></i>Promote Your Profile</h6>
-            <p class="small text-muted mb-3">Sharing your profile helps patients find you faster.</p>
-            <div class="alert alert-success small mb-0 border-0">
-              <i class="fas fa-gift me-2"></i>
-              <strong>Tell your colleagues:</strong> RankSewa is always free to use.
-            </div>
-          </div>
-        {% else %}
-          <div class="sidebar-card">
-            <h6 class="fw-bold mb-2"><i class="fas fa-user-check text-brand me-2"></i>Are you this doctor?</h6>
-            <p class="small text-muted mb-3">Claim your profile to update details, respond to reviews, and access analytics.</p>
-            <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-primary w-100" style="border-radius: 10px;">
-              <i class="fas fa-bolt me-2"></i>Claim This Profile
-            </a>
+            <p class="small text-muted mb-0">Share your profile link with patients to help them find you.</p>
           </div>
         {% endif %}
 
@@ -1233,71 +1134,14 @@ function handleBackClick(e) {
     <!-- MAIN CONTENT -->
     <div class="col-lg-8">
 
-      <div class="profile-mini-bar">
-        <div>
-          <div class="mini-bar-title">{{ doctor.name|doctor_title }}</div>
-          <div class="mini-bar-meta">
-            <span><i class="fas fa-star text-warning me-1"></i>{{ "%.1f"|format(avg_rating) }}</span>
-            <span>•</span>
-            <span>{{ ratings|length }} reviews</span>
-          </div>
-        </div>
-        <div class="mini-bar-actions">
-          <a href="#reviewsSection" class="btn btn-outline-secondary btn-sm">Jump to reviews</a>
-          {% if 'user_id' in session and session.get('doctor_id') != doctor.id %}
-            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ratingModal">
-              <i class="fas fa-star me-1"></i>Write a review
-            </button>
-          {% elif 'user_id' not in session %}
-            <a class="btn btn-primary btn-sm" href="{{ url_for('login', next=request.url) }}">
-              <i class="fas fa-sign-in-alt me-1"></i>Login to review
-            </a>
-          {% endif %}
-        </div>
-      </div>
 
 
       <!-- Reviews Card -->
       <div class="content-card" id="reviewsSection">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h3 class="section-title mb-0 border-0">Patient Reviews</h3>
-            <p class="text-muted small mb-0">Only real users can post reviews. Be respectful and honest.</p>
-          </div>
-          {% if 'user_id' in session and session.get('doctor_id') != doctor.id %}
-            <button class="btn btn-primary" style="border-radius: 12px;" data-bs-toggle="modal" data-bs-target="#ratingModal">
-              <i class="fas fa-star me-2"></i>Write a Review
-            </button>
-          {% endif %}
-        </div>
-
-        <hr class="mb-4">
+        <h3 class="section-title mb-4 border-0">Patient Reviews</h3>
 
         {% set total_reviews = ratings|length %}
         {% if total_reviews > 0 %}
-        <div class="review-metrics mb-4">
-          <div class="review-metric">
-            <div class="metric-icon"><i class="fas fa-star"></i></div>
-            <div>
-              <div class="metric-label">Average rating</div>
-              <div class="metric-value">{{ "%.1f"|format(avg_rating) }}/5</div>
-            </div>
-          </div>
-          <div class="review-metric">
-            <div class="metric-icon"><i class="fas fa-comment-dots"></i></div>
-            <div>
-              <div class="metric-label">Total reviews</div>
-              <div class="metric-value">{{ total_reviews }}</div>
-            </div>
-          </div>
-          <div class="review-metric">
-            <div class="metric-icon"><i class="fas fa-user-check"></i></div>
-            <div>
-              <div class="metric-label">Verified reviewers</div>
-              <div class="metric-value">Real users only</div>
-            </div>
-          </div>
-        </div>
         <div class="review-summary mb-4">
           <div class="summary-score">
             <div class="score">{{ "%.1f"|format(avg_rating) }}</div>
@@ -1412,29 +1256,11 @@ function handleBackClick(e) {
           <p class="text-muted text-center py-5">No reviews yet. Be the first to review this doctor.</p>
         {% endif %}
 
-        {% if 'user_id' in session %}
-          {% if session.get('doctor_id') == doctor.id %}
-            <div class="alert alert-warning mt-4">
-              <i class="fas fa-info-circle me-2"></i>You cannot rate your own profile.
-            </div>
-          {% endif %}
-        {% else %}
-          <div class="alert alert-info mt-4">
-            <i class="fas fa-info-circle me-2"></i>
-            You must be <a href="{{ url_for('login', next=request.url) }}" class="alert-link fw-bold">logged in</a> to rate a doctor.
-          </div>
-        {% endif %}
       </div>
 
       <!-- About Card -->
       <div class="content-card">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h3 class="section-title mb-0 border-0">About</h3>
-            <p class="text-muted small mb-0">Trusted information for patients. Please verify details before visiting.</p>
-          </div>
-        </div>
-
+        <h3 class="section-title mb-4 border-0">About</h3>
         <p class="mb-4">{{ doctor.description or 'No description provided yet.' }}</p>
 
         <div class="facts-grid">
