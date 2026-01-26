@@ -1,4 +1,4 @@
-{# Promotional Banner for New Year 2026 Launch Offer #}
+{# Promotional Banner #}
 <div class="alert alert-dismissible fade show mb-4 border-0 shadow-sm promo-surface"
      role="alert">
     <div class="container-fluid">
@@ -6,23 +6,27 @@
             <div class="col-lg-8 text-white">
                 <div class="d-flex align-items-center gap-3">
                     <div class="d-none d-md-flex" style="font-size: 2.5rem;">
-                        🎉
+                        ✨
                     </div>
                     <div>
                         <h5 class="mb-1 fw-bold text-white">
-                            <span class="d-inline d-md-none">🎉</span> New Year 2026 Special Launch Offer!
+                            <span class="d-inline d-md-none">✨</span> Doctors always free · Clinics free until April 25, 2026
                         </h5>
                         <p class="mb-0 small text-white-50">
-                            <strong class="text-white">100% FREE</strong> profile registration for all doctors until <strong class="text-white">April 25, 2026</strong>.
-                            No hidden charges. Claim your profile today!
+                            Patients are free. Clinics get the Availability & Flow Engine free during the launch period.
                         </p>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                <a href="{{ url_for('claim_profile') }}" class="btn btn-light btn-lg fw-semibold">
-                    <i class="fas fa-rocket me-2"></i>Get Started Free
-                </a>
+                <div class="d-flex flex-column flex-lg-row gap-2 justify-content-lg-end">
+                    <a href="{{ url_for('claim_profile') }}" class="btn btn-light btn-lg fw-semibold">
+                        <i class="fas fa-user-check me-2"></i>Claim Profile
+                    </a>
+                    <a href="{{ url_for('clinic_register') }}" class="btn btn-outline-light btn-lg fw-semibold">
+                        <i class="fas fa-hospital me-2"></i>Register Clinic
+                    </a>
+                </div>
             </div>
         </div>
     </div>

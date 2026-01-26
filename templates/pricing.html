@@ -14,16 +14,22 @@
         </div>
     </div>
 
-    <!-- Promotional Banner -->
+    <!-- Value Banner -->
     <div class="alert border-0 shadow-lg mb-5 promo-surface">
         <div class="text-center text-white py-4">
-            <div style="font-size: 3rem;" class="mb-3">🎉</div>
-            <h2 class="fw-bold mb-3">New Year 2026 Launch Special!</h2>
-            <h4 class="mb-3">ALL Features FREE Until April 25, 2026</h4>
-            <p class="lead mb-4">Join during our launch period and get everything at no cost. Doctors get full verification benefits, clinics get the complete Availability & Flow Engine - all free!</p>
-            <a href="{{ url_for('claim_profile') }}" class="btn btn-light btn-lg px-5">
-                <i class="fas fa-rocket me-2"></i>Get Started Free
-            </a>
+            <div style="font-size: 3rem;" class="mb-3">✨</div>
+            <h2 class="fw-bold mb-3">Patients and Doctors Are Always Free</h2>
+            <p class="lead mb-4">
+                Clinics are free until April 25, 2026. After that, choose a plan for the Availability & Flow Engine.
+            </p>
+            <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                <a href="{{ url_for('claim_profile') }}" class="btn btn-light btn-lg px-5">
+                    <i class="fas fa-user-check me-2"></i>Claim Doctor Profile
+                </a>
+                <a href="{{ url_for('clinic_register') }}" class="btn btn-outline-light btn-lg px-5">
+                    <i class="fas fa-hospital me-2"></i>Register a Clinic
+                </a>
+            </div>
         </div>
     </div>
 
@@ -142,7 +148,7 @@
         <div class="col-lg-4">
             <div class="card h-100 border-0 shadow-sm highlight-surface position-relative">
                 <div class="position-absolute top-0 start-50 translate-middle">
-                    <span class="badge bg-warning text-dark px-4 py-2">FREE Until April 25!</span>
+                    <span class="badge bg-warning text-dark px-4 py-2">Free Until April 25, 2026</span>
                 </div>
                 <div class="card-body p-4 pt-5">
                     <div class="text-center mb-4">
@@ -151,7 +157,6 @@
                         </div>
                         <h3 class="fw-bold">Clinic</h3>
                         <div class="my-3">
-                            <span class="h4 fw-bold text-decoration-line-through text-muted">NPR 4,999</span>
                             <div>
                                 <span class="h2 fw-bold text-success">FREE</span>
                             </div>
@@ -378,13 +383,13 @@
         </div>
     </div>
 
-    <!-- What Happens After April 25 -->
+    <!-- Clinic Pricing -->
     <div class="row justify-content-center mb-5">
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <h4 class="mb-3">
-                        <i class="fas fa-question-circle text-brand me-2"></i>What Happens After April 25, 2026?
+                        <i class="fas fa-question-circle text-brand me-2"></i>How Clinic Pricing Works
                     </h4>
                     <div class="row">
                         <div class="col-md-4 mb-3">
@@ -410,14 +415,14 @@
                                 <div class="card-body p-3 text-center">
                                     <i class="fas fa-hospital fa-2x mb-2" style="color: #10b981;"></i>
                                     <h6>Clinics</h6>
-                                    <p class="small text-muted mb-0"><strong>NPR 4,999/month</strong> for Availability & Flow Engine.</p>
+                                    <p class="small text-muted mb-0"><strong>Free until April 25, 2026</strong> for Availability & Flow Engine.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="alert alert-info mt-3 mb-0">
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong>Our Promise:</strong> We will notify clinics at least 30 days before the promotional period ends. Early adopters may receive special loyalty pricing.
+                        After April 25, 2026, clinics move to NPR 4,999/month. Cancel anytime; the public clinic page stays visible, but booking tools are disabled.
                     </div>
                 </div>
             </div>
@@ -531,12 +536,12 @@
                 <div class="accordion-item border-0 shadow-sm mb-3">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
-                            How much will clinics pay after the promotional period?
+                            How much do clinics pay?
                         </button>
                     </h2>
                     <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
                         <div class="accordion-body">
-                            After April 25, 2026, the Availability & Flow Engine will cost <strong>NPR 4,999/month</strong>. This includes all features: online booking, queue management, schedule management, and more. Early adopters who join during the promotional period may receive special loyalty pricing.
+                            Clinics are free until April 25, 2026. After that, the Availability & Flow Engine costs <strong>NPR 4,999/month</strong> and includes online booking, queue management, schedule management, and more.
                         </div>
                     </div>
                 </div>
