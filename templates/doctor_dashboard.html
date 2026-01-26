@@ -583,6 +583,7 @@
         </div>
         {% endif %}
 
+        {% if not doctor.is_verified %}
         <!-- Profile Preview for Unverified Doctors -->
         <div class="card mb-4" style="border-radius: 20px; border: none; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);">
             <div class="card-body p-4">
