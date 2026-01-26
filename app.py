@@ -6012,6 +6012,68 @@ def doctor_dashboard():
                          todays_appointments_count=todays_appointments_count)
 
 
+@app.route('/doctor/request-verification', methods=['GET', 'POST'])
+@login_required
+def doctor_request_verification():
+    """Allow claimed doctors to request verification"""
+    user = User.query.get(session['user_id'])
+
+    if not user.doctor_id:
+        flash('You need to claim a doctor profile first.', 'warning')
+        return redirect(url_for('claim_profile'))
+
+    doctor = user.doctor_profile
+
+    if doctor.is_verified:
+        flash('Your profile is already verified.', 'info')
+        return redirect(url_for('doctor_dashboard'))
+
+    # Check for pending verification request
+    existing_request = VerificationRequest.query.filter_by(
+        user_id=user.id,
+        status='pending'
+    ).first()
+
+    if existing_request:
+        flash('You already have a pending verification request.', 'info')
+        return redirect(url_for('doctor_dashboard'))
+
+    if request.method == 'POST':
+        nmc_number = request.form.get('nmc_number', '').strip()
+        phone_number = request.form.get('phone_number', '').strip()
+
+        if not nmc_number:
+            flash('NMC number is required for verification.', 'error')
+            return redirect(url_for('doctor_request_verification'))
+
+        # Create verification request
+        verification_request = VerificationRequest(
+            user_id=user.id,
+            doctor_id=doctor.id,
+            nmc_number=nmc_number,
+            phone_number=phone_number,
+            is_new_doctor=False,
+            status='pending'
+        )
+        db.session.add(verification_request)
+
+        # Update doctor's NMC if not set
+        if not doctor.nmc_number:
+            doctor.nmc_number = nmc_number
+        if phone_number and not doctor.phone_number:
+            doctor.phone_number = phone_number
+
+        db.session.commit()
+
+        # Send notification to admin
+        send_admin_verification_notification(verification_request, doctor.name, user.email)
+
+        flash('Verification request submitted! We\'ll review it within 24-48 hours.', 'success')
+        return redirect(url_for('doctor_dashboard'))
+
+    return render_template('doctor_request_verification.html', doctor=doctor, user=user)
+
+
 @app.route('/doctor/qr-code/generate')
 @verified_doctor_required
 def generate_qr_code():
