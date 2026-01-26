@@ -571,7 +571,7 @@
                         <i class="fas fa-pen me-2"></i>Edit Profile
                     </a>
                     {% if not verification_request or verification_request.status == 'rejected' %}
-                    <a href="{{ url_for('doctor_request_verification') }}" class="btn btn-outline-primary">
+                    <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-outline-primary">
                         <i class="fas fa-check-circle me-2"></i>Request Verification
                     </a>
                     {% endif %}
@@ -715,7 +715,7 @@
                                         <i class="fas fa-shield-alt me-1"></i>
                                         Get verified to unlock all features.
                                     </small>
-                                    <a href="{{ url_for('doctor_request_verification') }}" class="btn btn-sm btn-outline-dark">
+                                    <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-sm btn-outline-dark">
                                         Verify now
                                     </a>
                                 </div>

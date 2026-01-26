@@ -2177,13 +2177,26 @@ def claim_profile_form(doctor_id):
 
     # Check if doctor is already claimed by someone
     if doctor.user_account:
-        # If logged in and it's their profile, redirect to dashboard
+        # If logged in and it's their profile
         if session.get('user_id') and doctor.user_account.id == session['user_id']:
-            flash('You have already claimed this profile.', 'info')
-            return redirect(url_for('doctor_dashboard'))
-        # Otherwise, it's claimed by someone else
-        flash('This profile has already been claimed.', 'warning')
-        return redirect(url_for('claim_profile'))
+            # If not verified, let them continue to submit verification documents
+            if not doctor.is_verified:
+                # Check if they have a pending verification request
+                existing_request = VerificationRequest.query.filter_by(
+                    user_id=session['user_id'],
+                    status='pending'
+                ).first()
+                if existing_request:
+                    flash('You already have a pending verification request.', 'info')
+                    return redirect(url_for('doctor_dashboard'))
+                # Allow them to continue to the verification form
+            else:
+                flash('Your profile is already verified.', 'info')
+                return redirect(url_for('doctor_dashboard'))
+        else:
+            # Claimed by someone else
+            flash('This profile has already been claimed.', 'warning')
+            return redirect(url_for('claim_profile'))
 
     # If user is logged in, check for existing verification requests
     current_user = None
