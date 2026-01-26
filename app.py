@@ -2176,6 +2176,7 @@ def claim_profile_form(doctor_id):
         return redirect(url_for('claim_profile'))
 
     # Check if doctor is already claimed by someone
+    already_claimed_by_user = False
     if doctor.user_account:
         # If logged in and it's their profile
         if session.get('user_id') and doctor.user_account.id == session['user_id']:
@@ -2190,6 +2191,7 @@ def claim_profile_form(doctor_id):
                     flash('You already have a pending verification request.', 'info')
                     return redirect(url_for('doctor_dashboard'))
                 # Allow them to continue to the verification form
+                already_claimed_by_user = True
             else:
                 flash('Your profile is already verified.', 'info')
                 return redirect(url_for('doctor_dashboard'))
@@ -2224,7 +2226,8 @@ def claim_profile_form(doctor_id):
                           doctor=doctor,
                           cities=cities,
                           current_user=current_user,
-                          is_logged_in=is_logged_in)
+                          is_logged_in=is_logged_in,
+                          already_claimed_by_user=already_claimed_by_user)
 
 
 @app.route('/claim-profile/<int:doctor_id>/quick', methods=['POST'])

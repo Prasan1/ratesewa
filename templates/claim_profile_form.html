@@ -41,7 +41,113 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
 
-                    {% if is_logged_in %}
+                    {% if already_claimed_by_user %}
+                    <!-- Already Claimed - Show Verification Form -->
+                    <div class="text-center mb-4">
+                        <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #0d8abc 0%, #0ea5e9 100%); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                            <i class="fas fa-shield-alt fa-2x text-white"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Get Verified</h5>
+                        <p class="text-muted small mb-0">
+                            Submit your documents to verify your identity.
+                        </p>
+                    </div>
+
+                    <div class="alert alert-info mb-4" style="border-radius: 12px; border: none; background: #f0f9ff;">
+                        <h6 class="mb-2"><i class="fas fa-info-circle me-2"></i>What you'll unlock:</h6>
+                        <ul class="mb-0 ps-3 small">
+                            <li>Respond to patient reviews</li>
+                            <li>View profile analytics</li>
+                            <li>Get a QR code for your profile</li>
+                            <li>Connect with clinics</li>
+                        </ul>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('claim_profile_submit', doctor_id=doctor.id) }}" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Your Name</label>
+                            <input type="text" class="form-control" value="{{ doctor.name }}" disabled style="border-radius: 10px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">NMC Number <span class="text-danger">*</span></label>
+                            <input type="text" name="nmc_number" class="form-control"
+                                   value="{{ doctor.nmc_number or '' }}"
+                                   placeholder="e.g., 12345"
+                                   required
+                                   style="border-radius: 10px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Phone Number <span class="text-danger">*</span></label>
+                            <input type="tel" name="phone_number" class="form-control"
+                                   value="{{ doctor.phone_number or '' }}"
+                                   placeholder="e.g., 9801234567"
+                                   required
+                                   style="border-radius: 10px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Email <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control"
+                                   value="{{ current_user.email or '' }}"
+                                   placeholder="your@email.com"
+                                   required
+                                   style="border-radius: 10px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Practice Address <span class="text-danger">*</span></label>
+                            <input type="text" name="practice_address" class="form-control"
+                                   value="{{ doctor.hospital or '' }}"
+                                   placeholder="e.g., ABC Hospital, Kathmandu"
+                                   required
+                                   style="border-radius: 10px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Practice City <span class="text-danger">*</span></label>
+                            <select name="practice_city_id" class="form-select" required style="border-radius: 10px;">
+                                <option value="">Select City</option>
+                                {% for city in cities %}
+                                <option value="{{ city.id }}" {% if doctor.city_id == city.id %}selected{% endif %}>{{ city.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <hr class="my-4">
+                        <h6 class="mb-3"><i class="fas fa-file-upload me-2"></i>Required Documents</h6>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">NMC Practice License <span class="text-danger">*</span></label>
+                            <input type="file" name="practice_license" class="form-control" accept="image/*,.pdf" required style="border-radius: 10px;">
+                            <small class="text-muted">Your NMC registration certificate (image or PDF).</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Government ID <span class="text-danger">*</span></label>
+                            <input type="file" name="govt_id" class="form-control" accept="image/*,.pdf" required style="border-radius: 10px;">
+                            <small class="text-muted">Citizenship, passport, or national ID card (image or PDF).</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold small">Medical Degree <span class="text-muted fw-normal">(optional)</span></label>
+                            <input type="file" name="medical_degree" class="form-control" accept="image/*,.pdf" style="border-radius: 10px;">
+                            <small class="text-muted">MBBS or other medical degree certificate if available.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2" style="border-radius: 10px;">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Verification Request
+                        </button>
+                    </form>
+
+                    <p class="text-muted text-center small mt-4 mb-0">
+                        Verification typically takes 24-48 hours. We'll email you once approved.
+                    </p>
+
+                    {% elif is_logged_in %}
                     <!-- Logged In - Direct Claim -->
                     <div class="text-center">
                         <div class="mb-4">
