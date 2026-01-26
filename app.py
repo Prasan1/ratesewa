@@ -5764,7 +5764,7 @@ def admin_verification_detail(request_id):
     all_requests = VerificationRequest.query.filter_by(status='pending').all()
 
     return render_template('admin_verification_detail.html',
-                         request=verification_request,
+                         verification_request=verification_request,
                          all_requests=all_requests)
 
 

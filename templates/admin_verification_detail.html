@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Verification Request: {{ request.doctor.name }} - Admin - RankSewa{% endblock %}
+{% block title %}Verification Request: {{ verification_request.doctor.name if verification_request.doctor else verification_request.proposed_name }} - Admin - RankSewa{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
@@ -14,22 +14,22 @@
             </div>
 
             <!-- Status Banner -->
-            <div class="alert {% if request.status == 'pending' %}alert-warning{% elif request.status == 'approved' %}alert-success{% else %}alert-danger{% endif %} mb-4">
+            <div class="alert {% if verification_request.status == 'pending' %}alert-warning{% elif verification_request.status == 'approved' %}alert-success{% else %}alert-danger{% endif %} mb-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="mb-0">
                             Status:
-                            {% if request.status == 'pending' %}
+                            {% if verification_request.status == 'pending' %}
                             <i class="fas fa-clock"></i> Pending Review
-                            {% elif request.status == 'approved' %}
+                            {% elif verification_request.status == 'approved' %}
                             <i class="fas fa-check-circle"></i> Approved
                             {% else %}
                             <i class="fas fa-times-circle"></i> Rejected
                             {% endif %}
                         </h5>
-                        {% if request.reviewed_by %}
+                        {% if verification_request.reviewed_by %}
                         <small>
-                            Reviewed by {{ request.reviewer.name }} on {{ request.reviewed_at.strftime('%b %d, %Y at %I:%M %p') }}
+                            Reviewed by {{ verification_request.reviewer.name }} on {{ verification_request.reviewed_at.strftime('%b %d, %Y at %I:%M %p') }}
                         </small>
                         {% endif %}
                     </div>
@@ -37,10 +37,10 @@
             </div>
 
             <!-- Duplicate NMC Warning -->
-            {% if request.nmc_number and request.status == 'pending' %}
+            {% if verification_request.nmc_number and verification_request.status == 'pending' %}
                 {% set duplicate_requests = namespace(items=[]) %}
                 {% for other_request in all_requests %}
-                    {% if other_request.nmc_number == request.nmc_number and other_request.id != request.id and other_request.status == 'pending' %}
+                    {% if other_request.nmc_number == verification_request.nmc_number and other_request.id != verification_request.id and other_request.status == 'pending' %}
                         {% set _ = duplicate_requests.items.append(other_request) %}
                     {% endif %}
                 {% endfor %}
@@ -50,7 +50,7 @@
                         <i class="fas fa-exclamation-triangle me-2"></i>Duplicate NMC Number Detected!
                     </h6>
                     <p class="mb-2">
-                        <strong>{{ duplicate_requests.items|length }} other pending request(s)</strong> with the same NMC number <code>{{ request.nmc_number }}</code>.
+                        <strong>{{ duplicate_requests.items|length }} other pending request(s)</strong> with the same NMC number <code>{{ verification_request.nmc_number }}</code>.
                     </p>
                     <p class="mb-2 small">
                         This could indicate: fraud attempt, duplicate account, or data entry error. Compare documents carefully before approving.
@@ -73,10 +73,10 @@
 
             <!-- Doctor Information -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header {% if request.is_new_doctor %}bg-success{% else %}bg-primary{% endif %} text-white">
+                <div class="card-header {% if verification_request.is_new_doctor %}bg-success{% else %}bg-primary{% endif %} text-white">
                     <h5 class="mb-0">
                         <i class="fas fa-user-md me-2"></i>
-                        {% if request.is_new_doctor %}
+                        {% if verification_request.is_new_doctor %}
                         New Doctor Registration
                         {% else %}
                         Existing Doctor Profile
@@ -84,7 +84,7 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    {% if request.is_new_doctor %}
+                    {% if verification_request.is_new_doctor %}
                     <!-- New doctor - show proposed information -->
                     <div class="alert alert-info mb-3">
                         <i class="fas fa-info-circle me-2"></i>
@@ -92,34 +92,34 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>Proposed Name:</strong> {{ request.proposed_name }}</p>
-                            <p><strong>Specialty:</strong> {{ request.proposed_specialty.name if request.proposed_specialty else '-' }}</p>
-                            <p><strong>City:</strong> {{ request.proposed_city.name if request.proposed_city else '-' }}</p>
-                            <p><strong>Experience:</strong> {{ request.proposed_experience }} years</p>
+                            <p><strong>Proposed Name:</strong> {{ verification_request.proposed_name }}</p>
+                            <p><strong>Specialty:</strong> {{ verification_request.proposed_specialty.name if verification_request.proposed_specialty else '-' }}</p>
+                            <p><strong>City:</strong> {{ verification_request.proposed_city.name if verification_request.proposed_city else '-' }}</p>
+                            <p><strong>Experience:</strong> {{ verification_request.proposed_experience }} years</p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>Education:</strong> {{ request.proposed_education }}</p>
-                            <p><strong>College:</strong> {{ request.proposed_college }}</p>
+                            <p><strong>Education:</strong> {{ verification_request.proposed_education }}</p>
+                            <p><strong>College:</strong> {{ verification_request.proposed_college }}</p>
                         </div>
                     </div>
                     {% else %}
                     <!-- Existing doctor - show current profile info -->
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>Name:</strong> {{ request.doctor.name }}</p>
-                            <p><strong>Specialty:</strong> {{ request.doctor.specialty.name }}</p>
-                            <p><strong>City:</strong> {{ request.doctor.city.name }}</p>
+                            <p><strong>Name:</strong> {{ verification_request.doctor.name }}</p>
+                            <p><strong>Specialty:</strong> {{ verification_request.doctor.specialty.name }}</p>
+                            <p><strong>City:</strong> {{ verification_request.doctor.city.name }}</p>
                         </div>
                         <div class="col-md-6">
                             <p><strong>Current Status:</strong>
-                                {% if request.doctor.is_verified %}
+                                {% if verification_request.doctor.is_verified %}
                                 <span class="badge bg-success">Verified</span>
                                 {% else %}
                                 <span class="badge bg-secondary">Not Verified</span>
                                 {% endif %}
                             </p>
                             <p><strong>Profile:</strong>
-                                <a href="{{ url_for('doctor_profile', slug=request.doctor.slug) }}" target="_blank">
+                                <a href="{{ url_for('doctor_profile', slug=verification_request.doctor.slug) }}" target="_blank">
                                     View Public Profile <i class="fas fa-external-link-alt"></i>
                                 </a>
                             </p>
@@ -138,21 +138,21 @@
                     <div class="row">
                         <div class="col-md-6">
                             <p><strong>Submitted By:</strong><br>
-                                {{ request.user.name }}<br>
-                                <small class="text-muted">{{ request.user.email }}</small>
+                                {{ verification_request.user.name }}<br>
+                                <small class="text-muted">{{ verification_request.user.email }}</small>
                             </p>
-                            <p><strong>NMC Number:</strong> {{ request.nmc_number }}</p>
-                            <p><strong>Phone Number:</strong> {{ request.phone_number }}</p>
+                            <p><strong>NMC Number:</strong> {{ verification_request.nmc_number }}</p>
+                            <p><strong>Phone Number:</strong> {{ verification_request.phone_number }}</p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>Email:</strong> {{ request.email }}</p>
-                            <p><strong>Practice Address:</strong><br>{{ request.practice_address }}</p>
-                            <p><strong>Practice City:</strong> {{ request.practice_city.name if request.practice_city else '-' }}</p>
+                            <p><strong>Email:</strong> {{ verification_request.email }}</p>
+                            <p><strong>Practice Address:</strong><br>{{ verification_request.practice_address }}</p>
+                            <p><strong>Practice City:</strong> {{ verification_request.practice_city.name if verification_request.practice_city else '-' }}</p>
                         </div>
                     </div>
                     <div class="row mt-2">
                         <div class="col-12">
-                            <p class="mb-0"><strong>Submitted:</strong> {{ request.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                            <p class="mb-0"><strong>Submitted:</strong> {{ verification_request.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
                         </div>
                     </div>
                 </div>
@@ -168,13 +168,13 @@
                         <!-- Medical Degree -->
                         <div class="col-md-6 mb-3">
                             <h6><i class="fas fa-graduation-cap me-2"></i>Medical Degree</h6>
-                            {% if request.medical_degree_path %}
+                            {% if verification_request.medical_degree_path %}
                             <div class="border p-2 rounded">
-                                <a href="{{ url_for('serve_verification_document', request_id=request.id, doc_type='medical_degree') }}"
+                                <a href="{{ url_for('serve_verification_document', request_id=verification_request.id, doc_type='medical_degree') }}"
                                    target="_blank" class="btn btn-sm btn-primary">
                                     <i class="fas fa-download me-1"></i>View Document
                                 </a>
-                                <small class="d-block mt-2 text-muted">{{ request.medical_degree_path.split('/')[-1] }}</small>
+                                <small class="d-block mt-2 text-muted">{{ verification_request.medical_degree_path.split('/')[-1] }}</small>
                             </div>
                             {% else %}
                             <p class="text-muted">Not uploaded</p>
@@ -184,13 +184,13 @@
                         <!-- Government ID -->
                         <div class="col-md-6 mb-3">
                             <h6><i class="fas fa-id-card me-2"></i>Government ID</h6>
-                            {% if request.govt_id_path %}
+                            {% if verification_request.govt_id_path %}
                             <div class="border p-2 rounded">
-                                <a href="{{ url_for('serve_verification_document', request_id=request.id, doc_type='govt_id') }}"
+                                <a href="{{ url_for('serve_verification_document', request_id=verification_request.id, doc_type='govt_id') }}"
                                    target="_blank" class="btn btn-sm btn-primary">
                                     <i class="fas fa-download me-1"></i>View Document
                                 </a>
-                                <small class="d-block mt-2 text-muted">{{ request.govt_id_path.split('/')[-1] }}</small>
+                                <small class="d-block mt-2 text-muted">{{ verification_request.govt_id_path.split('/')[-1] }}</small>
                             </div>
                             {% else %}
                             <p class="text-muted">Not uploaded</p>
@@ -198,15 +198,15 @@
                         </div>
 
                         <!-- Practice License (Optional) -->
-                        {% if request.practice_license_path %}
+                        {% if verification_request.practice_license_path %}
                         <div class="col-md-6 mb-3">
                             <h6><i class="fas fa-certificate me-2"></i>Practice License</h6>
                             <div class="border p-2 rounded">
-                                <a href="{{ url_for('serve_verification_document', request_id=request.id, doc_type='practice_license') }}"
+                                <a href="{{ url_for('serve_verification_document', request_id=verification_request.id, doc_type='practice_license') }}"
                                    target="_blank" class="btn btn-sm btn-primary">
                                     <i class="fas fa-download me-1"></i>View Document
                                 </a>
-                                <small class="d-block mt-2 text-muted">{{ request.practice_license_path.split('/')[-1] }}</small>
+                                <small class="d-block mt-2 text-muted">{{ verification_request.practice_license_path.split('/')[-1] }}</small>
                             </div>
                         </div>
                         {% endif %}
@@ -215,19 +215,19 @@
             </div>
 
             <!-- Admin Notes (if rejected or approved) -->
-            {% if request.admin_notes %}
+            {% if verification_request.admin_notes %}
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-dark text-white">
                     <h5 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Admin Notes</h5>
                 </div>
                 <div class="card-body">
-                    <p class="mb-0">{{ request.admin_notes }}</p>
+                    <p class="mb-0">{{ verification_request.admin_notes }}</p>
                 </div>
             </div>
             {% endif %}
 
             <!-- Action Buttons (only for pending) -->
-            {% if request.status == 'pending' %}
+            {% if verification_request.status == 'pending' %}
             <div class="card shadow-sm border-warning">
                 <div class="card-body">
                     <h5 class="mb-3"><i class="fas fa-gavel me-2"></i>Review Actions</h5>
