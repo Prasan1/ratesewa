@@ -6015,7 +6015,7 @@ def doctor_dashboard():
 @app.route('/doctor/request-verification', methods=['GET', 'POST'])
 @login_required
 def doctor_request_verification():
-    """Allow claimed doctors to request verification"""
+    """Allow claimed doctors to request verification with document uploads"""
     user = User.query.get(session['user_id'])
 
     if not user.doctor_id:
@@ -6039,37 +6039,114 @@ def doctor_request_verification():
         return redirect(url_for('doctor_dashboard'))
 
     if request.method == 'POST':
-        nmc_number = request.form.get('nmc_number', '').strip()
         phone_number = request.form.get('phone_number', '').strip()
 
-        if not nmc_number:
-            flash('NMC number is required for verification.', 'error')
+        # Get uploaded files
+        nmc_license = request.files.get('nmc_license')
+        govt_id = request.files.get('govt_id')
+        practice_license = request.files.get('practice_license')
+
+        # Validate required documents
+        if not nmc_license or not nmc_license.filename:
+            flash('NMC License copy is required for verification.', 'error')
             return redirect(url_for('doctor_request_verification'))
 
-        # Create verification request
-        verification_request = VerificationRequest(
-            user_id=user.id,
-            doctor_id=doctor.id,
-            nmc_number=nmc_number,
-            phone_number=phone_number,
-            is_new_doctor=False,
-            status='pending'
-        )
-        db.session.add(verification_request)
+        if not govt_id or not govt_id.filename:
+            flash('Government ID is required for verification.', 'error')
+            return redirect(url_for('doctor_request_verification'))
 
-        # Update doctor's NMC if not set
-        if not doctor.nmc_number:
-            doctor.nmc_number = nmc_number
-        if phone_number and not doctor.phone_number:
-            doctor.phone_number = phone_number
+        try:
+            # Create upload folder
+            upload_folder = os.path.join(app.config.get('UPLOAD_FOLDER', 'uploads'), 'verification_docs')
+            os.makedirs(upload_folder, exist_ok=True)
 
-        db.session.commit()
+            # Upload NMC License (stored as medical_degree_path)
+            nmc_license_path = None
+            try:
+                nmc_license_path = r2_storage.save_verification_document(
+                    nmc_license, doctor.id, 'medical_degree'
+                )
+            except Exception as e:
+                print(f"R2 upload failed for nmc_license: {e}")
 
-        # Send notification to admin
-        send_admin_verification_notification(verification_request, doctor.name, user.email)
+            if not nmc_license_path:
+                try:
+                    nmc_license.seek(0)
+                except Exception:
+                    pass
+                nmc_license_path = upload_utils.save_verification_document(
+                    nmc_license, upload_folder, doctor.id, 'medical_degree'
+                )
 
-        flash('Verification request submitted! We\'ll review it within 24-48 hours.', 'success')
-        return redirect(url_for('doctor_dashboard'))
+            # Upload Government ID
+            govt_id_path = None
+            try:
+                govt_id_path = r2_storage.save_verification_document(
+                    govt_id, doctor.id, 'govt_id'
+                )
+            except Exception as e:
+                print(f"R2 upload failed for govt_id: {e}")
+
+            if not govt_id_path:
+                try:
+                    govt_id.seek(0)
+                except Exception:
+                    pass
+                govt_id_path = upload_utils.save_verification_document(
+                    govt_id, upload_folder, doctor.id, 'govt_id'
+                )
+
+            # Upload Practice License (optional)
+            practice_license_path = None
+            if practice_license and practice_license.filename:
+                try:
+                    practice_license_path = r2_storage.save_verification_document(
+                        practice_license, doctor.id, 'practice_license'
+                    )
+                except Exception as e:
+                    print(f"R2 upload failed for practice_license: {e}")
+
+                if not practice_license_path:
+                    try:
+                        practice_license.seek(0)
+                    except Exception:
+                        pass
+                    practice_license_path = upload_utils.save_verification_document(
+                        practice_license, upload_folder, doctor.id, 'practice_license'
+                    )
+
+            # Create verification request
+            verification_request = VerificationRequest(
+                user_id=user.id,
+                doctor_id=doctor.id,
+                nmc_number=doctor.nmc_number,
+                phone_number=phone_number or doctor.phone_number,
+                email=user.email,
+                medical_degree_path=nmc_license_path,
+                govt_id_path=govt_id_path,
+                practice_license_path=practice_license_path,
+                is_new_doctor=False,
+                email_verified=True,
+                status='pending'
+            )
+            db.session.add(verification_request)
+
+            # Update doctor's phone if provided
+            if phone_number and not doctor.phone_number:
+                doctor.phone_number = phone_number
+
+            db.session.commit()
+
+            # Send notification to admin
+            send_admin_verification_notification(verification_request, doctor.name, user.email)
+
+            flash('Verification request submitted! We\'ll review it within 24-48 hours.', 'success')
+            return redirect(url_for('doctor_dashboard'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'error')
+            return redirect(url_for('doctor_request_verification'))
 
     return render_template('doctor_request_verification.html', doctor=doctor, user=user)
 
