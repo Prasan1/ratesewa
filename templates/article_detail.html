@@ -72,6 +72,19 @@
             <strong>Medical Disclaimer:</strong> This article is for informational purposes only and does not replace professional medical advice. Consult a healthcare provider for medical concerns.
         </aside>
 
+        <!-- Early CTA - Catches users before they bounce -->
+        <aside class="article-callout article-callout--cta" style="background: linear-gradient(135deg, #0d8abc 0%, #0ea5e9 100%); color: white; border: none; margin: 1.5rem 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <strong style="font-size: 1.1rem;"><i class="fas fa-user-md me-2"></i>Need to consult a doctor?</strong>
+                    <p style="margin: 0.25rem 0 0 0; opacity: 0.9; font-size: 0.9rem;">Find verified specialists in Nepal - it's free to search.</p>
+                </div>
+                <a href="{{ url_for('get_doctors') }}" class="btn btn-light" style="white-space: nowrap;">
+                    <i class="fas fa-search me-1"></i>Find a Doctor
+                </a>
+            </div>
+        </aside>
+
         <!-- Quick Answer -->
         {% if article.quick_answer %}
         <aside class="article-callout article-callout--highlight">
@@ -184,6 +197,14 @@
     </div>
 </article>
 
+<!-- Floating CTA for Mobile - Shows after scrolling -->
+<div id="floatingCta" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: none;">
+    <a href="{{ url_for('get_doctors') }}" class="btn btn-primary btn-lg shadow-lg" style="border-radius: 50px; padding: 12px 24px; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-user-md"></i>
+        <span>Find a Doctor</span>
+    </a>
+</div>
+
 <script>
 function copyLink() {
     navigator.clipboard.writeText(window.location.href).then(function() {
@@ -214,6 +235,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const tocBox = document.getElementById('tableOfContents');
             if (tocBox) tocBox.style.display = 'none';
         }
+    }
+
+    // Floating CTA - show after scrolling 40% of page
+    const floatingCta = document.getElementById('floatingCta');
+    if (floatingCta) {
+        let lastScrollY = 0;
+        window.addEventListener('scroll', function() {
+            const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+
+            // Show after scrolling 40%, hide when near bottom (90%)
+            if (scrollPercent > 40 && scrollPercent < 90) {
+                floatingCta.style.display = 'block';
+            } else {
+                floatingCta.style.display = 'none';
+            }
+        });
     }
 });
 </script>
