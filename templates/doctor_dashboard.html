@@ -672,14 +672,14 @@
                                 </span>
                             </div>
                             {% if not doctor.is_verified %}
-                            <div class="alert alert-warning py-2 px-3 mb-0" style="border-radius: 12px;">
+                            <div class="alert py-2 px-3 mb-0" style="border-radius: 12px; background: rgba(13, 138, 188, 0.1); border: 1px solid rgba(13, 138, 188, 0.2);">
                                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-                                    <small class="mb-0">
-                                        <i class="fas fa-shield-alt me-1"></i>
-                                        Get verified to unlock all features.
+                                    <small class="mb-0" style="color: #0369a1;">
+                                        <i class="fas fa-star me-1"></i>
+                                        Verification helps patients find you
                                     </small>
-                                    <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-sm btn-outline-dark">
-                                        Verify now
+                                    <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-sm btn-primary">
+                                        Get verified
                                     </a>
                                 </div>
                             </div>
