@@ -542,15 +542,21 @@
         <!-- Verification Status Banner (for unverified doctors) -->
         {% if not doctor.is_verified %}
         <div class="card mb-4" style="border-radius: 16px; border: none; overflow: hidden; box-shadow: 0 4px 20px rgba(13, 138, 188, 0.15);">
-            <div style="background: linear-gradient(135deg, #0d8abc 0%, #0ea5e9 100%); padding: 20px 24px;">
+            {% if verification_request and verification_request.status == 'pending' %}
+            <!-- Pending Verification -->
+            <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 20px 24px;">
                 <div class="d-flex align-items-center gap-3">
-                    {% if verification_request and verification_request.status == 'pending' %}
                     <i class="fas fa-clock fa-2x text-white"></i>
                     <div class="flex-grow-1">
                         <h5 class="text-white mb-1">Verification In Progress</h5>
                         <p class="text-white mb-0" style="opacity: 0.9; font-size: 0.9rem;">Your request is being reviewed. We'll email you once approved.</p>
                     </div>
-                    {% elif verification_request and verification_request.status == 'rejected' %}
+                </div>
+            </div>
+            {% elif verification_request and verification_request.status == 'rejected' %}
+            <!-- Rejected Verification -->
+            <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 20px 24px;">
+                <div class="d-flex align-items-center gap-3">
                     <i class="fas fa-exclamation-circle fa-2x text-white"></i>
                     <div class="flex-grow-1">
                         <h5 class="text-white mb-1">Verification Not Approved</h5>
@@ -559,18 +565,56 @@
                     <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-light btn-sm">
                         <i class="fas fa-redo me-1"></i>Try Again
                     </a>
-                    {% else %}
-                    <i class="fas fa-shield-alt fa-2x text-white"></i>
-                    <div class="flex-grow-1">
-                        <h5 class="text-white mb-1">Get Verified to Unlock All Features</h5>
-                        <p class="text-white mb-0" style="opacity: 0.9; font-size: 0.9rem;">Respond to reviews, view analytics, get QR code, and more.</p>
-                    </div>
-                    <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-light">
-                        <i class="fas fa-check-circle me-1"></i>Get Verified
-                    </a>
-                    {% endif %}
                 </div>
             </div>
+            {% else %}
+            <!-- Not Verified - Show Benefits -->
+            <div style="background: linear-gradient(135deg, #0d8abc 0%, #0ea5e9 100%); padding: 24px;">
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    <i class="fas fa-shield-alt fa-2x text-white mt-1"></i>
+                    <div class="flex-grow-1">
+                        <h5 class="text-white mb-1">Get Verified — Stand Out to Patients</h5>
+                        <p class="text-white mb-0" style="opacity: 0.9; font-size: 0.9rem;">
+                            More patients are finding doctors on RankSewa through Google every day. Verified doctors get priority visibility.
+                        </p>
+                    </div>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6 col-md-3">
+                        <div class="d-flex align-items-center gap-2 text-white" style="font-size: 0.85rem;">
+                            <i class="fas fa-check-circle" style="opacity: 0.9;"></i>
+                            <span>Verified badge</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="d-flex align-items-center gap-2 text-white" style="font-size: 0.85rem;">
+                            <i class="fas fa-check-circle" style="opacity: 0.9;"></i>
+                            <span>Online booking</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="d-flex align-items-center gap-2 text-white" style="font-size: 0.85rem;">
+                            <i class="fas fa-check-circle" style="opacity: 0.9;"></i>
+                            <span>Respond to reviews</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="d-flex align-items-center gap-2 text-white" style="font-size: 0.85rem;">
+                            <i class="fas fa-check-circle" style="opacity: 0.9;"></i>
+                            <span>Analytics & QR code</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <span class="text-white" style="font-size: 0.8rem; opacity: 0.8;">
+                        <i class="fas fa-bolt me-1"></i>Takes less than 2 minutes
+                    </span>
+                    <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-light px-4">
+                        <i class="fas fa-check-circle me-1"></i>Verify Now
+                    </a>
+                </div>
+            </div>
+            {% endif %}
         </div>
         {% endif %}
 
