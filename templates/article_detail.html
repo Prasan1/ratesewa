@@ -79,7 +79,7 @@
                     <strong style="font-size: 1.1rem;"><i class="fas fa-user-md me-2"></i>Need to consult a doctor?</strong>
                     <p style="margin: 0.25rem 0 0 0; opacity: 0.9; font-size: 0.9rem;">Find verified specialists in Nepal - it's free to search.</p>
                 </div>
-                <a href="{{ url_for('get_doctors') }}" class="btn btn-light" style="white-space: nowrap;">
+                <a href="{{ url_for('index') }}" class="btn btn-light" style="white-space: nowrap;">
                     <i class="fas fa-search me-1"></i>Find a Doctor
                 </a>
             </div>
@@ -199,7 +199,7 @@
 
 <!-- Floating CTA for Mobile - Shows after scrolling -->
 <div id="floatingCta" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: none;">
-    <a href="{{ url_for('get_doctors') }}" class="btn btn-primary btn-lg shadow-lg" style="border-radius: 50px; padding: 12px 24px; display: flex; align-items: center; gap: 8px;">
+    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg shadow-lg" style="border-radius: 50px; padding: 12px 24px; display: flex; align-items: center; gap: 8px;">
         <i class="fas fa-user-md"></i>
         <span>Find a Doctor</span>
     </a>
