@@ -672,10 +672,10 @@
                                 </span>
                             </div>
                             {% if not doctor.is_verified %}
-                            <div class="alert py-2 px-3 mb-0" style="border-radius: 12px; background: rgba(13, 138, 188, 0.1); border: 1px solid rgba(13, 138, 188, 0.2);">
+                            <div class="py-2 px-3 mb-0" style="border-radius: 12px; background: rgba(255, 255, 255, 0.95);">
                                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-                                    <small class="mb-0" style="color: #0369a1;">
-                                        <i class="fas fa-star me-1"></i>
+                                    <small class="mb-0" style="color: #334155;">
+                                        <i class="fas fa-star text-warning me-1"></i>
                                         Verification helps patients find you
                                     </small>
                                     <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-sm btn-primary">
