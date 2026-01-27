@@ -1288,7 +1288,7 @@
                         <h5 class="mb-0 working-hours-title">
                             <i class="far fa-clock me-2"></i>Working Hours
                             {% if tier_features is defined and not tier_features.can_show_hours %}
-                            <span class="badge bg-warning text-dark float-end">Premium</span>
+                            <span class="badge bg-light text-secondary float-end"><i class="fas fa-lock me-1"></i>Verified Only</span>
                             {% endif %}
                         </h5>
                     </div>
@@ -1350,15 +1350,16 @@
 
                         {% else %}
                         <div class="text-center py-5">
-                            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
-                                <i class="fas fa-lock fa-3x text-white"></i>
+                            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #0d8abc 0%, #0ea5e9 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                                <i class="fas fa-clock fa-2x text-white"></i>
                             </div>
-                            <h5 class="mb-3">Working Hours — Premium Feature</h5>
+                            <h5 class="mb-3">Working Hours — Verified Doctors Only</h5>
                             <p class="text-muted mb-4">
-                                Upgrade to Premium to display working hours and help patients plan visits with confidence.
+                                Get verified to display your working hours and help patients plan their visits with confidence.<br>
+                                <span class="text-primary">Verification is free and takes less than 2 minutes.</span>
                             </p>
-                            <a href="{{ url_for('subscription_pricing') }}" class="btn btn-warning btn-lg">
-                                <i class="fas fa-crown me-2"></i>Upgrade to Premium
+                            <a href="{{ url_for('doctor_request_verification') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>Get Verified
                             </a>
                         </div>
                         {% endif %}
