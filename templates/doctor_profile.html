@@ -934,9 +934,14 @@ function handleBackClick(e) {
     {% if not doctor.user_account and not doctor.is_verified %}
     <div class="unclaimed-banner mb-3">
       <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-        <span class="unclaimed-text">
-          <i class="fas fa-info-circle"></i> This profile is unclaimed
-        </span>
+        <div>
+          <span class="unclaimed-text">
+            <i class="fas fa-user-md me-1"></i> Is this you, Doctor?
+          </span>
+          <span class="d-block d-sm-inline text-muted" style="font-size: 0.85rem; margin-left: 0.25rem;">
+            Claim your profile and let patients find you. <span class="text-success fw-medium">Free forever.</span>
+          </span>
+        </div>
         <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-sm btn-primary">
           <i class="fas fa-bolt me-1"></i>Claim Profile
         </a>
@@ -1274,7 +1279,7 @@ function handleBackClick(e) {
           </div>
 
           <!-- Practice Locations - Full Width Card Style -->
-          {% if doctor.workplaces and doctor.workplaces|length > 0 %}
+          {% if doctor.workplaces and doctor.workplaces|length > 0 and not (doctor.user_account and doctor.workplace) %}
           {# New structured workplace data #}
           <div class="fact-item full" style="grid-column: 1 / -1;">
             <div class="fact-label mb-3"><i class="fas fa-hospital text-brand"></i>Practice Locations</div>
