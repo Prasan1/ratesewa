@@ -758,26 +758,6 @@
             </div>
         </div>
 
-        <!-- Promo banner (unchanged logic) -->
-        {% set promo = get_promotion_banner() %}
-        {% if promo and not doctor.is_verified and doctor.subscription_tier == 'free' %}
-        <div class="alert shadow-lg mb-4" style="background: linear-gradient(135deg, {{ promo.color }} 0%, var(--brand) 100%); border: none; border-radius: 16px;">
-            <div class="row align-items-center text-white">
-                <div class="col-md-8">
-                    <h4 class="mb-2"><i class="fas fa-gift me-2"></i>{{ promo.message }}</h4>
-                    <p class="mb-0">Get instant access to Premium or Featured tier — FREE for {{ promo.days_left }} days. No credit card required.</p>
-                    {% if not doctor.is_verified %}
-                    <div class="small mt-2">Verify your doctor account to activate free Premium.</div>
-                    {% endif %}
-                </div>
-                <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                    <a href="{{ url_for('subscription_pricing') }}" class="btn btn-light btn-lg shadow">
-                        <i class="fas fa-rocket me-2"></i>Claim Free Premium
-                    </a>
-                </div>
-            </div>
-        </div>
-        {% endif %}
 
         <div class="dash-divider" aria-hidden="true"></div>
 
