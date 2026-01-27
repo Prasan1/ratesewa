@@ -5759,9 +5759,11 @@ def admin_verification_detail(request_id):
                         doctor = verification_request.doctor
                         if doctor:
                             doctor.is_verified = False
-                            # Only deactivate if it's a NEW self-registered doctor
-                            # Existing doctors who claimed should remain visible in public search
-                            if verification_request.is_new_doctor:
+                            # Deactivate if:
+                            # 1. It's a NEW self-registered doctor (always deactivate on reject), OR
+                            # 2. Admin explicitly checked "deactivate profile" for existing doctors
+                            deactivate_profile = request.form.get('deactivate_profile') == '1'
+                            if verification_request.is_new_doctor or deactivate_profile:
                                 doctor.is_active = False
 
                     db.session.commit()
