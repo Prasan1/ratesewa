@@ -568,14 +568,19 @@
                 </div>
             </div>
             {% else %}
-            <!-- Not Verified - Show Benefits -->
+            <!-- Not Verified - Celebrate & Invite -->
             <div style="background: linear-gradient(135deg, #0d8abc 0%, #0ea5e9 100%); padding: 24px;">
                 <div class="d-flex align-items-start gap-3 mb-3">
-                    <i class="fas fa-shield-alt fa-2x text-white mt-1"></i>
+                    <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i class="fas fa-star fa-lg text-white"></i>
+                    </div>
                     <div class="flex-grow-1">
-                        <h5 class="text-white mb-1">Get Verified — Stand Out to Patients</h5>
-                        <p class="text-white mb-0" style="opacity: 0.9; font-size: 0.9rem;">
-                            More patients are finding doctors on RankSewa through Google every day. Verified doctors get priority visibility.
+                        <h5 class="text-white mb-1">You've earned your credentials. Let patients find you.</h5>
+                        <p class="text-white mb-2" style="opacity: 0.95; font-size: 0.95rem;">
+                            Years of hard work brought you here. Thousands of patients search for trusted doctors in Nepal every day — verification helps the right patients find you.
+                        </p>
+                        <p class="text-white mb-0" style="opacity: 0.8; font-size: 0.85rem; font-style: italic;">
+                            RankSewa celebrates doctors who serve with dedication. Verification is our way of recognizing yours.
                         </p>
                     </div>
                 </div>
@@ -607,10 +612,10 @@
                 </div>
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <span class="text-white" style="font-size: 0.8rem; opacity: 0.8;">
-                        <i class="fas fa-bolt me-1"></i>Takes less than 2 minutes
+                        <i class="fas fa-bolt me-1"></i>Free forever · Takes 2 minutes
                     </span>
                     <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-light px-4">
-                        <i class="fas fa-check-circle me-1"></i>Verify Now
+                        <i class="fas fa-certificate me-1"></i>Get Verified
                     </a>
                 </div>
             </div>
@@ -1353,13 +1358,15 @@
                             <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #0d8abc 0%, #0ea5e9 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
                                 <i class="fas fa-clock fa-2x text-white"></i>
                             </div>
-                            <h5 class="mb-3">Working Hours — Verified Doctors Only</h5>
-                            <p class="text-muted mb-4">
-                                Get verified to display your working hours and help patients plan their visits with confidence.<br>
-                                <span class="text-primary">Verification is free and takes less than 2 minutes.</span>
+                            <h5 class="mb-3">Your Time is Valuable</h5>
+                            <p class="text-muted mb-2">
+                                Patients respect your schedule. Let them know when you're available so they can plan visits around your convenience.
+                            </p>
+                            <p class="text-muted mb-4" style="font-size: 0.9rem;">
+                                <i class="fas fa-star text-warning me-1"></i>Available for verified doctors — <a href="{{ url_for('doctor_request_verification') }}" class="text-decoration-none">get verified in 2 minutes</a>
                             </p>
                             <a href="{{ url_for('doctor_request_verification') }}" class="btn btn-primary btn-lg">
-                                <i class="fas fa-check-circle me-2"></i>Get Verified
+                                <i class="fas fa-certificate me-2"></i>Get Verified
                             </a>
                         </div>
                         {% endif %}
