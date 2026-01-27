@@ -2127,28 +2127,38 @@ def leaderboard():
 @app.route('/claim-profile', methods=['GET'])
 def claim_profile():
     """Search for unclaimed doctor profiles"""
-    # If user is already a verified doctor, redirect to dashboard
-    if session.get('role') == 'doctor':
-        flash('You already have a verified doctor profile.', 'info')
-        return redirect(url_for('doctor_dashboard'))
-
-    # Check if user has any verification request
+    # Check if user already has a doctor profile
     user_id = session.get('user_id')
     if user_id:
-        existing_request = VerificationRequest.query.filter_by(
-            user_id=user_id
+        current_user = User.query.get(user_id)
+        if current_user and current_user.doctor_id:
+            # User already has a linked doctor profile
+            if current_user.doctor_profile and current_user.doctor_profile.is_verified:
+                flash('You already have a verified doctor profile.', 'info')
+                return redirect(url_for('doctor_dashboard'))
+            else:
+                # Has linked doctor but not verified - let them manage from dashboard
+                flash('You already have a doctor profile. Please complete verification from your dashboard.', 'info')
+                return redirect(url_for('doctor_dashboard'))
+
+        # Check for pending verification request
+        pending_request = VerificationRequest.query.filter_by(
+            user_id=user_id,
+            status='pending'
+        ).first()
+
+        if pending_request:
+            flash('You already have a pending verification request. Please wait for admin review.', 'info')
+            return redirect(url_for('verification_submitted'))
+
+        # Check for rejected request - show warning but allow them to try again
+        rejected_request = VerificationRequest.query.filter_by(
+            user_id=user_id,
+            status='rejected'
         ).order_by(VerificationRequest.created_at.desc()).first()
 
-        if existing_request:
-            if existing_request.status == 'pending':
-                flash('You already have a pending verification request. Please wait for admin review.', 'info')
-                return redirect(url_for('verification_submitted'))
-            elif existing_request.status == 'approved':
-                flash('Your doctor profile is already verified.', 'success')
-                return redirect(url_for('doctor_dashboard'))
-            elif existing_request.status == 'rejected':
-                # Allow searching/claiming but show warning
-                flash(f'Your previous request was rejected: {existing_request.admin_notes}. You can submit a new request below.', 'warning')
+        if rejected_request:
+            flash(f'Your previous request was rejected: {rejected_request.admin_notes}. You can submit a new request below.', 'warning')
 
     search_query = request.args.get('search', '').strip()
     unclaimed_doctors = []
@@ -2223,18 +2233,27 @@ def claim_profile_form(doctor_id):
 
     if is_logged_in:
         current_user = User.query.get(session['user_id'])
-        existing_request = VerificationRequest.query.filter_by(
-            user_id=session['user_id']
-        ).order_by(VerificationRequest.created_at.desc()).first()
 
-        if existing_request:
-            if existing_request.status == 'pending':
-                flash('You already have a pending verification request. Please wait for admin review.', 'info')
-                return redirect(url_for('verification_submitted'))
-            elif existing_request.status == 'approved':
-                flash('Your doctor profile is already verified.', 'success')
-                return redirect(url_for('doctor_dashboard'))
-            # If rejected, allow them to claim a different profile
+        # If user already has a verified doctor profile, don't let them claim another
+        if current_user.doctor_id and current_user.doctor_profile and current_user.doctor_profile.is_verified:
+            flash('You already have a verified doctor profile.', 'info')
+            return redirect(url_for('doctor_dashboard'))
+
+        # If user has a linked doctor but it's a different one, prevent claiming multiple
+        if current_user.doctor_id and current_user.doctor_id != doctor_id:
+            flash('You already have a doctor profile linked to your account.', 'info')
+            return redirect(url_for('doctor_dashboard'))
+
+        # Check for any pending verification request (for this or any other doctor)
+        pending_request = VerificationRequest.query.filter_by(
+            user_id=session['user_id'],
+            status='pending'
+        ).first()
+
+        if pending_request:
+            flash('You already have a pending verification request. Please wait for admin review.', 'info')
+            return redirect(url_for('verification_submitted'))
+        # If rejected or no pending request, allow them to continue
 
     # Get all cities for the dropdown
     cities = City.query.order_by(City.name).all()
