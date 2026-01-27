@@ -5754,12 +5754,15 @@ def admin_verification_detail(request_id):
                         user.doctor_id = None
                         access_revoked = True
 
-                    # If there's a linked doctor profile, deactivate it
+                    # If there's a linked doctor profile, handle deactivation
                     if verification_request.doctor_id:
                         doctor = verification_request.doctor
                         if doctor:
                             doctor.is_verified = False
-                            doctor.is_active = False
+                            # Only deactivate if it's a NEW self-registered doctor
+                            # Existing doctors who claimed should remain visible in public search
+                            if verification_request.is_new_doctor:
+                                doctor.is_active = False
 
                     db.session.commit()
 
