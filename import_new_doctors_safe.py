@@ -29,7 +29,7 @@ from datetime import datetime
 from app import app, db
 from models import Doctor, City, Specialty
 from slugify import slugify
-from difflib import SequenceMatcher
+# Fuzzy matching removed for performance - using exact + alias matches only
 import re
 
 # Import location models from setup script
@@ -130,26 +130,13 @@ class SafeDoctorImporter:
             '', location, flags=re.IGNORECASE
         ).strip()
 
-        # Try exact match
+        # Try exact match (aliases already loaded - no fuzzy matching for speed)
         ll = self.local_level_lookup.get(location) or self.local_level_lookup.get(clean_location)
         if ll:
             city_id = ll.old_city_id or (self.default_city.id if self.default_city else 1)
             return ll, city_id
 
-        # Try fuzzy match
-        best_match = None
-        best_score = 0
-        for key, local_level in self.local_level_lookup.items():
-            score = SequenceMatcher(None, clean_location, key).ratio()
-            if score > best_score:
-                best_score = score
-                best_match = local_level
-
-        if best_score >= 0.8 and best_match:
-            city_id = best_match.old_city_id or (self.default_city.id if self.default_city else 1)
-            return best_match, city_id
-
-        # No good match - use default Kathmandu
+        # No exact match - use default Kathmandu (fuzzy matching removed for performance)
         ll = self.local_level_lookup.get('kathmandu')
         if ll:
             return ll, ll.old_city_id or self.default_city.id
