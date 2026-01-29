@@ -202,12 +202,23 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_limiter import Limiter
 
 def get_client_ip():
-    cf_ip = request.headers.get('CF-Connecting-IP')
-    if cf_ip:
-        return cf_ip
-    forwarded_for = request.headers.get('X-Forwarded-For', '')
-    if forwarded_for:
-        return forwarded_for.split(',')[0].strip()
+    """Get client IP with protection against header spoofing.
+
+    Only trust CF-Connecting-IP if CF-Ray header is present (indicates real Cloudflare request).
+    X-Forwarded-For is only trusted if we're behind a known proxy (CF-Ray present).
+    """
+    # Only trust Cloudflare headers if CF-Ray is present (can't be easily spoofed)
+    cf_ray = request.headers.get('CF-Ray')
+    if cf_ray:
+        # We're behind Cloudflare - trust CF-Connecting-IP
+        cf_ip = request.headers.get('CF-Connecting-IP')
+        if cf_ip:
+            return cf_ip
+        # Fallback to X-Forwarded-For if CF sets it
+        forwarded_for = request.headers.get('X-Forwarded-For', '')
+        if forwarded_for:
+            return forwarded_for.split(',')[0].strip()
+    # Not behind Cloudflare or no CF headers - use remote_addr (safe)
     return request.remote_addr
 
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
@@ -370,7 +381,7 @@ def is_booking_ip_limited(ip):
     window_start = datetime.utcnow() - timedelta(seconds=BOOKING_IP_WINDOW)
     recent_count = SecurityEvent.query.filter(
         SecurityEvent.event_type == 'booking_created',
-        SecurityEvent.ip_address == ip,
+        SecurityEvent.ip == ip,  # Fixed: was ip_address
         SecurityEvent.created_at >= window_start
     ).count()
     return recent_count >= BOOKING_IP_LIMIT
@@ -382,9 +393,10 @@ def is_booking_phone_limited(phone):
     # Normalize phone number (remove spaces, dashes)
     normalized_phone = ''.join(filter(str.isdigit, phone))[-10:]  # Last 10 digits
     window_start = datetime.utcnow() - timedelta(seconds=BOOKING_PHONE_WINDOW)
+    # Fixed: meta is Text not JSON, use LIKE for substring match
     recent_count = SecurityEvent.query.filter(
         SecurityEvent.event_type == 'booking_created',
-        SecurityEvent.meta.contains({'phone_suffix': normalized_phone}),
+        SecurityEvent.meta.like(f'%"phone_suffix": "{normalized_phone}"%'),
         SecurityEvent.created_at >= window_start
     ).count()
     return recent_count >= BOOKING_PHONE_LIMIT
@@ -394,8 +406,8 @@ def log_booking_event(ip, phone):
     normalized_phone = ''.join(filter(str.isdigit, phone))[-10:]
     event = SecurityEvent(
         event_type='booking_created',
-        ip_address=ip,
-        meta={'phone_suffix': normalized_phone}
+        ip=ip,  # Fixed: was ip_address
+        meta=json.dumps({'phone_suffix': normalized_phone})  # Fixed: serialize to JSON string
     )
     db.session.add(event)
 
@@ -453,6 +465,19 @@ def add_security_headers(response):
 
     # Permissions policy - disable unnecessary browser features
     response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+
+    # Content Security Policy - mitigate XSS attacks
+    # Note: 'unsafe-inline' needed for Bootstrap/inline styles, 'unsafe-eval' for some JS libraries
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://cdnjs.cloudflare.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
+        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; "
+        "img-src 'self' data: https:; "
+        "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com; "
+        "frame-ancestors 'self';"
+    )
+    response.headers['Content-Security-Policy'] = csp
 
     # HSTS - force HTTPS (only in production)
     if not app.debug:
@@ -643,6 +668,10 @@ def doctor_required(f):
             session.clear()
             flash('Your account has been deactivated. Please contact support.', 'danger')
             return redirect(url_for('login'))
+        # Security: Require email verification before any doctor actions
+        if not user.email_verified:
+            flash('Please verify your email before accessing doctor features. Check your inbox for the verification link.', 'warning')
+            return redirect(url_for('index'))
         if user.role != 'doctor':
             flash('Doctor access required. Please claim your profile first.', 'warning')
             return redirect(url_for('claim_profile'))

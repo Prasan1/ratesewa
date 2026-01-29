@@ -188,18 +188,84 @@ def is_honeypot_blocked(ip):
     return ip in honeypot_blocked_ips
 
 
+# Cache for verified bot IPs (IP -> is_verified)
+import socket
+_verified_bot_cache = {}
+_bot_cache_max_size = 1000
+
+def verify_bot_reverse_dns(ip, expected_domains):
+    """
+    Verify bot by reverse DNS lookup.
+    Returns True if IP resolves to one of the expected domains.
+    """
+    if ip in _verified_bot_cache:
+        return _verified_bot_cache[ip]
+
+    try:
+        # Reverse DNS lookup
+        hostname, _, _ = socket.gethostbyaddr(ip)
+        hostname = hostname.lower()
+
+        # Check if hostname ends with expected domain
+        is_valid = any(hostname.endswith(domain) for domain in expected_domains)
+
+        # Forward lookup to verify (prevents DNS spoofing)
+        if is_valid:
+            try:
+                resolved_ip = socket.gethostbyname(hostname)
+                is_valid = (resolved_ip == ip)
+            except socket.gaierror:
+                is_valid = False
+
+        # Cache result (limit cache size)
+        if len(_verified_bot_cache) < _bot_cache_max_size:
+            _verified_bot_cache[ip] = is_valid
+
+        return is_valid
+    except (socket.herror, socket.gaierror):
+        # DNS lookup failed - not a verified bot
+        if len(_verified_bot_cache) < _bot_cache_max_size:
+            _verified_bot_cache[ip] = False
+        return False
+
+
 def is_legitimate_bot(user_agent):
-    """Check if user agent is a legitimate search engine/social bot (good for SEO)"""
+    """
+    Check if user agent is a legitimate search engine/social bot (good for SEO).
+    For major bots (Google, Bing), verifies via reverse DNS to prevent spoofing.
+    """
     if not user_agent:
         return False
 
-    legitimate_bots = ['googlebot', 'bingbot', 'yandexbot', 'duckduckbot', 'baiduspider',
-                       'facebookexternalhit', 'twitterbot', 'linkedinbot', 'whatsapp', 'slackbot',
-                       'applebot', 'apis-google', 'mediapartners-google', 'adsbot-google']
     user_agent_lower = user_agent.lower()
-    for legit in legitimate_bots:
-        if legit in user_agent_lower:
+    ip = get_real_ip()
+
+    # Bots that require reverse DNS verification (high-value targets for spoofing)
+    verified_bots = {
+        'googlebot': ['.googlebot.com', '.google.com'],
+        'bingbot': ['.search.msn.com'],
+        'apis-google': ['.googlebot.com', '.google.com'],
+        'mediapartners-google': ['.googlebot.com', '.google.com'],
+        'adsbot-google': ['.googlebot.com', '.google.com'],
+    }
+
+    for bot_name, domains in verified_bots.items():
+        if bot_name in user_agent_lower:
+            # Verify via reverse DNS
+            if verify_bot_reverse_dns(ip, domains):
+                return True
+            else:
+                # Failed verification - likely spoofed, treat as regular user
+                print(f"[ANTI-SCRAPE] Failed bot verification: {bot_name} from {ip}")
+                return False
+
+    # Social media bots (lower risk, allow without verification)
+    social_bots = ['facebookexternalhit', 'twitterbot', 'linkedinbot', 'whatsapp',
+                   'slackbot', 'applebot', 'duckduckbot', 'yandexbot', 'baiduspider']
+    for bot in social_bots:
+        if bot in user_agent_lower:
             return True
+
     return False
 
 
@@ -330,8 +396,17 @@ def anti_scrape_check():
     """
     Main anti-scraping check. Returns None if OK, or error response if blocked.
     """
-    # Skip for logged-in users (they've proven they're human)
+    ip = get_real_ip()
+
+    # Check honeypot blocklist first for everyone (including logged-in users)
+    if is_honeypot_blocked(ip):
+        return ('Access denied', 403)
+
+    # Logged-in users get lighter checks but not completely exempt
     if session.get('user_id'):
+        # Still check for suspicious patterns (high volume scraping)
+        if is_suspicious_request_pattern(ip):
+            return ('Too many requests. Please slow down.', 429)
         return None
 
     user_agent = request.headers.get('User-Agent', '')
@@ -341,12 +416,7 @@ def anti_scrape_check():
     if is_legitimate_bot(user_agent):
         return None
 
-    ip = get_real_ip()
     path = request.path
-
-    # 0. Check honeypot blocklist first (caught bots)
-    if is_honeypot_blocked(ip):
-        return ('Access denied', 403)
 
     # 1. Check user agent (blocks bad bots like scrapy, curl, etc.)
     if is_bot_user_agent(user_agent):
