@@ -3412,14 +3412,9 @@ def get_homepage_stats():
 # --- Main App Routes ---
 @app.route('/')
 def index():
-    # Use canonical LocalLevel (753) instead of messy City table (4890)
-    # Fall back to City if LocalLevel table is empty or doesn't exist yet
-    try:
-        cities = LocalLevel.query.order_by(LocalLevel.name).all()
-        if not cities:
-            cities = City.query.order_by(City.name).all()
-    except Exception:
-        cities = City.query.order_by(City.name).all()
+    # TODO: Switch to LocalLevel after running migration on production
+    # For now, use City to ensure app works before migration
+    cities = City.query.order_by(City.name).all()
     specialties = Specialty.query.all()
 
     # Get cached stats for social proof section
@@ -3576,18 +3571,15 @@ def get_doctors():
         response_counts, Doctor.id == response_counts.c.doctor_id
     ).options(
         selectinload(Doctor.city),
-        selectinload(Doctor.local_level),
+        # selectinload(Doctor.local_level),  # TODO: Enable after migration
         selectinload(Doctor.specialty),
         selectinload(Doctor.clinic),
         selectinload(Doctor.user_account)
     ).filter(Doctor.is_active.is_(True))  # Show all active doctors (NMC city = practice location)
 
     if city_id:
-        # Filter by local_level_id if available, fall back to city_id for backwards compatibility
-        # This allows the app to work before and after location migration
-        query = query.filter(
-            or_(Doctor.local_level_id == city_id, Doctor.city_id == city_id)
-        )
+        # TODO: Add local_level_id filter after migration
+        query = query.filter(Doctor.city_id == city_id)
 
     if specialty_id:
         query = query.filter(Doctor.specialty_id == specialty_id)
@@ -3651,8 +3643,8 @@ def get_doctors():
             'id': d.id,
             'name': d.name,
             'slug': d.slug,
-            'city_id': d.local_level_id or d.city_id,  # Prefer local_level_id
-            'city_name': d.local_level.name if d.local_level else (d.city.name if d.city else 'Unknown'),
+            'city_id': d.city_id,  # TODO: Use local_level_id after migration
+            'city_name': d.city.name if d.city else 'Unknown',
             'clinic_name': d.clinic.name if d.clinic else None,
             'clinic_slug': d.clinic.slug if d.clinic else None,
             'specialty_id': d.specialty_id,
@@ -6464,8 +6456,9 @@ def doctor_request_verification():
             flash(f'An error occurred: {str(e)}', 'error')
             return redirect(url_for('doctor_request_verification'))
 
-    # Get cities for dropdown (use LocalLevel for canonical locations)
-    cities = LocalLevel.query.order_by(LocalLevel.name).all()
+    # Get cities for dropdown
+    # TODO: Switch to LocalLevel after migration
+    cities = City.query.order_by(City.name).all()
     return render_template('doctor_request_verification.html', doctor=doctor, user=user, cities=cities)
 
 
