@@ -3412,9 +3412,8 @@ def get_homepage_stats():
 # --- Main App Routes ---
 @app.route('/')
 def index():
-    # TODO: Switch to LocalLevel after running migration on production
-    # For now, use City to ensure app works before migration
-    cities = City.query.order_by(City.name).all()
+    # Use LocalLevel (753 palikas) instead of City (4890 entries) for faster loading
+    locations = LocalLevel.query.order_by(LocalLevel.name).all()
     specialties = Specialty.query.all()
 
     # Get cached stats for social proof section
@@ -3425,7 +3424,7 @@ def index():
         .limit(6).all()
 
     return render_template('index.html',
-                         cities=cities,
+                         cities=locations,
                          specialties=specialties,
                          total_doctors=stats['total_doctors'],
                          total_cities=753,  # Nepal's official local level count

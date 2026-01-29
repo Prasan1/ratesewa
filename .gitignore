@@ -36,9 +36,10 @@ test_*.py
 .DS_Store
 Thumbs.db
 
-# CSV files (EXCEPT the one we need for production)
+# CSV files (EXCEPT the ones we need for production)
 *.csv
 !nmc_doctors_complete.csv
+!new_doctors_to_import.csv
 
 # Environment variables
 .env

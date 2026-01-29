@@ -42,8 +42,8 @@ from nepal_location_setup import LocalLevel, LocationAlias, District
 # Verified doctors - NEVER touch these
 VERIFIED_NMC_NUMBERS = frozenset(['20912', '23561', '29527', '20158'])
 
-# Input file (deduplicated)
-INPUT_FILE = '/home/ppaudyal/Documents/scraper/doctors-28660-to-40000/new_doctors_to_import.csv'
+# Default input file (deduplicated) - use relative path for production compatibility
+DEFAULT_INPUT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'new_doctors_to_import.csv')
 
 # Default specialty for doctors without one
 DEFAULT_SPECIALTY = 'General Physician'
@@ -56,8 +56,9 @@ BATCH_SIZE = 500
 # ============================================================
 
 class SafeDoctorImporter:
-    def __init__(self, dry_run=True, limit=None):
+    def __init__(self, dry_run=True, limit=None, input_file=None):
         self.dry_run = dry_run
+        self.input_file = input_file or DEFAULT_INPUT_FILE
         self.limit = limit
         self.stats = {
             'total_rows': 0,
@@ -249,7 +250,7 @@ class SafeDoctorImporter:
                 print("\n  Aborted.")
                 return
 
-        print(f"\n  Input file: {INPUT_FILE}")
+        print(f"\n  Input file: {self.input_file}")
         print(f"  Limit: {self.limit or 'None (all records)'}")
         print(f"  Protected NMCs: {', '.join(VERIFIED_NMC_NUMBERS)}")
         print()
@@ -260,7 +261,7 @@ class SafeDoctorImporter:
             existing_slugs = set()
             batch = []
 
-            with open(INPUT_FILE, 'r', encoding='utf-8') as f:
+            with open(self.input_file, 'r', encoding='utf-8') as f:
                 reader = csv.DictReader(f)
 
                 for row in reader:
@@ -397,11 +398,14 @@ def main():
                         help='Actually execute import (default is dry run)')
     parser.add_argument('--limit', type=int, default=None,
                         help='Limit number of rows to process')
+    parser.add_argument('--file', type=str, default=None,
+                        help='Path to input CSV file')
     args = parser.parse_args()
 
     importer = SafeDoctorImporter(
         dry_run=not args.execute,
-        limit=args.limit
+        limit=args.limit,
+        input_file=args.file
     )
     importer.run()
 
