@@ -3489,7 +3489,7 @@ def get_doctors():
     clear_expired_subscriptions()
     city_id = request.args.get('city_id', '')
     specialty_id = request.args.get('specialty_id', '')
-    name_search = request.args.get('name', '')
+    name_search = request.args.get('name', '').strip()
     page = request.args.get('page', 1, type=int)
     per_page = 50  # Limit results per page
 
