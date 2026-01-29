@@ -24,65 +24,12 @@ from collections import defaultdict
 from difflib import SequenceMatcher
 
 from app import app, db
-from models import City, Doctor
+from models import City, Doctor, Province, District, LocalLevel, LocationAlias
 from sqlalchemy import text
 
-# Data files
 # Data files - use relative path for production compatibility
 import os
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'nepal_admin_data')
-
-# ============================================================
-# NEW MODELS (will be added to models.py)
-# ============================================================
-
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
-from sqlalchemy.orm import relationship
-
-class Province(db.Model):
-    """Nepal's 7 Provinces"""
-    __tablename__ = 'provinces'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False, unique=True)
-    nepali_name = db.Column(db.String(100))
-
-    districts = db.relationship('District', backref='province', lazy=True)
-
-class District(db.Model):
-    """Nepal's 77 Districts"""
-    __tablename__ = 'districts'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    nepali_name = db.Column(db.String(100))
-    province_id = db.Column(db.Integer, db.ForeignKey('provinces.id'), nullable=False)
-
-    local_levels = db.relationship('LocalLevel', backref='district', lazy=True)
-
-class LocalLevel(db.Model):
-    """Nepal's 753 Local Levels (Palika)"""
-    __tablename__ = 'local_levels'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    nepali_name = db.Column(db.String(150))
-    district_id = db.Column(db.Integer, db.ForeignKey('districts.id'), nullable=False)
-    level_type = db.Column(db.String(50))  # Metropolitan, Sub-Metropolitan, Municipality, Rural Municipality
-
-    # Link to old city for migration
-    old_city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=True)
-
-class LocationAlias(db.Model):
-    """Aliases for location names (K.M.C -> Kathmandu, etc.)"""
-    __tablename__ = 'location_aliases'
-
-    id = db.Column(db.Integer, primary_key=True)
-    alias = db.Column(db.String(200), nullable=False, index=True)  # e.g., "K.M.C", "Kathmandu Metropolitan City"
-    local_level_id = db.Column(db.Integer, db.ForeignKey('local_levels.id'), nullable=False)
-    alias_type = db.Column(db.String(50))  # 'abbreviation', 'full_name', 'nepali', 'common_variant'
-
-    local_level = db.relationship('LocalLevel', backref='aliases')
 
 
 # ============================================================
