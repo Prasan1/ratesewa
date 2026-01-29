@@ -844,13 +844,15 @@ function displayDoctors(response, shouldScroll = true) {
 
                         ${descriptionLine ? `<p class="doctor-summary">${descriptionLine}</p>` : ''}
 
-                        <div class="doctor-actions">
-                            <a href="/doctor/${doctor.slug}" class="btn btn-view-doctor btn-sm">
-                                View Profile
-                            </a>
-                            ${adminEditButton}
+                        <div class="card-footer-section">
+                            <div class="doctor-actions">
+                                <a href="/doctor/${doctor.slug}" class="btn btn-view-doctor btn-sm">
+                                    View Profile
+                                </a>
+                                ${adminEditButton}
+                            </div>
+                            ${claimLinkHtml}
                         </div>
-                        ${claimLinkHtml}
                     </div>
                 </div>
             </div>

@@ -696,8 +696,11 @@ a:hover {
     border-color: #e2e8f0;
 }
 
-.doctor-card .doctor-actions {
+.doctor-card .card-footer-section {
     margin-top: auto;
+}
+
+.doctor-card .doctor-actions {
     display: flex;
     justify-content: center;
     gap: 8px;
