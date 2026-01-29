@@ -194,6 +194,8 @@ class Doctor(db.Model):
 
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_by_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     # Subscription and monetization
     subscription_tier = db.Column(db.String(20), default='free')  # 'free', 'premium', 'featured'

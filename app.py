@@ -4045,7 +4045,22 @@ def admin_doctor_edit(doctor_id):
                     except ValueError as e:
                         flash(f'Error uploading photo: {str(e)}', 'warning')
 
+            # Track who made the edit
+            doctor.updated_by_user_id = session.get('user_id')
+
             db.session.commit()
+
+            # Log admin edit event
+            log_security_event(
+                'admin_doctor_edit',
+                user_id=session.get('user_id'),
+                meta=json.dumps({
+                    'doctor_id': doctor.id,
+                    'doctor_name': doctor.name,
+                    'action': 'edit'
+                })
+            )
+
             flash('Doctor updated successfully.', 'success')
             return redirect(url_for('admin_doctors'))
 
@@ -6737,7 +6752,22 @@ def doctor_profile_edit():
                     except ValueError as e:
                         flash(f'Error uploading photo: {str(e)}', 'warning')
 
+            # Track who made the edit
+            doctor.updated_by_user_id = session.get('user_id')
+
             db.session.commit()
+
+            # Log doctor self-edit event
+            log_security_event(
+                'doctor_profile_edit',
+                user_id=session.get('user_id'),
+                meta=json.dumps({
+                    'doctor_id': doctor.id,
+                    'doctor_name': doctor.name,
+                    'action': 'self_edit'
+                })
+            )
+
             if 'remove_photo' not in request.form and 'profile_photo' not in request.files:
                 flash('Profile updated successfully!', 'success')
             return redirect(url_for('doctor_dashboard'))
