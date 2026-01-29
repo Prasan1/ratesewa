@@ -18,6 +18,71 @@ class City(db.Model):
         return f'<City {self.name}>'
 
 
+# ============================================================
+# NEPAL ADMINISTRATIVE DIVISIONS (Official 753 Local Levels)
+# ============================================================
+
+class Province(db.Model):
+    """Nepal's 7 Provinces"""
+    __tablename__ = 'provinces'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    nepali_name = db.Column(db.String(100))
+
+    districts = db.relationship('District', backref='province', lazy=True)
+
+    def __repr__(self):
+        return f'<Province {self.name}>'
+
+
+class District(db.Model):
+    """Nepal's 77 Districts"""
+    __tablename__ = 'districts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    nepali_name = db.Column(db.String(100))
+    province_id = db.Column(db.Integer, db.ForeignKey('provinces.id'), nullable=False)
+
+    local_levels = db.relationship('LocalLevel', backref='district', lazy=True)
+
+    def __repr__(self):
+        return f'<District {self.name}>'
+
+
+class LocalLevel(db.Model):
+    """Nepal's 753 Local Levels (Palika) - Metropolitan, Sub-Metropolitan, Municipality, Rural Municipality"""
+    __tablename__ = 'local_levels'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    nepali_name = db.Column(db.String(150))
+    district_id = db.Column(db.Integer, db.ForeignKey('districts.id'), nullable=False)
+    level_type = db.Column(db.String(50))  # Metropolitan, Sub-Metropolitan, Municipality, Rural Municipality
+
+    # Link to old city for migration
+    old_city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=True)
+
+    def __repr__(self):
+        return f'<LocalLevel {self.name} ({self.level_type})>'
+
+
+class LocationAlias(db.Model):
+    """Aliases for location names (K.M.C -> Kathmandu, etc.)"""
+    __tablename__ = 'location_aliases'
+
+    id = db.Column(db.Integer, primary_key=True)
+    alias = db.Column(db.String(200), nullable=False, index=True)
+    local_level_id = db.Column(db.Integer, db.ForeignKey('local_levels.id'), nullable=False)
+    alias_type = db.Column(db.String(50))  # 'abbreviation', 'full_name', 'nepali', 'district_name', 'common_variant'
+
+    local_level = db.relationship('LocalLevel', backref='aliases')
+
+    def __repr__(self):
+        return f'<LocationAlias {self.alias} -> {self.local_level_id}>'
+
+
 class Specialty(db.Model):
     __tablename__ = 'specialties'
 
@@ -101,6 +166,7 @@ class Doctor(db.Model):
     name = db.Column(db.String(200), nullable=False)
     slug = db.Column(db.String(250), unique=True, nullable=False, index=True)
     city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
+    local_level_id = db.Column(db.Integer, db.ForeignKey('local_levels.id'), nullable=True)  # New: proper Nepal location
     specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=False)
     clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'), nullable=True)
     experience = db.Column(db.Integer)
@@ -142,6 +208,9 @@ class Doctor(db.Model):
     verification_requests = db.relationship('VerificationRequest', backref='doctor', lazy=True)
     review_responses = db.relationship('DoctorResponse', backref='doctor', lazy=True)
     clinic_managers = db.relationship('ClinicManagerDoctor', backref='doctor', lazy=True)
+
+    # Location relationship (new proper Nepal location system)
+    local_level = db.relationship('LocalLevel', backref='doctors', lazy='select', foreign_keys=[local_level_id])
 
     # Normalized data relationships
     # Using lazy='select' for backward compatibility - tables may not exist yet in production
