@@ -92,26 +92,35 @@ class SafeDoctorImporter:
 
         self.log(f"Loaded {len(self.city_cache)} cities, {len(self.specialty_cache)} specialties", 'OK')
 
-        # Load location lookup (local levels + aliases)
+        # Load location lookup (local levels + aliases) - store LocalLevel OBJECTS
         self.log("Loading location aliases...")
         self.local_level_lookup = {}
 
-        # Add local level names
+        # Add local level names -> LocalLevel objects
         local_levels = LocalLevel.query.all()
         for ll in local_levels:
-            self.local_level_lookup[ll.name.lower()] = ll.name
+            self.local_level_lookup[ll.name.lower()] = ll
 
-        # Add aliases
+        # Add aliases -> LocalLevel objects
         aliases = LocationAlias.query.all()
         for a in aliases:
-            self.local_level_lookup[a.alias.lower()] = a.local_level.name
+            self.local_level_lookup[a.alias.lower()] = a.local_level
+
+        # Get default city (Kathmandu) for fallback
+        self.default_city = self.city_cache.get('kathmandu')
+        if not self.default_city:
+            self.default_city = City.query.filter(City.name.ilike('%kathmandu%')).first()
 
         self.log(f"Loaded {len(self.local_level_lookup)} location lookups", 'OK')
 
-    def normalize_location(self, raw_location):
-        """Normalize a location string to a proper local level name"""
+    def get_local_level(self, raw_location):
+        """Find matching LocalLevel for a location string. Returns (LocalLevel, city_id) tuple."""
         if not raw_location:
-            return 'Kathmandu'
+            # Default to Kathmandu
+            ll = self.local_level_lookup.get('kathmandu')
+            if ll:
+                return ll, ll.old_city_id or self.default_city.id
+            return None, self.default_city.id if self.default_city else 1
 
         location = raw_location.lower().strip()
 
@@ -122,54 +131,29 @@ class SafeDoctorImporter:
         ).strip()
 
         # Try exact match
-        if location in self.local_level_lookup:
-            return self.local_level_lookup[location]
-        if clean_location in self.local_level_lookup:
-            return self.local_level_lookup[clean_location]
+        ll = self.local_level_lookup.get(location) or self.local_level_lookup.get(clean_location)
+        if ll:
+            city_id = ll.old_city_id or (self.default_city.id if self.default_city else 1)
+            return ll, city_id
 
         # Try fuzzy match
         best_match = None
         best_score = 0
-        for key, value in self.local_level_lookup.items():
+        for key, local_level in self.local_level_lookup.items():
             score = SequenceMatcher(None, clean_location, key).ratio()
             if score > best_score:
                 best_score = score
-                best_match = value
+                best_match = local_level
 
-        if best_score >= 0.8:
-            return best_match
+        if best_score >= 0.8 and best_match:
+            city_id = best_match.old_city_id or (self.default_city.id if self.default_city else 1)
+            return best_match, city_id
 
-        # No good match - return original (title case)
-        return raw_location.strip().title()
-
-    def get_or_create_city(self, city_name):
-        """Get city or create if not exists - uses normalized location"""
-        if not city_name:
-            return None
-
-        # Normalize to proper local level name
-        normalized = self.normalize_location(city_name)
-        key = normalized.lower().strip()
-
-        if key in self.city_cache:
-            return self.city_cache[key]
-
-        if not self.dry_run:
-            city = City(name=normalized)
-            db.session.add(city)
-            db.session.flush()
-            self.city_cache[key] = city
-            if normalized.lower() != city_name.lower():
-                self.log(f"Created city: {normalized} (from '{city_name}')")
-            else:
-                self.log(f"Created city: {city.name}")
-            return city
-        else:
-            if normalized.lower() != city_name.lower():
-                self.log(f"[DRY RUN] Would create city: {normalized} (from '{city_name}')")
-            else:
-                self.log(f"[DRY RUN] Would create city: {city_name}")
-            return None
+        # No good match - use default Kathmandu
+        ll = self.local_level_lookup.get('kathmandu')
+        if ll:
+            return ll, ll.old_city_id or self.default_city.id
+        return None, self.default_city.id if self.default_city else 1
 
     def get_or_create_specialty(self, specialty_name):
         """Get specialty or create if not exists"""
@@ -296,29 +280,30 @@ class SafeDoctorImporter:
                         self.stats['skipped_invalid'] += 1
                         continue
 
-                    # Get city and specialty
+                    # Get location and specialty
                     city_name = self.extract_city_from_address(address)
                     specialty_name = self.map_degree_to_specialty(degree)
 
-                    city = self.get_or_create_city(city_name)
+                    local_level, city_id = self.get_local_level(city_name)
                     specialty = self.get_or_create_specialty(specialty_name)
 
                     if self.dry_run:
                         self.stats['created'] += 1
                         continue
 
-                    if not city or not specialty:
+                    if not city_id or not specialty:
                         self.stats['skipped_invalid'] += 1
                         continue
 
-                    # Create doctor
+                    # Create doctor with local_level_id
                     slug = self.generate_unique_slug(name, existing_slugs)
 
                     doctor = Doctor(
                         name=name,
                         slug=slug,
                         nmc_number=nmc_no,
-                        city_id=city.id,
+                        city_id=city_id,
+                        local_level_id=local_level.id if local_level else None,
                         specialty_id=specialty.id,
                         education=degree or None,
                         is_verified=False,
