@@ -175,6 +175,18 @@ request_history = {}
 HISTORY_CLEANUP_INTERVAL = 300  # Clean up every 5 minutes
 last_cleanup = datetime.now()
 
+# Honeypot blocked IPs (bots that followed hidden links)
+honeypot_blocked_ips = set()
+
+def add_to_honeypot_blocklist(ip):
+    """Add IP to honeypot blocklist"""
+    honeypot_blocked_ips.add(ip)
+    print(f"[HONEYPOT] Blocked bot IP: {ip}")
+
+def is_honeypot_blocked(ip):
+    """Check if IP was caught by honeypot"""
+    return ip in honeypot_blocked_ips
+
 
 def is_legitimate_bot(user_agent):
     """Check if user agent is a legitimate search engine/social bot (good for SEO)"""
@@ -204,6 +216,36 @@ def is_bot_user_agent(user_agent):
     for pattern in BOT_PATTERNS:
         if pattern.search(user_agent):
             return True
+    return False
+
+
+def is_missing_browser_headers():
+    """
+    Detect bots by checking for missing headers that real browsers always send.
+    Real browsers send Accept, Accept-Language, Accept-Encoding.
+    Bots often forget these or send unusual values.
+    """
+    # Check for Accept header (browsers always send this)
+    accept = request.headers.get('Accept', '')
+    if not accept:
+        return True
+
+    # Check for Accept-Language (browsers always send this)
+    accept_lang = request.headers.get('Accept-Language', '')
+    if not accept_lang:
+        return True
+
+    # Check for Accept-Encoding (browsers always send this)
+    accept_encoding = request.headers.get('Accept-Encoding', '')
+    if not accept_encoding:
+        return True
+
+    # Check for suspicious Accept header (bots often use generic "*/*")
+    # Real browsers specify html, xhtml, xml, etc.
+    if accept == '*/*' and 'html' not in accept.lower():
+        # Could be an API call or bot - only flag on doctor pages
+        pass  # Don't block, just note it
+
     return False
 
 
@@ -302,10 +344,20 @@ def anti_scrape_check():
     ip = get_real_ip()
     path = request.path
 
+    # 0. Check honeypot blocklist first (caught bots)
+    if is_honeypot_blocked(ip):
+        return ('Access denied', 403)
+
     # 1. Check user agent (blocks bad bots like scrapy, curl, etc.)
     if is_bot_user_agent(user_agent):
         # Don't reveal why - just return 403
         return ('Access denied', 403)
+
+    # 1.5 Check for missing browser headers (only on doctor pages to avoid false positives)
+    if '/doctor' in path or '/doctors' in path:
+        if is_missing_browser_headers():
+            print(f"[ANTI-SCRAPE] Missing browser headers from: {ip}")
+            return ('Access denied', 403)
 
     # 2. Check data center IPs (only for doctor data pages)
     if '/doctor' in path or '/doctors' in path or '/api/' in path:

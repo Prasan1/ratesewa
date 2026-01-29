@@ -415,12 +415,50 @@ def blocklist_guard():
         abort(403)
 
 # Anti-scraping protection
-from anti_scrape import anti_scrape_middleware
+from anti_scrape import anti_scrape_middleware, add_to_honeypot_blocklist, get_real_ip
 
 @app.before_request
 def check_for_scraping():
     """Global anti-scraping check for sensitive routes"""
     return anti_scrape_middleware()
+
+# Honeypot trap routes - hidden links that only bots follow
+@app.route('/trap/doctors-list')
+@app.route('/trap/export-all')
+@app.route('/trap/download-database')
+@app.route('/admin-backup')
+@app.route('/data/doctors.json')
+def honeypot_trap():
+    """Trap for bots - any access = immediate block"""
+    ip = get_real_ip()
+    add_to_honeypot_blocklist(ip)
+    # Return fake empty response to waste bot's time
+    abort(404)
+
+# --- Security Headers ---
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to all responses"""
+    # Prevent clickjacking - allow embedding only from same origin
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+
+    # Prevent MIME type sniffing
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+
+    # XSS protection (legacy browsers)
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+
+    # Control referrer information
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+
+    # Permissions policy - disable unnecessary browser features
+    response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+
+    # HSTS - force HTTPS (only in production)
+    if not app.debug:
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+
+    return response
 
 # --- Authentication Decorators ---
 def login_required(f):
@@ -1960,13 +1998,79 @@ def sitemap():
 
 @app.route('/robots.txt')
 def robots():
-    """Robots.txt for search engines"""
-    robots_txt = """User-agent: *
+    """Robots.txt for search engines - allows SEO bots, blocks scrapers"""
+    robots_txt = """# RankSewa robots.txt - SEO friendly, scraper hostile
+
+# Allow legitimate search engines full access
+User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+# Block known scrapers completely
+User-agent: Scrapy
+Disallow: /
+
+User-agent: Python-urllib
+Disallow: /
+
+User-agent: python-requests
+Disallow: /
+
+User-agent: curl
+Disallow: /
+
+User-agent: wget
+Disallow: /
+
+User-agent: HTTrack
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+# Default rules for other bots
+User-agent: *
+Allow: /
+Crawl-delay: 2
+
+# Block bulk data endpoints
+Disallow: /api/doctors
+Disallow: /api/search
+Disallow: /trap/
 
 # Admin and private areas
 Disallow: /admin/
-Disallow: /api/
 Disallow: /doctor/dashboard
 Disallow: /doctor/analytics
 Disallow: /doctor/profile/edit
@@ -8074,7 +8178,7 @@ def clinic_register():
         city = city_record.name if city_record else 'Kathmandu'
 
         try:
-            # Create clinic (active immediately - payment will gate premium features later)
+            # Create clinic (inactive until admin review)
             clinic = Clinic(
                 name=name,
                 slug=slug,
@@ -8086,7 +8190,7 @@ def clinic_register():
                 clinic_type=clinic_type,
                 description=description,
                 created_by_user_id=session['user_id'],
-                is_active=True
+                is_active=False  # Requires admin approval
             )
             db.session.add(clinic)
             db.session.flush()  # Get the clinic ID
@@ -8114,7 +8218,7 @@ def clinic_register():
             db.session.add(staff)
             db.session.commit()
 
-            flash('Clinic registered successfully! Your clinic is now live. Add doctors and set up schedules to start accepting appointments.', 'success')
+            flash('Clinic registered successfully! Your clinic is pending review and will be activated within 24-48 hours. You can add doctors and set up schedules in the meantime.', 'success')
             return redirect(url_for('clinic_dashboard', clinic_slug=clinic.slug))
 
         except Exception as e:
