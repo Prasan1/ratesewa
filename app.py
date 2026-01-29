@@ -3570,15 +3570,15 @@ def get_doctors():
         response_counts, Doctor.id == response_counts.c.doctor_id
     ).options(
         selectinload(Doctor.city),
-        # selectinload(Doctor.local_level),  # TODO: Enable after migration
+        selectinload(Doctor.local_level),
         selectinload(Doctor.specialty),
         selectinload(Doctor.clinic),
         selectinload(Doctor.user_account)
     ).filter(Doctor.is_active.is_(True))  # Show all active doctors (NMC city = practice location)
 
     if city_id:
-        # TODO: Add local_level_id filter after migration
-        query = query.filter(Doctor.city_id == city_id)
+        # Filter by local_level_id (dropdown now sends LocalLevel IDs)
+        query = query.filter(Doctor.local_level_id == city_id)
 
     if specialty_id:
         query = query.filter(Doctor.specialty_id == specialty_id)
