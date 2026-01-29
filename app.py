@@ -3413,7 +3413,13 @@ def get_homepage_stats():
 @app.route('/')
 def index():
     # Use canonical LocalLevel (753) instead of messy City table (4890)
-    cities = LocalLevel.query.order_by(LocalLevel.name).all()
+    # Fall back to City if LocalLevel table is empty or doesn't exist yet
+    try:
+        cities = LocalLevel.query.order_by(LocalLevel.name).all()
+        if not cities:
+            cities = City.query.order_by(City.name).all()
+    except Exception:
+        cities = City.query.order_by(City.name).all()
     specialties = Specialty.query.all()
 
     # Get cached stats for social proof section
@@ -3577,8 +3583,11 @@ def get_doctors():
     ).filter(Doctor.is_active.is_(True))  # Show all active doctors (NMC city = practice location)
 
     if city_id:
-        # Filter by local_level_id (canonical 753 palikas) instead of legacy city_id
-        query = query.filter(Doctor.local_level_id == city_id)
+        # Filter by local_level_id if available, fall back to city_id for backwards compatibility
+        # This allows the app to work before and after location migration
+        query = query.filter(
+            or_(Doctor.local_level_id == city_id, Doctor.city_id == city_id)
+        )
 
     if specialty_id:
         query = query.filter(Doctor.specialty_id == specialty_id)
