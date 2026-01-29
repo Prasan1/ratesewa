@@ -233,31 +233,44 @@ def is_legitimate_bot(user_agent):
     """
     Check if user agent is a legitimate search engine/social bot (good for SEO).
     For major bots (Google, Bing), verifies via reverse DNS to prevent spoofing.
+    Note: When behind Cloudflare, we skip DNS verification since we can't verify
+    the actual bot IP through the proxy.
     """
     if not user_agent:
         return False
 
     user_agent_lower = user_agent.lower()
-    ip = get_real_ip()
 
-    # Bots that require reverse DNS verification (high-value targets for spoofing)
-    verified_bots = {
-        'googlebot': ['.googlebot.com', '.google.com'],
-        'bingbot': ['.search.msn.com'],
-        'apis-google': ['.googlebot.com', '.google.com'],
-        'mediapartners-google': ['.googlebot.com', '.google.com'],
-        'adsbot-google': ['.googlebot.com', '.google.com'],
-    }
+    # Check if we're behind Cloudflare - if so, we can't do proper reverse DNS
+    # verification because we only see Cloudflare proxy IPs, not the real bot IPs.
+    # In this case, trust the user-agent for search engine bots.
+    behind_cloudflare = request.headers.get('CF-Ray') is not None
 
-    for bot_name, domains in verified_bots.items():
+    # Major search engine bots
+    search_bots = ['googlebot', 'bingbot', 'apis-google', 'mediapartners-google', 'adsbot-google']
+
+    for bot_name in search_bots:
         if bot_name in user_agent_lower:
-            # Verify via reverse DNS
-            if verify_bot_reverse_dns(ip, domains):
+            if behind_cloudflare:
+                # Behind Cloudflare - can't verify IP, trust the user-agent
+                # Cloudflare provides some bot protection already
                 return True
             else:
-                # Failed verification - likely spoofed, treat as regular user
-                print(f"[ANTI-SCRAPE] Failed bot verification: {bot_name} from {ip}")
-                return False
+                # Not behind Cloudflare - can verify via reverse DNS
+                domains = {
+                    'googlebot': ['.googlebot.com', '.google.com'],
+                    'bingbot': ['.search.msn.com'],
+                    'apis-google': ['.googlebot.com', '.google.com'],
+                    'mediapartners-google': ['.googlebot.com', '.google.com'],
+                    'adsbot-google': ['.googlebot.com', '.google.com'],
+                }.get(bot_name, [])
+
+                ip = get_real_ip()
+                if verify_bot_reverse_dns(ip, domains):
+                    return True
+                else:
+                    print(f"[ANTI-SCRAPE] Failed bot verification: {bot_name} from {ip}")
+                    return False
 
     # Social media bots (lower risk, allow without verification)
     social_bots = ['facebookexternalhit', 'twitterbot', 'linkedinbot', 'whatsapp',
