@@ -51,12 +51,37 @@
                 {% endif %}
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Phone Number</label>
+                    <label class="form-label fw-bold">Phone Number <span class="text-danger">*</span></label>
                     <input type="tel" name="phone_number" class="form-control"
                            value="{{ doctor.phone_number or '' }}"
                            placeholder="e.g., 9801234567"
+                           required
                            style="border-radius: 10px;">
                     <small class="text-muted">We may contact you to verify your identity.</small>
+                </div>
+
+                <hr class="my-4">
+                <h6 class="mb-3"><i class="fas fa-map-marker-alt me-2"></i>Practice Location</h6>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Practice Address <span class="text-danger">*</span></label>
+                    <input type="text" name="practice_address" class="form-control"
+                           value="{{ doctor.practice_address or '' }}"
+                           placeholder="e.g., Jeevan Bikas Hospital, Biratnagar-5"
+                           required
+                           style="border-radius: 10px;">
+                    <small class="text-muted">Hospital/clinic name and location where you currently practice.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Practice City <span class="text-danger">*</span></label>
+                    <select name="practice_city_id" class="form-select" required style="border-radius: 10px;">
+                        <option value="">Select your practice city</option>
+                        {% for city in cities %}
+                        <option value="{{ city.id }}" {% if doctor.practice_city_id == city.id %}selected{% endif %}>{{ city.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">City where your primary practice is located.</small>
                 </div>
 
                 <hr class="my-4">
