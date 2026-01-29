@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
 from authlib.integrations.flask_client import OAuth
-from models import db, City, Specialty, Clinic, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag, BadgeDefinition, UserBadge, ReviewHelpful, Article, ArticleCategory, ClinicManagerDoctor, ClinicAccount, DoctorContact, DoctorWorkplace, DoctorSubscription, DoctorCredentials, DoctorSettings, DoctorMedicalTools, DoctorTemplateUsage, ClinicStaff, ClinicDoctor, ClinicSchedule, ScheduleException, AppointmentReminder, PatientNoShowRecord, BlockedIdentity, SecurityEvent
+from models import db, City, Specialty, Clinic, Doctor, User, Rating, Appointment, ContactMessage, Advertisement, VerificationRequest, DoctorResponse, ReviewFlag, BadgeDefinition, UserBadge, ReviewHelpful, Article, ArticleCategory, ClinicManagerDoctor, ClinicAccount, DoctorContact, DoctorWorkplace, DoctorSubscription, DoctorCredentials, DoctorSettings, DoctorMedicalTools, DoctorTemplateUsage, ClinicStaff, ClinicDoctor, ClinicSchedule, ScheduleException, AppointmentReminder, PatientNoShowRecord, BlockedIdentity, SecurityEvent, LocalLevel
 from config import Config
 import ad_manager
 import upload_utils
@@ -1141,6 +1141,90 @@ def send_verification_rejected_email(to_email, doctor_name, admin_notes=None):
     except Exception as e:
         print(f"❌ Failed to send rejection email to {to_email}: {e}")
         return False
+
+
+def send_resubmission_request_email(to_email, doctor_name, feedback_text):
+    """
+    Send email requesting document resubmission for verification
+
+    Args:
+        to_email: Doctor's email address
+        doctor_name: Full name of the doctor
+        feedback_text: Specific issues to address
+
+    Returns:
+        True if email sent successfully, False otherwise
+    """
+    if not resend_key:
+        app.logger.warning("RESEND_API_KEY not set. Skipping resubmission request email.")
+        return False
+
+    try:
+        last_name = doctor_name.split()[-1].replace('Dr.', '').strip()
+
+        subject = "Action Required: Please Resubmit Documents for RankSewa Verification"
+
+        # Format feedback with proper HTML
+        feedback_html = feedback_text.replace('\n', '<br>').replace('• ', '&bull; ')
+
+        html_body = f"""
+        <div style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #111;">
+            <p>Dear Dr. {last_name},</p>
+
+            <p>
+                Thank you for submitting your verification request on <strong>RankSewa</strong>.
+            </p>
+
+            <p>
+                We've reviewed your submission and need a few documents resubmitted before we can complete verification.
+                <strong>Your NMC registration has been validated</strong> — we just need clearer documentation.
+            </p>
+
+            <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0;">
+                <strong style="color: #92400e;">Please address the following:</strong><br><br>
+                {feedback_html}
+            </div>
+
+            <p>
+                <a href="https://ranksewa.com/doctor/request-verification"
+                   style="display: inline-block; background: #0d8abc; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                    Resubmit Documents
+                </a>
+            </p>
+
+            <p style="color: #6b7280; font-size: 14px;">
+                <strong>Why is this important?</strong><br>
+                Identity clarity is non-negotiable for a healthcare directory. Clear documentation protects both patients and your professional reputation.
+            </p>
+
+            <p>
+                If you have questions, reply to this email or contact us at
+                <a href="mailto:support@ranksewa.com">support@ranksewa.com</a>.
+            </p>
+
+            <p style="margin-top: 32px;">
+                Best regards,<br>
+                <strong>RankSewa Verification Team</strong><br>
+                <a href="https://ranksewa.com">https://ranksewa.com</a>
+            </p>
+        </div>
+        """
+
+        params = {
+            "from": "RankSewa Verification <onboarding@ranksewa.com>",
+            "to": [to_email],
+            "subject": subject,
+            "html": html_body
+        }
+
+        email_response = resend.Emails.send(params)
+        print(f"✅ Resubmission request email sent to {to_email}")
+        return True
+
+    except Exception as e:
+        print(f"❌ Failed to send resubmission email to {to_email}: {e}")
+        return False
+
 
 def send_admin_verification_notification(verification_request, doctor_name, user_email):
     """
@@ -3313,7 +3397,7 @@ def get_homepage_stats():
     # Fetch fresh data
     stats = {
         'total_doctors': Doctor.query.filter_by(is_active=True).count(),
-        'total_cities': City.query.count(),
+        'total_cities': 753,  # Nepal's official 753 local levels (palikas)
         'total_reviews': Rating.query.count(),
         'verified_doctors': Doctor.query.filter_by(is_verified=True, is_active=True).count(),
     }
@@ -3328,7 +3412,8 @@ def get_homepage_stats():
 # --- Main App Routes ---
 @app.route('/')
 def index():
-    cities = City.query.all()
+    # Use canonical LocalLevel (753) instead of messy City table (4890)
+    cities = LocalLevel.query.order_by(LocalLevel.name).all()
     specialties = Specialty.query.all()
 
     # Get cached stats for social proof section
@@ -3342,7 +3427,7 @@ def index():
                          cities=cities,
                          specialties=specialties,
                          total_doctors=stats['total_doctors'],
-                         total_cities=stats['total_cities'],
+                         total_cities=753,  # Nepal's official local level count
                          total_reviews=stats['total_reviews'],
                          verified_doctors=stats['verified_doctors'],
                          featured_clinics=featured_clinics)
@@ -3485,13 +3570,15 @@ def get_doctors():
         response_counts, Doctor.id == response_counts.c.doctor_id
     ).options(
         selectinload(Doctor.city),
+        selectinload(Doctor.local_level),
         selectinload(Doctor.specialty),
         selectinload(Doctor.clinic),
         selectinload(Doctor.user_account)
     ).filter(Doctor.is_active.is_(True))  # Show all active doctors (NMC city = practice location)
 
     if city_id:
-        query = query.filter(Doctor.city_id == city_id)
+        # Filter by local_level_id (canonical 753 palikas) instead of legacy city_id
+        query = query.filter(Doctor.local_level_id == city_id)
 
     if specialty_id:
         query = query.filter(Doctor.specialty_id == specialty_id)
@@ -3555,8 +3642,8 @@ def get_doctors():
             'id': d.id,
             'name': d.name,
             'slug': d.slug,
-            'city_id': d.city_id,
-            'city_name': d.city.name,
+            'city_id': d.local_level_id or d.city_id,  # Prefer local_level_id
+            'city_name': d.local_level.name if d.local_level else (d.city.name if d.city else 'Unknown'),
             'clinic_name': d.clinic.name if d.clinic else None,
             'clinic_slug': d.clinic.slug if d.clinic else None,
             'specialty_id': d.specialty_id,
@@ -5905,6 +5992,50 @@ def admin_verification_detail(request_id):
                     db.session.rollback()
                     flash(f'Error rejecting verification: {str(e)}', 'danger')
 
+        elif action == 'request_resubmission':
+            # Request resubmission with specific feedback
+            issues = request.form.getlist('issues')
+            additional_notes = request.form.get('resubmit_notes', '').strip()
+
+            if not issues:
+                flash('Please select at least one issue to include in the resubmission request.', 'warning')
+            else:
+                try:
+                    # Build feedback message
+                    issue_messages = {
+                        'unclear_nmc': 'Your NMC certificate photo is unclear or appears to be a photocopy. Please submit a clear photo of the original certificate.',
+                        'unclear_id': 'Your government ID photo is unclear or not recognizable. Please submit a clearer photo.',
+                        'need_additional_id': 'You submitted a citizenship document. Please also provide an additional photo ID (National ID, driving license, passport) or a clear selfie holding your citizenship.',
+                        'name_mismatch': 'The name on your documents does not match your profile name. Please clarify or submit documents with matching names.',
+                        'workplace_unverifiable': 'We could not verify your workplace. Please submit a hospital/clinic ID card, appointment letter, or other proof of employment.',
+                    }
+
+                    feedback_items = [issue_messages.get(issue, issue) for issue in issues]
+                    feedback_text = '\n'.join(f'• {item}' for item in feedback_items)
+
+                    if additional_notes:
+                        feedback_text += f'\n\nAdditional notes: {additional_notes}'
+
+                    # Update verification request status
+                    verification_request.status = 'resubmission_requested'
+                    verification_request.admin_notes = f'Resubmission requested:\n{feedback_text}'
+                    verification_request.reviewed_by = session['user_id']
+                    verification_request.reviewed_at = datetime.utcnow()
+
+                    db.session.commit()
+
+                    # Send resubmission request email
+                    user = verification_request.user
+                    doctor_name = verification_request.proposed_name if verification_request.is_new_doctor else (verification_request.doctor.name if verification_request.doctor else 'Doctor')
+                    send_resubmission_request_email(user.email, doctor_name, feedback_text)
+
+                    flash(f'Resubmission request sent to {user.email}.', 'success')
+                    return redirect(url_for('admin_verification_requests'))
+
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f'Error sending resubmission request: {str(e)}', 'danger')
+
     # Get all pending requests for duplicate NMC checking
     all_requests = VerificationRequest.query.filter_by(status='pending').all()
 
@@ -6201,11 +6332,22 @@ def doctor_request_verification():
 
     if request.method == 'POST':
         phone_number = request.form.get('phone_number', '').strip()
+        practice_address = request.form.get('practice_address', '').strip()
+        practice_city_id = request.form.get('practice_city_id', type=int)
 
         # Get uploaded files
         nmc_license = request.files.get('nmc_license')
         govt_id = request.files.get('govt_id')
         practice_license = request.files.get('practice_license')
+
+        # Validate required fields
+        if not practice_address:
+            flash('Practice address is required for verification.', 'error')
+            return redirect(url_for('doctor_request_verification'))
+
+        if not practice_city_id:
+            flash('Practice city is required for verification.', 'error')
+            return redirect(url_for('doctor_request_verification'))
 
         # Validate required documents
         if not nmc_license or not nmc_license.filename:
@@ -6286,15 +6428,19 @@ def doctor_request_verification():
                 medical_degree_path=nmc_license_path,
                 govt_id_path=govt_id_path,
                 practice_license_path=practice_license_path,
+                practice_address=practice_address,
+                practice_city_id=practice_city_id,
                 is_new_doctor=False,
                 email_verified=True,
                 status='pending'
             )
             db.session.add(verification_request)
 
-            # Update doctor's phone if provided
+            # Update doctor's practice info
             if phone_number and not doctor.phone_number:
                 doctor.phone_number = phone_number
+            if practice_address:
+                doctor.practice_address = practice_address
 
             db.session.commit()
 
@@ -6309,7 +6455,9 @@ def doctor_request_verification():
             flash(f'An error occurred: {str(e)}', 'error')
             return redirect(url_for('doctor_request_verification'))
 
-    return render_template('doctor_request_verification.html', doctor=doctor, user=user)
+    # Get cities for dropdown (use LocalLevel for canonical locations)
+    cities = LocalLevel.query.order_by(LocalLevel.name).all()
+    return render_template('doctor_request_verification.html', doctor=doctor, user=user, cities=cities)
 
 
 @app.route('/doctor/qr-code/generate')
