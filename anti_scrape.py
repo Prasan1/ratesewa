@@ -417,8 +417,9 @@ def anti_scrape_check():
 
     # Logged-in users get lighter checks but not completely exempt
     if session.get('user_id'):
-        # Still check for suspicious patterns (high volume scraping)
-        if is_suspicious_request_pattern(ip):
+        # Still check for extreme scraping patterns (100+ requests/min)
+        track_request(ip, request.path)
+        if is_scraping_pattern(ip):
             return ('Too many requests. Please slow down.', 429)
         return None
 
