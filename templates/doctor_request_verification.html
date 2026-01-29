@@ -30,6 +30,13 @@
                 </ul>
             </div>
 
+            <div class="alert" style="border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc;">
+                <h6 class="mb-2"><i class="fas fa-certificate me-2 text-primary"></i>Why both license AND identity?</h6>
+                <p class="small mb-2">Your NMC number is already validated against the medical council registry.</p>
+                <p class="small mb-0"><strong>RankSewa verification = License + Identity confidence</strong><br>
+                <span class="text-muted">A valid license alone doesn't verify that <em>you</em> are the license holder. We need to confirm both to protect patients and your professional reputation.</span></p>
+            </div>
+
             <form method="POST" enctype="multipart/form-data" class="mt-4">
                 <div class="mb-3">
                     <label class="form-label fw-bold">Your Name</label>
@@ -55,22 +62,32 @@
                 <hr class="my-4">
                 <h6 class="mb-3"><i class="fas fa-file-upload me-2"></i>Required Documents</h6>
 
+                <div class="alert alert-warning" style="border-radius: 12px; border: none; background: #fffbeb;">
+                    <h6 class="mb-2"><i class="fas fa-exclamation-triangle me-2"></i>Important:</h6>
+                    <ul class="mb-0 ps-3 small">
+                        <li><strong>NMC Certificate:</strong> Please submit a photo of the <strong>original certificate</strong>, not a photocopy.</li>
+                        <li><strong>ID Requirement:</strong> National ID card is preferred for faster verification.</li>
+                        <li><strong>Citizenship:</strong> If submitting citizenship, please also provide an additional photo ID (e.g., driving license, passport, or a clear selfie holding your citizenship).</li>
+                    </ul>
+                    <p class="mb-0 mt-2 small fst-italic"><i class="fas fa-shield-alt me-1"></i>Identity clarity is non-negotiable for a healthcare directory.</p>
+                </div>
+
                 <div class="mb-3">
-                    <label class="form-label fw-bold">NMC License Copy <span class="text-danger">*</span></label>
+                    <label class="form-label fw-bold">NMC License <span class="text-danger">*</span></label>
                     <input type="file" name="nmc_license" class="form-control" accept="image/*,.pdf" required style="border-radius: 10px;">
-                    <small class="text-muted">Your NMC registration certificate (image or PDF).</small>
+                    <small class="text-muted">Photo of your <strong>original</strong> NMC registration certificate (not a photocopy).</small>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Government ID <span class="text-danger">*</span></label>
                     <input type="file" name="govt_id" class="form-control" accept="image/*,.pdf" required style="border-radius: 10px;">
-                    <small class="text-muted">Citizenship, passport, or national ID card (image or PDF).</small>
+                    <small class="text-muted">National ID card (preferred), passport, or driving license.</small>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label fw-bold">Practice License <span class="text-muted fw-normal">(optional)</span></label>
+                    <label class="form-label fw-bold">Additional ID <span class="text-muted fw-normal">(required if submitting citizenship)</span></label>
                     <input type="file" name="practice_license" class="form-control" accept="image/*,.pdf" style="border-radius: 10px;">
-                    <small class="text-muted">Hospital/clinic practice authorization if available.</small>
+                    <small class="text-muted">If you submitted citizenship above, please provide an additional photo ID or a clear selfie holding your citizenship.</small>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 py-2" style="border-radius: 10px;">
