@@ -166,8 +166,7 @@ class Doctor(db.Model):
     name = db.Column(db.String(200), nullable=False)
     slug = db.Column(db.String(250), unique=True, nullable=False, index=True)
     city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
-    # TODO: Uncomment after running: ALTER TABLE doctors ADD COLUMN local_level_id INTEGER REFERENCES local_levels(id);
-    # local_level_id = db.Column(db.Integer, db.ForeignKey('local_levels.id'), nullable=True)
+    local_level_id = db.Column(db.Integer, db.ForeignKey('local_levels.id'), nullable=True)
     specialty_id = db.Column(db.Integer, db.ForeignKey('specialties.id'), nullable=False)
     clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'), nullable=True)
     experience = db.Column(db.Integer)
@@ -211,8 +210,7 @@ class Doctor(db.Model):
     clinic_managers = db.relationship('ClinicManagerDoctor', backref='doctor', lazy=True)
 
     # Location relationship (new proper Nepal location system)
-    # TODO: Uncomment after adding local_level_id column to doctors table
-    # local_level = db.relationship('LocalLevel', backref='doctors', lazy='select', foreign_keys=[local_level_id])
+    local_level = db.relationship('LocalLevel', backref='doctors', lazy='select', foreign_keys=[local_level_id])
 
     # Normalized data relationships
     # Using lazy='select' for backward compatibility - tables may not exist yet in production
