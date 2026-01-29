@@ -28,7 +28,9 @@ from models import City, Doctor
 from sqlalchemy import text
 
 # Data files
-DATA_DIR = '/home/ppaudyal/Documents/scraper/nepal_admin_data'
+# Data files - use relative path for production compatibility
+import os
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'nepal_admin_data')
 
 # ============================================================
 # NEW MODELS (will be added to models.py)
