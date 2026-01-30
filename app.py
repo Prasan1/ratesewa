@@ -964,10 +964,21 @@ def enforce_subscription_expiry(doctor):
         doctor.subscription_expires_at = None
         db.session.commit()
 
+_last_subscription_cleanup = None
+
 def clear_expired_subscriptions():
-    if promo_config.is_promotion_active():
-        return
+    """Clear expired subscriptions - runs at most once per 5 minutes"""
+    global _last_subscription_cleanup
     now = datetime.utcnow()
+
+    # Only run once every 5 minutes to avoid unnecessary DB writes on every request
+    if _last_subscription_cleanup and (now - _last_subscription_cleanup).total_seconds() < 300:
+        return
+
+    if promo_config.is_promotion_active():
+        _last_subscription_cleanup = now
+        return
+
     updated = Doctor.query.filter(
         Doctor.subscription_expires_at.isnot(None),
         Doctor.subscription_expires_at < now,
@@ -979,6 +990,8 @@ def clear_expired_subscriptions():
     }, synchronize_session=False)
     if updated:
         db.session.commit()
+
+    _last_subscription_cleanup = now
 
 # --- Helper Function for Slugs ---
 def generate_slug(name):
@@ -3414,6 +3427,33 @@ _homepage_stats_cache = {
 }
 STATS_CACHE_TTL = 300  # 5 minutes
 
+# Cache for dropdown data (locations, specialties) - rarely changes
+_dropdown_cache = {
+    'locations': None,
+    'specialties': None,
+    'expires_at': None
+}
+DROPDOWN_CACHE_TTL = 600  # 10 minutes
+
+def get_cached_dropdowns():
+    """Get cached locations and specialties for dropdowns"""
+    import time
+    now = time.time()
+
+    if _dropdown_cache['locations'] and _dropdown_cache['expires_at'] and now < _dropdown_cache['expires_at']:
+        return _dropdown_cache['locations'], _dropdown_cache['specialties']
+
+    # Fetch fresh data
+    locations = LocalLevel.query.order_by(LocalLevel.name).all()
+    specialties = Specialty.query.order_by(Specialty.name).all()
+
+    # Update cache
+    _dropdown_cache['locations'] = locations
+    _dropdown_cache['specialties'] = specialties
+    _dropdown_cache['expires_at'] = now + DROPDOWN_CACHE_TTL
+
+    return locations, specialties
+
 def get_homepage_stats():
     """Get cached homepage stats or fetch from DB if expired"""
     import time
@@ -3441,9 +3481,8 @@ def get_homepage_stats():
 # --- Main App Routes ---
 @app.route('/')
 def index():
-    # Use LocalLevel (753 palikas) instead of City (4890 entries) for faster loading
-    locations = LocalLevel.query.order_by(LocalLevel.name).all()
-    specialties = Specialty.query.all()
+    # Use cached dropdown data for faster loading
+    locations, specialties = get_cached_dropdowns()
 
     # Get cached stats for social proof section
     stats = get_homepage_stats()
