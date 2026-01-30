@@ -4797,10 +4797,31 @@ def admin_users():
         error_out=False
     )
 
+    # KPI stats
+    stats = {
+        'total': User.query.count(),
+        'verified': User.query.filter_by(email_verified=True).count(),
+        'doctors': User.query.filter_by(role='doctor').count(),
+        'admins': User.query.filter_by(is_admin=True).count(),
+        'unverified': User.query.filter_by(email_verified=False).count(),
+    }
+
+    # Get review counts for users on this page
+    user_ids = [u.id for u in pagination.items]
+    review_counts = {}
+    if user_ids:
+        from sqlalchemy import func
+        counts = db.session.query(
+            Rating.user_id, func.count(Rating.id)
+        ).filter(Rating.user_id.in_(user_ids)).group_by(Rating.user_id).all()
+        review_counts = {uid: cnt for uid, cnt in counts}
+
     return render_template('admin_users.html',
                          users=pagination.items,
                          pagination=pagination,
                          show_tests=show_tests,
+                         stats=stats,
+                         review_counts=review_counts,
                          now=datetime.utcnow())
 
 @app.route('/admin/blocklist', methods=['GET', 'POST'])

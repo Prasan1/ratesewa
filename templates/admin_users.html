@@ -3,189 +3,402 @@
 {% block title %}Manage Users{% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mb-4">
+<style>
+  .admin-page-header {
+    background: linear-gradient(135deg, rgba(220,53,69,0.10), rgba(13,110,253,0.08));
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 16px;
+    padding: 16px 16px;
+  }
+  .admin-kpi {
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 14px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.75);
+  }
+  .admin-kpi .label { font-size: .75rem; color: #6c757d; }
+  .admin-kpi .value { font-size: 1.05rem; font-weight: 700; }
+  .toolbar-card {
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 16px;
+    padding: 12px;
+    background: #fff;
+  }
+  .table-card {
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .users-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f8f9fa;
+    border-bottom: 1px solid rgba(0,0,0,0.08) !important;
+  }
+  .user-cell {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .user-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: rgba(13,110,253,0.10);
+    border: 1px solid rgba(13,110,253,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #0d6efd;
+    flex: 0 0 auto;
+    user-select: none;
+  }
+  .user-meta .name { font-weight: 700; line-height: 1.1; }
+  .user-meta .email { color: #6c757d; font-size: .85rem; }
+  .pill {
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: .82rem;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: #fff;
+    cursor: pointer;
+    user-select: none;
+  }
+  .pill.active {
+    border-color: rgba(13,110,253,0.35);
+    background: rgba(13,110,253,0.08);
+    color: #0d6efd;
+    font-weight: 700;
+  }
+  .actions-stack {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+  .muted-hint { color: #6c757d; font-size: .85rem; }
+  .nowrap { white-space: nowrap; }
+</style>
+
+<div class="admin-page-header mb-3">
+  <div class="d-flex flex-wrap gap-3 align-items-start justify-content-between">
     <div>
-        <h2 class="mb-1">Manage Users</h2>
-        <p class="text-muted mb-0">Review accounts and take action carefully.</p>
+      <h2 class="mb-1">Manage Users</h2>
+      <p class="text-muted mb-0">
+        Safer controls: admin changes require a double confirmation to prevent accidental grants.
+      </p>
     </div>
-    <div class="d-flex gap-2">
-        <a class="btn btn-danger btn-sm" href="{{ url_for('admin_detect_spam_users') }}">
-            <i class="fas fa-robot me-1"></i> Detect Spam
+
+    <div class="d-flex gap-2 flex-wrap align-items-center">
+      <a class="btn btn-danger btn-sm" href="{{ url_for('admin_detect_spam_users') }}">
+        <i class="fas fa-robot me-1"></i> Detect Spam
+      </a>
+
+      {% if show_tests %}
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_users') }}">
+          Hide test users
         </a>
-        {% if show_tests %}
-            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_users') }}">
-                Hide test users
-            </a>
-        {% else %}
-            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_users', show_tests=1) }}">
-                Show test users
-            </a>
-        {% endif %}
+      {% else %}
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_users', show_tests=1) }}">
+          Show test users
+        </a>
+      {% endif %}
     </div>
+  </div>
+
+  <div class="row g-2 mt-2">
+    <div class="col-6 col-md-2">
+      <div class="admin-kpi">
+        <div class="label">Total Users</div>
+        <div class="value">{{ stats.total }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="admin-kpi">
+        <div class="label">Verified</div>
+        <div class="value text-success">{{ stats.verified }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="admin-kpi">
+        <div class="label">Unverified</div>
+        <div class="value text-warning">{{ stats.unverified }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="admin-kpi">
+        <div class="label">Doctors</div>
+        <div class="value text-primary">{{ stats.doctors }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="admin-kpi">
+        <div class="label">Admins</div>
+        <div class="value text-danger">{{ stats.admins }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="admin-kpi">
+        <div class="label">This Page</div>
+        <div class="value">{{ users|length }}</div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="table-responsive">
-    <table class="table table-hover align-middle">
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Last Active</th>
-                <th>Joined</th>
-                <th class="text-end">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>
-                    <div class="fw-semibold">{{ user.name }}</div>
-                    <div class="text-muted small">{{ user.email }}</div>
-                    {% if not user.email_verified %}
-                    <span class="badge bg-secondary" style="font-size: 0.65rem;">Email not verified</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if user.is_admin %}
-                        <span class="badge bg-danger"><i class="fas fa-shield-alt me-1"></i>Admin</span>
-                    {% elif user.role == 'doctor' %}
-                        <span class="badge bg-primary"><i class="fas fa-user-md me-1"></i>Doctor</span>
-                    {% elif user.role == 'clinic_manager' %}
-                        <span class="badge bg-info"><i class="fas fa-hospital me-1"></i>Clinic Mgr</span>
-                    {% else %}
-                        <span class="badge bg-secondary"><i class="fas fa-user me-1"></i>User</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if user.is_active %}
-                        <span class="badge bg-success">Active</span>
-                    {% else %}
-                        <span class="badge bg-danger">Inactive</span>
-                    {% endif %}
-                </td>
-                <td class="small">
-                    {% if user.last_login_at %}
-                        {% set diff = (now - user.last_login_at).total_seconds() %}
-                        {% if diff < 3600 %}
-                            <span class="text-success fw-semibold"><i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>{{ (diff / 60)|int }} min ago</span>
-                        {% elif diff < 86400 %}
-                            <span class="text-success"><i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>{{ (diff / 3600)|int }} hrs ago</span>
-                        {% elif diff < 604800 %}
-                            <span class="text-primary">{{ (diff / 86400)|int }} days ago</span>
-                        {% elif diff < 2592000 %}
-                            <span class="text-muted">{{ (diff / 604800)|int }} weeks ago</span>
-                        {% else %}
-                            <span class="text-muted">{{ user.last_login_at.strftime('%b %d') }}</span>
-                        {% endif %}
-                    {% else %}
-                        <span class="text-muted">Never</span>
-                    {% endif %}
-                </td>
-                <td class="text-muted small">
-                    {% if user.created_at %}
-                        {{ user.created_at.strftime('%b %d, %Y') }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-                <td class="text-end">
-                    {% if session.get('user_id') != user.id %}
-                    <div class="d-flex gap-1 justify-content-end flex-wrap">
-                        <!-- View Reviews -->
-                        <a href="{{ url_for('admin_user_reviews', user_id=user.id) }}" class="btn btn-sm btn-outline-info" title="View reviews by this user">
-                            <i class="fas fa-star"></i>
-                        </a>
+<div class="toolbar-card mb-3">
+  <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+      <div class="input-group input-group-sm" style="min-width: 280px; max-width: 420px;">
+        <span class="input-group-text"><i class="fas fa-search"></i></span>
+        <input id="userSearch" type="text" class="form-control" placeholder="Search name or email…">
+        <button class="btn btn-outline-secondary" type="button" id="clearSearch" title="Clear">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
 
-                        <!-- Toggle Admin Status -->
-                        <form method="post" action="{{ url_for('admin_user_toggle_admin', user_id=user.id) }}" class="d-inline js-admin-toggle" data-name="{{ user.name }}" data-is-admin="{{ 'true' if user.is_admin else 'false' }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            {% if user.is_admin %}
-                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Remove admin privileges">
-                                <i class="fas fa-user-minus"></i>
-                            </button>
-                            {% else %}
-                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Make admin">
-                                <i class="fas fa-user-shield"></i>
-                            </button>
-                            {% endif %}
-                        </form>
+      <div class="d-flex gap-2 flex-wrap align-items-center">
+        <span class="muted-hint">Quick filters:</span>
+        <button class="pill active" data-filter="all" type="button">All</button>
+        <button class="pill" data-filter="admin" type="button"><i class="fas fa-shield-alt me-1"></i>Admins</button>
+        <button class="pill" data-filter="doctor" type="button"><i class="fas fa-user-md me-1"></i>Doctors</button>
+        <button class="pill" data-filter="clinic_manager" type="button"><i class="fas fa-hospital me-1"></i>Clinic Mgr</button>
+        <button class="pill" data-filter="unverified" type="button"><i class="fas fa-envelope me-1"></i>Unverified</button>
+        <button class="pill" data-filter="inactive" type="button"><i class="fas fa-ban me-1"></i>Inactive</button>
+      </div>
+    </div>
 
-                        <!-- Activate/Deactivate -->
-                        <form method="post" action="{{ url_for('admin_user_status', user_id=user.id) }}" class="d-inline js-user-status" data-email="{{ user.email }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            {% if user.is_active %}
-                            <input type="hidden" name="action" value="deactivate"/>
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Deactivate user">
-                                <i class="fas fa-ban"></i>
-                            </button>
-                            {% else %}
-                            <input type="hidden" name="action" value="activate"/>
-                            <button type="submit" class="btn btn-sm btn-success" title="Reactivate user">
-                                <i class="fas fa-check-circle"></i>
-                            </button>
-                            {% endif %}
-                        </form>
-                    </div>
-                    {% else %}
-                    <span class="badge bg-info"><i class="fas fa-user-shield me-1"></i>You</span>
-                    {% endif %}
-                </td>
-            </tr>
+    <div class="muted-hint">
+      {% if pagination and pagination.pages > 1 %}
+        Page {{ pagination.page }} of {{ pagination.pages }} · {{ pagination.total }} total
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 users-table" id="usersTable">
+      <thead>
+        <tr>
+          <th style="min-width: 320px;">User</th>
+          <th class="nowrap">Role</th>
+          <th class="nowrap">Status</th>
+          <th class="nowrap">Last Active</th>
+          <th class="nowrap">Joined</th>
+          <th class="text-end nowrap" style="min-width: 120px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        {% set role_key = 'admin' if user.is_admin else (user.role or 'user') %}
+        <tr
+          class="user-row"
+          data-name="{{ (user.name or '')|lower }}"
+          data-email="{{ (user.email or '')|lower }}"
+          data-role="{{ role_key }}"
+          data-active="{{ 'true' if user.is_active else 'false' }}"
+          data-verified="{{ 'true' if user.email_verified else 'false' }}"
+        >
+          <td>
+            <div class="user-cell">
+              <div class="user-avatar" title="{{ user.name }}">
+                {{ (user.name[:1] if user.name else (user.email[:1] if user.email else 'U'))|upper }}
+              </div>
+
+              <div class="user-meta">
+                <div class="name">
+                  {{ user.name or 'Unnamed' }}
+                  {% if user.email_verified %}
+                    <i class="fas fa-check-circle text-success ms-1" title="Email verified" style="font-size: 0.75rem;"></i>
+                  {% endif %}
+                </div>
+                <div class="email">{{ user.email or '-' }}</div>
+
+                <div class="d-flex gap-2 flex-wrap mt-1">
+                  {% if not user.email_verified %}
+                    <span class="badge bg-warning text-dark" style="font-size: 0.70rem;"><i class="fas fa-exclamation-circle me-1"></i>Unverified</span>
+                  {% endif %}
+
+                  {% if user.doctor_id and user.doctor_profile %}
+                    <a href="{{ url_for('doctor_profile', slug=user.doctor_profile.slug) }}"
+                       class="badge bg-primary text-decoration-none" style="font-size: 0.70rem;" target="_blank">
+                      <i class="fas fa-user-md me-1"></i>{{ user.doctor_profile.name[:20] }}{% if user.doctor_profile.name|length > 20 %}...{% endif %}
+                    </a>
+                  {% endif %}
+
+                  {% set review_count = review_counts.get(user.id, 0) %}
+                  {% if review_count > 0 %}
+                    <span class="badge bg-info text-dark" style="font-size: 0.70rem;">
+                      <i class="fas fa-star me-1"></i>{{ review_count }} review{% if review_count != 1 %}s{% endif %}
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </td>
+
+          <td class="nowrap">
+            {% if user.is_admin %}
+              <span class="badge bg-danger"><i class="fas fa-shield-alt me-1"></i>Admin</span>
+            {% elif user.role == 'doctor' %}
+              <span class="badge bg-primary"><i class="fas fa-user-md me-1"></i>Doctor</span>
+            {% elif user.role == 'clinic_manager' %}
+              <span class="badge bg-info text-dark"><i class="fas fa-hospital me-1"></i>Clinic Mgr</span>
             {% else %}
-            <tr>
-                <td colspan="6" class="text-center text-muted py-4">No users found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+              <span class="badge bg-secondary"><i class="fas fa-user me-1"></i>User</span>
+            {% endif %}
+          </td>
+
+          <td class="nowrap">
+            {% if user.is_active %}
+              <span class="badge bg-success">Active</span>
+            {% else %}
+              <span class="badge bg-danger">Inactive</span>
+            {% endif %}
+          </td>
+
+          <td class="small nowrap">
+            {% if user.last_login_at %}
+              {% set diff = (now - user.last_login_at).total_seconds() %}
+              {% if diff < 3600 %}
+                <span class="text-success fw-semibold"><i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>{{ (diff / 60)|int }} min ago</span>
+              {% elif diff < 86400 %}
+                <span class="text-success"><i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>{{ (diff / 3600)|int }} hrs ago</span>
+              {% elif diff < 604800 %}
+                <span class="text-primary">{{ (diff / 86400)|int }} days ago</span>
+              {% elif diff < 2592000 %}
+                <span class="text-muted">{{ (diff / 604800)|int }} weeks ago</span>
+              {% else %}
+                <span class="text-muted">{{ user.last_login_at.strftime('%b %d') }}</span>
+              {% endif %}
+            {% else %}
+              <span class="text-muted">Never</span>
+            {% endif %}
+          </td>
+
+          <td class="text-muted small nowrap">
+            {% if user.created_at %}
+              {{ user.created_at.strftime('%b %d, %Y') }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+
+          <td class="text-end">
+            {% if session.get('user_id') != user.id %}
+              <div class="actions-stack">
+                <!-- View reviews (only if has reviews) -->
+                {% set review_count = review_counts.get(user.id, 0) %}
+                {% if review_count > 0 %}
+                <a href="{{ url_for('admin_user_reviews', user_id=user.id) }}"
+                   class="btn btn-sm btn-outline-info"
+                   title="View {{ review_count }} review{% if review_count != 1 %}s{% endif %}">
+                  <i class="fas fa-star"></i>
+                </a>
+                {% endif %}
+
+                <!-- Status (deactivate/reactivate) -->
+                <form method="post"
+                      action="{{ url_for('admin_user_status', user_id=user.id) }}"
+                      class="d-inline js-user-status"
+                      data-email="{{ user.email }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                  {% if user.is_active %}
+                    <input type="hidden" name="action" value="deactivate"/>
+                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Deactivate user">
+                      <i class="fas fa-ban"></i>
+                    </button>
+                  {% else %}
+                    <input type="hidden" name="action" value="activate"/>
+                    <button type="submit" class="btn btn-sm btn-outline-success" title="Reactivate user">
+                      <i class="fas fa-check-circle"></i>
+                    </button>
+                  {% endif %}
+                </form>
+
+                <!-- Admin toggle -->
+                <form method="post"
+                      action="{{ url_for('admin_user_toggle_admin', user_id=user.id) }}"
+                      class="d-inline js-admin-toggle"
+                      data-name="{{ user.name }}"
+                      data-email="{{ user.email }}"
+                      data-is-admin="{{ 'true' if user.is_admin else 'false' }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                  {% if user.is_admin %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove admin privileges">
+                      <i class="fas fa-user-minus"></i>
+                    </button>
+                  {% else %}
+                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Make admin">
+                      <i class="fas fa-user-shield"></i>
+                    </button>
+                  {% endif %}
+                </form>
+              </div>
+            {% else %}
+              <span class="badge bg-info"><i class="fas fa-user-check me-1"></i>You</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="text-center text-muted py-4">No users found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
+  </div>
 </div>
 
 {% if pagination and pagination.pages > 1 %}
 <nav aria-label="User list pagination" class="mt-4">
-    <ul class="pagination justify-content-center">
-        {% if pagination.has_prev %}
-        <li class="page-item">
-            <a class="page-link" href="{{ url_for('admin_users', page=pagination.prev_num) }}">Previous</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled"><span class="page-link">Previous</span></li>
-        {% endif %}
+  <ul class="pagination justify-content-center">
+    {% if pagination.has_prev %}
+    <li class="page-item">
+      <a class="page-link" href="{{ url_for('admin_users', page=pagination.prev_num) }}">Previous</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+    {% endif %}
 
-        {% set start_page = [1, pagination.page - 2]|max %}
-        {% set end_page = [pagination.pages, pagination.page + 2]|min %}
+    {% set start_page = [1, pagination.page - 2]|max %}
+    {% set end_page = [pagination.pages, pagination.page + 2]|min %}
 
-        {% if start_page > 1 %}
-        <li class="page-item"><a class="page-link" href="{{ url_for('admin_users', page=1) }}">1</a></li>
-        {% if start_page > 2 %}
-        <li class="page-item disabled"><span class="page-link">...</span></li>
-        {% endif %}
-        {% endif %}
+    {% if start_page > 1 %}
+    <li class="page-item"><a class="page-link" href="{{ url_for('admin_users', page=1) }}">1</a></li>
+    {% if start_page > 2 %}
+    <li class="page-item disabled"><span class="page-link">...</span></li>
+    {% endif %}
+    {% endif %}
 
-        {% for p in range(start_page, end_page + 1) %}
-        <li class="page-item {% if p == pagination.page %}active{% endif %}">
-            <a class="page-link" href="{{ url_for('admin_users', page=p) }}">{{ p }}</a>
-        </li>
-        {% endfor %}
+    {% for p in range(start_page, end_page + 1) %}
+    <li class="page-item {% if p == pagination.page %}active{% endif %}">
+      <a class="page-link" href="{{ url_for('admin_users', page=p) }}">{{ p }}</a>
+    </li>
+    {% endfor %}
 
-        {% if end_page < pagination.pages %}
-        {% if end_page < pagination.pages - 1 %}
-        <li class="page-item disabled"><span class="page-link">...</span></li>
-        {% endif %}
-        <li class="page-item"><a class="page-link" href="{{ url_for('admin_users', page=pagination.pages) }}">{{ pagination.pages }}</a></li>
-        {% endif %}
+    {% if end_page < pagination.pages %}
+    {% if end_page < pagination.pages - 1 %}
+    <li class="page-item disabled"><span class="page-link">...</span></li>
+    {% endif %}
+    <li class="page-item"><a class="page-link" href="{{ url_for('admin_users', page=pagination.pages) }}">{{ pagination.pages }}</a></li>
+    {% endif %}
 
-        {% if pagination.has_next %}
-        <li class="page-item">
-            <a class="page-link" href="{{ url_for('admin_users', page=pagination.next_num) }}">Next</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled"><span class="page-link">Next</span></li>
-        {% endif %}
-    </ul>
-    <p class="text-center text-muted small">
-        Page {{ pagination.page }} of {{ pagination.pages }} ({{ pagination.total }} users total)
-    </p>
+    {% if pagination.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="{{ url_for('admin_users', page=pagination.next_num) }}">Next</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">Next</span></li>
+    {% endif %}
+  </ul>
+  <p class="text-center text-muted small">
+    Page {{ pagination.page }} of {{ pagination.pages }} ({{ pagination.total }} users total)
+  </p>
 </nav>
 {% endif %}
 {% endblock %}
@@ -193,42 +406,122 @@
 {% block scripts %}
 {{ super() }}
 <script>
-// Deactivate user requires typing email
-document.querySelectorAll('.js-user-status').forEach(function(form) {
-    form.addEventListener('submit', function(event) {
-        const action = form.querySelector('input[name="action"]');
-        if (!action || action.value !== 'deactivate') {
-            return;
-        }
-        const email = form.dataset.email || '';
-        const typed = prompt(`Type the user's email to confirm deactivation:\n${email}`);
-        if (!typed || typed.trim().toLowerCase() !== email.toLowerCase()) {
-            event.preventDefault();
-            alert('Deactivation cancelled.');
-        }
-    });
-});
+(function() {
+  // -----------------------------
+  // Client-side search + filters
+  // -----------------------------
+  const searchInput = document.getElementById('userSearch');
+  const clearBtn = document.getElementById('clearSearch');
+  const pills = document.querySelectorAll('.pill');
+  const rows = document.querySelectorAll('.user-row');
 
-// Admin toggle requires confirmation with typing
-document.querySelectorAll('.js-admin-toggle').forEach(function(form) {
-    form.addEventListener('submit', function(event) {
-        const name = form.dataset.name || 'this user';
-        const isAdmin = form.dataset.isAdmin === 'true';
+  let activeFilter = 'all';
 
-        if (isAdmin) {
-            // Removing admin - simple confirm
-            if (!confirm(`Remove admin privileges from ${name}?`)) {
-                event.preventDefault();
-            }
-        } else {
-            // Making admin - require typing "ADMIN"
-            const typed = prompt(`This grants full admin access to ${name}.\n\nType "ADMIN" to confirm:`);
-            if (!typed || typed.trim().toUpperCase() !== 'ADMIN') {
-                event.preventDefault();
-                alert('Admin grant cancelled.');
-            }
-        }
+  function matchesFilter(row) {
+    const role = row.dataset.role || 'user';
+    const isActive = (row.dataset.active === 'true');
+    const isVerified = (row.dataset.verified === 'true');
+
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'inactive') return !isActive;
+    if (activeFilter === 'unverified') return !isVerified;
+    return role === activeFilter;
+  }
+
+  function matchesSearch(row) {
+    const q = (searchInput.value || '').trim().toLowerCase();
+    if (!q) return true;
+    const name = row.dataset.name || '';
+    const email = row.dataset.email || '';
+    return name.includes(q) || email.includes(q);
+  }
+
+  function applyFilters() {
+    rows.forEach(row => {
+      const show = matchesFilter(row) && matchesSearch(row);
+      row.style.display = show ? '' : 'none';
     });
-});
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', applyFilters);
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      if (searchInput) searchInput.value = '';
+      applyFilters();
+      if (searchInput) searchInput.focus();
+    });
+  }
+
+  pills.forEach(btn => {
+    btn.addEventListener('click', function() {
+      pills.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter || 'all';
+      applyFilters();
+    });
+  });
+
+  // Initial
+  applyFilters();
+
+  // ----------------------------------------
+  // Deactivate requires typing user's email
+  // ----------------------------------------
+  document.querySelectorAll('.js-user-status').forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+      const action = form.querySelector('input[name="action"]');
+      if (!action || action.value !== 'deactivate') return;
+
+      const email = (form.dataset.email || '').trim();
+      const typed = prompt(`Type the user's email to confirm deactivation:\n\n${email}`);
+      if (!typed || typed.trim().toLowerCase() !== email.toLowerCase()) {
+        event.preventDefault();
+        alert('Deactivation cancelled.');
+      }
+    });
+  });
+
+  // -------------------------------------------------------
+  // Admin toggle: removing = confirm, granting = 2-step
+  // -------------------------------------------------------
+  document.querySelectorAll('.js-admin-toggle').forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+      const name = (form.dataset.name || 'this user').trim();
+      const email = (form.dataset.email || '').trim();
+      const isAdmin = form.dataset.isAdmin === 'true';
+
+      if (isAdmin) {
+        // Removing admin: confirm + type REMOVE
+        const ok = confirm(`Remove admin privileges from ${name}?`);
+        if (!ok) { event.preventDefault(); return; }
+        const typed = prompt(`Final confirmation.\n\nType "REMOVE" to remove admin from ${name}:`);
+        if (!typed || typed.trim().toUpperCase() !== 'REMOVE') {
+          event.preventDefault();
+          alert('Admin removal cancelled.');
+        }
+      } else {
+        // Making admin: require typing MAKE ADMIN + email
+        const typedPhrase = prompt(
+          `DANGER: This grants FULL admin access to ${name}.\n\nType "MAKE ADMIN" to continue:`
+        );
+        if (!typedPhrase || typedPhrase.trim().toUpperCase() !== 'MAKE ADMIN') {
+          event.preventDefault();
+          alert('Admin grant cancelled.');
+          return;
+        }
+
+        const typedEmail = prompt(
+          `Confirm the target user email exactly to proceed:\n\n${email}`
+        );
+        if (!typedEmail || typedEmail.trim().toLowerCase() !== email.toLowerCase()) {
+          event.preventDefault();
+          alert('Admin grant cancelled.');
+        }
+      }
+    });
+  });
+})();
 </script>
 {% endblock %}
