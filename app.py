@@ -2398,6 +2398,9 @@ def claim_profile():
         User.doctor_id.isnot(None)
     ).scalar() or 0
 
+    # Total doctors count for display
+    total_doctors = Doctor.query.filter_by(is_active=True).count()
+
     if search_query:
         # Find doctors without a linked user account
         # Search by both name AND NMC number for better accuracy
@@ -2416,7 +2419,8 @@ def claim_profile():
     return render_template('claim_profile_search.html',
                           search_query=search_query,
                           unclaimed_doctors=unclaimed_doctors,
-                          claimed_count=claimed_count)
+                          claimed_count=claimed_count,
+                          total_doctors=total_doctors)
 
 
 @app.route('/claim-profile/<int:doctor_id>', methods=['GET'])
