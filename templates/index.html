@@ -2,12 +2,12 @@
 
 {% block title %}RankSewa - Find Doctors in Nepal Based on Patient Reviews and Ratings{% endblock %}
 
-{% block meta_description %}Find and compare 28,000+ doctors in Nepal based on real patient reviews. Search by specialty and city in Kathmandu, Pokhara, Biratnagar, and across Nepal. Check NMC credentials, read verified patient experiences, and discover trusted healthcare providers near you.{% endblock %}
+{% block meta_description %}Find and compare {{ total_doctors|default(28000) }}+ doctors in Nepal. Search by specialty and city, verify NMC credentials, and read patient experiences. Discover trusted healthcare providers across Kathmandu, Pokhara, Biratnagar, and all of Nepal.{% endblock %}
 
 {% block meta_keywords %}find doctors in Nepal, doctor reviews Nepal, NMC verified doctors, doctors in Kathmandu, doctors in Pokhara, Nepal healthcare directory, patient reviews, medical professionals Nepal, specialist doctors Nepal, doctor ratings Nepal, RankSewa{% endblock %}
 
 {% block og_title %}RankSewa - Transparent Healthcare in Nepal | Find Doctors Based on Real Patient Experiences{% endblock %}
-{% block og_description %}Concerned about healthcare quality? Read honest patient reviews, verify NMC credentials, and make informed decisions. 28,000+ doctors, real experiences, transparent information - because you deserve better healthcare.{% endblock %}
+{% block og_description %}Concerned about healthcare quality? Verify NMC credentials, read patient experiences, and make informed decisions. {{ total_doctors|default(28000) }}+ doctors with verified profiles - because you deserve better healthcare.{% endblock %}
 
 {% block twitter_title %}RankSewa - Transparent Healthcare | Real Patient Reviews{% endblock %}
 {% block twitter_description %}Find trustworthy doctors in Nepal through real patient reviews and verified credentials. Healthcare transparency starts here.{% endblock %}
@@ -35,19 +35,23 @@
 
                     <div class="trust-strip mb-4">
                         <div class="trust-item">
-                            <i class="fas fa-shield-alt me-2 text-brand"></i>NMC Verified
+                            <i class="fas fa-shield-alt me-2 text-brand"></i>NMC License Checks
                         </div>
                         <div class="trust-item">
-                            <i class="fas fa-star me-2 text-brand"></i>Real Reviews
+                            <i class="fas fa-check-circle me-2 text-brand"></i>Verified Profiles
                         </div>
                         <div class="trust-item">
-                            <i class="fas fa-map-marker-alt me-2 text-brand"></i>{{ total_doctors|default(38000) }}+ Doctors
+                            <i class="fas fa-user-md me-2 text-brand"></i>{{ total_doctors }}+ Doctors
                         </div>
                     </div>
 
                     <p class="text-muted small mt-2 mb-0">
                         <i class="fas fa-info-circle me-1"></i>
                         No account needed to search.
+                    </p>
+                    <p class="text-muted small mt-1 mb-0">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        We verify NMC licenses. Verified badges require document review.
                     </p>
                 </div>
 
@@ -269,7 +273,7 @@
                                     <div class="col-md-4">
                                         <div class="d-flex align-items-start gap-2">
                                             <i class="fas fa-check-circle text-success mt-1"></i>
-                                            <span class="small">Improve visibility in search</span>
+                                            <span class="small">Get verified badge after review</span>
                                         </div>
                                     </div>
                                 </div>
@@ -394,7 +398,7 @@
                     </h2>
                     <span id="resultsCount" class="badge bg-primary" style="display: none;"></span>
                 </div>
-                <p class="text-muted mb-3 small">Verified profiles appear first to help patients choose with confidence.</p>
+                <p class="text-muted mb-3 small">Verified profiles are highlighted so you can choose with confidence.</p>
 
                 <div id="doctorList" class="row">
                     <div class="col-12 text-center py-5">
@@ -598,7 +602,12 @@ $(document).ready(function() {
         $('#specialtySelect').val(specialtyParam).trigger('change');
     }
 
-    loadDoctors(); // Initial load - no scroll
+    // Only auto-load if URL has search params, otherwise show clean landing state
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('city_id') || urlParams.has('specialty_id') || urlParams.has('name')) {
+        loadDoctors(); // Load based on URL params - no scroll
+    }
+    // Otherwise, keep initial state: "Please use the search filters to find doctors"
 
     $('#filterBtn').click(function() {
         loadDoctors(1, true); // User clicked search - scroll to results
@@ -1035,7 +1044,7 @@ function generateStarTextHtml(rating, ratingCount) {
         "@type": "SearchAction",
         "target": {
           "@type": "EntryPoint",
-          "urlTemplate": "{{ request.url_root }}search?q={search_term_string}"
+          "urlTemplate": "{{ request.url_root }}doctors?name={search_term_string}"
         },
         "query-input": "required name=search_term_string"
       },
@@ -1052,7 +1061,7 @@ function generateStarTextHtml(rating, ratingCount) {
       "about": {
         "@id": "{{ request.url_root }}#organization"
       },
-      "description": "Discover and compare 28,000+ doctors in Nepal. Search by specialty and city, read real patient reviews, check NMC credentials, and find trusted healthcare providers.",
+      "description": "Discover and compare {{ total_doctors }}+ doctors in Nepal. Search by specialty and city, verify NMC credentials, and find trusted healthcare providers.",
       "inLanguage": "en-US"
     },
     {
