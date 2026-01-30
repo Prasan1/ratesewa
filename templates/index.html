@@ -602,12 +602,7 @@ $(document).ready(function() {
         $('#specialtySelect').val(specialtyParam).trigger('change');
     }
 
-    // Only auto-load if URL has search params, otherwise show clean landing state
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('city_id') || urlParams.has('specialty_id') || urlParams.has('name')) {
-        loadDoctors(); // Load based on URL params - no scroll
-    }
-    // Otherwise, keep initial state: "Please use the search filters to find doctors"
+    loadDoctors(); // Initial load - no scroll
 
     $('#filterBtn').click(function() {
         loadDoctors(1, true); // User clicked search - scroll to results
