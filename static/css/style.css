@@ -814,11 +814,21 @@ a:hover {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 10px;
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid #f1f5f9;
-    min-height: 60px; /* Ensures consistent height across cards */
+    min-height: 60px;
+}
+
+.card-footer-extra .claim-views {
+    margin-bottom: 4px;
+}
+
+.card-footer-extra .claim-link-pill {
+    display: flex;
+    width: 100%;
+    justify-content: center;
 }
 
 /* Limit description text to 3 lines to keep cards uniform */
