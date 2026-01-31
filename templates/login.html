@@ -17,6 +17,20 @@
                     <strong>Claiming your profile?</strong> Use Google to sign up or log in instantly, or register with email below.
                     After login you will return to your claim.
                 </div>
+                {% else %}
+                <!-- Doctor Redirect Prompt -->
+                <div class="alert mb-4" style="background: linear-gradient(135deg, #048288 0%, #065f63 100%); border: none; border-radius: 12px; padding: 16px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="fas fa-user-md fa-lg text-white"></i>
+                        <div class="flex-grow-1">
+                            <strong class="text-white d-block">Are you a doctor?</strong>
+                            <small class="text-white" style="opacity: 0.9;">Claim your profile instead of logging in as a user</small>
+                        </div>
+                        <a href="{{ url_for('claim_profile') }}" class="btn btn-light btn-sm">
+                            Find Profile
+                        </a>
+                    </div>
+                </div>
                 {% endif %}
 
                 <form method="POST" action="{{ url_for('login', next=request.args.get('next')) }}">

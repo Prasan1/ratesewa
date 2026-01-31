@@ -9,6 +9,20 @@
             <div class="card-body">
                 <h2 class="card-title text-center mb-4">Create an Account</h2>
 
+                <!-- Doctor Redirect Prompt -->
+                <div class="alert mb-4" style="background: linear-gradient(135deg, #048288 0%, #065f63 100%); border: none; border-radius: 12px; padding: 16px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="fas fa-user-md fa-lg text-white"></i>
+                        <div class="flex-grow-1">
+                            <strong class="text-white d-block">Are you a doctor?</strong>
+                            <small class="text-white" style="opacity: 0.9;">Your profile may already exist on RankSewa</small>
+                        </div>
+                        <a href="{{ url_for('claim_profile') }}" class="btn btn-light btn-sm">
+                            Find Profile
+                        </a>
+                    </div>
+                </div>
+
                 <form method="POST" id="registerForm">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="g-recaptcha-response" id="recaptchaResponse">
