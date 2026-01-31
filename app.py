@@ -8592,7 +8592,12 @@ def clinic_public_page(clinic_slug):
     """Public clinic page showing all doctors"""
     from models import Clinic, ClinicDoctor
 
-    clinic = Clinic.query.filter_by(slug=clinic_slug, is_active=True).first_or_404()
+    clinic = Clinic.query.filter_by(slug=clinic_slug).first_or_404()
+
+    # Only admins can preview inactive clinics
+    if not clinic.is_active:
+        if not session.get('is_admin'):
+            abort(404)
 
     # Get approved doctors with their schedules
     clinic_doctors = ClinicDoctor.query.filter_by(

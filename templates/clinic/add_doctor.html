@@ -18,10 +18,9 @@
                     </h3>
 
                     <div class="alert alert-info mb-4">
-                        <i class="fas fa-user-md me-2"></i>
-                        Search and add doctors to your clinic. Doctors marked with
-                        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Verified</span>
-                        have completed RankSewa verification.
+                        <i class="fas fa-shield-alt me-2"></i>
+                        <strong>Only verified doctors</strong> can be added to clinics.
+                        If your doctor isn't showing up, they need to <a href="{{ url_for('claim_profile') }}" target="_blank">claim and verify their profile</a> first.
                     </div>
 
                     <form method="POST" action="{{ url_for('clinic_add_doctor', clinic_slug=clinic.slug) }}" id="addDoctorForm">
@@ -135,7 +134,7 @@ document.getElementById('doctorSearch').addEventListener('input', function() {
                     html += '</div>';
                     container.innerHTML = html;
                 } else if (result.success) {
-                    container.innerHTML = '<p class="text-muted">No doctors found matching your search.</p>';
+                    container.innerHTML = '<p class="text-muted">No verified doctors found. Make sure the doctor has <a href="{{ url_for("claim_profile") }}" target="_blank">claimed and verified their profile</a>.</p>';
                 } else {
                     container.innerHTML = '<p class="text-danger">Error searching. Please try again.</p>';
                 }

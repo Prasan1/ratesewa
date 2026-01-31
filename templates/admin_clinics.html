@@ -44,6 +44,9 @@
                         {% endif %}
                     </td>
                     <td class="text-end">
+                        <a class="btn btn-sm btn-outline-info" href="{{ url_for('clinic_public_page', clinic_slug=clinic.slug) }}" target="_blank">
+                            <i class="fas fa-external-link-alt me-1"></i>Preview
+                        </a>
                         <form method="post" action="{{ url_for('admin_clinic_approve', clinic_id=clinic.id) }}" class="d-inline">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <button type="submit" class="btn btn-sm btn-success">
@@ -87,6 +90,7 @@
                 </td>
                 <td class="text-end">
                     {% if not clinic.is_active %}
+                    <a class="btn btn-sm btn-outline-info" href="{{ url_for('clinic_public_page', clinic_slug=clinic.slug) }}" target="_blank">Preview</a>
                     <form method="post" action="{{ url_for('admin_clinic_approve', clinic_id=clinic.id) }}" class="d-inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn btn-sm btn-success">Activate</button>
