@@ -206,14 +206,22 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="alert alert-info" style="border-radius: 12px;">
+    <div class="alert alert-light border" style="border-radius: 12px;">
         <div class="text-center py-4">
             <i class="fas fa-user-md fa-3x mb-3" style="color: var(--brand);"></i>
             <h5>No Doctors Yet</h5>
             <p class="text-muted mb-3">Add verified doctors from RankSewa to start accepting appointments.</p>
-            <a href="{{ url_for('clinic_add_doctor', clinic_slug=clinic.slug) }}" class="btn btn-primary">
+            <a href="{{ url_for('clinic_add_doctor', clinic_slug=clinic.slug) }}" class="btn btn-primary mb-3">
                 <i class="fas fa-plus me-1"></i> Add Your First Doctor
             </a>
+            <div class="small text-muted">
+                <p class="mb-1"><i class="fas fa-shield-alt me-1" style="color: var(--brand);"></i><strong>How adding doctors works:</strong></p>
+                <ul class="text-start mb-0" style="max-width: 400px; margin: 0 auto;">
+                    <li>Doctors must be verified on RankSewa</li>
+                    <li>Doctors must approve being listed in your clinic</li>
+                    <li>This protects doctors, clinics, and patients</li>
+                </ul>
+            </div>
         </div>
     </div>
     {% endif %}

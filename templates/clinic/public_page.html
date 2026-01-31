@@ -313,6 +313,10 @@
       </div>
 
       {% if clinic_doctors %}
+      <p class="rs-muted-sm" style="margin-top: -0.75rem; margin-bottom: 1rem;">
+        <i class="fas fa-shield-alt me-1" style="color: var(--brand);"></i>
+        Doctors listed here are individually verified and have approved their association with this clinic.
+      </p>
       <div class="rs-grid">
         {% for cd in clinic_doctors %}
         <article class="rs-card">
@@ -420,7 +424,7 @@
       <div class="rs-empty">
         <div class="rs-empty-icon"><i class="fas fa-user-md"></i></div>
         <h3>No Doctors Listed Yet</h3>
-        <p>This clinic is setting up their doctor profiles. Check back soon.</p>
+        <p>This clinic is listed on RankSewa. Doctors will appear once they are verified and approve their association.</p>
         <div class="rs-empty-actions">
           {% if clinic.phone or clinic.phone_number %}
           <a href="tel:{{ clinic.phone or clinic.phone_number }}" class="rs-btn rs-btn--primary">
