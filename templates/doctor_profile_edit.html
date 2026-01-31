@@ -149,7 +149,7 @@
                         <!-- Workplace/Clinic -->
                         <div class="mb-3">
                             <label for="workplace" class="form-label">
-                                <i class="fas fa-hospital me-1"></i><strong>Workplace/Hospital/Clinic</strong>
+                                <i class="fas fa-hospital me-1"></i><strong>Practice Name</strong>
                             </label>
                             <input type="text"
                                    class="form-control"
@@ -158,14 +158,14 @@
                                    value="{{ doctor.workplace or '' }}"
                                    placeholder="e.g., Clinic One, Nepal Mediciti, B&C Medical College">
                             <small class="form-text text-muted">
-                                Where do you currently practice?
+                                This appears on your doctor card in search results
                             </small>
                         </div>
 
                         <!-- Practice Address -->
                         <div class="mb-3">
                             <label for="practice_address" class="form-label">
-                                <i class="fas fa-map-marker-alt me-1"></i><strong>Practice Address</strong>
+                                <i class="fas fa-map-marker-alt me-1"></i><strong>Full Address</strong>
                             </label>
                             <textarea class="form-control"
                                       id="practice_address"
@@ -173,7 +173,7 @@
                                       rows="2"
                                       placeholder="Your clinic/hospital address">{{ doctor.practice_address or '' }}</textarea>
                             <small class="form-text text-muted">
-                                Patients will use this to find your practice
+                                For patients who need directions to your practice
                             </small>
                         </div>
 
