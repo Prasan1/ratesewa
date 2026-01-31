@@ -66,6 +66,12 @@
                             <input type="text" class="form-control" value="{{ doctor.city.name }}" readonly>
                         </div>
 
+                        <!-- NMC Number (Read-only) -->
+                        <div class="mb-3">
+                            <label class="form-label"><strong>NMC Registration Number</strong></label>
+                            <input type="text" class="form-control" value="{{ doctor.nmc_number or 'Not set' }}" readonly>
+                        </div>
+
                         <hr class="my-4 profile-edit-divider">
 
                         <!-- Editable Fields -->
@@ -232,31 +238,6 @@
                             </small>
                         </div>
 
-                        <!-- NMC Number -->
-                        <div class="mb-3">
-                            <label for="nmc_number" class="form-label">
-                                <i class="fas fa-id-card me-1"></i><strong>NMC Registration Number</strong>
-                            </label>
-                            {% if doctor.nmc_number %}
-                            <input type="text"
-                                   class="form-control"
-                                   value="{{ doctor.nmc_number }}"
-                                   readonly>
-                            <small class="form-text text-muted">
-                                <i class="fas fa-lock me-1"></i>NMC number cannot be changed after verification. Contact support if incorrect.
-                            </small>
-                            {% else %}
-                            <input type="text"
-                                   class="form-control"
-                                   id="nmc_number"
-                                   name="nmc_number"
-                                   value=""
-                                   placeholder="e.g., 8325">
-                            <small class="form-text text-muted">
-                                Nepal Medical Council registration number (can only be set once)
-                            </small>
-                            {% endif %}
-                        </div>
 
                         <!-- Accepted Insurance -->
                         <div class="mb-3">

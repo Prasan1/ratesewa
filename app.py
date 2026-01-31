@@ -6832,17 +6832,7 @@ def doctor_profile_edit():
             except ValueError:
                 doctor.experience = 0
 
-            # NMC number (can only be set once)
-            if not doctor.nmc_number:
-                nmc_input = request.form.get('nmc_number', '').strip()
-                if nmc_input:
-                    # Check if NMC number already exists for another doctor
-                    existing = Doctor.query.filter_by(nmc_number=nmc_input).first()
-                    if existing and existing.id != doctor.id:
-                        flash('This NMC number is already registered to another doctor.', 'danger')
-                    else:
-                        doctor.nmc_number = nmc_input
-                        flash('NMC number added successfully!', 'success')
+            # NMC number is read-only (set during verification)
 
             # Accepted insurance
             doctor.accepted_insurance = request.form.get('accepted_insurance', '').strip()
