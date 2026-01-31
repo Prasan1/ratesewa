@@ -3440,16 +3440,20 @@ _dropdown_cache = {
 DROPDOWN_CACHE_TTL = 600  # 10 minutes
 
 def get_cached_dropdowns():
-    """Get cached locations and specialties for dropdowns"""
+    """Get cached locations and specialties for dropdowns
+
+    Returns plain dicts instead of ORM objects to avoid DetachedInstanceError
+    when cached objects are accessed across different requests/sessions.
+    """
     import time
     now = time.time()
 
     if _dropdown_cache['locations'] and _dropdown_cache['expires_at'] and now < _dropdown_cache['expires_at']:
         return _dropdown_cache['locations'], _dropdown_cache['specialties']
 
-    # Fetch fresh data
-    locations = LocalLevel.query.order_by(LocalLevel.name).all()
-    specialties = Specialty.query.order_by(Specialty.name).all()
+    # Fetch fresh data and convert to plain dicts (avoid DetachedInstanceError)
+    locations = [{'id': loc.id, 'name': loc.name} for loc in LocalLevel.query.order_by(LocalLevel.name).all()]
+    specialties = [{'id': s.id, 'name': s.name} for s in Specialty.query.order_by(Specialty.name).all()]
 
     # Update cache
     _dropdown_cache['locations'] = locations
