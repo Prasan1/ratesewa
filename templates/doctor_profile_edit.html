@@ -23,8 +23,8 @@
 
                         <!-- Read-only fields -->
                         <div class="alert alert-info profile-edit-note">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>Note:</strong> Name, Specialty, and City cannot be changed. Contact admin support if you need to update these fields.
+                            <i class="fas fa-lock me-2"></i>
+                            <strong>Name</strong>, <strong>City</strong>, and <strong>NMC Number</strong> cannot be changed after verification. Contact support if corrections are needed.
                         </div>
 
                         <!-- Name (Read-only) -->
@@ -33,10 +33,31 @@
                             <input type="text" class="form-control" value="{{ doctor.name }}" readonly>
                         </div>
 
-                        <!-- Specialty (Read-only) -->
+                        <!-- Specialty (Editable - will show as self-declared until verified) -->
                         <div class="mb-3">
-                            <label class="form-label"><strong>Specialty</strong></label>
-                            <input type="text" class="form-control" value="{{ doctor.specialty.name }}" readonly>
+                            <label for="specialty_id" class="form-label">
+                                <strong>Specialty</strong>
+                                {% if not doctor.specialty_verified %}
+                                <span class="badge specialty-self-declared ms-2">Self-declared</span>
+                                {% else %}
+                                <span class="badge bg-success ms-2"><i class="fas fa-check-circle me-1"></i>Verified</span>
+                                {% endif %}
+                            </label>
+                            <select class="form-select" id="specialty_id" name="specialty_id">
+                                {% for specialty in specialties %}
+                                <option value="{{ specialty.id }}" {% if specialty.id == doctor.specialty_id %}selected{% endif %}>
+                                    {{ specialty.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% if not doctor.specialty_verified %}
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>Your specialty will show as "Self-declared" on your profile until verified by admin.
+                                {% if not doctor.is_verified %}
+                                <a href="{{ url_for('doctor_request_verification') }}">Request verification</a> to have your credentials confirmed.
+                                {% endif %}
+                            </small>
+                            {% endif %}
                         </div>
 
                         <!-- City (Read-only) -->

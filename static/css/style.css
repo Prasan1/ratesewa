@@ -4016,3 +4016,24 @@ html {
         margin-top: 24px;
     }
 }
+
+/* =============================================================
+   SPECIALTY SELF-DECLARED BADGE
+   Shows when doctors self-declare their specialty before verification
+   ============================================================= */
+.specialty-self-declared {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+.specialty-self-declared-inline {
+    color: #b45309;
+    font-size: 0.75em;
+    font-weight: 500;
+    font-style: italic;
+}

@@ -754,7 +754,12 @@ function displayDoctors(response, shouldScroll = true) {
 
         const cityName = (doctor.city_name || '').replace(/\s+/g, ' ').trim();
         const cityLabel = cityName || 'Not specified';
-        const specialtyName = doctor.specialty_name || 'General Practice';
+        const specialtyNameBase = doctor.specialty_name || 'General Practice';
+        // Show "Self-declared" for claimed profiles where specialty is not verified
+        const showSelfDeclared = doctor.is_claimed && !doctor.specialty_verified && !doctor.is_verified;
+        const specialtyName = showSelfDeclared
+            ? `${specialtyNameBase} <span class="specialty-self-declared-inline">(Self-declared)</span>`
+            : specialtyNameBase;
         const experienceLabel = doctor.experience && doctor.experience > 0 ? `${doctor.experience} Years` : 'N/A';
         const practiceLabel = formatPracticeLocations(doctor.clinic_name || doctor.workplace || 'Not specified');
 

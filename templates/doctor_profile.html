@@ -980,7 +980,7 @@ function handleBackClick(e) {
           <div class="hero-identity">
             <h1 class="hero-title">{{ doctor.name|doctor_title }}</h1>
             <div class="hero-tagline">
-              {{ doctor.specialty.name }} in {{ doctor.city.name }}
+              {{ doctor.specialty.name }}{% if doctor.user_account and not doctor.specialty_verified and not doctor.is_verified %} <span class="specialty-self-declared-inline">(Self-declared)</span>{% endif %} in {{ doctor.city.name }}
               {% if doctor.experience is defined %}
                 • {{ doctor.experience }} yrs
               {% endif %}
@@ -1271,7 +1271,7 @@ function handleBackClick(e) {
         <div class="facts-grid">
           <div class="fact-item">
             <div class="fact-label"><i class="fas fa-stethoscope text-brand"></i>Specialty</div>
-            <div class="fact-value">{{ doctor.specialty.name }}</div>
+            <div class="fact-value">{{ doctor.specialty.name }}{% if doctor.user_account and not doctor.specialty_verified and not doctor.is_verified %} <span class="specialty-self-declared-inline">(Self-declared)</span>{% endif %}</div>
           </div>
           <div class="fact-item">
             <div class="fact-label"><i class="fas fa-briefcase-medical text-brand"></i>Experience</div>

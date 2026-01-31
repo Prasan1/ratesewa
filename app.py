@@ -3729,6 +3729,7 @@ def get_doctors():
             'photo_url': photo_url,
             'is_featured': d.is_featured,
             'is_verified': d.is_verified,
+            'specialty_verified': d.specialty_verified if hasattr(d, 'specialty_verified') else True,
             'is_claimed': d.user_account is not None,
             'avg_rating': float(avg_rating_value or 0),
             'rating_count': rating_count_int,
@@ -4092,6 +4093,9 @@ def admin_doctor_edit(doctor_id):
         doctor.is_featured = is_featured
         doctor.is_active = is_active
         doctor.is_verified = is_verified
+        # When admin verifies a doctor, also verify their specialty
+        if is_verified:
+            doctor.specialty_verified = True
 
         try:
             # Handle profile photo removal
@@ -5977,6 +5981,7 @@ def admin_verification_detail(request_id):
                         phone_number=verification_request.phone_number,
                         practice_address=verification_request.practice_address,
                         is_verified=True,  # Immediately verified upon approval
+                        specialty_verified=True,  # Specialty confirmed by admin
                         is_active=True,
                         is_featured=qualifies_for_lifetime,
                         subscription_tier='featured' if qualifies_for_lifetime else 'verified',
@@ -6015,6 +6020,7 @@ def admin_verification_detail(request_id):
                     # Mark doctor as verified
                     doctor = verification_request.doctor
                     doctor.is_verified = True
+                    doctor.specialty_verified = True  # Specialty confirmed by admin
                     promo_end = promo_config.CURRENT_PROMOTION.get('end_date')
                     qualifies_for_lifetime = bool(
                         promo_end
@@ -6784,9 +6790,33 @@ def doctor_profile_edit():
     """Edit doctor profile information"""
     user = User.query.get(session['user_id'])
     doctor = user.doctor_profile
+    specialties = Specialty.query.order_by(Specialty.name.asc()).all()
 
     if request.method == 'POST':
         try:
+            # Handle specialty change (allowed for claimed doctors)
+            new_specialty_id = request.form.get('specialty_id')
+            if new_specialty_id:
+                new_specialty_id = int(new_specialty_id)
+                if new_specialty_id != doctor.specialty_id:
+                    old_specialty = doctor.specialty.name if doctor.specialty else 'None'
+                    new_specialty = Specialty.query.get(new_specialty_id)
+                    if new_specialty:
+                        doctor.specialty_id = new_specialty_id
+                        doctor.specialty_verified = False  # Reset verification on change
+                        # Log specialty change for audit
+                        log_security_event(
+                            'doctor_specialty_change',
+                            user_id=session.get('user_id'),
+                            meta=json.dumps({
+                                'doctor_id': doctor.id,
+                                'doctor_name': doctor.name,
+                                'old_specialty': old_specialty,
+                                'new_specialty': new_specialty.name,
+                                'action': 'self_declared'
+                            })
+                        )
+
             # Allow editing only certain fields
             doctor.description = request.form.get('description', '').strip()
             doctor.education = request.form.get('education', '').strip()
@@ -6869,7 +6899,7 @@ def doctor_profile_edit():
             db.session.rollback()
             flash(f'Error updating profile: {str(e)}', 'danger')
 
-    return render_template('doctor_profile_edit.html', doctor=doctor, user=user)
+    return render_template('doctor_profile_edit.html', doctor=doctor, user=user, specialties=specialties)
 
 
 @app.route('/doctor/working-hours/update', methods=['POST'])

@@ -178,6 +178,7 @@ class Doctor(db.Model):
     is_featured = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
     is_verified = db.Column(db.Boolean, default=False)
+    specialty_verified = db.Column(db.Boolean, default=False)  # True if specialty confirmed by admin
     ranksewa_network_enabled = db.Column(db.Boolean, default=False)  # Allow patients to add to their network
 
     # Verification and contact info
