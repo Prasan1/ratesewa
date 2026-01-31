@@ -757,9 +757,7 @@ function displayDoctors(response, shouldScroll = true) {
         const specialtyNameBase = doctor.specialty_name || 'General Practice';
         // Show "Self-declared" for claimed profiles where specialty is not verified
         const showSelfDeclared = doctor.is_claimed && !doctor.specialty_verified && !doctor.is_verified;
-        const specialtyName = showSelfDeclared
-            ? `${specialtyNameBase} <span class="specialty-self-declared-inline">(Self-declared)</span>`
-            : specialtyNameBase;
+        const specialtyName = specialtyNameBase;
         const experienceLabel = doctor.experience && doctor.experience > 0 ? `${doctor.experience} Years` : 'N/A';
         const practiceLabel = formatPracticeLocations(doctor.clinic_name || doctor.workplace || 'Not specified');
 
@@ -784,11 +782,15 @@ function displayDoctors(response, shouldScroll = true) {
         const verifiedBadgeHtmlSimple = doctor.is_verified
             ? '<span class="badge bg-success" style="font-size: 0.65rem; padding: 3px 8px;">✓ Verified</span>'
             : '';
+        const selfDeclaredBadgeHtml = showSelfDeclared
+            ? '<span class="badge specialty-self-declared">Self-declared</span>'
+            : '';
 
         // Claim link for unclaimed profiles - with view count for social proof
         const showClaimPrompt = !doctor.is_claimed && !doctor.is_verified && currentUserRole !== 'doctor' && !isAdmin;
         const viewCount = doctor.profile_views || 0;
-        const viewsText = viewCount >= 10 ? `<div class="claim-views"><i class="fas fa-eye"></i> ${viewCount} views</div>` : '';
+        const hasViews = viewCount >= 10;
+        const viewsText = hasViews ? `<div class="claim-views"><i class="fas fa-eye"></i> ${viewCount} views</div>` : '';
         const unclaimedPillHtml = showClaimPrompt
             ? '<span class="badge bg-light text-dark border ms-2" style="font-size: 0.62rem; padding: 2px 6px;">Unclaimed</span>'
             : '';
@@ -800,7 +802,7 @@ function displayDoctors(response, shouldScroll = true) {
         // Claimed/verified: shows view count if >= 10, otherwise empty spacer
         const claimLinkHtml = showClaimPrompt
             ? `<div class="card-footer-extra">${viewsText}<a href="/claim-profile/${doctor.id}" class="claim-link claim-link-pill"><i class="fas fa-bolt"></i>Claim this profile</a></div>`
-            : `<div class="card-footer-extra">${viewsText}</div>`;
+            : (viewsText ? `<div class="card-footer-extra">${viewsText}</div>` : '');
         const claimButton = '';
 
         // Description text (sanitized and truncated)
@@ -842,6 +844,7 @@ function displayDoctors(response, shouldScroll = true) {
                             </div>
                             <div class="doctor-badges">
                                 ${verifiedBadgeHtmlSimple}
+                                ${selfDeclaredBadgeHtml}
                             </div>
                         </div>
 
