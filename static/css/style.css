@@ -808,6 +808,19 @@ a:hover {
     font-size: 0.6rem;
 }
 
+/* Consistent footer extra section for all cards */
+.card-footer-extra {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+    min-height: 60px; /* Ensures consistent height across cards */
+}
+
 /* Limit description text to 3 lines to keep cards uniform */
 .doctor-card .doctor-details > p.text-muted:last-of-type {
     display: -webkit-box;

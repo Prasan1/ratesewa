@@ -790,9 +790,12 @@ function displayDoctors(response, shouldScroll = true) {
         const claimHintHtml = showClaimPrompt
             ? '<div class="text-muted small">Claim free to update info + respond to reviews.</div>'
             : '';
+        // Always render footer-extra div for consistent card heights
+        // Unclaimed: shows views + claim link
+        // Claimed/verified: shows view count if >= 10, otherwise empty spacer
         const claimLinkHtml = showClaimPrompt
-            ? `<div class="claim-prompt">${viewsText}<a href="/claim-profile/${doctor.id}" class="claim-link claim-link-pill"><i class="fas fa-bolt"></i>Is this you? Claim your profile</a></div>`
-            : '';
+            ? `<div class="card-footer-extra">${viewsText}<a href="/claim-profile/${doctor.id}" class="claim-link claim-link-pill"><i class="fas fa-bolt"></i>Is this you? Claim your profile</a></div>`
+            : `<div class="card-footer-extra">${viewsText}</div>`;
         const claimButton = '';
 
         // Description text (sanitized and truncated)
