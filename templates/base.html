@@ -79,6 +79,11 @@
     </script>
     {% endif %}
 
+    <!-- Critical CSS to prevent FOUC in Firefox -->
+    <style>
+        body { background: #f8f8f5; font-family: 'Source Sans 3', -apple-system, sans-serif; }
+        .navbar { background: #fff; }
+    </style>
     <!-- Local Bootstrap CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
     <!-- Google Fonts (keeping CDN for fonts as they're frequently updated) -->
