@@ -157,7 +157,7 @@
                             </div>
                             <h5 class="fw-bold mb-2">Ready to Claim</h5>
                             <p class="text-muted small mb-0">
-                                You're signed in as <strong>{{ current_user.email }}</strong>
+                                Signed in as <strong>{{ current_user.email }}</strong>
                             </p>
                         </div>
 
@@ -168,16 +168,30 @@
                             </button>
                         </form>
 
-                        <small class="text-muted">
-                            You'll get instant access to edit your profile
-                        </small>
+                        <p class="text-muted small mb-2">
+                            You'll get instant access to edit your photo, bio, and practice info.
+                        </p>
+                        <p class="text-muted small mb-0" style="font-size: 0.75rem;">
+                            <i class="fas fa-info-circle me-1"></i>Verification is optional and can be done later.
+                        </p>
                     </div>
 
                     {% else %}
                     <!-- Not Logged In - Google Primary -->
                     <div class="text-center mb-4">
                         <h5 class="fw-bold mb-2">Claim Your Profile</h5>
-                        <p class="text-muted small mb-0">One click to take control of your presence</p>
+                        <p class="text-muted small mb-0">Take control of your online presence</p>
+                    </div>
+
+                    <!-- Security explanation -->
+                    <div class="alert mb-4" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="fas fa-shield-alt text-success mt-1"></i>
+                            <div class="small">
+                                <strong class="text-success">Why sign in?</strong>
+                                <p class="mb-0 text-muted">To protect your profile from unauthorized access. Only you should control your information.</p>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Google OAuth Button -->
@@ -193,9 +207,8 @@
 
                     <!-- Trust signals -->
                     <div class="d-flex justify-content-center gap-3 text-muted small mb-3">
-                        <span><i class="fas fa-lock me-1"></i>Secure</span>
-                        <span><i class="fas fa-bolt me-1"></i>Instant</span>
-                        <span><i class="fas fa-ban me-1"></i>No spam</span>
+                        <span><i class="fas fa-bolt me-1"></i>Instant access</span>
+                        <span><i class="fas fa-edit me-1"></i>Edit immediately</span>
                     </div>
 
                     <!-- Divider -->
@@ -269,23 +282,24 @@
 
             <!-- What You Get -->
             <div class="mt-4">
+                <p class="text-center text-muted small mb-3">After claiming, you can:</p>
                 <div class="row g-3 text-center">
                     <div class="col-4">
                         <div class="p-3">
-                            <i class="fas fa-edit text-primary mb-2 fa-lg"></i>
-                            <div class="small text-muted">Edit profile</div>
+                            <i class="fas fa-camera text-primary mb-2 fa-lg"></i>
+                            <div class="small text-muted">Add your photo</div>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="p-3">
-                            <i class="fas fa-comment text-success mb-2 fa-lg"></i>
-                            <div class="small text-muted">Reply to reviews</div>
+                            <i class="fas fa-user-edit text-success mb-2 fa-lg"></i>
+                            <div class="small text-muted">Update bio & info</div>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="p-3">
-                            <i class="fas fa-chart-line text-warning mb-2 fa-lg"></i>
-                            <div class="small text-muted">View analytics</div>
+                            <i class="fas fa-hospital text-warning mb-2 fa-lg"></i>
+                            <div class="small text-muted">Add workplace</div>
                         </div>
                     </div>
                 </div>
