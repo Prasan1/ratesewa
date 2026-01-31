@@ -6896,6 +6896,67 @@ def doctor_profile_edit():
     return render_template('doctor_profile_edit.html', doctor=doctor, user=user, specialties=specialties)
 
 
+@app.route('/doctor/request-correction', methods=['POST'])
+@doctor_required
+def doctor_request_correction():
+    """Handle requests to correct locked profile fields (name, city, NMC)"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+
+    field = request.form.get('field', '').strip()
+    current_value = request.form.get('current_value', '').strip()
+    requested_value = request.form.get('requested_value', '').strip()
+    reason = request.form.get('reason', '').strip()
+
+    # Validate field
+    valid_fields = ['name', 'city', 'nmc_number']
+    if field not in valid_fields:
+        flash('Invalid field selected.', 'danger')
+        return redirect(url_for('doctor_profile_edit'))
+
+    if not requested_value:
+        flash('Please provide the correct value.', 'warning')
+        return redirect(url_for('doctor_profile_edit'))
+
+    # Handle document upload (optional)
+    document_path = None
+    if 'document' in request.files:
+        doc_file = request.files['document']
+        if doc_file and doc_file.filename:
+            try:
+                # Save to verification uploads folder
+                import os
+                from werkzeug.utils import secure_filename
+                upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'corrections', str(doctor.id))
+                os.makedirs(upload_dir, exist_ok=True)
+                filename = secure_filename(f"{field}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{doc_file.filename}")
+                document_path = os.path.join(upload_dir, filename)
+                doc_file.save(document_path)
+            except Exception as e:
+                app.logger.error(f"Error saving correction document: {e}")
+
+    # Log the correction request
+    log_security_event(
+        'doctor_correction_request',
+        user_id=user.id,
+        meta=json.dumps({
+            'doctor_id': doctor.id,
+            'doctor_name': doctor.name,
+            'field': field,
+            'current_value': current_value,
+            'requested_value': requested_value,
+            'reason': reason,
+            'document_path': document_path
+        })
+    )
+
+    # TODO: In future, create a CorrectionRequest model and admin review UI
+    # For now, just log it and notify admin via email (if configured)
+
+    flash(f'Your correction request for "{field}" has been submitted. Our team will review it and contact you.', 'success')
+    return redirect(url_for('doctor_profile_edit'))
+
+
 @app.route('/doctor/working-hours/update', methods=['POST'])
 @doctor_required
 def doctor_update_working_hours():

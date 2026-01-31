@@ -4045,3 +4045,22 @@ html {
     font-weight: 500;
     font-style: italic;
 }
+
+/* =============================================================
+   LOCKED FIELDS SECTION (Doctor Profile Edit)
+   ============================================================= */
+.locked-fields-section {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+}
+
+.locked-fields-section .form-control.bg-light {
+    background-color: #e9ecef !important;
+    cursor: not-allowed;
+}
+
+.locked-fields-section .form-text {
+    font-size: 0.75rem;
+}
