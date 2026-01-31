@@ -568,55 +568,45 @@
                 </div>
             </div>
             {% else %}
-            <!-- Not Verified - Celebrate & Invite -->
-            <div style="background: linear-gradient(135deg, #0d8abc 0%, #0ea5e9 100%); padding: 24px;">
-                <div class="d-flex align-items-start gap-3 mb-3">
-                    <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <i class="fas fa-star fa-lg text-white"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h5 class="text-white mb-1">You've earned your credentials. Let patients find you.</h5>
-                        <p class="text-white mb-2" style="opacity: 0.95; font-size: 0.95rem;">
-                            Years of hard work brought you here. Thousands of patients search for trusted doctors in Nepal every day — verification helps the right patients find you.
+            <!-- Not Verified - Clean CTA -->
+            <div style="background: linear-gradient(135deg, #048288 0%, #065f63 100%); padding: 28px 32px; position: relative; overflow: hidden;">
+                <!-- Subtle decorative element -->
+                <div style="position: absolute; top: -20px; right: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
+                <div style="position: absolute; bottom: -40px; right: 60px; width: 80px; height: 80px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
+
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fas fa-shield-alt text-white" style="opacity: 0.9;"></i>
+                            <span class="text-white text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px; opacity: 0.8;">Verification</span>
+                        </div>
+                        <h4 class="text-white mb-2" style="font-weight: 600;">Get verified and let patients find you</h4>
+                        <p class="text-white mb-3" style="opacity: 0.9; font-size: 0.9rem; max-width: 540px;">
+                            Join verified doctors on RankSewa. Unlock your full dashboard, respond to reviews, and build trust with patients.
                         </p>
-                        <p class="text-white mb-0" style="opacity: 0.8; font-size: 0.85rem; font-style: italic;">
-                            RankSewa celebrates doctors who serve with dedication. Verification is our way of recognizing yours.
-                        </p>
-                    </div>
-                </div>
-                <div class="row g-2 mb-3">
-                    <div class="col-6 col-md-3">
-                        <div class="d-flex align-items-center gap-2 text-white" style="font-size: 0.85rem;">
-                            <i class="fas fa-check-circle" style="opacity: 0.9;"></i>
-                            <span>Verified badge</span>
+                        <div class="d-flex flex-wrap gap-3 mb-3">
+                            <span class="d-flex align-items-center gap-1 text-white" style="font-size: 0.8rem;">
+                                <i class="fas fa-check" style="color: #a7f3d0;"></i> Verified badge
+                            </span>
+                            <span class="d-flex align-items-center gap-1 text-white" style="font-size: 0.8rem;">
+                                <i class="fas fa-check" style="color: #a7f3d0;"></i> Respond to reviews
+                            </span>
+                            <span class="d-flex align-items-center gap-1 text-white" style="font-size: 0.8rem;">
+                                <i class="fas fa-check" style="color: #a7f3d0;"></i> Analytics
+                            </span>
+                            <span class="d-flex align-items-center gap-1 text-white" style="font-size: 0.8rem;">
+                                <i class="fas fa-check" style="color: #a7f3d0;"></i> QR code
+                            </span>
+                        </div>
+                        <div class="text-white" style="font-size: 0.75rem; opacity: 0.7;">
+                            <i class="fas fa-clock me-1"></i>Free forever · Usually verified in 1-2 days
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
-                        <div class="d-flex align-items-center gap-2 text-white" style="font-size: 0.85rem;">
-                            <i class="fas fa-check-circle" style="opacity: 0.9;"></i>
-                            <span>Online booking</span>
-                        </div>
+                    <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                        <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-light btn-lg px-4" style="font-weight: 600; border-radius: 8px;">
+                            <i class="fas fa-certificate me-2"></i>Get Verified
+                        </a>
                     </div>
-                    <div class="col-6 col-md-3">
-                        <div class="d-flex align-items-center gap-2 text-white" style="font-size: 0.85rem;">
-                            <i class="fas fa-check-circle" style="opacity: 0.9;"></i>
-                            <span>Respond to reviews</span>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="d-flex align-items-center gap-2 text-white" style="font-size: 0.85rem;">
-                            <i class="fas fa-check-circle" style="opacity: 0.9;"></i>
-                            <span>Analytics & QR code</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                    <span class="text-white" style="font-size: 0.8rem; opacity: 0.8;">
-                        <i class="fas fa-bolt me-1"></i>Free forever · Review in 2-3 business days
-                    </span>
-                    <a href="{{ url_for('claim_profile_form', doctor_id=doctor.id) }}" class="btn btn-light px-4">
-                        <i class="fas fa-certificate me-1"></i>Get Verified
-                    </a>
                 </div>
             </div>
             {% endif %}
