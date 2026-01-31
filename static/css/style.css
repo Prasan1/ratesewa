@@ -509,6 +509,11 @@ a:hover {
 }
 
 .doctor-card .doctor-details {
+    flex-grow: 0;
+}
+
+/* Make info-lines grow to fill available space, keeping text at top */
+.doctor-card .doctor-info-lines {
     flex-grow: 1;
 }
 
