@@ -653,6 +653,7 @@ def admin_required(f):
 LIMITED_DOCTOR_ALLOWED_ENDPOINTS = {
     'doctor_dashboard',
     'doctor_profile_edit',
+    'doctor_request_correction',
 }
 
 
