@@ -6789,6 +6789,15 @@ def generate_printable_qr():
     return response
 
 
+@app.route('/doctor/visibility-guide')
+@doctor_required
+def doctor_visibility_guide():
+    """Guide for doctors on how to increase visibility and handle reviews"""
+    user = User.query.get(session['user_id'])
+    doctor = user.doctor_profile
+    return render_template('doctor_visibility_guide.html', doctor=doctor)
+
+
 @app.route('/doctor/profile/edit', methods=['GET', 'POST'])
 @doctor_required
 def doctor_profile_edit():
