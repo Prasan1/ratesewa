@@ -6792,9 +6792,15 @@ def generate_printable_qr():
 @app.route('/doctor/visibility-guide')
 @doctor_required
 def doctor_visibility_guide():
-    """Guide for doctors on how to increase visibility and handle reviews"""
+    """Guide for doctors on how to increase visibility and handle reviews - verified doctors only"""
     user = User.query.get(session['user_id'])
     doctor = user.doctor_profile
+
+    # Only verified doctors can access this guide
+    if not doctor.is_verified:
+        flash('This guide is available for verified doctors only. Get verified to access practice growth tips.', 'info')
+        return redirect(url_for('doctor_dashboard'))
+
     return render_template('doctor_visibility_guide.html', doctor=doctor)
 
 

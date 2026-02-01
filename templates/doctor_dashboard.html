@@ -1027,6 +1027,7 @@
                         {% endif %}
                     </div>
 
+                    {% if doctor.is_verified %}
                     <div class="col-md-6 mb-3">
                         <a href="{{ url_for('doctor_visibility_guide') }}" class="text-decoration-none">
                             <div class="action-card action-card--secondary card h-100">
@@ -1040,6 +1041,7 @@
                             </div>
                         </a>
                     </div>
+                    {% endif %}
 
                     <div class="col-md-6 mb-3">
                         {% if doctor.is_verified %}
