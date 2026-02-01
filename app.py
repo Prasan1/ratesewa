@@ -670,7 +670,8 @@ def doctor_required(f):
             flash('Your account has been deactivated. Please contact support.', 'danger')
             return redirect(url_for('login'))
         # Security: Require email verification before any doctor actions
-        if not user.email_verified:
+        # Admins can bypass this check (they manage the system)
+        if not user.email_verified and not session.get('is_admin'):
             flash('Please verify your email before accessing doctor features. Check your inbox for the verification link.', 'warning')
             return redirect(url_for('index'))
         if user.role != 'doctor':
@@ -3209,10 +3210,6 @@ def create_checkout_session(tier):
             # Auto-grant tier during promotion
             doctor.subscription_tier = tier
 
-            # Set featured status if featured tier
-            if tier == 'featured':
-                doctor.is_featured = True
-
             # Set promo end date as subscription expiry
             doctor.subscription_expires_at = promo_config.CURRENT_PROMOTION['end_date']
 
@@ -3360,10 +3357,6 @@ def stripe_webhook():
         if doctor:
             doctor.subscription_tier = tier
             doctor.stripe_customer_id = customer_id
-
-            # Set is_featured based on tier
-            if tier == 'featured':
-                doctor.is_featured = True
 
             db.session.commit()
             print(f"✅ Subscription activated: Doctor {doctor.id} -> {tier}")
@@ -6032,11 +6025,7 @@ def admin_verification_detail(request_id):
                         and verification_request.created_at
                         and verification_request.created_at <= promo_end
                     )
-                    if qualifies_for_lifetime:
-                        doctor.subscription_tier = 'featured'
-                        doctor.is_featured = True
-                        doctor.subscription_expires_at = None
-                    elif doctor.subscription_tier in {None, 'free', ''}:
+                    if doctor.subscription_tier in {None, 'free', ''}:
                         doctor.subscription_tier = 'verified'
                     doctor.nmc_number = verification_request.nmc_number
                     doctor.nmc_expiry_date = nmc_expiry_date  # Can be None for permanent licenses
